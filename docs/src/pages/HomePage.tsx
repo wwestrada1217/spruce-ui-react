@@ -1,5 +1,6 @@
 import { Icon, Button } from 'spruce-react';
 import { SPRUCE_VERSION } from '../version';
+import { REPO_URL, ISSUES_URL, LICENSE_URL, LICENSE_NAME } from '../repo';
 
 interface NavCard {
   icon: string;
@@ -63,7 +64,7 @@ const COMPONENT_SECTIONS: NavSection[] = [
       { icon: 'search',             label: 'Combobox',          route: '#/components/combobox',          description: 'Autocomplete combobox with filtering' },
       { icon: 'layout-grid',        label: 'Grid Combobox',     route: '#/components/grid-combobox',     description: 'Multi-column dropdown with grid layout' },
       { icon: 'menu',               label: 'Dropdown Menu',     route: '#/components/dropdown',          description: 'Action menus with icons and nested items' },
-      { icon: 'file-text',          label: 'Textarea',          route: '#/components/textarea',          description: 'Multi-line text input with auto-grow' },
+      { icon: 'align-left',         label: 'Textarea',          route: '#/components/textarea',          description: 'Multi-line text input with auto-grow' },
       { icon: 'lock',               label: 'Password Input',    route: '#/components/password-input',    description: 'Password field with show/hide toggle' },
       { icon: 'shield',             label: 'Password Progress', route: '#/components/password-progress', description: 'Password strength meter' },
       { icon: 'hash',               label: 'OTP Input',         route: '#/components/otp-input',         description: 'One-time password input fields' },
@@ -83,13 +84,13 @@ const COMPONENT_SECTIONS: NavSection[] = [
       { icon: 'zap',               label: 'Button',            route: '#/components/button',          description: 'Primary actions with variants, sizes, and icons' },
       { icon: 'columns',           label: 'Button Group',      route: '#/components/button-group',    description: 'Grouped action buttons' },
       { icon: 'columns',           label: 'Split Button',      route: '#/components/split-button',    description: 'Button with dropdown actions' },
-      { icon: 'folder-open',       label: 'Tabs',              route: '#/components/tabs',            description: 'Tabbed content with lazy rendering' },
+      { icon: 'folder-dt',       label: 'Tabs',              route: '#/components/tabs',            description: 'Tabbed content with lazy rendering' },
       { icon: 'chevrons-right',    label: 'Breadcrumbs',       route: '#/components/breadcrumbs',     description: 'Navigation trail with separators' },
       { icon: 'list',              label: 'Stepper',           route: '#/components/stepper',         description: 'Multi-step process indicator' },
       { icon: 'toggle-left',       label: 'Segmented Control', route: '#/components/segmented',       description: 'Inline option switcher' },
-      { icon: 'gamepad-2',         label: 'FAB',               route: '#/components/fab',             description: 'Floating action button with speed-dial' },
+      { icon: 'plus',         label: 'FAB',               route: '#/components/fab',             description: 'Floating action button with speed-dial' },
       { icon: 'menu',              label: 'Navigation Menu',   route: '#/components/nav-menu',        description: 'Horizontal nav bar with dropdown panels' },
-      { icon: 'layout',            label: 'Toolbar',           route: '#/components/toolbar',         description: 'Configurable action toolbar' },
+      { icon: 'panel-top-dashed',  label: 'Toolbar',           route: '#/components/toolbar',         description: 'Configurable action toolbar' },
       { icon: 'chevrons-right',    label: 'Pager',             route: '#/components/pager',           description: 'Pagination with page size selector' },
     ],
   },
@@ -97,7 +98,7 @@ const COMPONENT_SECTIONS: NavSection[] = [
     label: 'Layout & Overlays',
     items: [
       { icon: 'square',            label: 'Card',              route: '#/components/card',             description: 'Container with header, media, and footer' },
-      { icon: 'layout',            label: 'Panel',             route: '#/components/panel',            description: 'Flexible panel with header/body/footer' },
+      { icon: 'layout-panel-left', label: 'Panel',             route: '#/components/panel',            description: 'Flexible panel with header/body/footer' },
       { icon: 'layout-grid',       label: 'Grid',              route: '#/components/grid',             description: 'Responsive 12-column grid system' },
       { icon: 'grip-vertical',     label: 'Splitter',          route: '#/components/splitter',         description: 'Resizable split panes' },
       { icon: 'sidebar-left',      label: 'Sidebar',           route: '#/components/sidebar',          description: 'Collapsible navigation sidebar' },
@@ -138,7 +139,7 @@ const EFFECTS: NavCard[] = [
 const UTILITIES: NavCard[] = [
   { icon: 'panel-right',    label: 'Scrollbar',        route: '#/utils/scrollbar',        description: 'Custom scrollbar styling' },
   { icon: 'more-vertical',  label: 'Overflow',         route: '#/utils/overflow',         description: 'Overflow menu for truncated items' },
-  { icon: 'crosshair',      label: 'Focus Directives', route: '#/utils/focus-directives', description: 'Focus trap and focus ring helpers' },
+  { icon: 'focus',      label: 'Focus Directives', route: '#/utils/focus-directives', description: 'Focus trap and focus ring helpers' },
   { icon: 'highlighter',    label: 'Highlight',        route: '#/utils/highlight',        description: 'Text search highlight' },
 ];
 
@@ -193,6 +194,15 @@ export function HomePage() {
           <span className="home__hero-pill">React 19+</span>
           <span className="home__hero-pill home__hero-pill--accent">WCAG AA</span>
           <span className="home__hero-pill">Zero deps</span>
+          <a
+            className="home__hero-pill home__hero-pill--link"
+            href={REPO_URL}
+            target="_blank"
+            rel="noreferrer"
+            title="View the source on GitHub (opens in a new tab)"
+          >
+            GitHub <Icon name="external-link" size={11} aria-hidden="true" />
+          </a>
         </div>
 
         <div className="home__hero-stats" role="list" aria-label="Library statistics">
@@ -410,7 +420,15 @@ export function HomePage() {
       {/* Footer */}
       <footer className="home__footer">
         <p>
-          Built with React &middot; Zero external dependencies &middot; Fully accessible &middot; MIT License
+          Built with React &middot; Zero external dependencies &middot; Fully accessible &middot;{' '}
+          <a href={LICENSE_URL} target="_blank" rel="noreferrer">{LICENSE_NAME} License</a>
+        </p>
+        <p className="home__footer-links">
+          <a href={REPO_URL} target="_blank" rel="noreferrer">GitHub</a>
+          <span aria-hidden="true">&middot;</span>
+          <a href={ISSUES_URL} target="_blank" rel="noreferrer">Report an issue</a>
+          <span aria-hidden="true">&middot;</span>
+          <a href="#/development">Development guide</a>
         </p>
       </footer>
     </div>

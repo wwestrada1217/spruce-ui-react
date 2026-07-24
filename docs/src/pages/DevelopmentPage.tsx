@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Alert, Badge, Button, Card, CardHeader } from 'spruce-react';
 import { CodePreview } from '../components/CodePreview';
+import { REPO_URL, NEW_ISSUE_URL, LICENSE_URL } from '../repo';
 
 /* ── Snippets ───────────────────────────────────────────────────────────── */
 
@@ -82,9 +83,6 @@ npm run build
 npm run docs:build
 npm run lint`;
 
-const REPO_URL = 'https://github.com/wwestrada1217/spruce-ui-react';
-const ISSUES_URL = `${REPO_URL}/issues`;
-
 /* ── Data ───────────────────────────────────────────────────────────────── */
 
 const SCRIPTS: { command: string; description: string }[] = [
@@ -111,6 +109,7 @@ const SECTIONS: Section[] = [
   { id: 'developing',   label: 'Developing' },
   { id: 'contributing', label: 'Contributing' },
   { id: 'issues',       label: 'Reporting An Issue' },
+  { id: 'license',      label: 'License' },
 ];
 
 /* ── Page ───────────────────────────────────────────────────────────────── */
@@ -306,10 +305,11 @@ export function DevelopmentPage() {
           <h2 id="issues-heading">Reporting An Issue</h2>
           <p className="section-desc">
             Found a bug or unexpected behavior? Open an issue on the{' '}
-            <a href={ISSUES_URL} target="_blank" rel="noreferrer">
+            <a href={NEW_ISSUE_URL} target="_blank" rel="noreferrer">
               GitHub issue tracker
-            </a>
-            . A good report makes the fix fast — please include:
+            </a>{' '}
+            — the bug report template walks you through everything below. A
+            good report makes the fix fast — please include:
           </p>
           <ul className="demo-list">
             <li>
@@ -332,6 +332,23 @@ export function DevelopmentPage() {
             Feature requests are welcome through the same tracker — describe
             the use case, not just the solution, so alternatives can be
             considered.
+          </p>
+        </section>
+
+        <section id="license" className="demo-section" aria-labelledby="license-heading">
+          <h2 id="license-heading">License</h2>
+          <p className="section-desc">
+            Spruce React is open source under the{' '}
+            <a href={LICENSE_URL} target="_blank" rel="noreferrer">
+              Apache License 2.0
+            </a>{' '}
+            — free to use, modify, and distribute in both personal and
+            commercial projects. Contributions are accepted under the same
+            license. The full text ships with the{' '}
+            <a href={REPO_URL} target="_blank" rel="noreferrer">
+              repository
+            </a>{' '}
+            and the npm package.
           </p>
         </section>
       </div>

@@ -5,6 +5,27 @@ All notable changes to `spruce-react` are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2026-07-24
+
+### Added
+
+- Community health files: Code of Conduct, security policy, GitHub issue templates (bug report and feature request forms), and a pull request template.
+- Docs: GitHub link pill in the home page hero, and a home footer with repository, issue reporting, and license links.
+- Docs: License section on the Development page; issue reporting now links to the GitHub issue template chooser.
+
+### Changed
+
+- Docs: sidebar and home page navigation icons that were missing from the icon registry now use registered icons (Textarea, Tabs, FAB, Toolbar, Panel, Carousel, Lightbox, and several upcoming components).
+- Community and security contact email is now <support@sprucestack.com>.
+
+### Removed
+
+- Docs: Playground section in the sidebar navigation.
+
+### Fixed
+
+- Docs: home page footer stated "MIT License" — the project is licensed under Apache-2.0.
+
 ## [0.1.1] - 2026-07-24
 
 ### Added
