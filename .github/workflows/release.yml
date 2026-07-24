@@ -8,14 +8,15 @@ on:
 permissions:
   contents: write # create the GitHub Release
   id-token: write # npm provenance
+  packages: write # publish to GitHub Packages
 
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           registry-url: 'https://registry.npmjs.org'
@@ -31,6 +32,19 @@ jobs:
         run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Switch npm registry to GitHub Packages
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          registry-url: 'https://npm.pkg.github.com'
+
+      - name: Publish to GitHub Packages (scoped copy)
+        run: |
+          npm pkg set name=@wwestrada1217/spruce-react
+          npm publish --ignore-scripts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create GitHub Release
         run: gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --generate-notes
