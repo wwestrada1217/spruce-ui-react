@@ -1,6 +1,6 @@
 {
   "name": "spruce-react",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Spruce React — a themeable React 19 design system with accessible components, design tokens, and an icon registry.",
   "license": "Apache-2.0",
   "author": "Wendell Wayne Estrada",
