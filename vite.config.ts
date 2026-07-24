@@ -7,6 +7,7 @@ import path from 'path';
 export default defineConfig({
   plugins: [react(), dts({ tsconfigPath: './tsconfig.app.json', entryRoot: 'src' })],
   build: {
+    copyPublicDir: false,
     lib: {
       entry: path.resolve(__dirname, 'src/index.ts'),
       name: 'SpruceReact',

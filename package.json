@@ -1,7 +1,25 @@
 {
   "name": "spruce-react",
-  "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "description": "Spruce React — a themeable React 19 design system with accessible components, design tokens, and an icon registry.",
+  "license": "Apache-2.0",
+  "author": "Wendell Wayne Estrada",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wwestrada1217/spruce-ui-react.git"
+  },
+  "homepage": "https://github.com/wwestrada1217/spruce-ui-react#readme",
+  "bugs": {
+    "url": "https://github.com/wwestrada1217/spruce-ui-react/issues"
+  },
+  "keywords": [
+    "react",
+    "design-system",
+    "component-library",
+    "ui",
+    "typescript",
+    "accessible"
+  ],
   "type": "module",
   "workspaces": [
     "docs"
@@ -26,6 +44,7 @@
   "scripts": {
     "dev": "npm run dev --workspace spruce-react-docs",
     "build": "tsc -b && vite build",
+    "prepublishOnly": "npm run build",
     "lint": "eslint .",
     "docs:build": "npm run build --workspace spruce-react-docs",
     "docs:preview": "npm run preview --workspace spruce-react-docs"

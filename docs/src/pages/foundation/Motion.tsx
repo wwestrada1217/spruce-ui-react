@@ -36,7 +36,19 @@ const PATTERNS = [
   { name: 'Slide Down', className: 'sp-slide-down-in', demoClass: 'demo-slide-down', desc: 'Slides down from above' },
   { name: 'Slide Left', className: 'sp-slide-left-in', demoClass: 'demo-slide-left', desc: 'Enters from the right' },
   { name: 'Slide Right', className: 'sp-slide-right-in', demoClass: 'demo-slide-right', desc: 'Enters from the left' },
-  { name: 'Scale In', className: 'sp-scale-in', demoClass: 'demo-scale-in', desc: 'Scales up from 0.7' },
+  { name: 'Scale In', className: 'sp-scale-in', demoClass: 'demo-scale-in', desc: 'Scales up from 0.95 with a spring' },
+]
+
+const UTILITIES = [
+  { cls: '.sp-fade-in / .sp-fade-out', desc: 'Opacity entrance / exit' },
+  { cls: '.sp-slide-up-in / .sp-slide-up-out', desc: 'Vertical slide entrance / exit' },
+  { cls: '.sp-slide-down-in / .sp-slide-down-out', desc: 'Vertical slide from above' },
+  { cls: '.sp-slide-left-in / .sp-slide-left-out', desc: 'Horizontal slide from the right' },
+  { cls: '.sp-slide-right-in / .sp-slide-right-out', desc: 'Horizontal slide from the left' },
+  { cls: '.sp-scale-in / .sp-scale-out / .sp-scale-up-in', desc: 'Scale entrances (spring) and exit' },
+  { cls: '.sp-expand / .sp-collapse', desc: 'Accordion-style max-height reveal' },
+  { cls: '.sp-spin', desc: 'Continuous rotation for spinners (0.8s linear)' },
+  { cls: '.sp-stagger-in', desc: 'List entrance; delay = var(--sp-stagger-index) × 30ms' },
 ]
 
 interface PatternDemoProps {
@@ -204,6 +216,25 @@ export function MotionPage() {
             <PatternDemo key={p.demoClass} pattern={p} index={i} />
           ))}
         </div>
+        <h3>Utility classes</h3>
+        <p className="section-desc">
+          Every keyframe ships with a utility class that applies it with the
+          default token timing. Stagger list entrances by setting{' '}
+          <code>--sp-stagger-index</code> per item.
+        </p>
+        <table className="token-table" aria-label="Motion utility classes">
+          <thead>
+            <tr><th>Class</th><th>Effect</th></tr>
+          </thead>
+          <tbody>
+            {UTILITIES.map(u => (
+              <tr key={u.cls}>
+                <td><code>{u.cls}</code></td>
+                <td>{u.desc}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </section>
 
       <section className="doc-section">
@@ -275,6 +306,20 @@ export function MotionPage() {
     scroll-behavior: auto !important;
   }
 }`}</code>
+          </pre>
+        </div>
+        <h3>Manual override</h3>
+        <p className="section-desc">
+          For an in-app &ldquo;reduce motion&rdquo; toggle, set{' '}
+          <code>data-reduce-motion=&quot;true&quot;</code> on the document
+          element — it mirrors the media query exactly, collapsing every
+          duration, distance, and scale token and disabling keyframe
+          animations globally.
+        </p>
+        <div className="code-block">
+          <pre>
+            <code>{`// In your settings UI
+document.documentElement.setAttribute('data-reduce-motion', 'true')`}</code>
           </pre>
         </div>
         <h3>Guidelines</h3>

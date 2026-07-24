@@ -2,16 +2,67 @@
    Spruce Design Tokens — Master CSS
    ============================================================================
    Import this file in your application to activate all design tokens.
+   (Bundled into `spruce-react/style.css`; also importable standalone.)
 
-   Usage:
-     import 'spruce-react/tokens/tokens.css';
+   Ported from the Angular design system's `@spruce-ui/tokens` styles —
+   keep the two in sync when the brand palette changes.
    ============================================================================ */
 
 /* ── Web Fonts ───────────────────────────────────────────────────────────────
-   Self-hosted League Spartan (variable, weight 100–900). No italics — the
-   family ships none. METRIC-PATCHED build (rebalanced vertical metrics so
-   centered UI text sits true — see spruce-ui tokens/scripts/patch-league-spartan-
-   metrics.mjs). Do NOT replace with a vanilla download. */
+   Self-hosted Geist (variable, weight 100–900). SIL Open Font License 1.1,
+   cleared for commercial use. Geometric-humanist sans built for dense UI —
+   neutral, crisp, and highly legible at small (11–14px) sizes. */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('./fonts/geist-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('./fonts/geist-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* Self-hosted Geist Mono (variable, weight 100–900). SIL Open Font License 1.1.
+   The monospace companion to Geist — same design language, for code previews,
+   token names, IDs, and numeric-heavy tabular data. */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('./fonts/geist-mono-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('./fonts/geist-mono-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* Self-hosted League Spartan (variable, weight 100–900) — kept as fallback.
+   METRIC-PATCHED build (rebalanced vertical metrics so centered UI text sits
+   true). Do NOT replace with a vanilla download — regenerate via the metric
+   patch script in the Angular repo or the bug returns. */
 @font-face {
   font-family: 'League Spartan';
   font-style: normal;
@@ -26,96 +77,113 @@
 
 /* ── Colors ──────────────────────────────────────────────────────────────── */
 :root {
-  /* Neutral surface scale (0 = lightest, 950 = darkest in light mode) */
-  --sp-surface-0: #ffffff;
-  --sp-surface-25: #fcfcfd;
-  --sp-surface-50: #f8f9fb;
-  --sp-surface-100: #f1f3f6;
-  --sp-surface-200: #e4e7ec;
-  --sp-surface-300: #cdd3dc;
-  --sp-surface-400: #9ca5b4;
-  --sp-surface-500: #6b7685;
-  --sp-surface-600: #4a5567;
-  --sp-surface-700: #374151;
-  --sp-surface-800: #1f2937;
-  --sp-surface-900: #151b2b;
-  --sp-surface-950: #0f1117;
+  /* Neutral surface scale (Spruce — cool, slate-tinted grays;
+     0 = lightest, 950 = darkest in light mode) */
+  --sp-surface-0: #f8fafc;
+  --sp-surface-25: #f4f7fb;
+  --sp-surface-50: #f1f5f9;
+  --sp-surface-100: #e9eef5;
+  --sp-surface-200: #e2e8f0;
+  --sp-surface-300: #cbd5e1;
+  --sp-surface-400: #94a3b8;
+  --sp-surface-500: #64748b;
+  --sp-surface-600: #475569;
+  --sp-surface-700: #334155;
+  --sp-surface-800: #1e293b;
+  --sp-surface-900: #0f172a;
+  --sp-surface-950: #020617;
 
-  /* Primary brand */
-  --sp-primary: #2563eb;
-  --sp-primary-hover: #1d4ed8;
-  --sp-primary-active: #1e40af;
-  --sp-primary-subtle: rgba(37, 99, 235, 0.1);
-  --sp-primary-text: #ffffff;
+  /* Primary brand (Spruce — evergreen-teal accent) */
+  --sp-primary: #0f766e;
+  --sp-primary-hover: #115e59;
+  --sp-primary-active: #134e4a;
+  --sp-primary-subtle: rgba(15, 118, 110, 0.08);
+  --sp-primary-text: #f8fafc;
 
   /* Semantic status */
   --sp-success: #16a34a;
-  --sp-success-subtle: rgba(22, 163, 74, 0.1);
-  --sp-warning: #d97706;
-  --sp-warning-subtle: rgba(217, 119, 6, 0.1);
+  --sp-success-subtle: rgba(22, 163, 74, 0.09);
+  --sp-warning: #b45309;
+  --sp-warning-subtle: rgba(180, 83, 9, 0.09);
   --sp-danger: #dc2626;
-  --sp-danger-subtle: rgba(220, 38, 38, 0.1);
-  --sp-info: #0891b2;
-  --sp-info-subtle: rgba(8, 145, 178, 0.1);
+  --sp-danger-subtle: rgba(220, 38, 38, 0.09);
+  --sp-info: #0e7490;
+  --sp-info-subtle: rgba(14, 116, 144, 0.09);
 
   /* Text */
-  --sp-text-color: #1a202c;
-  --sp-text-muted: #4a5568;
-  --sp-text-subtle: #718096;
-  --sp-text-disabled: #a0aec0;
-  --sp-text-inverse: #ffffff;
+  --sp-text-color: #0f172a;
+  --sp-text-muted: #334155;
+  --sp-text-subtle: #64748b;
+  --sp-text-disabled: #94a3b8;
+  --sp-text-inverse: #f8fafc;
 
   /* Borders */
-  --sp-border: rgba(0, 0, 0, 0.08);
-  --sp-border-strong: rgba(0, 0, 0, 0.14);
-  --sp-border-focus: var(--sp-primary);
+  --sp-border: rgba(15, 23, 42, 0.08);
+  --sp-border-strong: rgba(15, 23, 42, 0.14);
+  --sp-border-focus: #0f766e;
 
   /* Interactive backgrounds */
-  --sp-content-hover-bg: rgba(0, 0, 0, 0.04);
-  --sp-content-active-bg: rgba(0, 0, 0, 0.07);
+  --sp-content-hover-bg: rgba(15, 23, 42, 0.04);
+  --sp-content-active-bg: rgba(15, 23, 42, 0.07);
 
   /* Overlay */
-  --sp-overlay-bg: rgba(0, 0, 0, 0.5);
+  --sp-overlay-bg: rgba(15, 23, 42, 0.45);
 
   /* Scrollbar */
-  --sp-scrollbar-track: rgba(0, 0, 0, 0.03);
-  --sp-scrollbar-thumb: rgba(0, 0, 0, 0.14);
-  --sp-scrollbar-hover: rgba(0, 0, 0, 0.25);
+  --sp-scrollbar-track: rgba(15, 23, 42, 0.03);
+  --sp-scrollbar-thumb: #cbd5e1;
+  --sp-scrollbar-hover: #94a3b8;
+
+  /* Backdrop effects */
+  --sp-backdrop-filter: none;
+  --sp-backdrop-filter-strong: none;
+
+  /* Frosted surface (reusable translucent glass panel).
+     Unlike --sp-backdrop-filter (off by default), the frosted tokens always
+     carry a real blur so a frosted panel reads as glass in every theme.
+     Themes may override these for a stronger or tinted effect. */
+  --sp-frosted-bg: rgba(255, 255, 255, 0.55);
+  --sp-frosted-border: rgba(255, 255, 255, 0.6);
+  --sp-frosted-blur: blur(16px) saturate(160%);
+  --sp-frosted-blur-strong: blur(28px) saturate(180%);
+  --sp-frosted-shadow: 0 8px 32px -12px rgba(15, 23, 42, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
 
   /* Icons (duotone) */
   --sp-icon-secondary-color: currentColor;
   --sp-icon-secondary-opacity: 0.2;
 
   /* Focus ring ("Precision Glow") */
-  --sp-focus-ring-color: var(--sp-primary);
+  --sp-focus-ring-color: rgba(15, 118, 110, 0.35);
   --sp-focus-ring-width: 2px;
   --sp-focus-ring-offset: 2px;
-  --sp-focus-glow-color: var(--sp-primary-subtle);
-  --sp-focus-glow-spread: 6px;
+  --sp-focus-glow-color: rgba(15, 118, 110, 0.12);
+  --sp-focus-glow-spread: 5px;
 
   /* Charts */
-  --sp-chart-title-color: #1e293b;
+  --sp-chart-title-color: #0f172a;
   --sp-chart-subtitle-color: #64748b;
   --sp-chart-axis-text: #64748b;
   --sp-chart-axis-line: #e2e8f0;
-  --sp-chart-grid-line: #e2e8f0;
-  --sp-chart-value-label: #475569;
+  --sp-chart-grid-line: #eef2f7;
+  --sp-chart-value-label: #334155;
   --sp-chart-axis-label: #94a3b8;
   --sp-chart-legend-text: #64748b;
-  --sp-chart-dot-stroke: #ffffff;
-  --sp-chart-tooltip-bg: #1f2937;
-  --sp-chart-tooltip-text: #f9fafb;
+  --sp-chart-dot-stroke: #f8fafc;
+  --sp-chart-tooltip-bg: #1e293b;
+  --sp-chart-tooltip-text: #f8fafc;
   --sp-chart-track-bg: #f1f5f9;
 }
 
 /* ── Typography ──────────────────────────────────────────────────────────── */
 :root {
-  --sp-font-sans: 'League Spartan', system-ui, -apple-system, 'Segoe UI',
-    Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji',
-    'Segoe UI Emoji';
-  --sp-font-mono: ui-monospace, 'SFMono-Regular', 'SF Mono', Menlo, Consolas,
-    'Liberation Mono', monospace;
+  --sp-font-sans: 'Geist', 'League Spartan', system-ui, -apple-system,
+    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji';
+  --sp-font-mono: 'Geist Mono', ui-monospace, 'SFMono-Regular', 'SF Mono',
+    Menlo, Consolas, 'Liberation Mono', monospace;
 
+  /* Font sizes */
   --sp-text-2xs: 0.625rem;   /* 10px */
   --sp-text-xs: 0.6875rem;   /* 11px */
   --sp-text-sm: 0.8125rem;   /* 13px */
@@ -126,17 +194,28 @@
   --sp-text-2xl: 1.5rem;     /* 24px */
   --sp-text-3xl: 1.875rem;   /* 30px */
 
+  /* Font weights */
   --sp-font-normal: 400;
   --sp-font-medium: 500;
   --sp-font-semibold: 600;
   --sp-font-bold: 700;
 
+  /* Font usage (semantic aliases) */
+  --sp-font-body: var(--sp-text-base);      /* 14px */
+  --sp-font-label: var(--sp-text-sm);       /* 13px */
+  --sp-font-caption: var(--sp-text-xs);     /* 11px */
+  --sp-font-heading-sm: var(--sp-text-lg);  /* 18px */
+  --sp-font-heading-md: var(--sp-text-xl);  /* 20px */
+  --sp-font-heading-lg: var(--sp-text-2xl); /* 24px */
+
+  /* Line heights */
   --sp-leading-none: 1;
   --sp-leading-tight: 1.25;
   --sp-leading-snug: 1.375;
   --sp-leading-normal: 1.5;
   --sp-leading-relaxed: 1.625;
 
+  /* Letter spacing */
   --sp-tracking-tight: -0.02em;
   --sp-tracking-normal: 0;
   --sp-tracking-wide: 0.04em;
@@ -179,6 +258,18 @@
   --sp-radius-full: 9999px;
 }
 
+/* ── Border Widths ───────────────────────────────────────────────────────── */
+/* Works with the border color tokens (`--sp-border`, `--sp-border-strong`).
+   Example: border: var(--sp-border-width-hairline) solid var(--sp-border);
+   Dark mode does not change hairline width; only border colors are themed. */
+:root {
+  --sp-border-width-none: 0;
+  /* Default divider / control outline (data grids, tables, splitters) */
+  --sp-border-width-hairline: 1px;
+  /* Section breaks, emphasis separators, aggregate rows */
+  --sp-border-width-medium: 2px;
+}
+
 /* ── Shadows ─────────────────────────────────────────────────────────────── */
 :root {
   --sp-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -200,6 +291,140 @@
   --sp-z-popover: 500;
   --sp-z-toast: 600;
   --sp-z-tooltip: 700;
+}
+
+/* ── Density ─────────────────────────────────────────────────────────────── */
+/* Density presets define semantic sizing tokens for controls, lists, panels,
+   and data-dense surfaces. Components can either consume the semantic aliases
+   (for inherited density) or the preset-specific tokens (for local overrides).
+   Switch density with [data-density='dense' | 'default' | 'comfortable']. */
+:root {
+  --sp-density-dense-control-height: 28px;
+  --sp-density-dense-control-padding-x: 8px;
+  --sp-density-dense-control-padding-y: 4px;
+  --sp-density-dense-inline-gap: 8px;
+  --sp-density-dense-stack-gap: 12px;
+  --sp-density-dense-icon-size: 14px;
+  --sp-density-dense-list-item-min-height: 28px;
+  --sp-density-dense-panel-padding: 12px;
+  --sp-density-dense-datagrid-row-height: 26px;
+  --sp-density-dense-datagrid-header-height: 24px;
+  --sp-density-dense-datagrid-filter-height: 28px;
+  --sp-density-dense-datagrid-aggregate-height: 28px;
+  --sp-density-dense-datagrid-toolbar-height: 32px;
+  --sp-density-dense-datagrid-footer-height: 24px;
+  --sp-density-dense-datagrid-pagination-height: 30px;
+  --sp-density-dense-datagrid-group-header-height: 18px;
+  --sp-density-dense-datagrid-leaf-header-height: 26px;
+  --sp-density-dense-datagrid-cell-padding-x: 8px;
+  --sp-density-dense-datagrid-auto-cell-padding-y: 4px;
+
+  --sp-density-default-control-height: 32px;
+  --sp-density-default-control-padding-x: 10px;
+  --sp-density-default-control-padding-y: 6px;
+  --sp-density-default-inline-gap: 10px;
+  --sp-density-default-stack-gap: 16px;
+  --sp-density-default-icon-size: 16px;
+  --sp-density-default-list-item-min-height: 32px;
+  --sp-density-default-panel-padding: 16px;
+  --sp-density-default-datagrid-row-height: 32px;
+  --sp-density-default-datagrid-header-height: 32px;
+  --sp-density-default-datagrid-filter-height: 32px;
+  --sp-density-default-datagrid-aggregate-height: 32px;
+  --sp-density-default-datagrid-toolbar-height: 36px;
+  --sp-density-default-datagrid-footer-height: 28px;
+  --sp-density-default-datagrid-pagination-height: 34px;
+  --sp-density-default-datagrid-group-header-height: 22px;
+  --sp-density-default-datagrid-leaf-header-height: 30px;
+  --sp-density-default-datagrid-cell-padding-x: 10px;
+  --sp-density-default-datagrid-auto-cell-padding-y: 6px;
+
+  --sp-density-comfortable-control-height: 36px;
+  --sp-density-comfortable-control-padding-x: 12px;
+  --sp-density-comfortable-control-padding-y: 8px;
+  --sp-density-comfortable-inline-gap: 12px;
+  --sp-density-comfortable-stack-gap: 20px;
+  --sp-density-comfortable-icon-size: 18px;
+  --sp-density-comfortable-list-item-min-height: 40px;
+  --sp-density-comfortable-panel-padding: 20px;
+  --sp-density-comfortable-datagrid-row-height: 38px;
+  --sp-density-comfortable-datagrid-header-height: 32px;
+  --sp-density-comfortable-datagrid-filter-height: 34px;
+  --sp-density-comfortable-datagrid-aggregate-height: 34px;
+  --sp-density-comfortable-datagrid-toolbar-height: 40px;
+  --sp-density-comfortable-datagrid-footer-height: 30px;
+  --sp-density-comfortable-datagrid-pagination-height: 38px;
+  --sp-density-comfortable-datagrid-group-header-height: 24px;
+  --sp-density-comfortable-datagrid-leaf-header-height: 34px;
+  --sp-density-comfortable-datagrid-cell-padding-x: 12px;
+  --sp-density-comfortable-datagrid-auto-cell-padding-y: 8px;
+}
+
+:root,
+[data-density='default'] {
+  --sp-density-control-height: var(--sp-density-default-control-height);
+  --sp-density-control-padding-x: var(--sp-density-default-control-padding-x);
+  --sp-density-control-padding-y: var(--sp-density-default-control-padding-y);
+  --sp-density-inline-gap: var(--sp-density-default-inline-gap);
+  --sp-density-stack-gap: var(--sp-density-default-stack-gap);
+  --sp-density-icon-size: var(--sp-density-default-icon-size);
+  --sp-density-list-item-min-height: var(--sp-density-default-list-item-min-height);
+  --sp-density-panel-padding: var(--sp-density-default-panel-padding);
+  --sp-density-datagrid-row-height: var(--sp-density-default-datagrid-row-height);
+  --sp-density-datagrid-header-height: var(--sp-density-default-datagrid-header-height);
+  --sp-density-datagrid-filter-height: var(--sp-density-default-datagrid-filter-height);
+  --sp-density-datagrid-aggregate-height: var(--sp-density-default-datagrid-aggregate-height);
+  --sp-density-datagrid-toolbar-height: var(--sp-density-default-datagrid-toolbar-height);
+  --sp-density-datagrid-footer-height: var(--sp-density-default-datagrid-footer-height);
+  --sp-density-datagrid-pagination-height: var(--sp-density-default-datagrid-pagination-height);
+  --sp-density-datagrid-group-header-height: var(--sp-density-default-datagrid-group-header-height);
+  --sp-density-datagrid-leaf-header-height: var(--sp-density-default-datagrid-leaf-header-height);
+  --sp-density-datagrid-cell-padding-x: var(--sp-density-default-datagrid-cell-padding-x);
+  --sp-density-datagrid-auto-cell-padding-y: var(--sp-density-default-datagrid-auto-cell-padding-y);
+}
+
+[data-density='dense'] {
+  --sp-density-control-height: var(--sp-density-dense-control-height);
+  --sp-density-control-padding-x: var(--sp-density-dense-control-padding-x);
+  --sp-density-control-padding-y: var(--sp-density-dense-control-padding-y);
+  --sp-density-inline-gap: var(--sp-density-dense-inline-gap);
+  --sp-density-stack-gap: var(--sp-density-dense-stack-gap);
+  --sp-density-icon-size: var(--sp-density-dense-icon-size);
+  --sp-density-list-item-min-height: var(--sp-density-dense-list-item-min-height);
+  --sp-density-panel-padding: var(--sp-density-dense-panel-padding);
+  --sp-density-datagrid-row-height: var(--sp-density-dense-datagrid-row-height);
+  --sp-density-datagrid-header-height: var(--sp-density-dense-datagrid-header-height);
+  --sp-density-datagrid-filter-height: var(--sp-density-dense-datagrid-filter-height);
+  --sp-density-datagrid-aggregate-height: var(--sp-density-dense-datagrid-aggregate-height);
+  --sp-density-datagrid-toolbar-height: var(--sp-density-dense-datagrid-toolbar-height);
+  --sp-density-datagrid-footer-height: var(--sp-density-dense-datagrid-footer-height);
+  --sp-density-datagrid-pagination-height: var(--sp-density-dense-datagrid-pagination-height);
+  --sp-density-datagrid-group-header-height: var(--sp-density-dense-datagrid-group-header-height);
+  --sp-density-datagrid-leaf-header-height: var(--sp-density-dense-datagrid-leaf-header-height);
+  --sp-density-datagrid-cell-padding-x: var(--sp-density-dense-datagrid-cell-padding-x);
+  --sp-density-datagrid-auto-cell-padding-y: var(--sp-density-dense-datagrid-auto-cell-padding-y);
+}
+
+[data-density='comfortable'] {
+  --sp-density-control-height: var(--sp-density-comfortable-control-height);
+  --sp-density-control-padding-x: var(--sp-density-comfortable-control-padding-x);
+  --sp-density-control-padding-y: var(--sp-density-comfortable-control-padding-y);
+  --sp-density-inline-gap: var(--sp-density-comfortable-inline-gap);
+  --sp-density-stack-gap: var(--sp-density-comfortable-stack-gap);
+  --sp-density-icon-size: var(--sp-density-comfortable-icon-size);
+  --sp-density-list-item-min-height: var(--sp-density-comfortable-list-item-min-height);
+  --sp-density-panel-padding: var(--sp-density-comfortable-panel-padding);
+  --sp-density-datagrid-row-height: var(--sp-density-comfortable-datagrid-row-height);
+  --sp-density-datagrid-header-height: var(--sp-density-comfortable-datagrid-header-height);
+  --sp-density-datagrid-filter-height: var(--sp-density-comfortable-datagrid-filter-height);
+  --sp-density-datagrid-aggregate-height: var(--sp-density-comfortable-datagrid-aggregate-height);
+  --sp-density-datagrid-toolbar-height: var(--sp-density-comfortable-datagrid-toolbar-height);
+  --sp-density-datagrid-footer-height: var(--sp-density-comfortable-datagrid-footer-height);
+  --sp-density-datagrid-pagination-height: var(--sp-density-comfortable-datagrid-pagination-height);
+  --sp-density-datagrid-group-header-height: var(--sp-density-comfortable-datagrid-group-header-height);
+  --sp-density-datagrid-leaf-header-height: var(--sp-density-comfortable-datagrid-leaf-header-height);
+  --sp-density-datagrid-cell-padding-x: var(--sp-density-comfortable-datagrid-cell-padding-x);
+  --sp-density-datagrid-auto-cell-padding-y: var(--sp-density-comfortable-datagrid-auto-cell-padding-y);
 }
 
 /* ── Motion ──────────────────────────────────────────────────────────────── */
@@ -230,71 +455,96 @@
 /* ── Dark Theme Overrides ────────────────────────────────────────────────── */
 [data-theme='dark'],
 .dark {
-  --sp-surface-0: #0f1117;
-  --sp-surface-25: #12151d;
-  --sp-surface-50: #151b2b;
-  --sp-surface-100: #1a2236;
-  --sp-surface-200: #243044;
+  /* Neutral surface scale (Spruce — cool slate, inverted) */
+  --sp-surface-0: #0f172a;
+  --sp-surface-25: #131c30;
+  --sp-surface-50: #182236;
+  --sp-surface-100: #1e293b;
+  --sp-surface-200: #273449;
   --sp-surface-300: #334155;
-  --sp-surface-400: #4b5c73;
-  --sp-surface-500: #6b7e96;
+  --sp-surface-400: #475569;
+  --sp-surface-500: #64748b;
   --sp-surface-600: #94a3b8;
-  --sp-surface-700: #bdc8d8;
-  --sp-surface-800: #d8dee8;
-  --sp-surface-900: #edf0f4;
-  --sp-surface-950: #f8f9fb;
+  --sp-surface-700: #cbd5e1;
+  --sp-surface-800: #e2e8f0;
+  --sp-surface-900: #f1f5f9;
+  --sp-surface-950: #f8fafc;
 
-  --sp-primary: #4f8ef7;
-  --sp-primary-hover: #6ba1f9;
-  --sp-primary-active: #3b7de6;
-  --sp-primary-subtle: rgba(79, 142, 247, 0.12);
+  /* Primary brand (Spruce — bright evergreen-teal accent) */
+  --sp-primary: #2dd4bf;
+  --sp-primary-hover: #5eead4;
+  --sp-primary-active: #14b8a6;
+  --sp-primary-subtle: rgba(45, 212, 191, 0.14);
+  --sp-primary-text: #042f2a;
 
-  --sp-success: #4ade80;
-  --sp-success-subtle: rgba(74, 222, 128, 0.1);
+  /* Semantic status */
+  --sp-success: #34d399;
+  --sp-success-subtle: rgba(52, 211, 153, 0.13);
   --sp-warning: #fbbf24;
-  --sp-warning-subtle: rgba(251, 191, 36, 0.1);
+  --sp-warning-subtle: rgba(251, 191, 36, 0.13);
   --sp-danger: #f87171;
-  --sp-danger-subtle: rgba(248, 113, 113, 0.1);
-  --sp-info: #22d3ee;
-  --sp-info-subtle: rgba(34, 211, 238, 0.1);
+  --sp-danger-subtle: rgba(248, 113, 113, 0.13);
+  --sp-info: #38bdf8;
+  --sp-info-subtle: rgba(56, 189, 248, 0.13);
 
+  /* Text */
   --sp-text-color: #e2e8f0;
-  --sp-text-muted: #a0aec0;
-  --sp-text-subtle: #718096;
-  --sp-text-disabled: #4a5568;
-  --sp-text-inverse: #0f1117;
+  --sp-text-muted: #cbd5e1;
+  --sp-text-subtle: #94a3b8;
+  --sp-text-disabled: #64748b;
+  --sp-text-inverse: #0f172a;
 
-  --sp-border: rgba(255, 255, 255, 0.07);
-  --sp-border-strong: rgba(255, 255, 255, 0.13);
+  /* Borders */
+  --sp-border: rgba(226, 232, 240, 0.08);
+  --sp-border-strong: rgba(226, 232, 240, 0.14);
+  --sp-border-focus: #2dd4bf;
 
-  --sp-content-hover-bg: rgba(255, 255, 255, 0.04);
-  --sp-content-active-bg: rgba(255, 255, 255, 0.07);
+  /* Interactive backgrounds */
+  --sp-content-hover-bg: rgba(226, 232, 240, 0.05);
+  --sp-content-active-bg: rgba(226, 232, 240, 0.09);
 
-  --sp-overlay-bg: rgba(0, 0, 0, 0.7);
+  /* Overlay */
+  --sp-overlay-bg: rgba(2, 6, 23, 0.62);
 
-  --sp-scrollbar-track: rgba(255, 255, 255, 0.03);
-  --sp-scrollbar-thumb: rgba(255, 255, 255, 0.12);
-  --sp-scrollbar-hover: rgba(255, 255, 255, 0.22);
+  /* Frosted surface */
+  --sp-frosted-bg: rgba(24, 29, 39, 0.55);
+  --sp-frosted-border: rgba(255, 255, 255, 0.12);
+  --sp-frosted-blur: blur(18px) saturate(170%);
+  --sp-frosted-blur-strong: blur(30px) saturate(190%);
+  --sp-frosted-shadow: 0 10px 32px -14px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
 
+  /* Scrollbar */
+  --sp-scrollbar-track: rgba(226, 232, 240, 0.04);
+  --sp-scrollbar-thumb: #334155;
+  --sp-scrollbar-hover: #475569;
+
+  /* Icons (duotone) */
   --sp-icon-secondary-opacity: 0.25;
 
-  --sp-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
-  --sp-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
-  --sp-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.35), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
-  --sp-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.35);
-  --sp-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.45), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+  /* Focus ring */
+  --sp-focus-ring-color: rgba(45, 212, 191, 0.34);
+  --sp-focus-glow-color: rgba(45, 212, 191, 0.16);
 
-  --sp-chart-title-color: #f1f5f9;
+  /* Shadows (darker in dark mode) */
+  --sp-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --sp-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.42), 0 1px 2px rgba(0, 0, 0, 0.32);
+  --sp-shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.48), 0 2px 5px -2px rgba(0, 0, 0, 0.38);
+  --sp-shadow-lg: 0 12px 18px -3px rgba(0, 0, 0, 0.52), 0 5px 8px -4px rgba(0, 0, 0, 0.42);
+  --sp-shadow-xl: 0 22px 28px -6px rgba(0, 0, 0, 0.58), 0 9px 12px -7px rgba(0, 0, 0, 0.48);
+
+  /* Charts */
+  --sp-chart-title-color: #e2e8f0;
   --sp-chart-subtitle-color: #94a3b8;
   --sp-chart-axis-text: #94a3b8;
   --sp-chart-axis-line: #334155;
-  --sp-chart-grid-line: #334155;
+  --sp-chart-grid-line: #1e293b;
   --sp-chart-value-label: #cbd5e1;
   --sp-chart-axis-label: #64748b;
   --sp-chart-legend-text: #94a3b8;
-  --sp-chart-dot-stroke: #1e293b;
-  --sp-chart-tooltip-bg: #1e293b;
-  --sp-chart-tooltip-text: #f1f5f9;
+  --sp-chart-dot-stroke: #0f172a;
+  --sp-chart-tooltip-bg: #273449;
+  --sp-chart-tooltip-text: #f8fafc;
   --sp-chart-track-bg: #1e293b;
 }
 
@@ -353,6 +603,9 @@
 }
 
 /* ── Focus Ring ("Precision Glow") ───────────────────────────────────────── */
+/* Brand fingerprint: a two-layer focus indicator.
+   Layer 1 (Precision): crisp outline that snaps in instantly.
+   Layer 2 (Softness):  animated glow that blooms outward. */
 @keyframes sp-focus-glow {
   from { box-shadow: 0 0 0 0 var(--sp-focus-glow-color); }
   to   { box-shadow: 0 0 0 var(--sp-focus-glow-spread) var(--sp-focus-glow-color); }
@@ -362,4 +615,29 @@
   outline: var(--sp-focus-ring-width) solid var(--sp-focus-ring-color);
   outline-offset: var(--sp-focus-ring-offset);
   animation: sp-focus-glow var(--sp-duration-normal, 200ms) var(--sp-ease-out, ease-out) forwards;
+}
+
+/* ── Frosted surface utility ─────────────────────────────────────────────── */
+.sp-frosted {
+  background: var(--sp-frosted-bg, rgba(255, 255, 255, 0.55));
+  backdrop-filter: var(--sp-frosted-blur, blur(16px) saturate(160%));
+  -webkit-backdrop-filter: var(--sp-frosted-blur, blur(16px) saturate(160%));
+  border: var(--sp-border-width-hairline, 1px) solid
+    var(--sp-frosted-border, rgba(255, 255, 255, 0.6));
+  border-radius: var(--sp-radius-lg, 12px);
+  box-shadow: var(--sp-frosted-shadow, 0 8px 32px -12px rgba(15, 23, 42, 0.22));
+}
+
+/* Heavier blur for prominent, floating surfaces (modals, command bars). */
+.sp-frosted--strong {
+  backdrop-filter: var(--sp-frosted-blur-strong, blur(28px) saturate(180%));
+  -webkit-backdrop-filter: var(--sp-frosted-blur-strong, blur(28px) saturate(180%));
+}
+
+/* Fallback: when backdrop-filter is unsupported, there is no blur to hide the
+   content behind, so raise the surface opacity to keep contents legible. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .sp-frosted {
+    background: var(--sp-surface-0, #fff);
+  }
 }

@@ -9,7 +9,6 @@ interface PresetDef {
 }
 
 const LIGHT_PRESETS: PresetDef[] = [
-  { name: 'default',    displayName: 'Default',    base: 'light', color: '#2563eb', importName: 'defaultTheme' },
   { name: 'ocean',      displayName: 'Ocean',      base: 'light', color: '#0e7490', importName: 'oceanTheme' },
   { name: 'forest',     displayName: 'Forest',     base: 'light', color: '#166534', importName: 'forestTheme' },
   { name: 'rose',       displayName: 'Rose',       base: 'light', color: '#be185d', importName: 'roseTheme' },
@@ -52,7 +51,7 @@ function PresetCard({ preset, active, onClick }: { preset: PresetDef; active: bo
 }
 
 export function ThemingPage() {
-  const [activePreset, setActivePreset] = useState('default')
+  const [activePreset, setActivePreset] = useState('ocean')
 
   return (
     <>
@@ -196,22 +195,15 @@ const myTheme: SpruceTheme = {
 
         <h3>Registering and activating</h3>
         <p className="section-desc">
-          Register your theme with the provider, then activate it by name. The
-          service injects the token overrides as CSS custom properties on{' '}
-          <code>:root</code>.
+          Register the theme via <code>registerTheme()</code>, then activate it
+          by name with <code>setTheme()</code>. Registration injects the token
+          overrides as CSS custom properties on <code>:root</code> and applies
+          the theme&rsquo;s base via <code>data-theme</code> on the document
+          element.
         </p>
         <div className="code-block">
-          <pre><code>{`import { SpruceProvider } from 'spruce-react'
+          <pre><code>{`import { useTheme } from 'spruce-react'
 
-function App() {
-  return (
-    <SpruceProvider themes={[myTheme]} defaultTheme="my-brand">
-      <YourApp />
-    </SpruceProvider>
-  )
-}
-
-// Or register at runtime:
 function Settings() {
   const { registerTheme, setTheme } = useTheme()
 
@@ -286,7 +278,9 @@ function Settings() {
         <p className="section-desc">
           Spruce includes {ALL_PRESETS.length} ready-made presets. Each preset
           is a fully typed <code>SpruceTheme</code> object that you can import
-          and register directly.
+          and register directly. (The default evergreen-teal look needs no
+          preset — it&rsquo;s the built-in <code>light</code>/<code>dark</code>{' '}
+          base.)
         </p>
 
         <div className="preset-section-label">Light</div>
@@ -314,15 +308,31 @@ function Settings() {
         </div>
 
         <h3>Using a preset</h3>
+        <p className="section-desc">
+          Presets are named exports of the main package — register the ones you
+          offer, then activate by name.
+        </p>
         <div className="code-block">
-          <pre><code>{`import { SpruceProvider } from 'spruce-react'
-import { oceanTheme, nightTheme } from 'spruce-react/themes'
+          <pre><code>{`import { useTheme, oceanTheme, nightTheme } from 'spruce-react'
 
-function App() {
+function ThemePicker() {
+  const { registerTheme, setTheme } = useTheme()
+
+  function useOcean() {
+    registerTheme(oceanTheme)
+    setTheme('ocean')
+  }
+
+  function useNight() {
+    registerTheme(nightTheme)
+    setTheme('night')
+  }
+
   return (
-    <SpruceProvider themes={[oceanTheme, nightTheme]}>
-      <YourApp />
-    </SpruceProvider>
+    <>
+      <button onClick={useOcean}>Ocean</button>
+      <button onClick={useNight}>Night</button>
+    </>
   )
 }`}</code></pre>
         </div>
@@ -361,10 +371,10 @@ function App() {
             <tr><th>Token</th><th>Default</th><th>Description</th></tr>
           </thead>
           <tbody>
-            <tr><td>--sp-primary</td><td>#2563eb</td><td>Primary brand color</td></tr>
-            <tr><td>--sp-primary-hover</td><td>#1d4ed8</td><td>Hover state</td></tr>
-            <tr><td>--sp-primary-active</td><td>#1e40af</td><td>Active/pressed state</td></tr>
-            <tr><td>--sp-primary-text</td><td>#ffffff</td><td>Text on primary surfaces</td></tr>
+            <tr><td>--sp-primary</td><td>#0f766e</td><td>Primary brand color (evergreen teal)</td></tr>
+            <tr><td>--sp-primary-hover</td><td>#115e59</td><td>Hover state</td></tr>
+            <tr><td>--sp-primary-active</td><td>#134e4a</td><td>Active/pressed state</td></tr>
+            <tr><td>--sp-primary-text</td><td>#f8fafc</td><td>Text on primary surfaces</td></tr>
           </tbody>
         </table>
 
@@ -375,9 +385,9 @@ function App() {
           </thead>
           <tbody>
             <tr><td>--sp-success</td><td>#16a34a</td><td>Success states</td></tr>
-            <tr><td>--sp-warning</td><td>#d97706</td><td>Warning states</td></tr>
+            <tr><td>--sp-warning</td><td>#b45309</td><td>Warning states</td></tr>
             <tr><td>--sp-danger</td><td>#dc2626</td><td>Error/danger states</td></tr>
-            <tr><td>--sp-info</td><td>#0891b2</td><td>Informational states</td></tr>
+            <tr><td>--sp-info</td><td>#0e7490</td><td>Informational states</td></tr>
           </tbody>
         </table>
 
@@ -387,11 +397,11 @@ function App() {
             <tr><th>Token</th><th>Default</th><th>Description</th></tr>
           </thead>
           <tbody>
-            <tr><td>--sp-surface-0</td><td>#ffffff</td><td>Page background</td></tr>
-            <tr><td>--sp-surface-50</td><td>#f8f9fb</td><td>Subtle background</td></tr>
-            <tr><td>--sp-surface-100</td><td>#f1f3f6</td><td>Muted background</td></tr>
-            <tr><td>--sp-text-color</td><td>#1a202c</td><td>Primary text</td></tr>
-            <tr><td>--sp-text-muted</td><td>#4a5568</td><td>Muted text</td></tr>
+            <tr><td>--sp-surface-0</td><td>#f8fafc</td><td>Page background</td></tr>
+            <tr><td>--sp-surface-50</td><td>#f1f5f9</td><td>Subtle background</td></tr>
+            <tr><td>--sp-surface-100</td><td>#e9eef5</td><td>Muted background</td></tr>
+            <tr><td>--sp-text-color</td><td>#0f172a</td><td>Primary text</td></tr>
+            <tr><td>--sp-text-muted</td><td>#334155</td><td>Muted text</td></tr>
           </tbody>
         </table>
 
