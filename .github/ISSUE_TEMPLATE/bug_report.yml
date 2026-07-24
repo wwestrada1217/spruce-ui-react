@@ -1,0 +1,86 @@
+name: Bug report
+description: Report a defect in a component, the design tokens, or the docs site.
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please search
+        [existing issues](https://github.com/wwestrada1217/spruce-ui-react/issues)
+        first to avoid duplicates.
+
+        For security vulnerabilities, **do not open a public issue** — see
+        [SECURITY.md](https://github.com/wwestrada1217/spruce-ui-react/blob/main/SECURITY.md).
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of the project is affected?
+      options:
+        - Component (library)
+        - Design tokens / theming
+        - Icons
+        - TypeScript types
+        - Documentation site
+        - Build / packaging
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: component
+    attributes:
+      label: Component
+      description: If a specific component is affected, name it.
+      placeholder: e.g. DatePicker, Combobox, Sidebar
+  - type: input
+    id: version
+    attributes:
+      label: spruce-react version
+      placeholder: e.g. 0.1.1
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A clear description of the bug, including what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Minimal steps or a code snippet that reproduces the problem.
+      placeholder: |
+        1. Render `<DatePicker value="..." onChange={...} />`
+        2. Open the calendar panel
+        3. ...
+    validations:
+      required: true
+  - type: dropdown
+    id: theme
+    attributes:
+      label: Theme
+      description: Does the bug depend on the active theme?
+      options:
+        - Both light and dark
+        - Light only
+        - Dark only
+        - A custom theme preset
+        - Not theme-related / not sure
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Browser, OS, React version, bundler.
+      placeholder: |
+        - Browser: Chrome 138
+        - OS: Windows 11
+        - React: 19.1
+        - Bundler: Vite 8
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context
+      description: Screenshots, console errors, or anything else that helps.
