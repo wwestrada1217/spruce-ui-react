@@ -1,0 +1,143 @@
+/* ── List ──────────────────────────────────────────────────────────────── */
+
+.sp-list {
+  display: flex;
+  flex-direction: column;
+  --sp-list-divider: var(--sp-border);
+  --sp-list-hover: var(--sp-content-hover-bg, var(--sp-surface-50));
+  --sp-list-gap: var(--sp-space-3, 12px);
+  --sp-list-item-py: var(--sp-space-3, 12px);
+  --sp-list-item-px: var(--sp-space-4, 16px);
+}
+
+/* ── Bordered variant ─────────────────────────────────────────────────── */
+
+.sp-list--bordered {
+  border: 1px solid var(--sp-border);
+  border-radius: var(--sp-radius-lg, 8px);
+  overflow: hidden;
+}
+
+/* ── Striped variant ──────────────────────────────────────────────────── */
+
+.sp-list--striped > .sp-list-item:nth-child(even) {
+  background: var(--sp-surface-50);
+}
+
+/* ── Size: sm ─────────────────────────────────────────────────────────── */
+
+.sp-list--sm {
+  --sp-list-gap: var(--sp-space-2, 8px);
+  --sp-list-item-py: var(--sp-space-2, 8px);
+  --sp-list-item-px: var(--sp-space-3, 12px);
+  font-size: var(--sp-font-size-sm, 0.875rem);
+}
+
+/* ── Size: lg ─────────────────────────────────────────────────────────── */
+
+.sp-list--lg {
+  --sp-list-gap: var(--sp-space-4, 16px);
+  --sp-list-item-py: var(--sp-space-4, 16px);
+  --sp-list-item-px: var(--sp-space-5, 20px);
+  font-size: var(--sp-font-size-base, 1rem);
+}
+
+/* ── List Item ─────────────────────────────────────────────────────────── */
+
+.sp-list-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-list-gap, var(--sp-space-3, 12px));
+  padding: var(--sp-list-item-py, var(--sp-space-3, 12px)) var(--sp-list-item-px, var(--sp-space-4, 16px));
+  border-bottom: 1px solid var(--sp-list-divider, var(--sp-border));
+  transition: background var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-list-item:last-child {
+  border-bottom: none;
+}
+
+/* ── Interactive ──────────────────────────────────────────────────────── */
+
+.sp-list-item--interactive {
+  cursor: pointer;
+}
+
+.sp-list-item--interactive:hover {
+  background: var(--sp-list-hover, var(--sp-content-hover-bg, var(--sp-surface-50)));
+}
+
+.sp-list-item--interactive:focus-visible {
+  outline: 2px solid var(--sp-focus-ring, var(--sp-primary, #2563eb));
+  outline-offset: -2px;
+  border-radius: var(--sp-radius-sm, 4px);
+}
+
+/* ── States ───────────────────────────────────────────────────────────── */
+
+.sp-list-item--active {
+  background: var(--sp-list-active-bg, var(--sp-primary-subtle));
+}
+
+.sp-list-item--selected {
+  background: var(--sp-list-selected-bg, var(--sp-primary-subtle));
+  border-left: 3px solid var(--sp-primary);
+}
+
+.sp-list-item--disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.sp-list-item--unread {
+  background: var(--sp-list-unread-bg, var(--sp-surface-50));
+}
+
+.sp-list-item--unread .sp-list-item__body {
+  font-weight: 600;
+}
+
+/* ── Leading (avatar, icon, checkbox area) ────────────────────────────── */
+
+.sp-list-item__leading {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* ── Body (main content area) ─────────────────────────────────────────── */
+
+.sp-list-item__body {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Trailing (badges, actions, timestamps) ───────────────────────────── */
+
+.sp-list-item__trailing {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-space-2, 8px);
+  flex-shrink: 0;
+}
+
+/* ── ListItemLine ─────────────────────────────────────────────────────── */
+
+.sp-list-item-line {
+  display: block;
+  font-size: var(--sp-font-size-sm, 0.875rem);
+  line-height: var(--sp-line-height-normal, 1.5);
+  color: var(--sp-text-color);
+}
+
+.sp-list-item-line--secondary {
+  font-size: var(--sp-font-size-xs, 0.75rem);
+  color: var(--sp-text-muted);
+  font-weight: 400;
+}
+
+.sp-list-item-line--ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

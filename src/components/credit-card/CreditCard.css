@@ -1,0 +1,129 @@
+.sp-credit-card {
+  position: relative;
+  overflow: hidden;
+  width: 340px;
+  height: 210px;
+  border-radius: 14px;
+  padding: 20px 24px;
+  color: rgba(255, 255, 255, 0.95);
+  font-family: inherit;
+  display: inline-flex;
+  flex-direction: column;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.15);
+  user-select: none;
+}
+
+/* -- Top: Chip & contactless ---------------------------------------- */
+.sp-credit-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.sp-credit-card__chip {
+  width: 36px;
+  height: 26px;
+  background: linear-gradient(135deg, #e8d5a3 0%, #c9a94e 50%, #e8d5a3 100%);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  padding: 4px 5px;
+}
+.sp-credit-card__chip-line {
+  height: 2px;
+  border-radius: 1px;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.sp-credit-card__contactless {
+  width: 20px;
+  height: 20px;
+  color: rgba(255, 255, 255, 0.7);
+  transform: rotate(90deg);
+}
+
+/* -- Card number ---------------------------------------------------- */
+.sp-credit-card__number {
+  display: flex;
+  gap: 12px;
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  margin-bottom: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+/* -- Bottom row ----------------------------------------------------- */
+.sp-credit-card__bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.sp-credit-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.sp-credit-card__info--right {
+  text-align: right;
+  margin-left: 24px;
+}
+
+.sp-credit-card__label {
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.55);
+}
+.sp-credit-card__value {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* -- Network logo --------------------------------------------------- */
+.sp-credit-card__network {
+  margin-left: auto;
+  display: flex;
+  align-items: flex-end;
+}
+.sp-credit-card__network-text {
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.sp-credit-card__network-text--visa {
+  font-size: 20px;
+  font-style: italic;
+}
+.sp-credit-card__network-text--amex {
+  font-size: 14px;
+}
+.sp-credit-card__network-text--discover {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+}
+.sp-credit-card__network-logo {
+  width: 48px;
+  height: 28px;
+}
+
+/* -- Shimmer overlay ------------------------------------------------ */
+.sp-credit-card__shimmer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.04) 45%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 55%,
+    transparent 70%
+  );
+}

@@ -1,0 +1,124 @@
+/* ─── Toolbar ─────────────────────────────────────────────────────── */
+
+.sp-toolbar {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 2px;
+  overflow: hidden;
+  padding: 4px;
+  background: var(--sp-surface-0, #fff);
+  border: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08));
+  border-radius: var(--sp-radius-md, 6px);
+}
+
+/* ─── Button ──────────────────────────────────────────────────────── */
+
+.sp-toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 32px;
+  min-width: 32px;
+  padding: 0 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--sp-text-color, #1a202c);
+  background: none;
+  border: none;
+  border-radius: var(--sp-radius-sm, 4px);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s ease;
+}
+
+.sp-toolbar-btn:hover:not(:disabled) {
+  background: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04));
+}
+
+.sp-toolbar-btn:focus-visible {
+  outline: 2px solid var(--sp-focus-ring-color, #2563eb);
+  outline-offset: -2px;
+}
+
+.sp-toolbar-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ─── Sizes ───────────────────────────────────────────────────────── */
+
+.sp-toolbar--sm .sp-toolbar-btn {
+  height: 28px;
+  min-width: 28px;
+  font-size: 12px;
+}
+
+.sp-toolbar--lg .sp-toolbar-btn {
+  height: 40px;
+  min-width: 40px;
+  font-size: 14px;
+}
+
+/* ─── Divider ─────────────────────────────────────────────────────── */
+
+.sp-toolbar__divider {
+  width: 1px;
+  height: 16px;
+  background: var(--sp-border, rgba(0, 0, 0, 0.08));
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.sp-toolbar--sm .sp-toolbar__divider {
+  height: 12px;
+}
+
+.sp-toolbar--lg .sp-toolbar__divider {
+  height: 20px;
+}
+
+/* ─── Overflow Menu ───────────────────────────────────────────────── */
+
+.sp-toolbar__menu {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.sp-toolbar__menu-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  min-width: 32px;
+  padding: 0;
+  font-family: inherit;
+  color: var(--sp-text-color, #1a202c);
+  background: none;
+  border: none;
+  border-radius: var(--sp-radius-sm, 4px);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.sp-toolbar__menu-trigger:hover {
+  background: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04));
+}
+
+.sp-toolbar__menu-trigger:focus-visible {
+  outline: 2px solid var(--sp-focus-ring-color, #2563eb);
+  outline-offset: -2px;
+}
+
+.sp-toolbar--sm .sp-toolbar__menu-trigger {
+  height: 28px;
+  min-width: 28px;
+}
+
+.sp-toolbar--lg .sp-toolbar__menu-trigger {
+  height: 40px;
+  min-width: 40px;
+}

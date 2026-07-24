@@ -1,0 +1,123 @@
+.sp-git-graph {
+  --_row-hover: var(--sp-surface-50, #f8fafc);
+  --_row-selected: color-mix(in srgb, var(--sp-primary, #2563eb) 8%, transparent);
+  --_row-selected-hover: color-mix(in srgb, var(--sp-primary, #2563eb) 12%, transparent);
+
+  display: flex;
+  overflow: auto;
+  font-family: var(--sp-font-sans, system-ui, -apple-system, sans-serif);
+  border: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08));
+  border-radius: var(--sp-radius-md, 6px);
+  background: var(--sp-surface-0, #fff);
+}
+
+.sp-git-graph__svg {
+  flex-shrink: 0;
+}
+
+.sp-git-graph__rows {
+  flex: 1;
+  min-width: 0;
+}
+
+.sp-git-graph__row {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding: 0 var(--sp-space-3, 12px);
+  box-sizing: border-box;
+  border-bottom: 1px solid var(--sp-border, rgba(0, 0, 0, 0.06));
+  cursor: pointer;
+  transition: background var(--sp-duration-fast) var(--sp-ease-default);
+  outline: none;
+}
+
+.sp-git-graph__row:hover {
+  background: var(--_row-hover);
+}
+
+.sp-git-graph__row:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--sp-primary, #2563eb);
+  border-radius: var(--sp-radius-sm, 4px);
+}
+
+.sp-git-graph__row--selected {
+  background: var(--_row-selected);
+}
+
+.sp-git-graph__row--selected:hover {
+  background: var(--_row-selected-hover);
+}
+
+.sp-git-graph__top-line {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-space-1-5, 6px);
+  min-width: 0;
+}
+
+.sp-git-graph__message {
+  font-size: var(--sp-text-sm, 13px);
+  font-weight: var(--sp-font-medium, 500);
+  color: var(--sp-text-color, #1a202c);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sp-git-graph__ref {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 6px;
+  font-size: var(--sp-text-2xs, 10px);
+  font-weight: var(--sp-font-semibold, 600);
+  color: var(--_ref, var(--sp-primary, #2563eb));
+  background: color-mix(in srgb, var(--_ref, var(--sp-primary, #2563eb)) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--_ref, var(--sp-primary, #2563eb)) 25%, transparent);
+  border-radius: var(--sp-radius-full, 9999px);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.sp-git-graph__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 6px;
+  font-size: var(--sp-text-2xs, 10px);
+  font-weight: var(--sp-font-semibold, 600);
+  color: var(--sp-warning, #d97706);
+  background: color-mix(in srgb, var(--sp-warning, #d97706) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sp-warning, #d97706) 20%, transparent);
+  border-radius: var(--sp-radius-full, 9999px);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.sp-git-graph__bottom-line {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-space-2, 8px);
+  font-size: var(--sp-text-2xs, 10px);
+  color: var(--sp-text-muted, #4a5568);
+}
+
+.sp-git-graph__hash {
+  font-family: var(--sp-font-mono, 'SFMono-Regular', Consolas, monospace);
+  color: var(--sp-primary, #2563eb);
+  font-size: var(--sp-text-2xs, 10px);
+  padding: 0 4px;
+  background: var(--sp-surface-50, #f8fafc);
+  border-radius: var(--sp-radius-sm, 4px);
+}
+
+.sp-git-graph__author,
+.sp-git-graph__date {
+  white-space: nowrap;
+}
+
+.sp-git-graph__date {
+  color: var(--sp-text-subtle, #718096);
+}

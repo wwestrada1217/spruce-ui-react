@@ -1,0 +1,114 @@
+.sp-carousel {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--sp-radius-lg, 8px);
+  outline: none;
+}
+
+.sp-carousel:focus-visible {
+  outline: 2px solid var(--sp-border-focus, #2563eb);
+  outline-offset: 2px;
+}
+
+.sp-carousel__viewport {
+  overflow: hidden;
+  width: 100%;
+  touch-action: pan-y pinch-zoom;
+}
+
+.sp-carousel__track {
+  display: flex;
+  width: 100%;
+  will-change: transform;
+}
+
+.sp-carousel__slide {
+  flex: 0 0 100%;
+  min-width: 0;
+  width: 100%;
+}
+
+/* -- Arrows ----------------------------------------------------------- */
+.sp-carousel__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--sp-radius-full, 9999px);
+  border: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08));
+  background: var(--sp-surface-0, #fff);
+  color: var(--sp-text-color);
+  cursor: pointer;
+  box-shadow: var(--sp-shadow-sm);
+  opacity: 0;
+  transition:
+    opacity var(--sp-duration-normal) var(--sp-ease-default),
+    background var(--sp-duration-normal) var(--sp-ease-default);
+}
+
+.sp-carousel__arrow:hover {
+  background: var(--sp-content-hover-bg);
+}
+
+.sp-carousel__arrow:disabled {
+  opacity: 0 !important;
+  cursor: default;
+}
+
+.sp-carousel__arrow--prev {
+  left: var(--sp-space-3, 12px);
+}
+
+.sp-carousel__arrow--next {
+  right: var(--sp-space-3, 12px);
+}
+
+.sp-carousel:hover .sp-carousel__arrow:not(:disabled),
+.sp-carousel:focus-within .sp-carousel__arrow:not(:disabled) {
+  opacity: 1;
+}
+
+/* -- Indicators ------------------------------------------------------- */
+.sp-carousel__indicators {
+  position: absolute;
+  bottom: var(--sp-space-3, 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: var(--sp-space-1-5, 6px);
+  padding: var(--sp-space-1, 4px) var(--sp-space-2, 8px);
+  border-radius: var(--sp-radius-full, 9999px);
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.sp-carousel__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--sp-radius-full, 9999px);
+  border: none;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition:
+    background var(--sp-duration-normal) var(--sp-ease-default),
+    width var(--sp-duration-normal) var(--sp-ease-default);
+}
+
+.sp-carousel__dot--active {
+  background: #fff;
+}
+
+.sp-carousel__dot--bar {
+  width: 20px;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.sp-carousel__dot--bar.sp-carousel__dot--active {
+  width: 28px;
+}

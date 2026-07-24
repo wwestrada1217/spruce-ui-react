@@ -1,0 +1,59 @@
+.sp-range {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.sp-range--disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.sp-range__values {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--sp-text-sm, 13px);
+  font-weight: var(--sp-font-semibold, 600);
+  color: var(--sp-text-color, #1f2937);
+}
+
+.sp-range__track {
+  position: relative;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--sp-surface-200, #e5e7eb);
+  cursor: pointer;
+}
+
+.sp-range__fill {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--sp-primary, #2563eb);
+  pointer-events: none;
+}
+
+.sp-range__thumb {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--sp-primary, #2563eb);
+  box-shadow: var(--sp-shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.1));
+  cursor: grab;
+  transition: box-shadow var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-range__thumb:hover {
+  box-shadow: 0 0 0 4px var(--sp-primary-subtle, rgba(37, 99, 235, 0.15));
+}
+
+.sp-range__thumb:focus-visible {
+  outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color, #2563eb);
+  outline-offset: var(--sp-focus-ring-offset, 2px);
+}

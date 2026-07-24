@@ -1,0 +1,228 @@
+/* ── Combobox ─────────────────────────────────────────────────────────────── */
+
+.sp-combo {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* ── Input wrap ──────────────────────────────────────────────────────────── */
+
+.sp-combo__input-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-space-2, 8px);
+  padding: 0 var(--sp-space-3, 12px);
+  height: 32px;
+  border: 1px solid var(--sp-border-strong, rgba(0, 0, 0, 0.14));
+  border-radius: var(--sp-radius-md, 6px);
+  background: var(--sp-surface-0, #fff);
+  cursor: text;
+  transition:
+    border-color var(--sp-duration-normal, 200ms) var(--sp-ease-default, ease),
+    box-shadow var(--sp-duration-normal, 200ms) var(--sp-ease-default, ease);
+}
+
+.sp-combo__input-wrap--multi {
+  flex-wrap: wrap;
+  height: auto;
+  min-height: 32px;
+  padding: 4px var(--sp-space-3, 12px);
+  gap: 4px;
+}
+
+.sp-combo--open .sp-combo__input-wrap {
+  border-color: var(--sp-focus-ring-color, #2563eb);
+  box-shadow: 0 0 0 3px var(--sp-focus-glow-color, rgba(37, 99, 235, 0.12));
+}
+
+.sp-combo--disabled .sp-combo__input-wrap {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--sp-surface-100, #f1f5f9);
+}
+
+/* ── Search icon ─────────────────────────────────────────────────────────── */
+
+.sp-combo__search-icon {
+  flex-shrink: 0;
+  color: var(--sp-text-subtle, #718096);
+}
+
+/* ── Input field ─────────────────────────────────────────────────────────── */
+
+.sp-combo__input {
+  flex: 1;
+  min-width: 60px;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: var(--sp-text-sm, 13px);
+  color: var(--sp-text-color, #1a202c);
+  padding: 0;
+  line-height: 1.4;
+}
+
+.sp-combo__input::placeholder {
+  color: var(--sp-text-disabled, #a0aec0);
+}
+
+.sp-combo--disabled .sp-combo__input {
+  cursor: not-allowed;
+}
+
+/* ── Chips (multi mode) ──────────────────────────────────────────────────── */
+
+.sp-combo__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: var(--sp-radius-sm, 4px);
+  background: var(--sp-surface-100, #f1f5f9);
+  font-size: var(--sp-text-xs, 12px);
+  color: var(--sp-text-color, #1a202c);
+  line-height: 1.4;
+  max-width: 100%;
+  white-space: nowrap;
+}
+
+.sp-combo__chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: var(--sp-radius-full, 9999px);
+  border: none;
+  background: none;
+  color: var(--sp-text-muted, #4a5568);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: background var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-combo__chip-remove:hover {
+  background: var(--sp-surface-200, #e2e6ec);
+}
+
+/* ── Clear button ────────────────────────────────────────────────────────── */
+
+.sp-combo__clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--sp-radius-full, 9999px);
+  border: none;
+  background: var(--sp-surface-200, #e2e6ec);
+  color: var(--sp-text-muted, #4a5568);
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  transition: background var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-combo__clear:hover {
+  background: var(--sp-surface-300, #cdd3dc);
+}
+
+/* ── Dropdown panel ──────────────────────────────────────────────────────── */
+
+.sp-combo__dropdown {
+  max-height: 220px;
+  overflow-y: auto;
+  padding: var(--sp-space-1, 4px) 0;
+  background: var(--sp-surface-0, #fff);
+  border: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08));
+  border-radius: var(--sp-radius-md, 6px);
+  box-shadow: var(--sp-shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1));
+  animation: sp-combo-slide-in var(--sp-duration-fast, 100ms) var(--sp-ease-out, ease-out) both;
+}
+
+/* ── Option ──────────────────────────────────────────────────────────────── */
+
+.sp-combo__option {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-space-2, 8px);
+  width: 100%;
+  padding: var(--sp-space-1_5, 6px) var(--sp-space-3, 12px);
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: var(--sp-text-sm, 13px);
+  color: var(--sp-text-color, #1a202c);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--sp-duration-fast, 100ms) var(--sp-ease-default, cubic-bezier(0.2, 0, 0, 1));
+}
+
+.sp-combo__option:hover,
+.sp-combo__option--highlighted {
+  background: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04));
+}
+
+.sp-combo__option--selected {
+  font-weight: 600;
+  color: var(--sp-primary, #2563eb);
+}
+
+/* ── Check mark (single mode) ────────────────────────────────────────────── */
+
+.sp-combo__check {
+  margin-left: auto;
+  color: var(--sp-primary, #2563eb);
+  flex-shrink: 0;
+}
+
+/* ── Checkbox (multi mode) ───────────────────────────────────────────────── */
+
+.sp-combo__option-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--sp-radius-sm, 4px);
+  border: 2px solid var(--sp-border-strong, rgba(0, 0, 0, 0.14));
+  background: var(--sp-surface-0, #fff);
+  flex-shrink: 0;
+  transition:
+    background var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease),
+    border-color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+  color: var(--sp-primary-text, #fff);
+}
+
+.sp-combo__option-checkbox--checked {
+  background: var(--sp-primary, #2563eb);
+  border-color: var(--sp-primary, #2563eb);
+}
+
+/* ── Empty state ─────────────────────────────────────────────────────────── */
+
+.sp-combo__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-space-3, 12px);
+  font-size: var(--sp-text-sm, 13px);
+  color: var(--sp-text-subtle, #718096);
+}
+
+/* ── Animation ───────────────────────────────────────────────────────────── */
+
+@keyframes sp-combo-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

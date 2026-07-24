@@ -1,0 +1,35 @@
+.sp-avatar-group {
+  display: inline-flex;
+  align-items: center;
+}
+
+.sp-avatar-group .sp-avatar {
+  position: relative;
+  margin-left: calc(var(--sp-avatar-spacing, 8px) * -1);
+  border: 2px solid var(--sp-avatar-group-border, var(--sp-surface-0, #fff));
+  box-sizing: content-box;
+}
+
+.sp-avatar-group .sp-avatar:first-child {
+  margin-left: 0;
+}
+
+.sp-avatar-group__overflow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--sp-surface-200, #e5e7eb);
+  color: var(--sp-text-muted, #6b7280);
+  font-weight: var(--sp-font-semibold, 600);
+  margin-left: calc(var(--sp-avatar-spacing, 8px) * -1);
+  border: 2px solid var(--sp-avatar-group-border, var(--sp-surface-0, #fff));
+  box-sizing: content-box;
+  flex-shrink: 0;
+}
+
+.sp-avatar-group__overflow--xs { width: 24px; height: 24px; font-size: 10px; }
+.sp-avatar-group__overflow--sm { width: 32px; height: 32px; font-size: 11px; }
+.sp-avatar-group__overflow--md { width: 40px; height: 40px; font-size: 12px; }
+.sp-avatar-group__overflow--lg { width: 48px; height: 48px; font-size: 14px; }
+.sp-avatar-group__overflow--xl { width: 64px; height: 64px; font-size: 18px; }

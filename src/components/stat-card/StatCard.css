@@ -1,0 +1,95 @@
+/* ── Base card ─────────────────────────────────────────────────────────── */
+
+.sp-stat-card {
+  background: var(--sp-surface-0, #fff);
+  border: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08));
+  border-radius: var(--sp-radius-lg, 8px);
+  padding: var(--sp-space-4, 16px);
+  display: flex;
+  gap: var(--sp-space-3, 12px);
+}
+
+/* ── Flat variant ──────────────────────────────────────────────────────── */
+
+.sp-stat-card--flat {
+  flex-direction: column;
+  gap: var(--sp-space-1, 4px);
+}
+
+/* ── Icon variant ──────────────────────────────────────────────────────── */
+
+.sp-stat-card--icon {
+  align-items: center;
+}
+
+.sp-stat-card__icon {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: var(--sp-radius-md, 6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Trend variant ─────────────────────────────────────────────────────── */
+
+.sp-stat-card--trend {
+  flex-direction: column;
+  gap: 0;
+  padding-bottom: 0;
+  overflow: hidden;
+}
+
+.sp-stat-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-space-2, 8px);
+}
+
+.sp-stat-card__chart {
+  margin: var(--sp-space-2, 8px) calc(var(--sp-space-4, 16px) * -1) 0;
+}
+
+/* ── Shared body ───────────────────────────────────────────────────────── */
+
+.sp-stat-card__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-space-0_5, 2px);
+  min-width: 0;
+}
+
+.sp-stat-card__label {
+  font-size: var(--sp-text-xs, 11px);
+  font-weight: var(--sp-font-medium, 500);
+  color: var(--sp-text-subtle, #718096);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sp-stat-card__value {
+  font-size: var(--sp-text-xl, 20px);
+  font-weight: var(--sp-font-bold, 700);
+  color: var(--sp-text-color, #1a202c);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.sp-stat-card__change {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: var(--sp-text-xs, 11px);
+  font-weight: var(--sp-font-medium, 500);
+  color: var(--sp-text-muted, #4a5568);
+  white-space: nowrap;
+}
+
+.sp-stat-card__change--up   { color: var(--sp-success, #16a34a); }
+.sp-stat-card__change--down { color: var(--sp-danger,  #dc2626); }

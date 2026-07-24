@@ -1,0 +1,235 @@
+/* ── Pager ─────────────────────────────────────────────────────────────────── */
+
+.sp-pager {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-space-3, 12px);
+  font-family: inherit;
+  font-size: var(--sp-text-sm, 13px);
+  color: var(--sp-text-color, #1a202c);
+  user-select: none;
+}
+
+.sp-pager--disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ── Controls row ─────────────────────────────────────────────────────────── */
+
+.sp-pager__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-space-1, 4px);
+}
+
+/* ── Buttons (shared) ─────────────────────────────────────────────────────── */
+
+.sp-pager__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 var(--sp-space-1_5, 6px);
+  font-size: var(--sp-text-sm, 13px);
+  font-family: inherit;
+  font-weight: var(--sp-font-medium, 500);
+  line-height: 1;
+  color: var(--sp-text-color, #1a202c);
+  background: transparent;
+  border: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08));
+  border-radius: var(--sp-radius-md, 6px);
+  cursor: pointer;
+  transition:
+    background var(--sp-duration-normal, 200ms) var(--sp-ease-default, cubic-bezier(0.2, 0, 0, 1)),
+    color var(--sp-duration-normal, 200ms) var(--sp-ease-default, cubic-bezier(0.2, 0, 0, 1)),
+    border-color var(--sp-duration-normal, 200ms) var(--sp-ease-default, cubic-bezier(0.2, 0, 0, 1));
+}
+
+.sp-pager__btn:hover:not(:disabled) {
+  background: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04));
+  border-color: var(--sp-border-strong, rgba(0, 0, 0, 0.14));
+}
+
+.sp-pager__btn:active:not(:disabled) {
+  background: var(--sp-content-active-bg, rgba(0, 0, 0, 0.07));
+}
+
+.sp-pager__btn:focus-visible {
+  outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color, #2563eb);
+  outline-offset: var(--sp-focus-ring-offset, 2px);
+}
+
+.sp-pager__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── Active page ──────────────────────────────────────────────────────────── */
+
+.sp-pager__btn--active {
+  background: var(--sp-primary, #2563eb);
+  color: var(--sp-primary-text, #fff);
+  border-color: var(--sp-primary, #2563eb);
+  font-weight: var(--sp-font-semibold, 600);
+}
+
+.sp-pager__btn--active:hover:not(:disabled) {
+  background: var(--sp-primary-hover, #1d4ed8);
+  border-color: var(--sp-primary-hover, #1d4ed8);
+  color: var(--sp-primary-text, #fff);
+}
+
+.sp-pager__btn--active:active:not(:disabled) {
+  background: var(--sp-primary-active, #1e40af);
+  border-color: var(--sp-primary-active, #1e40af);
+}
+
+/* ── Ellipsis ─────────────────────────────────────────────────────────────── */
+
+.sp-pager__ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  font-size: var(--sp-text-sm, 13px);
+  color: var(--sp-text-muted, #64748b);
+  letter-spacing: 1px;
+}
+
+/* ── Total display ────────────────────────────────────────────────────────── */
+
+.sp-pager__total {
+  color: var(--sp-text-muted, #64748b);
+  font-size: var(--sp-text-sm, 13px);
+  white-space: nowrap;
+}
+
+/* ── Page size selector ───────────────────────────────────────────────────── */
+
+.sp-pager__page-size {
+  display: flex;
+  align-items: center;
+}
+
+.sp-pager__page-size-label {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-space-2, 8px);
+  font-size: var(--sp-text-sm, 13px);
+  color: var(--sp-text-muted, #64748b);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.sp-pager__page-size-select {
+  height: 32px;
+  padding: 0 var(--sp-space-6, 24px) 0 var(--sp-space-2, 8px);
+  font-size: var(--sp-text-sm, 13px);
+  font-family: inherit;
+  color: var(--sp-text-color, #1a202c);
+  background: var(--sp-surface, #fff);
+  border: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08));
+  border-radius: var(--sp-radius-md, 6px);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  transition:
+    border-color var(--sp-duration-normal, 200ms) var(--sp-ease-default, cubic-bezier(0.2, 0, 0, 1));
+}
+
+.sp-pager__page-size-select:hover {
+  border-color: var(--sp-border-strong, rgba(0, 0, 0, 0.14));
+}
+
+.sp-pager__page-size-select:focus-visible {
+  outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color, #2563eb);
+  outline-offset: var(--sp-focus-ring-offset, 2px);
+}
+
+/* ── Sizes ────────────────────────────────────────────────────────────────── */
+
+.sp-pager--sm .sp-pager__btn {
+  min-width: 28px;
+  height: 28px;
+  font-size: var(--sp-text-xs, 11px);
+}
+
+.sp-pager--sm .sp-pager__ellipsis {
+  min-width: 28px;
+  height: 28px;
+  font-size: var(--sp-text-xs, 11px);
+}
+
+.sp-pager--sm .sp-pager__total,
+.sp-pager--sm .sp-pager__page-size-label {
+  font-size: var(--sp-text-xs, 11px);
+}
+
+.sp-pager--sm .sp-pager__page-size-select {
+  height: 28px;
+  font-size: var(--sp-text-xs, 11px);
+}
+
+.sp-pager--lg .sp-pager__btn {
+  min-width: 40px;
+  height: 40px;
+  font-size: var(--sp-text-base, 15px);
+}
+
+.sp-pager--lg .sp-pager__ellipsis {
+  min-width: 40px;
+  height: 40px;
+  font-size: var(--sp-text-base, 15px);
+}
+
+.sp-pager--lg .sp-pager__total,
+.sp-pager--lg .sp-pager__page-size-label {
+  font-size: var(--sp-text-base, 15px);
+}
+
+.sp-pager--lg .sp-pager__page-size-select {
+  height: 40px;
+  font-size: var(--sp-text-base, 15px);
+}
+
+/* ── Variant: outline ─────────────────────────────────────────────────────── */
+
+.sp-pager--outline .sp-pager__btn--active {
+  background: var(--sp-primary-subtle, rgba(37, 99, 235, 0.1));
+  color: var(--sp-primary, #2563eb);
+  border-color: var(--sp-primary, #2563eb);
+}
+
+.sp-pager--outline .sp-pager__btn--active:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--sp-primary-subtle, rgba(37, 99, 235, 0.1)) 60%, var(--sp-primary, #2563eb) 40%);
+  color: var(--sp-primary-text, #fff);
+}
+
+/* ── Variant: ghost ───────────────────────────────────────────────────────── */
+
+.sp-pager--ghost .sp-pager__btn {
+  border-color: transparent;
+}
+
+.sp-pager--ghost .sp-pager__btn:hover:not(:disabled) {
+  background: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04));
+  border-color: transparent;
+}
+
+.sp-pager--ghost .sp-pager__btn--active {
+  background: var(--sp-content-active-bg, rgba(0, 0, 0, 0.07));
+  color: var(--sp-primary, #2563eb);
+  border-color: transparent;
+  font-weight: var(--sp-font-semibold, 600);
+}
+
+.sp-pager--ghost .sp-pager__btn--active:hover:not(:disabled) {
+  background: var(--sp-primary-subtle, rgba(37, 99, 235, 0.1));
+  border-color: transparent;
+}

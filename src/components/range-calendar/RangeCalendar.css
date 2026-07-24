@@ -1,0 +1,338 @@
+/* ──────────────────────────────────────────────
+   RangeCalendar  (sp-rcal)
+   ────────────────────────────────────────────── */
+
+.sp-rcal {
+  display: inline-flex;
+  flex-direction: column;
+  padding: 12px;
+  border: 1px solid var(--sp-border, #e5e7eb);
+  border-radius: var(--sp-radius-lg, 8px);
+  background: var(--sp-surface-0, #fff);
+  font-family: inherit;
+  box-sizing: border-box;
+  user-select: none;
+  outline: none;
+}
+
+.sp-rcal--disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ── Body (presets sidebar + content) ── */
+
+.sp-rcal__body {
+  display: flex;
+}
+
+/* ── Content (panels area) ── */
+
+.sp-rcal__content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Panels ── */
+
+.sp-rcal__panels {
+  display: flex;
+  gap: var(--sp-space-4, 16px);
+}
+
+.sp-rcal__panel {
+  width: 240px;
+}
+
+/* ── Header ── */
+
+.sp-rcal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.sp-rcal__header-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--sp-text, inherit);
+  cursor: pointer;
+  transition: background var(--sp-duration-fast, 100ms) ease;
+}
+
+.sp-rcal__header-label:hover {
+  background: var(--sp-surface-hover, rgba(0, 0, 0, 0.06));
+}
+
+.sp-rcal__header-label:focus-visible {
+  outline: 2px solid var(--sp-primary, #3b82f6);
+  outline-offset: -2px;
+}
+
+.sp-rcal__nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--sp-text, inherit);
+  cursor: pointer;
+  transition: background var(--sp-duration-fast, 100ms) ease;
+}
+
+.sp-rcal__nav:hover {
+  background: var(--sp-surface-hover, rgba(0, 0, 0, 0.06));
+}
+
+.sp-rcal__nav:focus-visible {
+  outline: 2px solid var(--sp-primary, #3b82f6);
+  outline-offset: -2px;
+}
+
+.sp-rcal__nav-spacer {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+}
+
+/* ── Weekday Headers ── */
+
+.sp-rcal__weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 2px;
+}
+
+.sp-rcal__weekday {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--sp-text-subtle, #6b7280);
+  padding: 4px 0;
+}
+
+/* ── Day Grid ── */
+
+.sp-rcal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+}
+
+/* ── Day Cell ── */
+
+.sp-rcal__day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  border: none;
+  border-radius: var(--sp-radius-sm, 4px);
+  background: transparent;
+  font-size: 13px;
+  color: var(--sp-text, inherit);
+  cursor: pointer;
+  padding: 0;
+  transition:
+    background var(--sp-duration-fast, 100ms) ease,
+    color var(--sp-duration-fast, 100ms) ease;
+}
+
+.sp-rcal__day:hover:not(.sp-rcal__day--start):not(.sp-rcal__day--end):not(.sp-rcal__day--empty):not(.sp-rcal__day--disabled) {
+  background: var(--sp-surface-hover, rgba(0, 0, 0, 0.06));
+}
+
+.sp-rcal__day:focus-visible {
+  outline: none;
+}
+
+.sp-rcal__day--empty {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.sp-rcal__day--today {
+  font-weight: bold;
+  color: var(--sp-primary, #3b82f6);
+}
+
+.sp-rcal__day--in-range {
+  background: var(--sp-primary-subtle, rgba(37, 99, 235, 0.1));
+}
+
+.sp-rcal__day--start,
+.sp-rcal__day--end {
+  background: var(--sp-primary, #3b82f6) !important;
+  color: #fff !important;
+  font-weight: 600;
+}
+
+.sp-rcal__day--focused:not(.sp-rcal__day--start):not(.sp-rcal__day--end) {
+  outline: 2px solid var(--sp-primary, #3b82f6);
+  outline-offset: -2px;
+}
+
+.sp-rcal__day--disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── Footer ── */
+
+.sp-rcal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--sp-border, #e5e7eb);
+}
+
+.sp-rcal__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border: 1px solid var(--sp-border, #e5e7eb);
+  border-radius: 6px;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--sp-text, inherit);
+  cursor: pointer;
+  transition:
+    background var(--sp-duration-fast, 100ms) ease,
+    color var(--sp-duration-fast, 100ms) ease;
+}
+
+.sp-rcal__action:hover {
+  background: var(--sp-surface-hover, rgba(0, 0, 0, 0.06));
+}
+
+.sp-rcal__action:focus-visible {
+  outline: 2px solid var(--sp-primary, #3b82f6);
+  outline-offset: -2px;
+}
+
+.sp-rcal__action--primary {
+  background: var(--sp-primary, #3b82f6);
+  color: #fff;
+  border-color: var(--sp-primary, #3b82f6);
+}
+
+.sp-rcal__action--primary:hover {
+  opacity: 0.9;
+  background: var(--sp-primary, #3b82f6);
+}
+
+/* ── Presets Sidebar ── */
+
+.sp-rcal__presets {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-right: 12px;
+  margin-right: 12px;
+  border-right: 1px solid var(--sp-border, #e5e7eb);
+  min-width: 140px;
+}
+
+.sp-rcal__preset {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 13px;
+  color: var(--sp-text, inherit);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background var(--sp-duration-fast, 100ms) ease,
+    color var(--sp-duration-fast, 100ms) ease;
+}
+
+.sp-rcal__preset:hover {
+  background: var(--sp-surface-hover, rgba(0, 0, 0, 0.06));
+}
+
+.sp-rcal__preset:focus-visible {
+  outline: 2px solid var(--sp-primary, #3b82f6);
+  outline-offset: -2px;
+}
+
+.sp-rcal__preset--active {
+  background: var(--sp-primary-subtle, rgba(37, 99, 235, 0.1));
+  color: var(--sp-primary, #3b82f6);
+  font-weight: 600;
+}
+
+/* ── Picker View (months / years) ── */
+
+.sp-rcal__picker-view {
+  width: 240px;
+}
+
+.sp-rcal__cell-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  padding: 4px 0;
+}
+
+.sp-rcal__cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 4px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 13px;
+  color: var(--sp-text, inherit);
+  cursor: pointer;
+  transition:
+    background var(--sp-duration-fast, 100ms) ease,
+    color var(--sp-duration-fast, 100ms) ease;
+}
+
+.sp-rcal__cell:hover:not(.sp-rcal__cell--selected):not(.sp-rcal__cell--disabled) {
+  background: var(--sp-surface-hover, rgba(0, 0, 0, 0.06));
+}
+
+.sp-rcal__cell:focus-visible {
+  outline: 2px solid var(--sp-primary, #3b82f6);
+  outline-offset: -2px;
+}
+
+.sp-rcal__cell--current {
+  font-weight: bold;
+  color: var(--sp-primary, #3b82f6);
+}
+
+.sp-rcal__cell--selected {
+  background: var(--sp-primary, #3b82f6);
+  color: #fff;
+  font-weight: 600;
+}
+
+.sp-rcal__cell--selected.sp-rcal__cell--current {
+  color: #fff;
+}

@@ -1,0 +1,433 @@
+/* ── DateTimePicker ───────────────────────────────────────────────────────── */
+
+.sp-dtp {
+  display: inline-block;
+  position: relative;
+}
+
+.sp-dtp--open {
+  z-index: 1;
+}
+
+/* ── Button trigger ──────────────────────────────────────────────────────── */
+
+.sp-dtp__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--sp-border-strong, rgba(0, 0, 0, 0.14));
+  border-radius: 6px;
+  background: var(--sp-surface-0, #fff);
+  font-family: inherit;
+  font-size: var(--sp-text-sm, 13px);
+  color: var(--sp-text-color, #1a202c);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-dtp__trigger:hover:not(:disabled) {
+  border-color: var(--sp-border-hover, rgba(0, 0, 0, 0.24));
+}
+
+.sp-dtp__trigger:focus-visible {
+  outline: 2px solid var(--sp-focus-ring-color, #2563eb);
+  outline-offset: 2px;
+}
+
+.sp-dtp__trigger--sm {
+  height: 28px;
+  font-size: var(--sp-text-xs, 12px);
+}
+
+.sp-dtp__trigger--lg {
+  height: 44px;
+  font-size: var(--sp-text-base, 15px);
+}
+
+.sp-dtp__trigger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sp-dtp__value {
+  flex: 1;
+  text-align: left;
+}
+
+/* ── Input mode ──────────────────────────────────────────────────────────── */
+
+.sp-dtp__input-wrap {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  border: 1px solid var(--sp-border-strong, rgba(0, 0, 0, 0.14));
+  border-radius: 6px;
+  background: var(--sp-surface-0, #fff);
+  overflow: hidden;
+  transition: border-color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-dtp__input-wrap:focus-within {
+  border-color: var(--sp-primary, #2563eb);
+  box-shadow: 0 0 0 2px var(--sp-focus-ring-color, rgba(37, 99, 235, 0.25));
+}
+
+.sp-dtp__input-wrap--sm {
+  height: 28px;
+}
+
+.sp-dtp__input-wrap--lg {
+  height: 44px;
+}
+
+.sp-dtp__input-wrap--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sp-dtp__input-icon {
+  flex-shrink: 0;
+  margin: 0 8px;
+  color: var(--sp-text-muted, #6b7280);
+}
+
+.sp-dtp__input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--sp-text-color, #1a202c);
+}
+
+.sp-dtp__input::placeholder {
+  color: var(--sp-text-muted, #9ca3af);
+}
+
+.sp-dtp__input:disabled {
+  cursor: not-allowed;
+}
+
+.sp-dtp__input-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 100%;
+  flex-shrink: 0;
+  border: none;
+  border-left: 1px solid var(--sp-border, rgba(0, 0, 0, 0.12));
+  background: var(--sp-surface-50, #f9fafb);
+  color: var(--sp-text-muted, #6b7280);
+  cursor: pointer;
+  transition: background var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-dtp__input-toggle:hover:not(:disabled) {
+  background: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04));
+}
+
+.sp-dtp__input-toggle:focus-visible {
+  outline: 2px solid var(--sp-focus-ring-color, #2563eb);
+  outline-offset: -2px;
+}
+
+.sp-dtp__input-toggle:disabled {
+  cursor: not-allowed;
+}
+
+/* ── Panel ───────────────────────────────────────────────────────────────── */
+
+.sp-dtp__panel {
+  min-width: 280px;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: var(
+    --sp-shadow-lg,
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -4px rgba(0, 0, 0, 0.1)
+  );
+  background: var(--sp-surface-0, #fff);
+  border: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08));
+  animation: sp-dtp-slide-in var(--sp-duration-fast, 100ms)
+    var(--sp-ease-out, ease-out) both;
+}
+
+/* ── Calendar header ─────────────────────────────────────────────────────── */
+
+.sp-dtp__cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.sp-dtp__cell-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.sp-dtp__header-label {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--sp-text-color, #1a202c);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-dtp__header-label:hover {
+  background: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04));
+}
+
+.sp-dtp__header-label:focus-visible {
+  outline: 2px solid var(--sp-focus-ring-color, #2563eb);
+  outline-offset: 2px;
+}
+
+.sp-dtp__nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--sp-text-muted, #6b7280);
+  cursor: pointer;
+  transition: background var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease),
+    color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-dtp__nav:hover {
+  background: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04));
+  color: var(--sp-text-color, #1a202c);
+}
+
+.sp-dtp__nav:focus-visible {
+  outline: 2px solid var(--sp-focus-ring-color, #2563eb);
+  outline-offset: 2px;
+}
+
+/* ── Weekdays row ────────────────────────────────────────────────────────── */
+
+.sp-dtp__weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.sp-dtp__weekday {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--sp-text-subtle, #9ca3af);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 4px 0;
+  user-select: none;
+}
+
+/* ── Day grid ────────────────────────────────────────────────────────────── */
+
+.sp-dtp__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.sp-dtp__day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--sp-text-color, #1a202c);
+  cursor: pointer;
+  transition: background var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-dtp__day:hover:not(.sp-dtp__day--empty):not(.sp-dtp__day--selected) {
+  background: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04));
+}
+
+.sp-dtp__day:focus-visible {
+  outline: 2px solid var(--sp-focus-ring-color, #2563eb);
+  outline-offset: -2px;
+}
+
+.sp-dtp__day--empty {
+  cursor: default;
+  pointer-events: none;
+}
+
+.sp-dtp__day--today {
+  font-weight: 700;
+  color: var(--sp-primary, #2563eb);
+}
+
+.sp-dtp__day--selected {
+  background: var(--sp-primary, #2563eb);
+  color: #fff;
+  font-weight: 600;
+}
+
+.sp-dtp__day--selected:hover {
+  background: var(--sp-primary-hover, #1d4ed8);
+}
+
+/* ── Month/Year cell grid ────────────────────────────────────────────────── */
+
+.sp-dtp__cell-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+
+.sp-dtp__cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 4px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--sp-text-color, #1a202c);
+  cursor: pointer;
+  transition: background var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-dtp__cell:hover:not(.sp-dtp__cell--selected) {
+  background: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04));
+}
+
+.sp-dtp__cell:focus-visible {
+  outline: 2px solid var(--sp-focus-ring-color, #2563eb);
+  outline-offset: 2px;
+}
+
+.sp-dtp__cell--current {
+  font-weight: 700;
+  color: var(--sp-primary, #2563eb);
+}
+
+.sp-dtp__cell--selected {
+  background: var(--sp-primary, #2563eb);
+  color: #fff;
+  font-weight: 600;
+}
+
+.sp-dtp__cell--selected:hover {
+  background: var(--sp-primary-hover, #1d4ed8);
+}
+
+/* ── Divider ─────────────────────────────────────────────────────────────── */
+
+.sp-dtp__divider {
+  height: 1px;
+  background: var(--sp-border, rgba(0, 0, 0, 0.08));
+  margin: 8px 0;
+}
+
+/* ── Time section ────────────────────────────────────────────────────────── */
+
+.sp-dtp__time {
+  padding-top: 4px;
+}
+
+.sp-dtp__time-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--sp-text-subtle, #9ca3af);
+  margin-bottom: 8px;
+}
+
+.sp-dtp__columns {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+
+.sp-dtp__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08));
+}
+
+.sp-dtp__clear-btn,
+.sp-dtp__apply-btn {
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease),
+    color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-dtp__clear-btn {
+  color: var(--sp-text-muted, #6b7280);
+}
+
+.sp-dtp__clear-btn:hover {
+  background: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04));
+  color: var(--sp-text-color, #1a202c);
+}
+
+.sp-dtp__apply-btn {
+  color: var(--sp-primary, #2563eb);
+  font-weight: 600;
+}
+
+.sp-dtp__apply-btn:hover {
+  background: var(--sp-primary-subtle-bg, rgba(37, 99, 235, 0.08));
+}
+
+.sp-dtp__clear-btn:focus-visible,
+.sp-dtp__apply-btn:focus-visible {
+  outline: 2px solid var(--sp-focus-ring-color, #2563eb);
+  outline-offset: 2px;
+}
+
+/* ── Animation ───────────────────────────────────────────────────────────── */
+
+@keyframes sp-dtp-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

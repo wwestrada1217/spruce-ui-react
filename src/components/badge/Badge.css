@@ -1,0 +1,89 @@
+.sp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-space-1, 4px);
+  padding: 2px var(--sp-space-2, 8px);
+  font-size: var(--sp-text-xs, 11px);
+  font-weight: var(--sp-font-semibold, 600);
+  line-height: var(--sp-leading-tight, 1.25);
+  border-radius: var(--sp-badge-radius, 4px);
+  white-space: nowrap;
+  background: var(--sp-badge-default-bg, #f1f3f6);
+  color: var(--sp-badge-default-text, #1a202c);
+  border: 1px solid var(--sp-badge-default-border, rgba(0, 0, 0, 0.08));
+  /* Component-level tokens */
+  --sp-badge-radius: var(--sp-radius-sm, 4px);
+  --sp-badge-default-bg: var(--sp-surface-100, #f1f3f6);
+  --sp-badge-default-text: var(--sp-text-color, #1a202c);
+  --sp-badge-default-border: var(--sp-border, rgba(0, 0, 0, 0.08));
+  --sp-badge-primary-bg: var(--sp-primary-subtle, rgba(37, 99, 235, 0.1));
+  --sp-badge-primary-text: var(--sp-primary, #2563eb);
+  --sp-badge-success-bg: var(--sp-success-subtle, rgba(22, 163, 74, 0.1));
+  --sp-badge-success-text: var(--sp-success, #16a34a);
+  --sp-badge-warning-bg: var(--sp-warning-subtle, rgba(217, 119, 6, 0.1));
+  --sp-badge-warning-text: var(--sp-warning, #d97706);
+  --sp-badge-danger-bg: var(--sp-danger-subtle, rgba(220, 38, 38, 0.1));
+  --sp-badge-danger-text: var(--sp-danger, #dc2626);
+  --sp-badge-info-bg: var(--sp-info-subtle, rgba(8, 145, 178, 0.1));
+  --sp-badge-info-text: var(--sp-info, #0891b2);
+}
+
+/* ── Variants ──────────────────────────────────────────────────────────────── */
+
+.sp-badge--primary {
+  background: var(--sp-badge-primary-bg, rgba(37, 99, 235, 0.1));
+  color: var(--sp-badge-primary-text, #2563eb);
+  border-color: color-mix(in srgb, var(--sp-badge-primary-text, #2563eb) 25%, transparent);
+}
+
+.sp-badge--success {
+  background: var(--sp-badge-success-bg, rgba(22, 163, 74, 0.1));
+  color: var(--sp-badge-success-text, #16a34a);
+  border-color: color-mix(in srgb, var(--sp-badge-success-text, #16a34a) 25%, transparent);
+}
+
+.sp-badge--warning {
+  background: var(--sp-badge-warning-bg, rgba(217, 119, 6, 0.1));
+  color: var(--sp-badge-warning-text, #d97706);
+  border-color: color-mix(in srgb, var(--sp-badge-warning-text, #d97706) 25%, transparent);
+}
+
+.sp-badge--danger {
+  background: var(--sp-badge-danger-bg, rgba(220, 38, 38, 0.1));
+  color: var(--sp-badge-danger-text, #dc2626);
+  border-color: color-mix(in srgb, var(--sp-badge-danger-text, #dc2626) 25%, transparent);
+}
+
+.sp-badge--info {
+  background: var(--sp-badge-info-bg, rgba(8, 145, 178, 0.1));
+  color: var(--sp-badge-info-text, #0891b2);
+  border-color: color-mix(in srgb, var(--sp-badge-info-text, #0891b2) 25%, transparent);
+}
+
+/* ── Sizes ─────────────────────────────────────────────────────────────────── */
+
+.sp-badge--sm {
+  padding: 1px var(--sp-space-1_5, 6px);
+  font-size: var(--sp-text-2xs, 10px);
+}
+
+.sp-badge--lg {
+  padding: var(--sp-space-1, 4px) var(--sp-space-2_5, 10px);
+  font-size: var(--sp-text-sm, 13px);
+}
+
+/* ── Pill (fully rounded) ──────────────────────────────────────────────────── */
+
+.sp-badge--pill {
+  border-radius: var(--sp-radius-full, 9999px);
+}
+
+/* ── Dot indicator ─────────────────────────────────────────────────────────── */
+
+.sp-badge__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: currentColor;
+  flex-shrink: 0;
+}

@@ -1,0 +1,98 @@
+/* ── Host container ─────────────────────────────────────────────────────── */
+
+.sp-snackbar-host {
+  position: fixed;
+  bottom: var(--sp-space-6, 24px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+}
+
+/* ── Snackbar ────────────────────────────────────────────────────────── */
+
+.sp-snackbar {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-space-3, 12px);
+  min-width: 280px;
+  max-width: 560px;
+  padding: var(--sp-space-3, 12px) var(--sp-space-4, 16px);
+  background: var(--sp-surface-900, #1a202c);
+  color: var(--sp-surface-50, #f8f9fb);
+  border-radius: var(--sp-radius-lg, 8px);
+  box-shadow: var(--sp-shadow-lg, 0 8px 24px rgba(0, 0, 0, 0.18));
+  font-size: var(--sp-text-sm, 13px);
+  line-height: var(--sp-leading-normal, 1.5);
+  pointer-events: auto;
+  --sp-motion-distance-md: 16px;
+  animation: sp-slide-up-in var(--sp-duration-slow) var(--sp-ease-out) both;
+}
+
+.sp-snackbar--removing {
+  animation: sp-slide-down-out var(--sp-duration-slow) var(--sp-ease-in) forwards;
+}
+
+/* ── Message ─────────────────────────────────────────────────────────── */
+
+.sp-snackbar__message {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Action button ───────────────────────────────────────────────────── */
+
+.sp-snackbar__action {
+  flex-shrink: 0;
+  border: none;
+  background: none;
+  color: var(--sp-primary, #3b82f6);
+  font-size: var(--sp-text-sm, 13px);
+  font-weight: var(--sp-font-semibold, 600);
+  font-family: inherit;
+  cursor: pointer;
+  padding: var(--sp-space-1, 4px) var(--sp-space-2, 8px);
+  border-radius: var(--sp-radius-md, 6px);
+  transition: background var(--sp-duration-fast) var(--sp-ease-default);
+  white-space: nowrap;
+}
+
+.sp-snackbar__action:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sp-snackbar__action:focus-visible {
+  outline: var(--sp-focus-ring-width) solid var(--sp-focus-ring-color);
+  outline-offset: var(--sp-focus-ring-offset);
+  animation: sp-focus-glow var(--sp-duration-normal) var(--sp-ease-out) forwards;
+}
+
+/* ── Close button ────────────────────────────────────────────────────── */
+
+.sp-snackbar__close {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--sp-radius-sm, 4px);
+  border: none;
+  background: none;
+  color: var(--sp-surface-400, #9ca3af);
+  cursor: pointer;
+  transition: background var(--sp-duration-fast) var(--sp-ease-default), color var(--sp-duration-fast) var(--sp-ease-default);
+}
+
+.sp-snackbar__close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--sp-surface-50, #f8f9fb);
+}
+
+.sp-snackbar__close:focus-visible {
+  outline: var(--sp-focus-ring-width) solid var(--sp-focus-ring-color);
+  outline-offset: var(--sp-focus-ring-offset);
+  animation: sp-focus-glow var(--sp-duration-normal) var(--sp-ease-out) forwards;
+}

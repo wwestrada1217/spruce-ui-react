@@ -1,0 +1,185 @@
+.sp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-space-1_5, 6px);
+  padding: 0 var(--sp-space-4, 16px);
+  height: var(--sp-btn-height-md, 32px);
+  font-size: var(--sp-text-sm, 13px);
+  font-weight: var(--sp-font-medium, 500);
+  font-family: inherit;
+  line-height: 1;
+  border-radius: var(--sp-btn-radius, 6px);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition:
+    background var(--sp-duration-normal, 200ms) var(--sp-ease-default, cubic-bezier(0.2, 0, 0, 1)),
+    color var(--sp-duration-normal, 200ms) var(--sp-ease-default, cubic-bezier(0.2, 0, 0, 1)),
+    border-color var(--sp-duration-normal, 200ms) var(--sp-ease-default, cubic-bezier(0.2, 0, 0, 1)),
+    box-shadow var(--sp-duration-normal, 200ms) var(--sp-ease-default, cubic-bezier(0.2, 0, 0, 1));
+  white-space: nowrap;
+  user-select: none;
+  /* Component-level tokens */
+  --sp-btn-primary-bg: var(--sp-primary, #2563eb);
+  --sp-btn-primary-text: var(--sp-primary-text, #fff);
+  --sp-btn-primary-bg-hover: var(--sp-primary-hover, #1d4ed8);
+  --sp-btn-primary-bg-active: var(--sp-primary-active, #1e40af);
+  --sp-btn-danger-bg: var(--sp-danger, #dc2626);
+  --sp-btn-success-bg: var(--sp-success, #16a34a);
+  --sp-btn-radius: var(--sp-radius-md, 6px);
+  --sp-btn-height-sm: 28px;
+  --sp-btn-height-md: 32px;
+  --sp-btn-height-lg: 44px;
+}
+
+.sp-btn:focus-visible {
+  outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color, #2563eb);
+  outline-offset: var(--sp-focus-ring-offset, 2px);
+  animation: sp-focus-glow var(--sp-duration-normal, 200ms) var(--sp-ease-out, cubic-bezier(0, 0, 0.2, 1)) forwards;
+}
+
+.sp-btn:active:not(:disabled) {
+  transform: scale(0.97);
+  transition: transform var(--sp-duration-fast, 100ms) var(--sp-ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
+}
+
+.sp-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── Variants ──────────────────────────────────────────────────────────────── */
+
+.sp-btn--primary {
+  background: var(--sp-btn-primary-bg, #2563eb);
+  color: var(--sp-btn-primary-text, #fff);
+}
+.sp-btn--primary:hover { background: var(--sp-btn-primary-bg-hover, #1d4ed8); }
+.sp-btn--primary:active { background: var(--sp-btn-primary-bg-active, #1e40af); }
+
+.sp-btn--secondary {
+  background: var(--sp-surface-100, #f1f3f6);
+  color: var(--sp-text-color, #1a202c);
+}
+.sp-btn--secondary:hover { background: var(--sp-surface-200, #e4e7ec); }
+.sp-btn--secondary:active { background: var(--sp-surface-300, #cdd3dc); }
+
+.sp-btn--outline {
+  background: transparent;
+  color: var(--sp-text-color, #1a202c);
+  border-color: var(--sp-border-strong, rgba(0, 0, 0, 0.14));
+}
+.sp-btn--outline:hover {
+  background: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04));
+  border-color: var(--sp-surface-400, #9ca5b4);
+}
+.sp-btn--outline:active { background: var(--sp-content-active-bg, rgba(0, 0, 0, 0.07)); }
+
+.sp-btn--ghost {
+  background: transparent;
+  color: var(--sp-text-color, #1a202c);
+}
+.sp-btn--ghost:hover { background: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04)); }
+.sp-btn--ghost:active { background: var(--sp-content-active-bg, rgba(0, 0, 0, 0.07)); }
+
+.sp-btn--danger {
+  background: var(--sp-btn-danger-bg, #dc2626);
+  color: #fff;
+}
+.sp-btn--danger:hover { background: color-mix(in srgb, var(--sp-btn-danger-bg, #dc2626) 85%, #000); }
+.sp-btn--danger:active { background: color-mix(in srgb, var(--sp-btn-danger-bg, #dc2626) 75%, #000); }
+
+.sp-btn--danger-outline {
+  background: transparent;
+  color: var(--sp-btn-danger-bg, #dc2626);
+  border-color: var(--sp-btn-danger-bg, #dc2626);
+}
+.sp-btn--danger-outline:hover {
+  background: var(--sp-danger-subtle, rgba(220, 38, 38, 0.1));
+}
+.sp-btn--danger-outline:active {
+  background: color-mix(in srgb, var(--sp-btn-danger-bg, #dc2626) 15%, transparent);
+}
+
+.sp-btn--success {
+  background: var(--sp-btn-success-bg, #16a34a);
+  color: #fff;
+}
+.sp-btn--success:hover { background: color-mix(in srgb, var(--sp-btn-success-bg, #16a34a) 85%, #000); }
+.sp-btn--success:active { background: color-mix(in srgb, var(--sp-btn-success-bg, #16a34a) 75%, #000); }
+
+.sp-btn--success-outline {
+  background: transparent;
+  color: var(--sp-btn-success-bg, #16a34a);
+  border-color: var(--sp-btn-success-bg, #16a34a);
+}
+.sp-btn--success-outline:hover {
+  background: var(--sp-success-subtle, rgba(22, 163, 74, 0.1));
+}
+.sp-btn--success-outline:active {
+  background: color-mix(in srgb, var(--sp-btn-success-bg, #16a34a) 15%, transparent);
+}
+
+/* ── Sizes ─────────────────────────────────────────────────────────────────── */
+
+.sp-btn--sm {
+  height: var(--sp-btn-height-sm, 28px);
+  padding: 0 var(--sp-space-2_5, 10px);
+  font-size: var(--sp-text-xs, 11px);
+}
+
+.sp-btn--lg {
+  height: var(--sp-btn-height-lg, 44px);
+  padding: 0 var(--sp-space-5, 20px);
+  font-size: var(--sp-text-base, 14px);
+}
+
+/* ── Modifiers ─────────────────────────────────────────────────────────────── */
+
+.sp-btn--full { width: 100%; }
+
+/* ── Active / Selected ─────────────────────────────────────────────────────── */
+
+.sp-btn--active {
+  background: var(--sp-primary-subtle, rgba(37, 99, 235, 0.1));
+  color: var(--sp-primary, #2563eb);
+  border-color: var(--sp-primary, #2563eb);
+  font-weight: var(--sp-font-semibold, 600);
+  z-index: 1;
+}
+
+.sp-btn--active:hover {
+  background: color-mix(in srgb, var(--sp-primary-subtle, rgba(37, 99, 235, 0.1)) 60%, var(--sp-primary, #2563eb) 40%);
+}
+
+.sp-btn--active:active {
+  background: color-mix(in srgb, var(--sp-primary-subtle, rgba(37, 99, 235, 0.1)) 40%, var(--sp-primary, #2563eb) 60%);
+}
+
+.sp-btn--icon-only {
+  padding: 0;
+  width: var(--sp-btn-height-md, 32px);
+}
+.sp-btn--icon-only.sp-btn--sm { width: var(--sp-btn-height-sm, 28px); }
+.sp-btn--icon-only.sp-btn--lg { width: var(--sp-btn-height-lg, 44px); }
+.sp-btn--icon-only .sp-btn__label { display: none; }
+
+.sp-btn__label {
+  display: inline-flex;
+  align-items: center;
+}
+
+.sp-btn__spinner {
+  animation: sp-spin 1s var(--sp-ease-linear, linear) infinite;
+}
+
+@keyframes sp-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes sp-focus-glow {
+  from { box-shadow: 0 0 0 0 var(--sp-focus-glow-color, rgba(37, 99, 235, 0.4)); }
+  to   { box-shadow: 0 0 0 var(--sp-focus-glow-spread, 6px) transparent; }
+}

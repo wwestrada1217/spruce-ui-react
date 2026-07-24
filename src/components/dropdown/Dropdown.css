@@ -1,0 +1,78 @@
+.sp-dropdown__menu {
+  padding: var(--sp-space-1, 4px) 0;
+  background: var(--sp-surface-0, #fff);
+  border: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08));
+  border-radius: var(--sp-radius-md, 6px);
+  box-shadow: var(--sp-shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1));
+  min-width: 160px;
+  animation: sp-slide-down-in var(--sp-duration-fast, 100ms) var(--sp-ease-out, ease-out) both;
+  outline: none;
+}
+
+.sp-dropdown__item-wrap {
+  position: relative;
+}
+
+.sp-dropdown__item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-space-2, 8px);
+  width: 100%;
+  padding: var(--sp-space-1_5, 6px) var(--sp-space-3, 12px);
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: var(--sp-text-sm, 13px);
+  color: var(--sp-text-color, #1a202c);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--sp-duration-fast, 100ms) var(--sp-ease-default, cubic-bezier(0.2, 0, 0, 1));
+}
+
+.sp-dropdown__item:hover:not(:disabled) {
+  background: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04));
+}
+
+.sp-dropdown__item:focus-visible {
+  outline: 2px solid var(--sp-focus-ring-color, #2563eb);
+  outline-offset: -2px;
+  background: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04));
+}
+
+.sp-dropdown__item--disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.sp-dropdown__label {
+  flex: 1;
+}
+
+.sp-dropdown__chevron {
+  flex-shrink: 0;
+  opacity: 0.5;
+}
+
+.sp-dropdown__separator {
+  height: 1px;
+  margin: var(--sp-space-1, 4px) 0;
+  background: var(--sp-border, rgba(0, 0, 0, 0.08));
+}
+
+/* ── Submenu ──────────────────────────────────────────────────────────────── */
+
+.sp-dropdown__submenu {
+  animation: sp-scale-in var(--sp-duration-fast, 100ms) var(--sp-ease-out, ease-out) both;
+}
+
+/* ── Animations ───────────────────────────────────────────────────────────── */
+
+@keyframes sp-slide-down-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes sp-scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}

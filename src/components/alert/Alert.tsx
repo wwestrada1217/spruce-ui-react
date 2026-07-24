@@ -1,0 +1,60 @@
+import './Alert.css';
+import { useState, type ReactNode } from 'react';
+import { Icon } from '../../icons/Icon.js';
+
+export type AlertVariant = 'info' | 'success' | 'warning' | 'danger';
+
+export interface AlertProps {
+  variant?: AlertVariant;
+  title?: string;
+  dismissible?: boolean;
+  onClose?: () => void;
+  className?: string;
+  children?: ReactNode;
+}
+
+function iconNameForVariant(variant: AlertVariant): string {
+  switch (variant) {
+    case 'success': return 'check-circle';
+    case 'warning': return 'alert-triangle';
+    case 'danger': return 'alert-circle';
+    default: return 'info';
+  }
+}
+
+export function Alert({
+  variant = 'info',
+  title = '',
+  dismissible = false,
+  onClose,
+  className = '',
+  children,
+}: AlertProps) {
+  const [dismissed, setDismissed] = useState(false);
+
+  if (dismissed) return null;
+
+  const classes = ['sp-alert', `sp-alert--${variant}`, className]
+    .filter(Boolean)
+    .join(' ');
+
+  function handleDismiss() {
+    setDismissed(true);
+    onClose?.();
+  }
+
+  return (
+    <div className={classes} role="alert">
+      <Icon name={iconNameForVariant(variant)} size={18} className="sp-alert__icon" />
+      <div className="sp-alert__body">
+        {title && <div className="sp-alert__title">{title}</div>}
+        <div className="sp-alert__message">{children}</div>
+      </div>
+      {dismissible && (
+        <button className="sp-alert__close" aria-label="Dismiss" onClick={handleDismiss}>
+          <Icon name="x" size={14} />
+        </button>
+      )}
+    </div>
+  );
+}

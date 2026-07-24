@@ -1,0 +1,40 @@
+{
+  "$schema": "../../.nx/installation/node_modules/nx/schemas/project-schema.json",
+  "name": "react-docs",
+  "projectType": "application",
+  "root": "spruce-react/spruce-react-docs",
+  "sourceRoot": "spruce-react/spruce-react-docs/src",
+  "tags": ["scope:spruce-react", "type:app", "framework:react"],
+  "implicitDependencies": ["react-core"],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run build",
+        "cwd": "spruce-react/spruce-react-docs"
+      },
+      "outputs": ["{projectRoot}/dist"]
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run dev",
+        "cwd": "spruce-react/spruce-react-docs"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run lint",
+        "cwd": "spruce-react/spruce-react-docs"
+      }
+    },
+    "preview": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run preview",
+        "cwd": "spruce-react/spruce-react-docs"
+      }
+    }
+  }
+}

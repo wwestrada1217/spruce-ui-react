@@ -1,0 +1,150 @@
+/* ── Mention ───────────────────────────────────────────────────────────── */
+
+.sp-mention {
+  display: block;
+  position: relative;
+
+  /* Component-level tokens */
+  --sp-mention-bg: var(--sp-surface-0, #fff);
+  --sp-mention-border: var(--sp-border-strong, #cbd5e1);
+  --sp-mention-focus-border: var(--sp-primary, #2563eb);
+  --sp-mention-focus-ring: var(--sp-primary-subtle, rgba(37, 99, 235, 0.15));
+  --sp-mention-radius: var(--sp-radius-md, 6px);
+  --sp-mention-text: var(--sp-text-color, #1a202c);
+  --sp-mention-placeholder: var(--sp-text-disabled, #a0aec0);
+  --sp-mention-panel-bg: var(--sp-surface-0, #fff);
+  --sp-mention-panel-border: var(--sp-border, rgba(0, 0, 0, 0.08));
+  --sp-mention-panel-shadow: var(--sp-shadow-lg, 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1));
+  --sp-mention-option-hover: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04));
+  --sp-mention-tag-bg: var(--sp-primary-subtle, rgba(37, 99, 235, 0.1));
+  --sp-mention-tag-color: var(--sp-primary, #2563eb);
+}
+
+/* ── Input ─────────────────────────────────────────────────────────────── */
+
+.sp-mention__input {
+  display: block;
+  width: 100%;
+  padding: var(--sp-space-2, 8px) var(--sp-space-3, 12px);
+  font-family: inherit;
+  font-size: var(--sp-text-sm, 13px);
+  line-height: var(--sp-leading-normal, 1.5);
+  color: var(--sp-mention-text);
+  background: var(--sp-mention-bg);
+  border: 1px solid var(--sp-mention-border);
+  border-radius: var(--sp-mention-radius);
+  resize: vertical;
+  outline: none;
+  transition: border-color var(--sp-duration-normal) var(--sp-ease-default), box-shadow var(--sp-duration-normal) var(--sp-ease-default);
+}
+
+.sp-mention__input:focus {
+  border-color: var(--sp-mention-focus-border);
+  box-shadow: 0 0 0 2px var(--sp-mention-focus-ring);
+}
+
+.sp-mention__input::placeholder {
+  color: var(--sp-mention-placeholder);
+}
+
+.sp-mention__input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--sp-surface-100, #f1f3f6);
+}
+
+.sp-mention__input--sm {
+  padding: var(--sp-space-1, 4px) var(--sp-space-2, 8px);
+  font-size: var(--sp-text-xs, 11px);
+}
+
+.sp-mention__input--lg {
+  padding: var(--sp-space-3, 12px) var(--sp-space-4, 16px);
+  font-size: var(--sp-text-base, 15px);
+}
+
+/* ── Panel ─────────────────────────────────────────────────────────────── */
+
+.sp-mention__panel {
+  width: 260px;
+  max-height: 240px;
+  overflow-y: auto;
+  padding: var(--sp-space-1, 4px) 0;
+  background: var(--sp-mention-panel-bg);
+  border: 1px solid var(--sp-mention-panel-border);
+  border-radius: var(--sp-mention-radius);
+  box-shadow: var(--sp-mention-panel-shadow);
+}
+
+/* ── Option ────────────────────────────────────────────────────────────── */
+
+.sp-mention__option {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-space-2, 8px);
+  width: 100%;
+  padding: var(--sp-space-1_5, 6px) var(--sp-space-3, 12px);
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: var(--sp-text-sm, 13px);
+  color: var(--sp-mention-text);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--sp-duration-fast) var(--sp-ease-default);
+}
+
+.sp-mention__option:hover,
+.sp-mention__option--active {
+  background: var(--sp-mention-option-hover);
+}
+
+.sp-mention__avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--sp-radius-full, 9999px);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.sp-mention__avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--sp-radius-full, 9999px);
+  background: var(--sp-mention-tag-bg);
+  color: var(--sp-mention-tag-color);
+  font-size: var(--sp-text-xs, 11px);
+  font-weight: var(--sp-font-semibold, 600);
+  flex-shrink: 0;
+}
+
+.sp-mention__option-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sp-mention__option-label {
+  font-weight: var(--sp-font-medium, 500);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sp-mention__option-desc {
+  font-size: var(--sp-text-xs, 11px);
+  color: var(--sp-text-muted, #4a5568);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sp-mention__empty {
+  padding: var(--sp-space-3, 12px);
+  text-align: center;
+  font-size: var(--sp-text-sm, 13px);
+  color: var(--sp-text-subtle, #718096);
+}

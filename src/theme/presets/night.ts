@@ -1,0 +1,35 @@
+import type { SpruceTheme } from '../types.js';
+
+/** Night preset — a deep navy dark theme with bright sky-blue accents. */
+export const nightTheme: SpruceTheme = {
+  name: 'night',
+  displayName: 'Night',
+  base: 'dark',
+  tokens: {
+    '--sp-primary': '#38bdf8',
+    '--sp-primary-hover': '#7dd3fc',
+    '--sp-primary-active': '#0ea5e9',
+    '--sp-primary-subtle': 'rgba(56, 189, 248, 0.15)',
+    '--sp-primary-text': '#0c1a2a',
+    '--sp-border-focus': '#38bdf8',
+    '--sp-success': '#34d399',
+    '--sp-success-subtle': 'rgba(52, 211, 153, 0.12)',
+    '--sp-info': '#818cf8',
+    '--sp-info-subtle': 'rgba(129, 140, 248, 0.12)',
+    '--sp-warning': '#fbbf24',
+    '--sp-warning-subtle': 'rgba(251, 191, 36, 0.12)',
+    '--sp-danger': '#f87171',
+    '--sp-danger-subtle': 'rgba(248, 113, 113, 0.12)',
+    '--sp-surface-0': '#0d1117',
+    '--sp-surface-25': '#111520',
+    '--sp-surface-50': '#161b27',
+    '--sp-surface-100': '#1c2333',
+    '--sp-surface-200': '#253047',
+    '--sp-surface-300': '#364260',
+    '--sp-chart-grid-line': '#253047',
+    '--sp-chart-axis-line': '#253047',
+    '--sp-chart-dot-stroke': '#0d1117',
+    '--sp-chart-tooltip-bg': '#161b27',
+    '--sp-chart-track-bg': '#161b27',
+  },
+};

@@ -1,0 +1,57 @@
+.sp-kbd-host {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-space-0_5, 2px);
+  --sp-kbd-bg: var(--sp-surface-50, #f8f9fb);
+  --sp-kbd-border: var(--sp-border-strong, rgba(0, 0, 0, 0.14));
+  --sp-kbd-text: var(--sp-text-color, #1a202c);
+  --sp-kbd-shadow: 0 1px 0 var(--sp-border-strong, rgba(0, 0, 0, 0.14)), inset 0 -1px 0 var(--sp-border-strong, rgba(0, 0, 0, 0.14));
+  --sp-kbd-radius: var(--sp-radius-sm, 4px);
+  --sp-kbd-font: var(--sp-font-mono, ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace);
+}
+
+.sp-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px var(--sp-space-1_5, 6px);
+  min-width: 24px;
+  height: 24px;
+  font-family: var(--sp-kbd-font);
+  font-size: var(--sp-text-xs, 11px);
+  font-weight: var(--sp-font-semibold, 600);
+  line-height: 1;
+  color: var(--sp-kbd-text);
+  background: var(--sp-kbd-bg);
+  border: 1px solid var(--sp-kbd-border);
+  border-radius: var(--sp-kbd-radius);
+  box-shadow: var(--sp-kbd-shadow);
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* ── Sizes ─────────────────────────────────────────────────────────────── */
+
+.sp-kbd--sm {
+  padding: 1px var(--sp-space-1, 4px);
+  min-width: 20px;
+  height: 20px;
+  font-size: var(--sp-text-2xs, 10px);
+}
+
+.sp-kbd--lg {
+  padding: 3px var(--sp-space-2, 8px);
+  min-width: 28px;
+  height: 28px;
+  font-size: var(--sp-text-sm, 13px);
+}
+
+/* ── Separator ─────────────────────────────────────────────────────────── */
+
+.sp-kbd__sep {
+  font-size: var(--sp-text-xs, 11px);
+  color: var(--sp-text-subtle, #718096);
+  line-height: 1;
+  user-select: none;
+  padding: 0 1px;
+}

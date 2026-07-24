@@ -1,0 +1,13 @@
+/* ─── Overflow ────────────────────────────────────────────────────── */
+
+.sp-overflow {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow: hidden;
+  align-items: center;
+}
+
+.sp-overflow__menu {
+  flex-shrink: 0;
+  margin-left: auto;
+}

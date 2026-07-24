@@ -1,0 +1,204 @@
+/* ============================================================================
+   Coachmark — matches Angular sp-coachmark component
+   ============================================================================ */
+
+.sp-coachmark-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: none;
+  animation: sp-fade-in var(--sp-duration-normal, 200ms) var(--sp-ease-out, ease-out) both;
+}
+
+.sp-coachmark-backdrop--no-overlay {
+  pointer-events: none;
+}
+
+.sp-coachmark-backdrop--no-overlay .sp-coachmark-card {
+  pointer-events: auto;
+}
+
+/* ── Spotlight cutout (box-shadow technique matching Angular) ──────────────── */
+.sp-coachmark-spotlight {
+  box-shadow: 0 0 0 9999px var(--sp-coachmark-backdrop, rgba(0, 0, 0, 0.55));
+  pointer-events: none;
+  transition:
+    top 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    left 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Card ──────────────────────────────────────────────────────────────────── */
+
+.sp-coachmark-card {
+  position: relative;
+  z-index: 1101;
+  background: var(--sp-surface-0, #fff);
+  border: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08));
+  border-radius: var(--sp-radius-xl, 12px);
+  box-shadow: var(--sp-shadow-xl, 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1));
+  width: 320px;
+  animation: sp-coachmark-pop-in var(--sp-duration-normal, 200ms) var(--sp-ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)) both;
+  transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1), left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sp-coachmark-card:focus {
+  outline: none;
+}
+
+/* ── Card body ────────────────────────────────────────────────────────────── */
+
+.sp-coachmark-card__body {
+  padding: var(--sp-space-4, 16px) var(--sp-space-5, 20px);
+}
+
+.sp-coachmark-card__title {
+  font-size: var(--sp-text-base, 15px);
+  font-weight: var(--sp-font-semibold, 600);
+  color: var(--sp-text-color);
+  margin: 0 0 var(--sp-space-1, 4px);
+}
+
+.sp-coachmark-card__desc {
+  font-size: var(--sp-text-sm, 13px);
+  color: var(--sp-text-muted, #4a5568);
+  margin: 0;
+  line-height: var(--sp-leading-normal, 1.5);
+}
+
+/* ── Card footer ──────────────────────────────────────────────────────────── */
+
+.sp-coachmark-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-space-3, 12px) var(--sp-space-5, 20px);
+  border-top: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08));
+  gap: var(--sp-space-2, 8px);
+}
+
+.sp-coachmark-card__progress {
+  font-size: var(--sp-text-xs, 12px);
+  color: var(--sp-text-subtle, #718096);
+  font-weight: var(--sp-font-medium, 500);
+  white-space: nowrap;
+}
+
+.sp-coachmark-card__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-space-2, 8px);
+  margin-left: auto;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────────── */
+
+.sp-coachmark-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  font-size: var(--sp-text-sm, 13px);
+  font-weight: var(--sp-font-medium, 500);
+  font-family: inherit;
+  border-radius: var(--sp-radius-md, 6px);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition:
+    background var(--sp-duration-normal, 200ms) var(--sp-ease-default, ease),
+    color var(--sp-duration-normal, 200ms) var(--sp-ease-default, ease),
+    border-color var(--sp-duration-normal, 200ms) var(--sp-ease-default, ease);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.sp-coachmark-btn--primary {
+  background: var(--sp-primary, #2563eb);
+  color: var(--sp-primary-text, #fff);
+  border-color: var(--sp-primary, #2563eb);
+}
+.sp-coachmark-btn--primary:hover {
+  background: var(--sp-primary-hover, #1d4ed8);
+  border-color: var(--sp-primary-hover, #1d4ed8);
+}
+
+.sp-coachmark-btn--outline {
+  background: transparent;
+  color: var(--sp-text-color);
+  border-color: var(--sp-border, rgba(0, 0, 0, 0.08));
+}
+.sp-coachmark-btn--outline:hover {
+  background: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04));
+}
+
+.sp-coachmark-btn--ghost {
+  background: transparent;
+  color: var(--sp-text-muted, #4a5568);
+  border-color: transparent;
+}
+.sp-coachmark-btn--ghost:hover {
+  color: var(--sp-text-color);
+  background: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04));
+}
+
+/* ── Arrow ────────────────────────────────────────────────────────────────── */
+
+.sp-coachmark-arrow {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: var(--sp-surface-0, #fff);
+  border: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08));
+  transform: rotate(45deg);
+}
+
+.sp-coachmark-arrow[data-side="top"] {
+  top: -6px;
+  left: 50%;
+  margin-left: -5px;
+  border-bottom: none;
+  border-right: none;
+}
+
+.sp-coachmark-arrow[data-side="bottom"] {
+  bottom: -6px;
+  left: 50%;
+  margin-left: -5px;
+  border-top: none;
+  border-left: none;
+}
+
+.sp-coachmark-arrow[data-side="left"] {
+  left: -6px;
+  top: 50%;
+  margin-top: -5px;
+  border-top: none;
+  border-right: none;
+}
+
+.sp-coachmark-arrow[data-side="right"] {
+  right: -6px;
+  top: 50%;
+  margin-top: -5px;
+  border-bottom: none;
+  border-left: none;
+}
+
+/* ── Animations ──────────────────────────────────────────────────────────── */
+
+@keyframes sp-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes sp-coachmark-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(var(--sp-motion-scale-in, 0.95)) translateY(var(--sp-motion-distance-sm, 4px));
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}

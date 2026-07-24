@@ -1,0 +1,91 @@
+/* ── Slider ────────────────────────────────────────────────────────────── */
+
+.sp-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.sp-slider--disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ── Value display ────────────────────────────────────────────────────── */
+
+.sp-slider__value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--sp-text-color, #1a202c);
+  align-self: flex-end;
+  line-height: 1;
+}
+
+/* ── Track ────────────────────────────────────────────────────────────── */
+
+.sp-slider__track {
+  position: relative;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--sp-surface-200, #e5e7eb);
+  cursor: pointer;
+  touch-action: none;
+}
+
+.sp-slider__track:focus-visible {
+  outline: none;
+}
+
+.sp-slider__track:focus-visible .sp-slider__thumb {
+  outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color, #2563eb);
+  outline-offset: var(--sp-focus-ring-offset, 2px);
+}
+
+/* ── Fill ─────────────────────────────────────────────────────────────── */
+
+.sp-slider__fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--sp-primary, #2563eb);
+  pointer-events: none;
+}
+
+/* ── Thumb ────────────────────────────────────────────────────────────── */
+
+.sp-slider__thumb {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--sp-primary, #2563eb);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  cursor: grab;
+  pointer-events: none;
+  transition: box-shadow var(--sp-duration-normal, 200ms) var(--sp-ease-default, cubic-bezier(0.2, 0, 0, 1));
+}
+
+.sp-slider__track:hover .sp-slider__thumb {
+  box-shadow: 0 0 0 4px var(--sp-primary-subtle, rgba(37, 99, 235, 0.15));
+}
+
+.sp-slider__track:active .sp-slider__thumb {
+  cursor: grabbing;
+}
+
+/* ── Tick labels ──────────────────────────────────────────────────────── */
+
+.sp-slider__ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--sp-text-muted, #6b7280);
+  line-height: 1;
+  user-select: none;
+}

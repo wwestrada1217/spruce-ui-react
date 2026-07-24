@@ -1,0 +1,97 @@
+.sp-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--sp-space-8, 32px) var(--sp-space-4, 16px);
+  gap: var(--sp-space-2, 8px);
+}
+
+/* ── Bordered ──────────────────────────────────────────────────────────── */
+
+.sp-empty--bordered {
+  border: 1px dashed var(--sp-border, rgba(0, 0, 0, 0.12));
+  border-radius: var(--sp-radius-lg, 8px);
+  background: var(--sp-surface-50, #f8f9fb);
+}
+
+/* ── Icon ──────────────────────────────────────────────────────────────── */
+
+.sp-empty__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--sp-radius-full, 9999px);
+  background: var(--sp-surface-100, #f1f3f6);
+  color: var(--sp-text-subtle, #718096);
+  margin-bottom: var(--sp-space-1, 4px);
+}
+
+/* ── Text ──────────────────────────────────────────────────────────────── */
+
+.sp-empty__title {
+  font-size: var(--sp-text-base, 15px);
+  font-weight: var(--sp-font-semibold, 600);
+  color: var(--sp-text-color, #1a202c);
+  margin: 0;
+}
+
+.sp-empty__desc {
+  font-size: var(--sp-text-sm, 13px);
+  color: var(--sp-text-muted, #4a5568);
+  margin: 0;
+  max-width: 320px;
+  line-height: 1.5;
+}
+
+/* ── Sizes ─────────────────────────────────────────────────────────────── */
+
+.sp-empty--sm {
+  padding: var(--sp-space-5, 20px) var(--sp-space-3, 12px);
+  gap: var(--sp-space-1_5, 6px);
+}
+
+.sp-empty--sm .sp-empty__icon {
+  width: 36px;
+  height: 36px;
+}
+
+.sp-empty--sm .sp-empty__title {
+  font-size: var(--sp-text-sm, 13px);
+}
+
+.sp-empty--sm .sp-empty__desc {
+  font-size: var(--sp-text-xs, 11px);
+}
+
+.sp-empty--lg {
+  padding: var(--sp-space-12, 48px) var(--sp-space-6, 24px);
+  gap: var(--sp-space-3, 12px);
+}
+
+.sp-empty--lg .sp-empty__icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: var(--sp-space-2, 8px);
+}
+
+.sp-empty--lg .sp-empty__title {
+  font-size: var(--sp-text-lg, 18px);
+}
+
+.sp-empty--lg .sp-empty__desc {
+  font-size: var(--sp-text-base, 15px);
+  max-width: 400px;
+}
+
+/* ── Actions (projected content) ──────────────────────────────────────── */
+
+.sp-empty__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-space-2, 8px);
+  margin-top: var(--sp-space-2, 8px);
+}

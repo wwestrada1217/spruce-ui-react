@@ -1,0 +1,235 @@
+/* ─── CSS Custom Properties (theming) ─── */
+.sp-code-editor-host {
+  /* Editor surface */
+  --sp-ce-bg: #1e1e2e;
+  --sp-ce-text: #dce0f5;
+  --sp-ce-gutter-bg: #181825;
+  --sp-ce-gutter-text: #7f849c;
+  --sp-ce-gutter-border: #313244;
+  --sp-ce-border: #313244;
+  --sp-ce-selection: rgba(137, 180, 250, 0.2);
+  --sp-ce-cursor: #dce0f5;
+  --sp-ce-placeholder: #636679;
+  --sp-ce-focus-border: #89b4fa;
+  --sp-ce-active-line: rgba(255, 255, 255, 0.04);
+
+  /* Typography */
+  --sp-ce-font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', 'Monaco', 'Courier New', monospace;
+  --sp-ce-font-size: 13px;
+  --sp-ce-line-height: 1.6;
+
+  /* Token colors (Catppuccin Mocha-inspired) */
+  --sp-ce-keyword: #cba6f7;
+  --sp-ce-string: #a6e3a1;
+  --sp-ce-comment: #7f849c;
+  --sp-ce-number: #fab387;
+  --sp-ce-operator: #94e2d5;
+  --sp-ce-function: #89b4fa;
+  --sp-ce-type: #f9e2af;
+  --sp-ce-property: #89b4fa;
+  --sp-ce-tag: #f38ba8;
+  --sp-ce-attribute: #fab387;
+  --sp-ce-punctuation: #a6adc8;
+  --sp-ce-builtin: #f2cdcd;
+  --sp-ce-variable: #f5c2e7;
+  --sp-ce-decorator: #f9e2af;
+
+  display: block;
+}
+
+/* ─── Light theme ─── */
+[data-theme='light'] .sp-code-editor-host,
+.light .sp-code-editor-host {
+  --sp-ce-bg: #fafafa;
+  --sp-ce-text: #383a42;
+  --sp-ce-gutter-bg: #f0f0f0;
+  --sp-ce-gutter-text: #9d9d9f;
+  --sp-ce-gutter-border: #e0e0e0;
+  --sp-ce-border: #d0d0d0;
+  --sp-ce-selection: rgba(64, 120, 242, 0.15);
+  --sp-ce-cursor: #383a42;
+  --sp-ce-placeholder: #a0a1a7;
+  --sp-ce-focus-border: #4078f2;
+  --sp-ce-active-line: rgba(0, 0, 0, 0.04);
+
+  --sp-ce-keyword: #a626a4;
+  --sp-ce-string: #50a14f;
+  --sp-ce-comment: #a0a1a7;
+  --sp-ce-number: #986801;
+  --sp-ce-operator: #0184bc;
+  --sp-ce-function: #4078f2;
+  --sp-ce-type: #c18401;
+  --sp-ce-property: #4078f2;
+  --sp-ce-tag: #e45649;
+  --sp-ce-attribute: #986801;
+  --sp-ce-punctuation: #696c77;
+  --sp-ce-builtin: #ca1243;
+  --sp-ce-variable: #a626a4;
+  --sp-ce-decorator: #c18401;
+}
+
+/* ─── Editor Container ─── */
+.sp-code-editor-host .sp-code-editor {
+  display: flex;
+  overflow: auto;
+  background: var(--sp-ce-bg);
+  color: var(--sp-ce-text);
+  border: 1px solid var(--sp-ce-border);
+  font-family: var(--sp-ce-font-family);
+  font-size: var(--sp-ce-font-size);
+  line-height: var(--sp-ce-line-height);
+  scrollbar-width: thin;
+  scrollbar-color: var(--sp-scrollbar-thumb, rgba(0, 0, 0, 0.14)) var(--sp-scrollbar-track, rgba(0, 0, 0, 0.03));
+}
+
+.sp-code-editor-host .sp-code-editor::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.sp-code-editor-host .sp-code-editor::-webkit-scrollbar-track {
+  background: var(--sp-scrollbar-track, rgba(0, 0, 0, 0.03));
+}
+
+.sp-code-editor-host .sp-code-editor::-webkit-scrollbar-thumb {
+  background: var(--sp-scrollbar-thumb, rgba(0, 0, 0, 0.14));
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.sp-code-editor-host .sp-code-editor::-webkit-scrollbar-thumb:hover {
+  background: var(--sp-scrollbar-hover, rgba(0, 0, 0, 0.25));
+  background-clip: content-box;
+}
+
+.sp-code-editor-host .sp-code-editor::-webkit-scrollbar-corner {
+  background: var(--sp-scrollbar-track, rgba(0, 0, 0, 0.03));
+}
+
+.sp-code-editor-host.sp-code-editor-host--focused .sp-code-editor {
+  border-color: var(--sp-ce-focus-border);
+  outline: 2px solid var(--sp-ce-focus-border);
+  outline-offset: -1px;
+}
+
+/* ─── Line Numbers Gutter ─── */
+.sp-code-editor-host .sp-code-editor__gutter {
+  flex-shrink: 0;
+  padding: 12px 0;
+  background: var(--sp-ce-gutter-bg);
+  border-right: 1px solid var(--sp-ce-gutter-border);
+  text-align: right;
+  user-select: none;
+  min-width: 48px;
+  overflow: hidden;
+}
+
+.sp-code-editor-host .sp-code-editor__line-number {
+  padding: 0 12px 0 8px;
+  color: var(--sp-ce-gutter-text);
+  font-size: var(--sp-ce-font-size);
+  line-height: var(--sp-ce-line-height);
+  font-family: var(--sp-ce-font-family);
+}
+
+/* ─── Content Area (stacked textarea + pre) ─── */
+.sp-code-editor-host .sp-code-editor__content {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Shared sizing between textarea and pre */
+.sp-code-editor-host .sp-code-editor__textarea,
+.sp-code-editor-host .sp-code-editor__highlight {
+  margin: 0;
+  padding: 12px 16px;
+  border: none;
+  outline: none;
+  font-family: var(--sp-ce-font-family);
+  font-size: var(--sp-ce-font-size);
+  line-height: var(--sp-ce-line-height);
+  tab-size: 2;
+  white-space: pre;
+  word-wrap: normal;
+  overflow-wrap: normal;
+}
+
+/* ─── Syntax Highlight Overlay ─── */
+.sp-code-editor-host .sp-code-editor__highlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  pointer-events: none;
+  color: var(--sp-ce-text);
+  background: transparent;
+}
+
+/* ─── Textarea (invisible text, visible caret) ─── */
+.sp-code-editor-host .sp-code-editor__textarea {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  background: transparent;
+  color: transparent;
+  caret-color: var(--sp-ce-cursor);
+  resize: none;
+  overflow: auto;
+}
+
+.sp-code-editor-host .sp-code-editor__textarea::selection {
+  background: var(--sp-ce-selection);
+  color: transparent;
+}
+
+.sp-code-editor-host .sp-code-editor__textarea::placeholder {
+  color: transparent;
+}
+
+/* ─── Placeholder ─── */
+.sp-code-editor-host .sp-code-editor__placeholder {
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  color: var(--sp-ce-placeholder);
+  pointer-events: none;
+  user-select: none;
+  font-family: var(--sp-ce-font-family);
+  font-size: var(--sp-ce-font-size);
+  line-height: var(--sp-ce-line-height);
+}
+
+/* ─── Readonly state ─── */
+.sp-code-editor-host.sp-code-editor-host--readonly .sp-code-editor {
+  cursor: default;
+}
+
+.sp-code-editor-host.sp-code-editor-host--readonly .sp-code-editor__highlight {
+  pointer-events: auto;
+  user-select: text;
+  overflow: auto;
+}
+
+/* ─── Token Colors ─── */
+.sp-code-editor-host .sp-ce-keyword   { color: var(--sp-ce-keyword); font-weight: 500; }
+.sp-code-editor-host .sp-ce-string    { color: var(--sp-ce-string); }
+.sp-code-editor-host .sp-ce-comment   { color: var(--sp-ce-comment); font-style: italic; }
+.sp-code-editor-host .sp-ce-number    { color: var(--sp-ce-number); }
+.sp-code-editor-host .sp-ce-operator  { color: var(--sp-ce-operator); }
+.sp-code-editor-host .sp-ce-function  { color: var(--sp-ce-function); }
+.sp-code-editor-host .sp-ce-type      { color: var(--sp-ce-type); }
+.sp-code-editor-host .sp-ce-property  { color: var(--sp-ce-property); }
+.sp-code-editor-host .sp-ce-tag       { color: var(--sp-ce-tag); }
+.sp-code-editor-host .sp-ce-attribute { color: var(--sp-ce-attribute); }
+.sp-code-editor-host .sp-ce-punctuation { color: var(--sp-ce-punctuation); }
+.sp-code-editor-host .sp-ce-builtin   { color: var(--sp-ce-builtin); }
+.sp-code-editor-host .sp-ce-variable  { color: var(--sp-ce-variable); }
+.sp-code-editor-host .sp-ce-decorator { color: var(--sp-ce-decorator); }

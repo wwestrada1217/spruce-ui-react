@@ -1,0 +1,285 @@
+/* ──────────────────────────────────────────────
+   Calendar  (sp-cal)
+   ────────────────────────────────────────────── */
+
+.sp-cal {
+  display: inline-flex;
+  flex-direction: column;
+  width: 280px;
+  padding: 12px;
+  border: 1px solid var(--sp-border);
+  border-radius: var(--sp-radius-lg, 8px);
+  background: var(--sp-surface-0, #fff);
+  font-family: inherit;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+.sp-cal--with-weeks {
+  width: 310px;
+}
+
+.sp-cal--disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ── Header ── */
+
+.sp-cal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.sp-cal__nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--sp-text, inherit);
+  cursor: pointer;
+  transition: background var(--sp-duration-fast, 100ms) ease;
+}
+
+.sp-cal__nav:hover {
+  background: var(--sp-surface-hover, rgba(0, 0, 0, 0.06));
+}
+
+.sp-cal__nav:focus-visible {
+  outline: 2px solid var(--sp-primary, #3b82f6);
+  outline-offset: -2px;
+}
+
+.sp-cal__header-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--sp-text, inherit);
+  cursor: pointer;
+  transition: background var(--sp-duration-fast, 100ms) ease;
+}
+
+.sp-cal__header-label:hover {
+  background: var(--sp-surface-hover, rgba(0, 0, 0, 0.06));
+}
+
+.sp-cal__header-label:focus-visible {
+  outline: 2px solid var(--sp-primary, #3b82f6);
+  outline-offset: -2px;
+}
+
+.sp-cal__header-label--static {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ── Weekday Headers ── */
+
+.sp-cal__weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 2px;
+}
+
+.sp-cal__weekdays--with-weeks {
+  grid-template-columns: 28px repeat(7, 1fr);
+}
+
+.sp-cal__weekday {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--sp-text-subtle, #6b7280);
+  padding: 4px 0;
+}
+
+/* ── Day Grid ── */
+
+.sp-cal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.sp-cal__grid--with-weeks {
+  grid-template-columns: 28px repeat(7, 1fr);
+}
+
+/* ── Day Cell ── */
+
+.sp-cal__day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 13px;
+  color: var(--sp-text, inherit);
+  cursor: pointer;
+  padding: 0;
+  transition:
+    background var(--sp-duration-fast, 100ms) ease,
+    color var(--sp-duration-fast, 100ms) ease;
+}
+
+.sp-cal__day:hover:not(.sp-cal__day--selected):not(.sp-cal__day--empty):not(.sp-cal__day--disabled) {
+  background: var(--sp-surface-hover, rgba(0, 0, 0, 0.06));
+}
+
+.sp-cal__day:focus-visible {
+  outline: none;
+}
+
+.sp-cal__day--empty {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.sp-cal__day--today {
+  font-weight: bold;
+  color: var(--sp-primary, #3b82f6);
+}
+
+.sp-cal__day--selected {
+  background: var(--sp-primary, #3b82f6);
+  color: var(--sp-primary-text, #fff);
+  font-weight: 600;
+}
+
+.sp-cal__day--selected.sp-cal__day--today {
+  color: var(--sp-primary-text, #fff);
+}
+
+.sp-cal__day--focused:not(.sp-cal__day--selected) {
+  outline: 2px solid var(--sp-primary, #3b82f6);
+  outline-offset: -2px;
+}
+
+.sp-cal__day--disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── Week Number ── */
+
+.sp-cal__week-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: var(--sp-text-muted, #9ca3af);
+}
+
+.sp-cal__week-number--bg {
+  background: var(--sp-surface-1, rgba(0, 0, 0, 0.03));
+  border-radius: 4px;
+}
+
+/* ── Cell Grid (Months / Years) ── */
+
+.sp-cal__cell-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  padding: 4px 0;
+}
+
+.sp-cal__cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 4px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 13px;
+  color: var(--sp-text, inherit);
+  cursor: pointer;
+  transition:
+    background var(--sp-duration-fast, 100ms) ease,
+    color var(--sp-duration-fast, 100ms) ease;
+}
+
+.sp-cal__cell:hover:not(.sp-cal__cell--selected):not(.sp-cal__cell--disabled) {
+  background: var(--sp-surface-hover, rgba(0, 0, 0, 0.06));
+}
+
+.sp-cal__cell:focus-visible {
+  outline: 2px solid var(--sp-primary, #3b82f6);
+  outline-offset: -2px;
+}
+
+.sp-cal__cell--current {
+  font-weight: bold;
+  color: var(--sp-primary, #3b82f6);
+}
+
+.sp-cal__cell--selected {
+  background: var(--sp-primary, #3b82f6);
+  color: var(--sp-primary-text, #fff);
+  font-weight: 600;
+}
+
+.sp-cal__cell--selected.sp-cal__cell--current {
+  color: var(--sp-primary-text, #fff);
+}
+
+.sp-cal__cell--disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── Footer ── */
+
+.sp-cal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--sp-border, #e5e7eb);
+}
+
+.sp-cal__today-btn,
+.sp-cal__clear-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--sp-primary, #3b82f6);
+  cursor: pointer;
+  transition: background var(--sp-duration-fast, 100ms) ease;
+}
+
+.sp-cal__today-btn:hover,
+.sp-cal__clear-btn:hover {
+  background: var(--sp-surface-hover, rgba(0, 0, 0, 0.06));
+}
+
+.sp-cal__today-btn:focus-visible,
+.sp-cal__clear-btn:focus-visible {
+  outline: 2px solid var(--sp-primary, #3b82f6);
+  outline-offset: -2px;
+}

@@ -1,0 +1,104 @@
+.sp-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-space-2, 8px);
+  padding: 0 var(--sp-space-3, 12px);
+  border: 1px solid var(--sp-border-strong, rgba(0,0,0,0.14));
+  border-radius: var(--sp-radius-md, 6px);
+  background: var(--sp-surface-0, #fff);
+  transition: border-color var(--sp-duration-normal, 200ms) var(--sp-ease-default, ease),
+    box-shadow var(--sp-duration-normal, 200ms) var(--sp-ease-default, ease);
+  height: 32px;
+}
+
+.sp-input-wrap--sm {
+  height: 28px;
+  padding: 0 var(--sp-space-2, 8px);
+}
+
+.sp-input-wrap--lg {
+  height: 44px;
+  padding: 0 var(--sp-space-4, 16px);
+}
+
+.sp-input-wrap--focused {
+  border-color: var(--sp-focus-ring-color, #2563eb);
+  box-shadow: 0 0 0 3px var(--sp-focus-glow-color, rgba(37,99,235,0.12));
+}
+
+.sp-input-wrap--error {
+  border-color: var(--sp-danger, #dc2626) !important;
+}
+
+.sp-input-wrap--error.sp-input-wrap--focused {
+  box-shadow: 0 0 0 3px var(--sp-danger-subtle, rgba(220,38,38,0.12));
+}
+
+.sp-input-wrap--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--sp-surface-100, #f1f5f9);
+}
+
+.sp-input-wrap__icon {
+  flex-shrink: 0;
+  color: var(--sp-text-subtle, #718096);
+}
+
+.sp-input-wrap__field {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: var(--sp-text-sm, 13px);
+  color: var(--sp-text-color, #1a202c);
+}
+
+.sp-input-wrap--sm .sp-input-wrap__field {
+  font-size: var(--sp-text-xs, 11px);
+}
+
+.sp-input-wrap--lg .sp-input-wrap__field {
+  font-size: var(--sp-text-base, 14px);
+}
+
+.sp-input-wrap__field::placeholder {
+  color: var(--sp-text-disabled, #a0aec0);
+}
+
+.sp-input-wrap__field:disabled {
+  cursor: not-allowed;
+}
+
+.sp-input-wrap__clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--sp-radius-full, 9999px);
+  border: none;
+  background: var(--sp-surface-200, #e2e6ec);
+  color: var(--sp-text-muted, #4a5568);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-input-wrap__clear:hover {
+  background: var(--sp-surface-300, #cdd3dc);
+}
+
+.sp-input-error {
+  margin: var(--sp-space-1, 4px) 0 0;
+  font-size: var(--sp-text-xs, 11px);
+  color: var(--sp-danger, #dc2626);
+}
+
+.sp-input-hint {
+  margin: var(--sp-space-1, 4px) 0 0;
+  font-size: var(--sp-text-xs, 11px);
+  color: var(--sp-text-subtle, #718096);
+}

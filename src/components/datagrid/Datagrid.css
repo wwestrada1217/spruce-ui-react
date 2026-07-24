@@ -1,0 +1,2966 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Spruce React DataGrid — Complete Styles
+   Ported from Angular SCSS to plain CSS with sp-grid- prefix.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Design tokens ─────────────────────────────────────────────────────── */
+.sp-grid-root {
+  --grid-bg: var(--sp-surface-0, #ffffff);
+  --grid-border: var(--sp-border, rgba(0, 0, 0, 0.08));
+  --grid-border-strong: var(--sp-border-strong, rgba(0, 0, 0, 0.14));
+  --grid-header-bg: var(--sp-surface-50, #f4f6fb);
+  --grid-header-text: var(--sp-text-muted, #4a5568);
+  --grid-header-hover-bg: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04));
+  --grid-row-bg: transparent;
+  --grid-row-odd-bg: rgba(0, 0, 0, 0.018);
+  --grid-row-hover-bg: color-mix(in srgb, var(--sp-primary, #2563eb) 6%, transparent);
+  --grid-row-selected-bg: color-mix(in srgb, var(--sp-primary, #2563eb) 10%, transparent);
+  --grid-row-border: rgba(0, 0, 0, 0.05);
+  --grid-cell-text: var(--sp-text-color, #1a202c);
+  --grid-cell-secondary: var(--sp-text-subtle, #718096);
+  --grid-accent: var(--sp-primary, #2563eb);
+  --grid-accent-glow: color-mix(in srgb, var(--sp-primary, #2563eb) 15%, transparent);
+  --grid-accent-dim: color-mix(in srgb, var(--sp-primary, #2563eb) 55%, transparent);
+  --grid-resize-handle: color-mix(in srgb, var(--sp-primary, #2563eb) 30%, transparent);
+  --grid-resize-handle-hover: var(--sp-primary, #2563eb);
+  --grid-scrollbar-track: var(--sp-scrollbar-track, rgba(0, 0, 0, 0.03));
+  --grid-scrollbar-thumb: var(--sp-scrollbar-thumb, rgba(0, 0, 0, 0.14));
+  --grid-scrollbar-hover: var(--sp-scrollbar-hover, rgba(0, 0, 0, 0.25));
+  --grid-panel-bg: var(--sp-surface-0, #ffffff);
+  --grid-editor-bg: var(--sp-surface-0, #ffffff);
+  --grid-pinned-bg: var(--sp-surface-0, #ffffff);
+  --grid-pinned-bg-odd: var(--sp-surface-50, #f9fafb);
+  --grid-pinned-bg-selected: color-mix(in srgb, var(--sp-primary, #2563eb) 8%, var(--sp-surface-0, #ffffff));
+  --grid-pinned-bg-hover: color-mix(in srgb, var(--sp-primary, #2563eb) 6%, var(--sp-surface-0, #ffffff));
+  --grid-pinned-bg-hover-odd: color-mix(in srgb, var(--sp-primary, #2563eb) 6%, var(--sp-surface-50, #f9fafb));
+  --grid-pinned-bg-header: var(--sp-surface-50, #f4f6fb);
+  --grid-detail-bg: color-mix(in srgb, var(--sp-primary, #2563eb) 3%, var(--sp-surface-0, #ffffff));
+  --grid-pinned-shadow-right: 3px 0 6px -1px rgba(0, 0, 0, 0.18);
+  --grid-pinned-shadow-left: -3px 0 6px -1px rgba(0, 0, 0, 0.18);
+  --grid-pinned-border-right: var(--sp-border-strong, rgba(0, 0, 0, 0.14));
+  --grid-pinned-border-left: var(--sp-border-strong, rgba(0, 0, 0, 0.14));
+  --grid-radius: var(--sp-radius-sm, 8px);
+  --grid-font: var(--sp-font-sans, system-ui, -apple-system, sans-serif);
+  --grid-font-mono: var(--sp-font-mono, ui-monospace, monospace);
+  --grid-header-size: var(--sp-text-xs, 11.5px);
+  --grid-cell-size: var(--sp-text-sm, 13px);
+  --grid-row-h: 44px;
+  --grid-header-h: 32px;
+  --grid-filter-h: 36px;
+  --grid-aggregate-h: 36px;
+  --grid-toolbar-h: 44px;
+  --grid-footer-h: 32px;
+  --grid-pagination-h: 40px;
+  --grid-group-header-h: 26px;
+  --grid-leaf-header-h: 38px;
+  --grid-sticky-header-h: var(--grid-header-h);
+  --grid-cell-padding-x: var(--sp-space-3_5, 14px);
+  --grid-auto-cell-padding-y: var(--sp-space-2_5, 10px);
+
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  font-family: var(--grid-font);
+  box-sizing: border-box;
+  isolation: isolate;
+  background: var(--grid-bg);
+  border-radius: var(--grid-radius);
+  border: 1px solid var(--grid-border-strong);
+  overflow: hidden;
+  position: relative;
+}
+
+/* ─── Dark theme overrides ────────────────────────────────────────────── */
+.dark .sp-grid-root,
+[data-theme='dark'] .sp-grid-root {
+  --grid-row-odd-bg: rgba(255, 255, 255, 0.018);
+  --grid-row-hover-bg: color-mix(in srgb, var(--sp-primary, #4f8ef7) 6%, transparent);
+  --grid-row-border: rgba(255, 255, 255, 0.04);
+  --grid-accent-glow: color-mix(in srgb, var(--sp-primary, #4f8ef7) 18%, transparent);
+  --grid-pinned-bg-selected: color-mix(in srgb, var(--sp-primary, #4f8ef7) 12%, var(--sp-surface-0, #0f1117));
+  --grid-pinned-shadow-right: 3px 0 6px -1px rgba(0, 0, 0, 0.55);
+  --grid-pinned-shadow-left: -3px 0 6px -1px rgba(0, 0, 0, 0.55);
+}
+
+/* ─── Toolbar ─────────────────────────────────────────────────────────── */
+.sp-grid-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--grid-border);
+  background: var(--grid-header-bg);
+  min-height: var(--grid-toolbar-h);
+  flex-shrink: 0;
+}
+.sp-grid-toolbar__spacer {
+  flex: 1;
+}
+.sp-grid-toolbar__right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sp-grid-toolbar__left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sp-grid-toolbar__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--grid-border-strong);
+  background: transparent;
+  color: var(--grid-header-text);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--grid-font);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.sp-grid-toolbar__btn:hover {
+  background: var(--grid-header-hover-bg);
+  color: var(--grid-cell-text);
+}
+.sp-grid-toolbar__btn.active {
+  background: var(--grid-accent-glow);
+  color: var(--grid-accent);
+  border-color: var(--grid-accent-dim);
+}
+
+.sp-grid-toolbar__action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid var(--grid-border-strong);
+  background: transparent;
+  color: var(--grid-header-text);
+  font-size: 11px;
+  font-weight: 500;
+  font-family: var(--grid-font);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.sp-grid-toolbar__action-btn:hover:not(:disabled) {
+  background: var(--grid-header-hover-bg);
+  color: var(--grid-cell-text);
+}
+.sp-grid-toolbar__action-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.sp-grid-toolbar__action-btn--danger {
+  color: var(--sp-danger, #e53e3e);
+  border-color: var(--sp-danger, #e53e3e);
+}
+.sp-grid-toolbar__action-btn--danger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--sp-danger, #e53e3e) 10%, transparent);
+  color: var(--sp-danger, #e53e3e);
+}
+
+.sp-grid-toolbar__filter-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--grid-accent-glow);
+  color: var(--grid-accent);
+  border: 1px solid var(--grid-accent-dim);
+}
+.sp-grid-toolbar__filter-clear {
+  background: none;
+  border: none;
+  color: var(--grid-accent-dim);
+  cursor: pointer;
+  font-size: 11px;
+  padding: 0 0 0 4px;
+  line-height: 1;
+}
+.sp-grid-toolbar__filter-clear:hover {
+  color: var(--grid-accent);
+}
+
+.sp-grid-toolbar__group-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  background: rgba(72, 199, 142, 0.08);
+  color: #48c78e;
+  border: 1px solid rgba(72, 199, 142, 0.25);
+}
+.sp-grid-toolbar__group-badge strong {
+  font-weight: 700;
+}
+
+.sp-grid-toolbar__tree-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: 100px;
+  font-size: 11px;
+  background: rgba(109, 40, 217, 0.08);
+  color: #7c3aed;
+  border: 1px solid rgba(109, 40, 217, 0.2);
+}
+.dark .sp-grid-toolbar__tree-badge,
+[data-theme='dark'] .sp-grid-toolbar__tree-badge {
+  background: rgba(139, 92, 246, 0.1);
+  color: #a78bfa;
+  border-color: rgba(139, 92, 246, 0.25);
+}
+.sp-grid-toolbar__tree-btn {
+  padding: 0 5px;
+  background: rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.sp-grid-toolbar__tree-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+.dark .sp-grid-toolbar__tree-btn,
+[data-theme='dark'] .sp-grid-toolbar__tree-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+.dark .sp-grid-toolbar__tree-btn:hover,
+[data-theme='dark'] .sp-grid-toolbar__tree-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ─── Container — single scroll viewport ──────────────────────────────── */
+.sp-grid-container {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: var(--grid-scrollbar-thumb) var(--grid-scrollbar-track);
+}
+.sp-grid-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.sp-grid-container::-webkit-scrollbar-track {
+  background: var(--grid-scrollbar-track);
+}
+.sp-grid-container::-webkit-scrollbar-thumb {
+  background: var(--grid-scrollbar-thumb);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+.sp-grid-container::-webkit-scrollbar-thumb:hover {
+  background: var(--grid-scrollbar-hover);
+  background-clip: content-box;
+}
+.sp-grid-container::-webkit-scrollbar-corner {
+  background: var(--grid-scrollbar-track);
+}
+.sp-grid-scroll-inner {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+/* ─── Header ──────────────────────────────────────────────────────────── */
+.sp-grid-header {
+  display: flex;
+  flex-shrink: 0;
+  background: var(--grid-header-bg);
+  border-bottom: 1px solid var(--grid-border-strong);
+  height: var(--grid-header-h);
+  overflow: visible;
+  position: sticky;
+  top: 0;
+  z-index: 15;
+}
+.sp-grid-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--grid-accent-dim) 40%, transparent);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.sp-grid-header-cell {
+  display: flex;
+  align-items: stretch;
+  position: relative;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  border-right: 1px solid var(--grid-border);
+  transition: background 0.12s;
+  overflow: visible;
+}
+.sp-grid-header-cell:last-child {
+  border-right: none;
+}
+.sp-grid-header-cell.sortable {
+  cursor: pointer;
+}
+.sp-grid-header-cell.sortable:hover {
+  background: var(--grid-header-hover-bg);
+}
+.sp-grid-header-cell.col-draggable .sp-grid-header-cell__inner {
+  cursor: grab;
+}
+.sp-grid-header-cell.is-dragging-src {
+  opacity: 0.4;
+  background: var(--grid-accent-glow);
+}
+.sp-grid-header-cell.drop-left::before {
+  content: '';
+  position: absolute;
+  left: -2px;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  background: var(--grid-accent);
+  border-radius: 2px;
+  z-index: 30;
+  box-shadow: 0 0 8px var(--grid-accent-glow);
+}
+.sp-grid-header-cell.drop-right::after {
+  content: '';
+  position: absolute;
+  right: -2px;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  background: var(--grid-accent);
+  border-radius: 2px;
+  z-index: 30;
+  box-shadow: 0 0 8px var(--grid-accent-glow);
+}
+
+.sp-grid-header-cell--checkbox {
+  width: 44px;
+  min-width: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--grid-border);
+}
+
+.sp-grid-header-cell--expand,
+.sp-grid-cell--expand {
+  width: 36px;
+  min-width: 36px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--grid-border);
+  padding: 0;
+}
+
+.sp-grid-header-cell--drag,
+.sp-grid-cell--drag {
+  width: 36px;
+  min-width: 36px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--grid-border);
+  padding: 0;
+}
+
+.sp-grid-header-cell--actions,
+.sp-grid-cell--actions {
+  width: 80px;
+  min-width: 80px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border-right: 1px solid var(--grid-border);
+  padding: 0 8px;
+}
+
+.sp-grid-header-cell__inner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 var(--grid-cell-padding-x);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.sp-grid-header-cell__label {
+  font-size: var(--grid-header-size);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--grid-header-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+}
+
+.sp-grid-header-cell__edit-hint {
+  width: 11px;
+  height: 11px;
+  flex-shrink: 0;
+  color: rgba(160, 174, 192, 0.3);
+  display: flex;
+  align-items: center;
+}
+
+.sp-grid-header-cell__filter-btn {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(160, 174, 192, 0.5);
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.15s;
+  margin-left: 2px;
+}
+.sp-grid-header-cell__filter-btn:hover {
+  color: var(--grid-accent);
+}
+.sp-grid-header-cell__filter-btn.active {
+  color: var(--grid-accent);
+}
+
+/* ─── Column menu ─────────────────────────────────────────────────────── */
+.sp-grid-header-cell__menu {
+  flex-shrink: 0;
+  margin-left: 2px;
+}
+.sp-grid-header-cell__menu-btn {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(160, 174, 192, 0.4);
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.15s;
+}
+.sp-grid-header-cell__menu-btn:hover {
+  color: var(--grid-accent);
+  background: var(--grid-header-hover-bg, rgba(0, 0, 0, 0.05));
+}
+.sp-grid-header-cell:hover .sp-grid-header-cell__menu-btn {
+  color: rgba(160, 174, 192, 0.7);
+}
+
+/* ─── Sort icon ───────────────────────────────────────────────────────── */
+.sp-grid-sort-icon {
+  min-width: 12px;
+  height: 14px;
+  flex-shrink: 0;
+  color: rgba(160, 174, 192);
+  transition: color 0.15s;
+  display: flex;
+  align-items: center;
+}
+.sp-grid-sort-icon.active {
+  color: var(--grid-accent);
+}
+.sp-grid-sort-icon .sort-neutral {
+  opacity: 0.4;
+}
+
+.sp-grid-sort-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 14px;
+  height: 14px;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--sp-primary-text, #fff);
+  background: var(--grid-accent);
+  border-radius: 100px;
+  margin-left: 1px;
+}
+
+/* ─── Resize handle ───────────────────────────────────────────────────── */
+.sp-grid-resize-handle {
+  position: absolute;
+  right: -2px;
+  top: 10%;
+  height: 80%;
+  width: 5px;
+  cursor: col-resize;
+  z-index: 19;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sp-grid-resize-handle::before {
+  content: '';
+  width: 2px;
+  height: 100%;
+  border-radius: 2px;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.sp-grid-resize-handle:hover::before {
+  background: var(--grid-resize-handle-hover);
+  box-shadow: 0 0 8px var(--grid-accent-glow);
+}
+.sp-grid-resize-handle.dragging::before {
+  background: var(--grid-accent);
+  box-shadow: 0 0 12px var(--grid-accent-glow);
+}
+.sp-grid-resize-handle.always-visible::before {
+  background: var(--grid-resize-handle);
+}
+
+/* ─── Body ────────────────────────────────────────────────────────────── */
+.sp-grid-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+.sp-grid-rows-container {
+  display: flex;
+  flex-direction: column;
+}
+.sp-grid-rows-container > .sp-grid-row:last-child {
+  border-bottom: 1px solid var(--grid-border);
+}
+
+/* ─── Rows ────────────────────────────────────────────────────────────── */
+.sp-grid-row {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid var(--grid-row-border);
+  background: var(--grid-pinned-bg);
+  flex-shrink: 0;
+  transition: background 0.08s;
+  isolation: isolate;
+  position: relative;
+}
+.sp-grid-row:last-child {
+  border-bottom: none;
+}
+.sp-grid-row.sp-grid-row--odd {
+  background: var(--grid-pinned-bg-odd);
+}
+.sp-grid-row.sp-grid-row--selected {
+  background: var(--grid-pinned-bg-selected) !important;
+}
+.sp-grid--selectable .sp-grid-row {
+  cursor: pointer;
+}
+.sp-grid--selectable .sp-grid-row:hover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--grid-row-hover-bg);
+  pointer-events: none;
+  z-index: 0;
+}
+.sp-grid--selectable .sp-grid-row.sp-grid-row--selected:hover {
+  background: var(--grid-pinned-bg-selected) !important;
+}
+.sp-grid--selectable .sp-grid-row.sp-grid-row--selected:hover::after {
+  display: none;
+}
+
+/* ─── Row editing ─────────────────────────────────────────────────────── */
+.sp-grid-row--editing {
+  background: var(--grid-accent-glow) !important;
+  border-bottom: 1px solid var(--grid-accent-dim) !important;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--sp-primary, #2563eb) 15%, transparent) inset;
+  align-items: stretch;
+  flex-wrap: nowrap;
+  z-index: 5;
+}
+.sp-grid-row--editing .sp-grid-cell {
+  align-items: flex-start;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+/* ─── Row dragging ────────────────────────────────────────────────────── */
+.sp-grid-row--dragging {
+  opacity: 0.85;
+  pointer-events: none;
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.4),
+    0 2px 6px rgba(0, 0, 0, 0.25),
+    inset 0 0 0 1px var(--grid-accent-dim);
+  z-index: 10;
+  border-radius: 3px;
+  background: var(--grid-header-bg) !important;
+  will-change: transform;
+  transition:
+    transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow 160ms ease,
+    opacity 160ms ease;
+}
+.sp-grid-row--drag-shifting {
+  will-change: transform;
+}
+
+/* Detail open row */
+.sp-grid-row--detail-open {
+  border-bottom: 1px solid var(--grid-accent-dim) !important;
+}
+.sp-grid-row--detail-open .sp-grid-cell--expand .sp-grid-expand-btn {
+  color: var(--grid-accent);
+}
+
+/* Row with active editor */
+.sp-grid-row:has(.sp-grid-cell-editor) {
+  z-index: 5;
+}
+.sp-grid-cell:has(.sp-grid-cell-editor) {
+  overflow: visible;
+  padding: 4px 6px;
+  z-index: 10;
+}
+
+/* ─── Cells ───────────────────────────────────────────────────────────── */
+.sp-grid-cell {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  min-height: 100%;
+  padding: 0 var(--grid-cell-padding-x);
+  box-sizing: border-box;
+  flex-shrink: 0;
+  border-right: 1px solid var(--grid-border);
+  overflow: hidden;
+}
+.sp-grid-cell:last-child {
+  border-right: none;
+}
+.sp-grid-cell--checkbox {
+  width: 44px;
+  min-width: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-right: 1px solid var(--grid-border);
+}
+.sp-grid-cell__text {
+  display: flex;
+  align-items: center;
+  font-size: var(--grid-cell-size);
+  color: var(--grid-cell-text);
+  min-height: 100%;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+.sp-grid-cell--wrap {
+  align-items: flex-start;
+  height: auto;
+}
+.sp-grid-cell--wrap .sp-grid-cell__text {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  word-break: break-word;
+  align-items: flex-start;
+}
+
+/* Drag cell */
+.sp-grid-cell--drag {
+  color: rgba(160, 174, 192, 0.25);
+  cursor: grab;
+}
+.sp-grid-cell--drag:hover {
+  color: rgba(160, 174, 192, 0.6);
+}
+.sp-grid-cell--drag:active {
+  cursor: grabbing;
+}
+
+/* Edit indicator */
+.sp-grid-cell__edit-indicator {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  opacity: 0;
+  color: var(--grid-accent-dim);
+  pointer-events: none;
+  transition: opacity 0.15s;
+  display: flex;
+  align-items: center;
+}
+.sp-grid-cell--editable:hover .sp-grid-cell__edit-indicator {
+  opacity: 1;
+}
+
+/* Editable cell */
+.sp-grid-cell--editable {
+  position: relative;
+}
+.sp-grid--cell-edit .sp-grid-cell--editable {
+  cursor: default;
+}
+.sp-grid--cell-edit .sp-grid-cell--editable:focus {
+  outline: 1.5px solid var(--grid-accent-dim);
+  outline-offset: -1px;
+}
+.sp-grid--cell-edit .sp-grid-cell--editable:hover {
+  background: var(--grid-accent-glow) !important;
+}
+
+/* Cell actively being edited */
+.sp-grid-cell--editing {
+  padding: 4px 6px;
+  overflow: visible;
+  z-index: 5;
+}
+
+/* Fix: editable pinned cell hover in cell-edit mode */
+.sp-grid--cell-edit .sp-grid-cell--pinned-left.sp-grid-cell--editable:hover,
+.sp-grid--cell-edit .sp-grid-cell--pinned-right.sp-grid-cell--editable:hover {
+  background: color-mix(
+    in srgb,
+    var(--sp-primary, #2563eb) 15%,
+    var(--grid-pinned-bg)
+  ) !important;
+}
+.dark .sp-grid--cell-edit .sp-grid-cell--pinned-left.sp-grid-cell--editable:hover,
+.dark .sp-grid--cell-edit .sp-grid-cell--pinned-right.sp-grid-cell--editable:hover,
+[data-theme='dark'] .sp-grid--cell-edit .sp-grid-cell--pinned-left.sp-grid-cell--editable:hover,
+[data-theme='dark'] .sp-grid--cell-edit .sp-grid-cell--pinned-right.sp-grid-cell--editable:hover {
+  background: color-mix(
+    in srgb,
+    var(--sp-primary, #4f8ef7) 15%,
+    var(--grid-pinned-bg)
+  ) !important;
+}
+
+/* ─── Pinned columns — left ───────────────────────────────────────────── */
+.sp-grid-cell--pinned-left,
+.sp-grid-header-cell--pinned-left {
+  position: sticky !important;
+  background: var(--grid-pinned-bg) !important;
+  z-index: 12;
+  overflow: visible;
+  border-right: 1px solid var(--grid-pinned-border-right, rgba(0, 0, 0, 0.1)) !important;
+}
+.sp-grid-cell--pinned-left::after,
+.sp-grid-header-cell--pinned-left::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: -6px;
+  width: 6px;
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.08) 0%,
+    rgba(0, 0, 0, 0.03) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+.dark .sp-grid-cell--pinned-left::after,
+.dark .sp-grid-header-cell--pinned-left::after,
+[data-theme='dark'] .sp-grid-cell--pinned-left::after,
+[data-theme='dark'] .sp-grid-header-cell--pinned-left::after {
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.18) 0%,
+    rgba(0, 0, 0, 0.06) 50%,
+    transparent 100%
+  );
+}
+
+/* ─── Pinned columns — right ──────────────────────────────────────────── */
+.sp-grid-cell--pinned-right,
+.sp-grid-header-cell--pinned-right {
+  position: sticky !important;
+  background: var(--grid-pinned-bg) !important;
+  z-index: 12;
+  overflow: visible;
+  border-left: 1px solid var(--grid-pinned-border-left, rgba(0, 0, 0, 0.1)) !important;
+}
+.sp-grid-cell--pinned-right::before,
+.sp-grid-header-cell--pinned-right::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -6px;
+  width: 6px;
+  background: linear-gradient(
+    to left,
+    rgba(0, 0, 0, 0.08) 0%,
+    rgba(0, 0, 0, 0.03) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+.dark .sp-grid-cell--pinned-right::before,
+.dark .sp-grid-header-cell--pinned-right::before,
+[data-theme='dark'] .sp-grid-cell--pinned-right::before,
+[data-theme='dark'] .sp-grid-header-cell--pinned-right::before {
+  background: linear-gradient(
+    to left,
+    rgba(0, 0, 0, 0.18) 0%,
+    rgba(0, 0, 0, 0.06) 50%,
+    transparent 100%
+  );
+}
+
+/* ─── Pinned header cells z-index ─────────────────────────────────────── */
+.sp-grid-header-cell--pinned-left {
+  z-index: 20 !important;
+  background: var(--grid-pinned-bg-header) !important;
+}
+.sp-grid-header-cell--pinned-right {
+  z-index: 20 !important;
+  background: var(--grid-pinned-bg-header) !important;
+}
+
+/* ─── Pinned per-row state overrides ──────────────────────────────────── */
+.sp-grid-row .sp-grid-cell--pinned-left,
+.sp-grid-row .sp-grid-cell--pinned-right {
+  background: var(--grid-pinned-bg) !important;
+}
+.sp-grid-row.sp-grid-row--odd .sp-grid-cell--pinned-left,
+.sp-grid-row.sp-grid-row--odd .sp-grid-cell--pinned-right {
+  background: var(--grid-pinned-bg-odd) !important;
+}
+.sp-grid-row.sp-grid-row--selected .sp-grid-cell--pinned-left,
+.sp-grid-row.sp-grid-row--selected .sp-grid-cell--pinned-right {
+  background: var(--grid-pinned-bg-selected) !important;
+}
+.sp-grid--selectable .sp-grid-row:hover .sp-grid-cell--pinned-left,
+.sp-grid--selectable .sp-grid-row:hover .sp-grid-cell--pinned-right {
+  background: var(--grid-pinned-bg-hover) !important;
+}
+.sp-grid--selectable .sp-grid-row.sp-grid-row--odd:hover .sp-grid-cell--pinned-left,
+.sp-grid--selectable .sp-grid-row.sp-grid-row--odd:hover .sp-grid-cell--pinned-right {
+  background: var(--grid-pinned-bg-hover-odd) !important;
+}
+.sp-grid--selectable .sp-grid-row.sp-grid-row--selected:hover .sp-grid-cell--pinned-left,
+.sp-grid--selectable .sp-grid-row.sp-grid-row--selected:hover .sp-grid-cell--pinned-right {
+  background: var(--grid-pinned-bg-selected) !important;
+}
+
+/* ─── Sticky columns (PinPosition = 'sticky') ────────────────────────── */
+.sp-grid-cell--sticky,
+.sp-grid-header-cell--sticky {
+  position: sticky !important;
+  background: var(--grid-pinned-bg) !important;
+  z-index: 11;
+}
+.sp-grid-header-cell--sticky {
+  z-index: 19 !important;
+  background: var(--grid-pinned-bg-header) !important;
+}
+.sp-grid-row .sp-grid-cell--sticky {
+  background: var(--grid-pinned-bg) !important;
+}
+.sp-grid-row.sp-grid-row--odd .sp-grid-cell--sticky {
+  background: var(--grid-pinned-bg-odd) !important;
+}
+.sp-grid-row.sp-grid-row--selected .sp-grid-cell--sticky {
+  background: var(--grid-pinned-bg-selected) !important;
+}
+.sp-grid--selectable .sp-grid-row:hover .sp-grid-cell--sticky {
+  background: var(--grid-pinned-bg-hover) !important;
+}
+.sp-grid--cell-edit .sp-grid-cell--sticky.sp-grid-cell--editable:hover {
+  background: color-mix(
+    in srgb,
+    var(--sp-primary, #2563eb) 15%,
+    var(--grid-pinned-bg)
+  ) !important;
+}
+.dark .sp-grid--cell-edit .sp-grid-cell--sticky.sp-grid-cell--editable:hover,
+[data-theme='dark'] .sp-grid--cell-edit .sp-grid-cell--sticky.sp-grid-cell--editable:hover {
+  background: color-mix(
+    in srgb,
+    var(--sp-primary, #4f8ef7) 15%,
+    var(--grid-pinned-bg)
+  ) !important;
+}
+.sp-grid--selectable .sp-grid-row.sp-grid-row--odd:hover .sp-grid-cell--sticky {
+  background: var(--grid-pinned-bg-hover-odd) !important;
+}
+.sp-grid--selectable .sp-grid-row.sp-grid-row--selected:hover .sp-grid-cell--sticky {
+  background: var(--grid-pinned-bg-selected) !important;
+}
+
+/* ─── Pinned control columns ──────────────────────────────────────────── */
+.sp-grid-cell--control-pinned,
+.sp-grid-header-cell--control-pinned,
+.sp-grid-filter-cell--control-pinned,
+.sp-grid-agg-cell--control-pinned {
+  position: sticky !important;
+  background: var(--grid-pinned-bg) !important;
+  z-index: 12;
+  overflow: visible;
+}
+.sp-grid-header-cell--control-pinned {
+  z-index: 20 !important;
+  background: var(--grid-pinned-bg-header) !important;
+}
+.sp-grid-filter-cell--control-pinned,
+.sp-grid-agg-cell--control-pinned {
+  z-index: 14 !important;
+  background: var(--grid-pinned-bg-header) !important;
+}
+.sp-grid-cell--control-pinned::after,
+.sp-grid-header-cell--control-pinned::after,
+.sp-grid-filter-cell--control-pinned::after,
+.sp-grid-agg-cell--control-pinned::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: -6px;
+  width: 6px;
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.07) 0%,
+    rgba(0, 0, 0, 0.02) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+.dark .sp-grid-cell--control-pinned::after,
+.dark .sp-grid-header-cell--control-pinned::after,
+.dark .sp-grid-filter-cell--control-pinned::after,
+.dark .sp-grid-agg-cell--control-pinned::after,
+[data-theme='dark'] .sp-grid-cell--control-pinned::after,
+[data-theme='dark'] .sp-grid-header-cell--control-pinned::after,
+[data-theme='dark'] .sp-grid-filter-cell--control-pinned::after,
+[data-theme='dark'] .sp-grid-agg-cell--control-pinned::after {
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.16) 0%,
+    rgba(0, 0, 0, 0.05) 50%,
+    transparent 100%
+  );
+}
+.sp-grid-row .sp-grid-cell--control-pinned {
+  background: var(--grid-pinned-bg) !important;
+}
+.sp-grid-row.sp-grid-row--odd .sp-grid-cell--control-pinned {
+  background: var(--grid-pinned-bg-odd) !important;
+}
+.sp-grid-row.sp-grid-row--selected .sp-grid-cell--control-pinned {
+  background: var(--grid-pinned-bg-selected) !important;
+}
+.sp-grid--selectable .sp-grid-row:hover .sp-grid-cell--control-pinned {
+  background: var(--grid-pinned-bg-hover) !important;
+}
+.sp-grid--selectable .sp-grid-row.sp-grid-row--odd:hover .sp-grid-cell--control-pinned {
+  background: var(--grid-pinned-bg-hover-odd) !important;
+}
+.sp-grid--selectable .sp-grid-row.sp-grid-row--selected:hover .sp-grid-cell--control-pinned {
+  background: var(--grid-pinned-bg-selected) !important;
+}
+
+/* ─── Checkbox ────────────────────────────────────────────────────────── */
+.sp-grid-checkbox {
+  width: 18px;
+  height: 18px;
+  border-radius: var(--sp-radius-sm, 4px);
+  border: 2px solid var(--sp-border-strong, rgba(0, 0, 0, 0.14));
+  background: var(--sp-surface-0, #fff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+  color: #fff;
+  position: relative;
+}
+.sp-grid-checkbox:hover {
+  border-color: var(--sp-primary, #2563eb);
+}
+.sp-grid-checkbox.checked {
+  background: var(--sp-primary, #2563eb);
+  border-color: var(--sp-primary, #2563eb);
+}
+.sp-grid-checkbox.indeterminate {
+  border-color: var(--sp-primary, #2563eb);
+}
+.sp-grid-checkbox.indeterminate::after {
+  content: '';
+  width: 8px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--sp-primary, #2563eb);
+  position: absolute;
+}
+
+/* ─── Autofit ─────────────────────────────────────────────────────────── */
+.sp-grid--autofit .sp-grid-header-cell:not(.sp-grid-header-cell--checkbox),
+.sp-grid--autofit .sp-grid-cell:not(.sp-grid-cell--checkbox) {
+  flex-shrink: 1;
+  min-width: 0;
+}
+.sp-grid--autofit .sp-grid-scroll-inner {
+  min-width: unset !important;
+  width: 100%;
+}
+
+/* ─── Auto row height ─────────────────────────────────────────────────── */
+.sp-grid--auto-row-height .sp-grid-row {
+  align-items: stretch;
+}
+.sp-grid--auto-row-height .sp-grid-cell {
+  align-items: center;
+}
+.sp-grid--auto-row-height .sp-grid-cell__text {
+  display: block;
+  min-height: 0;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  word-break: break-word;
+}
+
+/* ─── Empty state ─────────────────────────────────────────────────────── */
+.sp-grid-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 64px 24px;
+  color: var(--grid-cell-secondary);
+}
+.sp-grid-empty span {
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+
+/* ─── Loading overlay ─────────────────────────────────────────────────── */
+.sp-grid-loading-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: rgba(240, 244, 255, 0.85);
+  backdrop-filter: blur(4px);
+  z-index: 50;
+}
+.dark .sp-grid-loading-overlay,
+[data-theme='dark'] .sp-grid-loading-overlay {
+  background: rgba(10, 13, 20, 0.75);
+}
+.sp-grid-spinner {
+  position: relative;
+  width: 36px;
+  height: 36px;
+}
+.sp-grid-spinner__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2.5px solid transparent;
+  border-top-color: var(--grid-accent);
+  animation: sp-grid-spin 0.85s linear infinite;
+}
+.sp-grid-spinner__ring--delay {
+  border-top-color: transparent;
+  border-right-color: var(--grid-accent-dim);
+  animation-duration: 1.4s;
+  animation-direction: reverse;
+}
+.sp-grid-loading-text {
+  font-size: 12px;
+  color: var(--grid-cell-secondary);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* ─── Footer ──────────────────────────────────────────────────────────── */
+.sp-grid-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px var(--grid-cell-padding-x);
+  border-top: 1px solid var(--grid-border);
+  background: var(--grid-header-bg);
+  flex-shrink: 0;
+  min-height: var(--grid-footer-h);
+}
+.sp-grid-footer__count {
+  font-size: 11px;
+  color: var(--grid-cell-secondary);
+  letter-spacing: 0.04em;
+}
+.sp-grid-footer__badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--grid-accent-dim);
+}
+.sp-grid-footer__badge strong {
+  color: var(--grid-accent);
+  font-weight: 600;
+  margin-right: 2px;
+}
+.sp-grid-footer__badge--selection {
+  color: var(--grid-accent-dim);
+}
+.sp-grid-footer__clear {
+  background: none;
+  border: none;
+  color: var(--grid-cell-secondary);
+  cursor: pointer;
+  padding: 0 2px;
+  font-size: 10px;
+  border-radius: 3px;
+  line-height: 1;
+}
+.sp-grid-footer__clear:hover {
+  color: var(--grid-cell-text);
+}
+.sp-grid-footer__filtered {
+  font-size: 10px;
+  color: var(--grid-accent-dim);
+  margin-left: 3px;
+}
+.sp-grid-footer__server-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  border-radius: 100px;
+  margin-left: 6px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  background: var(--grid-accent-glow);
+  color: var(--grid-accent);
+  border: 1px solid var(--grid-accent-dim);
+}
+.sp-grid-footer__edit-hint {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: rgba(160, 174, 192, 0.4);
+  letter-spacing: 0.02em;
+}
+.sp-grid-footer__virtual-hint {
+  font-size: 10px;
+  color: rgba(160, 174, 192, 0.4);
+  letter-spacing: 0.04em;
+}
+.sp-grid-footer__infinite-hint {
+  font-size: 11px;
+  color: var(--grid-accent-dim);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* New row footer badge */
+.sp-grid--has-new-row .sp-grid-footer::after {
+  content: '\FF0B New row';
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--grid-accent-dim);
+  letter-spacing: 0.04em;
+  margin-left: auto;
+  padding: 1px 6px;
+  border-radius: 3px;
+  border: 1px solid var(--grid-accent-dim);
+  opacity: 0.6;
+}
+
+/* ─── Edit action buttons ─────────────────────────────────────────────── */
+.sp-grid-edit-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.sp-grid-edit-btn--edit {
+  color: rgba(160, 174, 192, 0.5);
+}
+.sp-grid-edit-btn--edit:hover {
+  background: var(--grid-header-hover-bg);
+  color: var(--grid-accent);
+  border-color: var(--grid-accent-dim);
+}
+.sp-grid-edit-btn--save {
+  color: #48c78e;
+  border-color: rgba(72, 199, 142, 0.3);
+  background: rgba(72, 199, 142, 0.1);
+}
+.sp-grid-edit-btn--save:hover {
+  background: rgba(72, 199, 142, 0.2);
+}
+.sp-grid-edit-btn--cancel {
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.3);
+  background: rgba(248, 113, 113, 0.08);
+}
+.sp-grid-edit-btn--cancel:hover {
+  background: rgba(248, 113, 113, 0.15);
+}
+
+/* ─── Keyboard navigation ─────────────────────────────────────────────── */
+.sp-grid-root.sp-grid--keynav .sp-grid-cell:focus {
+  outline: 2px solid var(--grid-accent);
+  outline-offset: -2px;
+  z-index: 2;
+}
+
+/* ─── Borderless mode ─────────────────────────────────────────────────── */
+.sp-grid--borderless .sp-grid-row {
+  border-bottom-color: transparent;
+}
+.sp-grid--borderless .sp-grid-cell {
+  border-right-color: transparent;
+}
+.sp-grid--borderless .sp-grid-cell--checkbox {
+  border-right-color: transparent;
+}
+.sp-grid--borderless .sp-grid-header-cell {
+  border-right-color: transparent;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Pagination
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sp-grid-pagination {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 6px 12px;
+  border-top: 1px solid var(--grid-border);
+  background: var(--grid-header-bg);
+  flex-shrink: 0;
+  min-height: var(--grid-pagination-h);
+}
+.sp-grid-pagination__info {
+  font-size: 11px;
+  color: var(--grid-cell-secondary);
+  min-width: 80px;
+  white-space: nowrap;
+}
+.sp-grid-pagination__pages {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex: 1;
+  justify-content: center;
+}
+.sp-grid-pagination__btn {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--sp-radius-md, 6px);
+  border: 1px solid var(--grid-border-strong);
+  background: transparent;
+  color: var(--grid-header-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.sp-grid-pagination__btn:hover:not(:disabled) {
+  background: var(--grid-row-hover-bg);
+  color: var(--grid-cell-text);
+}
+.sp-grid-pagination__btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.sp-grid-pagination__page {
+  min-width: 28px;
+  height: 28px;
+  padding: 0 6px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--grid-header-text);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.sp-grid-pagination__page:hover {
+  background: var(--grid-row-hover-bg);
+  color: var(--grid-cell-text);
+}
+.sp-grid-pagination__page.active {
+  background: var(--grid-accent);
+  color: #fff;
+  border-color: var(--grid-accent);
+  font-weight: 600;
+}
+.sp-grid-pagination__ellipsis {
+  color: var(--grid-cell-secondary);
+  font-size: 13px;
+  padding: 0 2px;
+}
+.sp-grid-pagination__size {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+.sp-grid-pagination__size-label {
+  font-size: 10px;
+  color: var(--grid-cell-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.sp-grid-pagination__size-btn {
+  padding: 3px 8px;
+  border-radius: 5px;
+  border: 1px solid var(--grid-border-strong);
+  background: transparent;
+  color: var(--grid-header-text);
+  font-size: 11px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.sp-grid-pagination__size-btn:hover {
+  background: var(--grid-row-hover-bg);
+}
+.sp-grid-pagination__size-btn.active {
+  background: var(--grid-accent-glow);
+  color: var(--grid-accent);
+  border-color: var(--grid-accent-dim);
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Group rows
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sp-grid-group-row {
+  display: flex;
+  align-items: stretch;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--grid-border);
+  background: var(--grid-header-bg);
+  cursor: pointer;
+  transition: background 0.1s;
+  position: relative;
+  z-index: 3;
+}
+.sp-grid-group-row:hover {
+  background: color-mix(in srgb, var(--sp-primary, #2563eb) 6%, var(--grid-header-bg));
+}
+.sp-grid-group-row--sticky {
+  position: sticky;
+  top: var(--grid-header-h);
+  z-index: 4;
+}
+.sp-grid-root.sp-grid--has-inline-filters .sp-grid-group-row--sticky {
+  top: calc(var(--grid-header-h) + var(--grid-filter-h));
+}
+.sp-grid-group-row--vs-overlay {
+  position: sticky;
+  top: var(--grid-header-h);
+  z-index: 5;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+.sp-grid-root.sp-grid--has-inline-filters .sp-grid-group-row--vs-overlay {
+  top: calc(var(--grid-header-h) + var(--grid-filter-h));
+}
+.sp-grid-root.sp-grid--has-col-groups .sp-grid-group-row--vs-overlay {
+  top: calc(var(--grid-group-header-h, 28px) + var(--grid-leaf-header-h, 36px));
+}
+.sp-grid-root.sp-grid--has-col-groups.sp-grid--has-inline-filters .sp-grid-group-row--vs-overlay {
+  top: calc(var(--grid-group-header-h, 28px) + var(--grid-leaf-header-h, 36px) + var(--grid-filter-h));
+}
+.sp-grid-group-row__content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 var(--grid-cell-padding-x);
+}
+.sp-grid-group-row__chevron {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--grid-accent-dim);
+  display: flex;
+  align-items: center;
+  transition: transform 0.18s;
+}
+.sp-grid-group-row__chevron.collapsed {
+  transform: rotate(-90deg);
+}
+.sp-grid-group-row__key {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--grid-cell-text);
+  letter-spacing: 0.01em;
+}
+.sp-grid-group-row__count {
+  font-size: 11px;
+  color: var(--grid-cell-secondary);
+  background: rgba(0, 0, 0, 0.04);
+  padding: 1px 7px;
+  border-radius: 100px;
+  border: 1px solid var(--grid-border-strong);
+}
+.dark .sp-grid-group-row__count,
+[data-theme='dark'] .sp-grid-group-row__count {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Tree rows
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sp-grid-expand-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(160, 174, 192, 0.45);
+  transition: all 0.15s;
+}
+.sp-grid-expand-btn:hover {
+  background: var(--grid-row-hover-bg);
+  color: var(--grid-accent);
+}
+.sp-grid-expand-btn.expanded svg {
+  transform: rotate(0deg);
+}
+.sp-grid-expand-btn:not(.expanded) svg {
+  transform: rotate(-90deg);
+}
+
+.sp-grid-tree-indent {
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* Tree depth shading */
+.sp-grid-row--depth-1 {
+  border-left: 2px solid color-mix(in srgb, var(--sp-primary, #2563eb) 10%, transparent);
+}
+.sp-grid-row--depth-2 {
+  border-left: 4px solid color-mix(in srgb, var(--sp-primary, #2563eb) 14%, transparent);
+}
+.sp-grid-row--depth-3 {
+  border-left: 6px solid color-mix(in srgb, var(--sp-primary, #2563eb) 18%, transparent);
+}
+.sp-grid-row--depth-4 {
+  border-left: 8px solid color-mix(in srgb, var(--sp-primary, #2563eb) 22%, transparent);
+}
+.sp-grid-row--depth-5 {
+  border-left: 10px solid color-mix(in srgb, var(--sp-primary, #2563eb) 26%, transparent);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Row drag ghost
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sp-grid-row-drag-ghost {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  margin-top: -1px;
+  background: var(--grid-accent);
+  pointer-events: none;
+  z-index: 50;
+  border-radius: 1px;
+  box-shadow:
+    0 0 0 1px rgba(79, 142, 247, 0.2),
+    0 0 8px rgba(79, 142, 247, 0.4);
+  will-change: transform;
+  transition: transform 60ms linear;
+}
+.sp-grid-row-drag-ghost::before,
+.sp-grid-row-drag-ghost::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--grid-accent);
+  box-shadow: 0 0 4px rgba(79, 142, 247, 0.5);
+}
+.sp-grid-row-drag-ghost::before {
+  left: 0;
+}
+.sp-grid-row-drag-ghost::after {
+  right: 0;
+}
+.dark .sp-grid-row-drag-ghost,
+[data-theme='dark'] .sp-grid-row-drag-ghost {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--sp-primary, #4f8ef7) 20%, transparent),
+    0 0 8px color-mix(in srgb, var(--sp-primary, #4f8ef7) 40%, transparent);
+}
+.dark .sp-grid-row-drag-ghost::before,
+.dark .sp-grid-row-drag-ghost::after,
+[data-theme='dark'] .sp-grid-row-drag-ghost::before,
+[data-theme='dark'] .sp-grid-row-drag-ghost::after {
+  box-shadow: 0 0 4px color-mix(in srgb, var(--sp-primary, #4f8ef7) 50%, transparent);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Infinite scroll
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sp-grid-infinite-sentinel {
+  padding: 10px 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--grid-row-h);
+}
+.sp-grid-infinite-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--grid-cell-secondary);
+}
+.sp-grid-spinner--sm {
+  width: 20px;
+  height: 20px;
+}
+.sp-grid-spinner--sm .sp-grid-spinner__ring {
+  border-width: 2px;
+}
+.sp-grid-infinite-end {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: rgba(160, 174, 192, 0.35);
+  letter-spacing: 0.04em;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Detail panel
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sp-grid-detail-row {
+  border-bottom: 1px solid var(--grid-border);
+  animation: sp-grid-detail-slide-in 0.2s ease;
+  background: var(--grid-detail-bg);
+  overflow: hidden;
+}
+.sp-grid-detail-row__inner {
+  padding: 16px 20px;
+  color: var(--grid-cell-text);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   New row
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sp-grid-row--new-row {
+  --_nr-accent: var(--grid-accent-dim);
+  --_nr-bg: color-mix(in srgb, var(--sp-primary, #2563eb) 3%, var(--grid-pinned-bg));
+  background: var(--_nr-bg);
+  border-top: 1.5px dashed var(--_nr-accent);
+  position: relative;
+  z-index: 2;
+}
+.sp-grid-row--new-row .sp-grid-cell {
+  background: transparent;
+  border-bottom: none;
+}
+.sp-grid-row--new-row .sp-grid-cell--editable {
+  cursor: text;
+  position: relative;
+}
+.sp-grid-row--new-row .sp-grid-cell--editable::after {
+  content: '';
+  position: absolute;
+  inset: 4px 4px;
+  border-radius: 4px;
+  border: 1px dashed color-mix(in srgb, var(--sp-primary, #2563eb) 25%, transparent);
+  pointer-events: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+.sp-grid-row--new-row .sp-grid-cell--editable:hover::after {
+  border-color: var(--_nr-accent);
+  background: color-mix(in srgb, var(--sp-primary, #2563eb) 4%, transparent);
+}
+.sp-grid-row--new-row .sp-grid-cell--editable:focus-within::after {
+  border-color: transparent;
+}
+
+.sp-grid-new-row__empty-indicator {
+  display: block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--grid-cell-secondary);
+  opacity: 0.3;
+  margin: 0 auto;
+  pointer-events: none;
+}
+
+.sp-grid-row--new-row-active {
+  --_nr-bg: color-mix(in srgb, var(--sp-primary, #2563eb) 6%, var(--grid-pinned-bg));
+  background: var(--_nr-bg);
+  border-top-style: solid;
+  border-top-color: var(--_nr-accent);
+}
+.sp-grid-row--new-row-active .sp-grid-cell {
+  background: transparent;
+}
+.sp-grid-row--new-row-active .sp-grid-cell--editable::after {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--sp-primary, #2563eb) 18%, transparent);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Skeleton loading
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sp-grid-skeleton-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.sp-grid-skeleton-row {
+  display: flex;
+  align-items: stretch;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--grid-row-border);
+  background: var(--grid-pinned-bg);
+  overflow: hidden;
+}
+.sp-grid-skeleton-cell {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--grid-cell-padding-x);
+  box-sizing: border-box;
+  flex-shrink: 0;
+  border-right: 1px solid var(--grid-border);
+  overflow: hidden;
+}
+.sp-grid-skeleton-cell:last-child {
+  border-right: none;
+}
+.sp-grid-skeleton-shimmer {
+  width: 100%;
+  height: 10px;
+  border-radius: 5px;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.04) 0%,
+    rgba(0, 0, 0, 0.1) 40%,
+    rgba(0, 0, 0, 0.04) 100%
+  );
+  background-size: 400% 100%;
+  animation: sp-grid-skeleton-shimmer 1.6s ease-in-out infinite;
+}
+.dark .sp-grid-skeleton-shimmer,
+[data-theme='dark'] .sp-grid-skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0.1) 40%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  background-size: 400% 100%;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Virtual scroll
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sp-grid-virtual-spacer {
+  position: relative;
+  width: 100%;
+
+  --_bar-h: 10px;
+  --_bar-y: calc((var(--vs-row-h, 44px) - var(--_bar-h)) / 2);
+  --_bar-color: rgba(0, 0, 0, 0.045);
+  --_sweep-color: rgba(0, 0, 0, 0.08);
+
+  background-color: var(--grid-pinned-bg);
+  background-image:
+    linear-gradient(90deg, transparent 0%, var(--_sweep-color) 40%, transparent 80%),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent var(--_bar-y),
+      var(--_bar-color) var(--_bar-y),
+      var(--_bar-color) calc(var(--_bar-y) + var(--_bar-h)),
+      transparent calc(var(--_bar-y) + var(--_bar-h)),
+      transparent var(--vs-row-h, 44px)
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent calc(var(--vs-row-h, 44px) - 1px),
+      var(--grid-row-border) calc(var(--vs-row-h, 44px) - 1px),
+      var(--grid-row-border) var(--vs-row-h, 44px)
+    );
+  background-size:
+    400% var(--vs-row-h, 44px),
+    30% var(--vs-row-h, 44px),
+    100% var(--vs-row-h, 44px);
+  background-repeat: repeat;
+  background-position:
+    100% 0,
+    24px 0,
+    0 0;
+  animation: sp-grid-vs-skeleton-sweep 1.8s ease-in-out infinite;
+}
+.dark .sp-grid-virtual-spacer,
+[data-theme='dark'] .sp-grid-virtual-spacer {
+  --_bar-color: rgba(255, 255, 255, 0.04);
+  --_sweep-color: rgba(255, 255, 255, 0.06);
+}
+
+.sp-grid-virtual-skeleton-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  z-index: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.sp-grid-virtual-window {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+  backface-visibility: hidden;
+  z-index: 1;
+}
+.sp-grid-virtual-window > .sp-grid-row,
+.sp-grid-virtual-window > .sp-grid-group-row,
+.sp-grid-virtual-window > .sp-grid-detail-row {
+  animation: sp-grid-vs-row-appear 0.12s ease-out both;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Inline filter row
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sp-grid-filter-row {
+  display: flex;
+  flex-shrink: 0;
+  background: var(--grid-pinned-bg-header);
+  border-bottom: 1px solid var(--grid-border);
+  height: var(--grid-filter-h);
+  position: sticky;
+  top: var(--grid-header-h);
+  z-index: 12;
+}
+.sp-grid-filter-cell {
+  display: flex;
+  align-items: center;
+  position: relative;
+  box-sizing: border-box;
+  z-index: 25;
+  flex-shrink: 0;
+  border-right: 1px solid var(--grid-border);
+  padding: 0 6px;
+}
+.sp-grid-filter-cell:last-child {
+  border-right: none;
+}
+.sp-grid-filter-cell--spacer {
+  flex-shrink: 0;
+  border-right: 1px solid var(--grid-border);
+}
+.sp-grid-filter-inline {
+  width: 100%;
+  padding: 3px 22px 3px 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--grid-cell-text);
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.sp-grid-filter-inline:focus {
+  border-color: var(--grid-accent);
+  background: var(--grid-editor-bg, rgba(255, 255, 255, 0.06));
+}
+.sp-grid-filter-inline::placeholder {
+  color: var(--grid-cell-secondary);
+  opacity: 0.5;
+}
+.sp-grid-filter-inline-clear {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: var(--grid-cell-secondary);
+  cursor: pointer;
+  font-size: 10px;
+  padding: 0;
+  line-height: 1;
+}
+.sp-grid-filter-inline-clear:hover {
+  color: var(--grid-cell-text);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Aggregate row
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sp-grid-aggregate-row {
+  display: flex;
+  flex-shrink: 0;
+  border-top: 2px solid var(--grid-border-strong);
+  height: var(--grid-aggregate-h);
+  position: sticky;
+  bottom: 0;
+  z-index: 12;
+  background: var(--grid-pinned-bg-header);
+}
+.sp-grid-aggregate-row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--grid-accent-dim) 40%, transparent);
+  opacity: 0.4;
+  pointer-events: none;
+}
+.sp-grid-agg-cell {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--grid-cell-padding-x);
+  box-sizing: border-box;
+  flex-shrink: 0;
+  border-right: 1px solid var(--grid-border);
+}
+.sp-grid-agg-cell:last-child {
+  border-right: none;
+}
+.sp-grid-agg-cell--pinned-left {
+  position: sticky !important;
+  background: var(--grid-pinned-bg-header) !important;
+  z-index: 14;
+  border-right: 1px solid var(--grid-pinned-border-right, rgba(0, 0, 0, 0.1)) !important;
+}
+.sp-grid-agg-cell--pinned-right {
+  position: sticky !important;
+  background: var(--grid-pinned-bg-header) !important;
+  z-index: 14;
+  border-left: 1px solid var(--grid-pinned-border-left, rgba(0, 0, 0, 0.1)) !important;
+}
+.sp-grid-agg-cell--sticky {
+  position: sticky !important;
+  background: var(--grid-pinned-bg-header) !important;
+  z-index: 14;
+}
+.sp-grid-agg-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--grid-accent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Column header grouping — stacked / multi-row headers
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sp-grid-header-grouped-wrap {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  background: var(--grid-header-bg);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+.sp-grid-header-grouped-wrap::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--grid-accent-dim) 40%, transparent);
+  opacity: 0.4;
+  pointer-events: none;
+  z-index: 1;
+}
+.sp-grid-header--group-row {
+  display: flex;
+  flex-shrink: 0;
+  height: var(--grid-group-header-h);
+  min-height: var(--grid-group-header-h);
+  background: var(--grid-header-bg);
+  border-bottom: none;
+  position: static;
+  z-index: auto;
+  overflow: visible;
+}
+.sp-grid-header--group-row::before {
+  display: none;
+}
+.sp-grid-header--leaf-row {
+  display: flex;
+  flex-shrink: 0;
+  height: var(--grid-leaf-header-h);
+  min-height: var(--grid-leaf-header-h);
+  background: var(--grid-header-bg);
+  border-bottom: 1px solid var(--grid-border-strong);
+  position: static;
+  z-index: auto;
+  overflow: visible;
+}
+.sp-grid-header--leaf-row::before {
+  display: none;
+}
+.sp-grid-header-cell--leaf-spacer {
+  visibility: hidden;
+  pointer-events: none;
+  border-bottom: none;
+  cursor: default !important;
+}
+.sp-grid-header-cell--spans-both-rows {
+  height: calc(var(--grid-group-header-h) + var(--grid-leaf-header-h));
+  min-height: calc(var(--grid-group-header-h) + var(--grid-leaf-header-h));
+  z-index: 2;
+  align-items: center;
+  overflow: visible;
+  background: var(--grid-header-bg);
+  border-bottom: 1px solid var(--grid-border-strong);
+}
+.sp-grid-header-cell--group {
+  display: flex;
+  align-items: stretch;
+  position: relative;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  border-right: 1px solid var(--grid-border);
+  border-bottom: 1px solid var(--grid-border);
+  cursor: default;
+  overflow: visible;
+  background: var(--grid-header-bg);
+}
+.sp-grid-header-cell--group.sp-grid-header-cell--pinned-left {
+  position: sticky !important;
+  background: var(--grid-pinned-bg-header) !important;
+  border-right: 1px solid var(--grid-pinned-border-right, rgba(0, 0, 0, 0.1)) !important;
+  z-index: 20;
+}
+.sp-grid-header-cell--group.sp-grid-header-cell--pinned-right {
+  position: sticky !important;
+  background: var(--grid-pinned-bg-header) !important;
+  border-left: 1px solid var(--grid-pinned-border-left, rgba(0, 0, 0, 0.1)) !important;
+  z-index: 20;
+}
+.sp-grid-header-cell__group-inner {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--grid-cell-padding-x);
+}
+.sp-grid-header-cell__group-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--grid-accent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+  opacity: 0.85;
+}
+.sp-grid-header-cell__group-accent {
+  position: absolute;
+  bottom: 0;
+  left: 10px;
+  right: 10px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--grid-accent);
+  opacity: 0.45;
+}
+.sp-grid-header-cell--in-group-row {
+  background: var(--grid-header-bg);
+  border-bottom: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Deferred resize/reorder ghost lines
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sp-grid-resize-ghost {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  transform: translateX(-1px);
+  background: var(--grid-accent);
+  opacity: 0.85;
+  pointer-events: none;
+  z-index: 100;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--sp-primary, #2563eb) 20%, transparent),
+    0 0 8px color-mix(in srgb, var(--sp-primary, #2563eb) 25%, transparent);
+}
+.sp-grid-resize-ghost::before {
+  content: '';
+  position: absolute;
+  top: calc(var(--grid-sticky-header-h) + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid var(--grid-accent);
+}
+.sp-grid-reorder-ghost {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  transform: translateX(-1px);
+  background: var(--grid-accent);
+  pointer-events: none;
+  z-index: 100;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--sp-primary, #2563eb) 20%, transparent),
+    0 0 10px color-mix(in srgb, var(--sp-primary, #2563eb) 30%, transparent);
+  border-radius: 2px;
+}
+.sp-grid-reorder-ghost::before {
+  content: '';
+  position: absolute;
+  top: calc(var(--grid-sticky-header-h) + 4px);
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  background: var(--grid-accent);
+  border-radius: 1px;
+  box-shadow: 0 0 4px color-mix(in srgb, var(--sp-primary, #2563eb) 40%, transparent);
+}
+.sp-grid-root.sp-grid--deferred-reorder-active .sp-grid-header-cell.drop-left::before,
+.sp-grid-root.sp-grid--deferred-reorder-active .sp-grid-header-cell.drop-right::after {
+  display: none;
+}
+.dark .sp-grid-resize-ghost,
+.dark .sp-grid-reorder-ghost,
+[data-theme='dark'] .sp-grid-resize-ghost,
+[data-theme='dark'] .sp-grid-reorder-ghost {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--sp-primary, #4f8ef7) 25%, transparent),
+    0 0 8px color-mix(in srgb, var(--sp-primary, #4f8ef7) 35%, transparent);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DataContext record-state row classes
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Modified field cell highlight */
+.sp-grid-cell--state-modified {
+  position: relative;
+  background: color-mix(in srgb, #d97706 10%, var(--grid-row-bg)) !important;
+  box-shadow:
+    inset 3px 0 0 0 #d97706,
+    inset 0 0 0 1px rgba(217, 119, 6, 0.18);
+}
+.dark .sp-grid-cell--state-modified,
+[data-theme='dark'] .sp-grid-cell--state-modified {
+  background: color-mix(in srgb, #fbbf24 12%, var(--grid-row-bg)) !important;
+  box-shadow:
+    inset 3px 0 0 0 #fbbf24,
+    inset 0 0 0 1px rgba(251, 191, 36, 0.22);
+}
+
+/* Modified cell on pinned/sticky/control cells */
+.sp-grid-row .sp-grid-cell--state-modified.sp-grid-cell--pinned-left,
+.sp-grid-row .sp-grid-cell--state-modified.sp-grid-cell--pinned-right,
+.sp-grid-row .sp-grid-cell--state-modified.sp-grid-cell--sticky,
+.sp-grid-row .sp-grid-cell--state-modified.sp-grid-cell--control-pinned {
+  background: color-mix(in srgb, #d97706 10%, var(--grid-pinned-bg)) !important;
+}
+.sp-grid-row.sp-grid-row--odd .sp-grid-cell--state-modified.sp-grid-cell--pinned-left,
+.sp-grid-row.sp-grid-row--odd .sp-grid-cell--state-modified.sp-grid-cell--pinned-right,
+.sp-grid-row.sp-grid-row--odd .sp-grid-cell--state-modified.sp-grid-cell--sticky,
+.sp-grid-row.sp-grid-row--odd .sp-grid-cell--state-modified.sp-grid-cell--control-pinned {
+  background: color-mix(in srgb, #d97706 10%, var(--grid-pinned-bg-odd)) !important;
+}
+.sp-grid-row.sp-grid-row--selected .sp-grid-cell--state-modified.sp-grid-cell--pinned-left,
+.sp-grid-row.sp-grid-row--selected .sp-grid-cell--state-modified.sp-grid-cell--pinned-right,
+.sp-grid-row.sp-grid-row--selected .sp-grid-cell--state-modified.sp-grid-cell--sticky,
+.sp-grid-row.sp-grid-row--selected .sp-grid-cell--state-modified.sp-grid-cell--control-pinned {
+  background: color-mix(in srgb, #d97706 10%, var(--grid-pinned-bg-selected)) !important;
+}
+.sp-grid--selectable .sp-grid-row:hover .sp-grid-cell--state-modified.sp-grid-cell--pinned-left,
+.sp-grid--selectable .sp-grid-row:hover .sp-grid-cell--state-modified.sp-grid-cell--pinned-right,
+.sp-grid--selectable .sp-grid-row:hover .sp-grid-cell--state-modified.sp-grid-cell--sticky,
+.sp-grid--selectable .sp-grid-row:hover .sp-grid-cell--state-modified.sp-grid-cell--control-pinned {
+  background: color-mix(in srgb, #d97706 10%, var(--grid-pinned-bg-hover)) !important;
+}
+.sp-grid--selectable .sp-grid-row.sp-grid-row--odd:hover .sp-grid-cell--state-modified.sp-grid-cell--pinned-left,
+.sp-grid--selectable .sp-grid-row.sp-grid-row--odd:hover .sp-grid-cell--state-modified.sp-grid-cell--pinned-right,
+.sp-grid--selectable .sp-grid-row.sp-grid-row--odd:hover .sp-grid-cell--state-modified.sp-grid-cell--sticky,
+.sp-grid--selectable .sp-grid-row.sp-grid-row--odd:hover .sp-grid-cell--state-modified.sp-grid-cell--control-pinned {
+  background: color-mix(in srgb, #d97706 10%, var(--grid-pinned-bg-hover-odd)) !important;
+}
+.dark .sp-grid-row .sp-grid-cell--state-modified.sp-grid-cell--pinned-left,
+.dark .sp-grid-row .sp-grid-cell--state-modified.sp-grid-cell--pinned-right,
+.dark .sp-grid-row .sp-grid-cell--state-modified.sp-grid-cell--sticky,
+.dark .sp-grid-row .sp-grid-cell--state-modified.sp-grid-cell--control-pinned,
+[data-theme='dark'] .sp-grid-row .sp-grid-cell--state-modified.sp-grid-cell--pinned-left,
+[data-theme='dark'] .sp-grid-row .sp-grid-cell--state-modified.sp-grid-cell--pinned-right,
+[data-theme='dark'] .sp-grid-row .sp-grid-cell--state-modified.sp-grid-cell--sticky,
+[data-theme='dark'] .sp-grid-row .sp-grid-cell--state-modified.sp-grid-cell--control-pinned {
+  background: color-mix(in srgb, #fbbf24 12%, var(--grid-pinned-bg)) !important;
+}
+.dark .sp-grid-row.sp-grid-row--odd .sp-grid-cell--state-modified.sp-grid-cell--pinned-left,
+.dark .sp-grid-row.sp-grid-row--odd .sp-grid-cell--state-modified.sp-grid-cell--pinned-right,
+.dark .sp-grid-row.sp-grid-row--odd .sp-grid-cell--state-modified.sp-grid-cell--sticky,
+.dark .sp-grid-row.sp-grid-row--odd .sp-grid-cell--state-modified.sp-grid-cell--control-pinned,
+[data-theme='dark'] .sp-grid-row.sp-grid-row--odd .sp-grid-cell--state-modified.sp-grid-cell--pinned-left,
+[data-theme='dark'] .sp-grid-row.sp-grid-row--odd .sp-grid-cell--state-modified.sp-grid-cell--pinned-right,
+[data-theme='dark'] .sp-grid-row.sp-grid-row--odd .sp-grid-cell--state-modified.sp-grid-cell--sticky,
+[data-theme='dark'] .sp-grid-row.sp-grid-row--odd .sp-grid-cell--state-modified.sp-grid-cell--control-pinned {
+  background: color-mix(in srgb, #fbbf24 12%, var(--grid-pinned-bg-odd)) !important;
+}
+.dark .sp-grid-row.sp-grid-row--selected .sp-grid-cell--state-modified.sp-grid-cell--pinned-left,
+.dark .sp-grid-row.sp-grid-row--selected .sp-grid-cell--state-modified.sp-grid-cell--pinned-right,
+.dark .sp-grid-row.sp-grid-row--selected .sp-grid-cell--state-modified.sp-grid-cell--sticky,
+.dark .sp-grid-row.sp-grid-row--selected .sp-grid-cell--state-modified.sp-grid-cell--control-pinned,
+[data-theme='dark'] .sp-grid-row.sp-grid-row--selected .sp-grid-cell--state-modified.sp-grid-cell--pinned-left,
+[data-theme='dark'] .sp-grid-row.sp-grid-row--selected .sp-grid-cell--state-modified.sp-grid-cell--pinned-right,
+[data-theme='dark'] .sp-grid-row.sp-grid-row--selected .sp-grid-cell--state-modified.sp-grid-cell--sticky,
+[data-theme='dark'] .sp-grid-row.sp-grid-row--selected .sp-grid-cell--state-modified.sp-grid-cell--control-pinned {
+  background: color-mix(in srgb, #fbbf24 12%, var(--grid-pinned-bg-selected)) !important;
+}
+.dark .sp-grid--selectable .sp-grid-row:hover .sp-grid-cell--state-modified.sp-grid-cell--pinned-left,
+.dark .sp-grid--selectable .sp-grid-row:hover .sp-grid-cell--state-modified.sp-grid-cell--pinned-right,
+.dark .sp-grid--selectable .sp-grid-row:hover .sp-grid-cell--state-modified.sp-grid-cell--sticky,
+.dark .sp-grid--selectable .sp-grid-row:hover .sp-grid-cell--state-modified.sp-grid-cell--control-pinned,
+[data-theme='dark'] .sp-grid--selectable .sp-grid-row:hover .sp-grid-cell--state-modified.sp-grid-cell--pinned-left,
+[data-theme='dark'] .sp-grid--selectable .sp-grid-row:hover .sp-grid-cell--state-modified.sp-grid-cell--pinned-right,
+[data-theme='dark'] .sp-grid--selectable .sp-grid-row:hover .sp-grid-cell--state-modified.sp-grid-cell--sticky,
+[data-theme='dark'] .sp-grid--selectable .sp-grid-row:hover .sp-grid-cell--state-modified.sp-grid-cell--control-pinned {
+  background: color-mix(in srgb, #fbbf24 12%, var(--grid-pinned-bg-hover)) !important;
+}
+.dark .sp-grid--selectable .sp-grid-row.sp-grid-row--odd:hover .sp-grid-cell--state-modified.sp-grid-cell--pinned-left,
+.dark .sp-grid--selectable .sp-grid-row.sp-grid-row--odd:hover .sp-grid-cell--state-modified.sp-grid-cell--pinned-right,
+.dark .sp-grid--selectable .sp-grid-row.sp-grid-row--odd:hover .sp-grid-cell--state-modified.sp-grid-cell--sticky,
+.dark .sp-grid--selectable .sp-grid-row.sp-grid-row--odd:hover .sp-grid-cell--state-modified.sp-grid-cell--control-pinned,
+[data-theme='dark'] .sp-grid--selectable .sp-grid-row.sp-grid-row--odd:hover .sp-grid-cell--state-modified.sp-grid-cell--pinned-left,
+[data-theme='dark'] .sp-grid--selectable .sp-grid-row.sp-grid-row--odd:hover .sp-grid-cell--state-modified.sp-grid-cell--pinned-right,
+[data-theme='dark'] .sp-grid--selectable .sp-grid-row.sp-grid-row--odd:hover .sp-grid-cell--state-modified.sp-grid-cell--sticky,
+[data-theme='dark'] .sp-grid--selectable .sp-grid-row.sp-grid-row--odd:hover .sp-grid-cell--state-modified.sp-grid-cell--control-pinned {
+  background: color-mix(in srgb, #fbbf24 12%, var(--grid-pinned-bg-hover-odd)) !important;
+}
+
+/* New record — green left border */
+.sp-grid-row--state-new {
+  box-shadow: inset 3px 0 0 0 #16a34a !important;
+}
+.sp-grid-row--state-new::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(22, 163, 74, 0.05);
+  pointer-events: none;
+  z-index: 0;
+}
+.sp-grid-row--state-new .sp-grid-cell--pinned-left,
+.sp-grid-row--state-new .sp-grid-cell--pinned-right,
+.sp-grid-row--state-new .sp-grid-cell--sticky,
+.sp-grid-row--state-new .sp-grid-cell--control-pinned {
+  background: color-mix(in srgb, #16a34a 7%, var(--grid-pinned-bg)) !important;
+}
+.sp-grid-row--state-new.sp-grid-row--odd .sp-grid-cell--pinned-left,
+.sp-grid-row--state-new.sp-grid-row--odd .sp-grid-cell--pinned-right,
+.sp-grid-row--state-new.sp-grid-row--odd .sp-grid-cell--sticky,
+.sp-grid-row--state-new.sp-grid-row--odd .sp-grid-cell--control-pinned {
+  background: color-mix(in srgb, #16a34a 7%, var(--grid-pinned-bg-odd)) !important;
+}
+.sp-grid-row--state-new > .sp-grid-cell--control-pinned:first-child,
+.sp-grid-row--state-new > .sp-grid-cell--pinned-left:first-child,
+.sp-grid-row--state-new > .sp-grid-cell--sticky:first-child {
+  box-shadow: inset 3px 0 0 0 #16a34a !important;
+}
+.dark .sp-grid-row--state-new,
+[data-theme='dark'] .sp-grid-row--state-new {
+  box-shadow: inset 3px 0 0 0 #48c78e !important;
+}
+.dark .sp-grid-row--state-new::before,
+[data-theme='dark'] .sp-grid-row--state-new::before {
+  background: rgba(72, 199, 142, 0.05);
+}
+.dark .sp-grid-row--state-new .sp-grid-cell--pinned-left,
+.dark .sp-grid-row--state-new .sp-grid-cell--pinned-right,
+.dark .sp-grid-row--state-new .sp-grid-cell--sticky,
+.dark .sp-grid-row--state-new .sp-grid-cell--control-pinned,
+[data-theme='dark'] .sp-grid-row--state-new .sp-grid-cell--pinned-left,
+[data-theme='dark'] .sp-grid-row--state-new .sp-grid-cell--pinned-right,
+[data-theme='dark'] .sp-grid-row--state-new .sp-grid-cell--sticky,
+[data-theme='dark'] .sp-grid-row--state-new .sp-grid-cell--control-pinned {
+  background: color-mix(in srgb, #48c78e 7%, var(--grid-pinned-bg)) !important;
+}
+.dark .sp-grid-row--state-new.sp-grid-row--odd .sp-grid-cell--pinned-left,
+.dark .sp-grid-row--state-new.sp-grid-row--odd .sp-grid-cell--pinned-right,
+.dark .sp-grid-row--state-new.sp-grid-row--odd .sp-grid-cell--sticky,
+.dark .sp-grid-row--state-new.sp-grid-row--odd .sp-grid-cell--control-pinned,
+[data-theme='dark'] .sp-grid-row--state-new.sp-grid-row--odd .sp-grid-cell--pinned-left,
+[data-theme='dark'] .sp-grid-row--state-new.sp-grid-row--odd .sp-grid-cell--pinned-right,
+[data-theme='dark'] .sp-grid-row--state-new.sp-grid-row--odd .sp-grid-cell--sticky,
+[data-theme='dark'] .sp-grid-row--state-new.sp-grid-row--odd .sp-grid-cell--control-pinned {
+  background: color-mix(in srgb, #48c78e 7%, var(--grid-pinned-bg-odd)) !important;
+}
+.dark .sp-grid-row--state-new > .sp-grid-cell--control-pinned:first-child,
+.dark .sp-grid-row--state-new > .sp-grid-cell--pinned-left:first-child,
+.dark .sp-grid-row--state-new > .sp-grid-cell--sticky:first-child,
+[data-theme='dark'] .sp-grid-row--state-new > .sp-grid-cell--control-pinned:first-child,
+[data-theme='dark'] .sp-grid-row--state-new > .sp-grid-cell--pinned-left:first-child,
+[data-theme='dark'] .sp-grid-row--state-new > .sp-grid-cell--sticky:first-child {
+  box-shadow: inset 3px 0 0 0 #48c78e !important;
+}
+
+/* Modified record — amber left border */
+.sp-grid-row--state-modified {
+  box-shadow: inset 3px 0 0 0 #d97706 !important;
+}
+.sp-grid-row--state-modified::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(217, 119, 6, 0.05);
+  pointer-events: none;
+  z-index: 0;
+}
+.sp-grid-row--state-modified .sp-grid-cell--pinned-left,
+.sp-grid-row--state-modified .sp-grid-cell--pinned-right,
+.sp-grid-row--state-modified .sp-grid-cell--sticky,
+.sp-grid-row--state-modified .sp-grid-cell--control-pinned {
+  background: color-mix(in srgb, #d97706 6%, var(--grid-pinned-bg)) !important;
+}
+.sp-grid-row--state-modified.sp-grid-row--odd .sp-grid-cell--pinned-left,
+.sp-grid-row--state-modified.sp-grid-row--odd .sp-grid-cell--pinned-right,
+.sp-grid-row--state-modified.sp-grid-row--odd .sp-grid-cell--sticky,
+.sp-grid-row--state-modified.sp-grid-row--odd .sp-grid-cell--control-pinned {
+  background: color-mix(in srgb, #d97706 6%, var(--grid-pinned-bg-odd)) !important;
+}
+.sp-grid-row--state-modified > .sp-grid-cell--control-pinned:first-child,
+.sp-grid-row--state-modified > .sp-grid-cell--pinned-left:first-child,
+.sp-grid-row--state-modified > .sp-grid-cell--sticky:first-child {
+  box-shadow: inset 3px 0 0 0 #d97706 !important;
+}
+.dark .sp-grid-row--state-modified,
+[data-theme='dark'] .sp-grid-row--state-modified {
+  box-shadow: inset 3px 0 0 0 #fbbf24 !important;
+}
+.dark .sp-grid-row--state-modified::before,
+[data-theme='dark'] .sp-grid-row--state-modified::before {
+  background: rgba(251, 191, 36, 0.04);
+}
+.dark .sp-grid-row--state-modified .sp-grid-cell--pinned-left,
+.dark .sp-grid-row--state-modified .sp-grid-cell--pinned-right,
+.dark .sp-grid-row--state-modified .sp-grid-cell--sticky,
+.dark .sp-grid-row--state-modified .sp-grid-cell--control-pinned,
+[data-theme='dark'] .sp-grid-row--state-modified .sp-grid-cell--pinned-left,
+[data-theme='dark'] .sp-grid-row--state-modified .sp-grid-cell--pinned-right,
+[data-theme='dark'] .sp-grid-row--state-modified .sp-grid-cell--sticky,
+[data-theme='dark'] .sp-grid-row--state-modified .sp-grid-cell--control-pinned {
+  background: color-mix(in srgb, #fbbf24 6%, var(--grid-pinned-bg)) !important;
+}
+.dark .sp-grid-row--state-modified.sp-grid-row--odd .sp-grid-cell--pinned-left,
+.dark .sp-grid-row--state-modified.sp-grid-row--odd .sp-grid-cell--pinned-right,
+.dark .sp-grid-row--state-modified.sp-grid-row--odd .sp-grid-cell--sticky,
+.dark .sp-grid-row--state-modified.sp-grid-row--odd .sp-grid-cell--control-pinned,
+[data-theme='dark'] .sp-grid-row--state-modified.sp-grid-row--odd .sp-grid-cell--pinned-left,
+[data-theme='dark'] .sp-grid-row--state-modified.sp-grid-row--odd .sp-grid-cell--pinned-right,
+[data-theme='dark'] .sp-grid-row--state-modified.sp-grid-row--odd .sp-grid-cell--sticky,
+[data-theme='dark'] .sp-grid-row--state-modified.sp-grid-row--odd .sp-grid-cell--control-pinned {
+  background: color-mix(in srgb, #fbbf24 6%, var(--grid-pinned-bg-odd)) !important;
+}
+.dark .sp-grid-row--state-modified > .sp-grid-cell--control-pinned:first-child,
+.dark .sp-grid-row--state-modified > .sp-grid-cell--pinned-left:first-child,
+.dark .sp-grid-row--state-modified > .sp-grid-cell--sticky:first-child,
+[data-theme='dark'] .sp-grid-row--state-modified > .sp-grid-cell--control-pinned:first-child,
+[data-theme='dark'] .sp-grid-row--state-modified > .sp-grid-cell--pinned-left:first-child,
+[data-theme='dark'] .sp-grid-row--state-modified > .sp-grid-cell--sticky:first-child {
+  box-shadow: inset 3px 0 0 0 #fbbf24 !important;
+}
+
+/* Deleted record — red strikethrough + dimmed */
+.sp-grid-row--state-deleted {
+  box-shadow: inset 3px 0 0 0 #dc2626 !important;
+  text-decoration: line-through;
+}
+.sp-grid-row--state-deleted::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(220, 38, 38, 0.04);
+  pointer-events: none;
+  z-index: 0;
+}
+.sp-grid-row--state-deleted > .sp-grid-cell {
+  opacity: 0.45;
+}
+.sp-grid-row--state-deleted > .sp-grid-cell--control-pinned:first-child,
+.sp-grid-row--state-deleted > .sp-grid-cell--pinned-left:first-child,
+.sp-grid-row--state-deleted > .sp-grid-cell--sticky:first-child {
+  box-shadow: inset 3px 0 0 0 #dc2626 !important;
+}
+.dark .sp-grid-row--state-deleted,
+[data-theme='dark'] .sp-grid-row--state-deleted {
+  box-shadow: inset 3px 0 0 0 #f87171 !important;
+}
+.dark .sp-grid-row--state-deleted::before,
+[data-theme='dark'] .sp-grid-row--state-deleted::before {
+  background: rgba(248, 113, 113, 0.04);
+}
+.dark .sp-grid-row--state-deleted > .sp-grid-cell--control-pinned:first-child,
+.dark .sp-grid-row--state-deleted > .sp-grid-cell--pinned-left:first-child,
+.dark .sp-grid-row--state-deleted > .sp-grid-cell--sticky:first-child,
+[data-theme='dark'] .sp-grid-row--state-deleted > .sp-grid-cell--control-pinned:first-child,
+[data-theme='dark'] .sp-grid-row--state-deleted > .sp-grid-cell--pinned-left:first-child,
+[data-theme='dark'] .sp-grid-row--state-deleted > .sp-grid-cell--sticky:first-child {
+  box-shadow: inset 3px 0 0 0 #f87171 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Filter Expression Panel
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sp-grid-outer {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+.sp-grid-outer .sp-grid-root {
+  flex: 1;
+  min-width: 0;
+}
+.sp-grid-filter-panel {
+  display: flex;
+  flex-direction: column;
+  width: 320px;
+  flex-shrink: 0;
+  background: var(--grid-bg);
+  border: 1px solid var(--grid-border-strong);
+  overflow: hidden;
+  z-index: 200;
+}
+.sp-grid-outer--panel-right .sp-grid-filter-panel {
+  border-left: none;
+  border-radius: 0 var(--grid-radius) var(--grid-radius) 0;
+}
+.sp-grid-outer--panel-left .sp-grid-filter-panel {
+  border-right: none;
+  border-radius: var(--grid-radius) 0 0 var(--grid-radius);
+}
+.sp-grid-outer--panel-pinned .sp-grid-filter-panel {
+  position: relative;
+}
+.sp-grid-filter-panel--floating {
+  position: absolute !important;
+  top: 0;
+  bottom: 0;
+  box-shadow: var(--sp-shadow-xl, 0 20px 25px -5px rgba(0, 0, 0, 0.1));
+}
+.sp-grid-outer--panel-right .sp-grid-filter-panel--floating {
+  right: 0;
+  border-left: 1px solid var(--grid-border-strong);
+  border-radius: var(--grid-radius) 0 0 var(--grid-radius);
+}
+.sp-grid-outer--panel-left .sp-grid-filter-panel--floating {
+  left: 0;
+  border-right: 1px solid var(--grid-border-strong);
+  border-radius: 0 var(--grid-radius) var(--grid-radius) 0;
+}
+.sp-grid-outer--panel-pinned.sp-grid-outer--panel-right .sp-grid-root {
+  border-radius: var(--grid-radius) 0 0 var(--grid-radius);
+}
+.sp-grid-outer--panel-pinned.sp-grid-outer--panel-left .sp-grid-root {
+  border-radius: 0 var(--grid-radius) var(--grid-radius) 0;
+}
+.sp-grid-filter-panel__splitter {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  cursor: col-resize;
+  z-index: 201;
+  transition: background 0.15s;
+}
+.sp-grid-filter-panel__splitter--left {
+  left: 0;
+}
+.sp-grid-filter-panel__splitter--right {
+  right: 0;
+}
+.sp-grid-filter-panel__splitter:hover,
+.sp-grid-filter-panel__splitter:active {
+  background: var(--grid-accent);
+  opacity: 0.25;
+}
+.sp-grid-filter-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--grid-border);
+  background: var(--grid-header-bg);
+  flex-shrink: 0;
+  min-height: var(--grid-toolbar-h);
+}
+.sp-grid-filter-panel__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--grid-header-size);
+  font-weight: 600;
+  color: var(--grid-header-text);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.sp-grid-filter-panel__actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.sp-grid-filter-panel__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: var(--sp-radius-sm, 4px);
+  background: transparent;
+  color: var(--grid-header-text);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.sp-grid-filter-panel__btn:hover {
+  background: var(--grid-header-hover-bg);
+  color: var(--grid-cell-text);
+}
+.sp-grid-filter-panel__btn.active {
+  color: var(--grid-accent);
+  background: var(--grid-accent-glow);
+}
+.sp-grid-filter-panel__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--grid-scrollbar-thumb) var(--grid-scrollbar-track);
+}
+.sp-grid-filter-panel__body::-webkit-scrollbar {
+  width: 8px;
+}
+.sp-grid-filter-panel__body::-webkit-scrollbar-track {
+  background: var(--grid-scrollbar-track);
+}
+.sp-grid-filter-panel__body::-webkit-scrollbar-thumb {
+  background: var(--grid-scrollbar-thumb);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+.sp-grid-filter-panel__body::-webkit-scrollbar-thumb:hover {
+  background: var(--grid-scrollbar-hover);
+  background-clip: content-box;
+}
+.sp-grid-filter-panel__footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--grid-border);
+  background: var(--grid-header-bg);
+  flex-shrink: 0;
+}
+.sp-grid-filter-panel__footer-btn {
+  flex: 1;
+  padding: 6px 12px;
+  border: 1px solid var(--grid-border-strong);
+  border-radius: var(--sp-radius-md, 6px);
+  font-size: var(--grid-header-size);
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+.sp-grid-filter-panel__footer-btn--clear {
+  background: transparent;
+  color: var(--grid-header-text);
+}
+.sp-grid-filter-panel__footer-btn--clear:hover {
+  background: var(--grid-header-hover-bg);
+  color: var(--grid-cell-text);
+}
+.sp-grid-filter-panel__footer-btn--apply {
+  background: var(--grid-accent);
+  color: var(--sp-primary-text, #fff);
+  border-color: var(--grid-accent);
+}
+.sp-grid-filter-panel__footer-btn--apply:hover {
+  opacity: 0.9;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CellEditor sub-component styles
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sp-grid-cell-editor {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  position: relative;
+}
+.sp-grid-cell-editor__input {
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid var(--grid-accent-dim);
+  border-radius: 4px;
+  background: var(--grid-editor-bg);
+  color: var(--grid-cell-text);
+  font-size: var(--grid-cell-size);
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-sizing: border-box;
+}
+.sp-grid-cell-editor__input:focus {
+  border-color: var(--grid-accent);
+  box-shadow: 0 0 0 2px var(--grid-accent-glow);
+}
+.sp-grid-cell-editor__textarea {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--grid-accent-dim);
+  border-radius: 4px;
+  background: var(--grid-editor-bg);
+  color: var(--grid-cell-text);
+  font-size: var(--grid-cell-size);
+  font-family: inherit;
+  outline: none;
+  resize: vertical;
+  min-height: 60px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-sizing: border-box;
+}
+.sp-grid-cell-editor__textarea:focus {
+  border-color: var(--grid-accent);
+  box-shadow: 0 0 0 2px var(--grid-accent-glow);
+}
+.sp-grid-cell-editor__select {
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid var(--grid-accent-dim);
+  border-radius: 4px;
+  background: var(--grid-editor-bg);
+  color: var(--grid-cell-text);
+  font-size: var(--grid-cell-size);
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-sizing: border-box;
+}
+.sp-grid-cell-editor__select:focus {
+  border-color: var(--grid-accent);
+  box-shadow: 0 0 0 2px var(--grid-accent-glow);
+}
+.sp-grid-cell-editor__switch {
+  width: 36px;
+  height: 20px;
+  border-radius: 10px;
+  border: 2px solid var(--grid-border-strong);
+  background: var(--grid-border);
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s, border-color 0.2s;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+.sp-grid-cell-editor__switch--checked {
+  background: var(--grid-accent);
+  border-color: var(--grid-accent);
+}
+.sp-grid-cell-editor__switch-thumb {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s;
+  transform: translateX(1px);
+}
+.sp-grid-cell-editor__switch--checked .sp-grid-cell-editor__switch-thumb {
+  transform: translateX(17px);
+}
+.sp-grid-cell-editor__error {
+  font-size: 11px;
+  color: var(--sp-danger, #e53e3e);
+  margin-top: 4px;
+  padding: 2px 4px;
+  background: color-mix(in srgb, var(--sp-danger, #e53e3e) 8%, transparent);
+  border-radius: 3px;
+  line-height: 1.3;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ColumnPanel sub-component styles
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sp-grid-column-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+  background: var(--grid-panel-bg);
+  border: 1px solid var(--grid-border-strong);
+  border-radius: var(--grid-radius);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  max-height: 400px;
+  overflow: hidden;
+  min-width: 220px;
+}
+.sp-grid-column-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--grid-border);
+}
+.sp-grid-column-panel__title {
+  font-size: var(--grid-header-size);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--grid-header-text);
+}
+.sp-grid-column-panel__actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.sp-grid-column-panel__btn {
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--grid-border-strong);
+  background: transparent;
+  color: var(--grid-header-text);
+  font-size: 11px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.sp-grid-column-panel__btn:hover:not(:disabled) {
+  background: var(--grid-header-hover-bg);
+  color: var(--grid-cell-text);
+}
+.sp-grid-column-panel__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.sp-grid-column-panel__list {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  overflow-y: auto;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: var(--grid-scrollbar-thumb) var(--grid-scrollbar-track);
+}
+.sp-grid-column-panel__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  cursor: default;
+  transition: background 0.1s;
+  border-top: 2px solid transparent;
+  border-bottom: 2px solid transparent;
+}
+.sp-grid-column-panel__item:hover {
+  background: var(--grid-header-hover-bg);
+}
+.sp-grid-column-panel__item--dragging {
+  opacity: 0.4;
+  background: var(--grid-accent-glow);
+}
+.sp-grid-column-panel__item--drop-before {
+  border-top-color: var(--grid-accent);
+}
+.sp-grid-column-panel__item--drop-after {
+  border-bottom-color: var(--grid-accent);
+}
+.sp-grid-column-panel__checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--grid-accent);
+}
+.sp-grid-column-panel__label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+  font-size: var(--grid-cell-size);
+  color: var(--grid-cell-text);
+}
+.sp-grid-column-panel__column-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sp-grid-column-panel__drag-handle {
+  display: flex;
+  align-items: center;
+  color: rgba(160, 174, 192, 0.4);
+  cursor: grab;
+  flex-shrink: 0;
+}
+.sp-grid-column-panel__drag-handle:active {
+  cursor: grabbing;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GridColumnFilter sub-component styles
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sp-grid-column-filter {
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  background: var(--grid-panel-bg);
+  border: 1px solid var(--grid-border-strong);
+  border-radius: var(--grid-radius);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  min-width: 240px;
+}
+.sp-grid-column-filter__header {
+  margin-bottom: 10px;
+}
+.sp-grid-column-filter__title {
+  font-size: var(--grid-header-size);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--grid-header-text);
+}
+.sp-grid-column-filter__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sp-grid-column-filter__label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--grid-cell-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.sp-grid-column-filter__select {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--grid-border-strong);
+  border-radius: 4px;
+  background: var(--grid-editor-bg);
+  color: var(--grid-cell-text);
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.sp-grid-column-filter__select:focus {
+  border-color: var(--grid-accent);
+}
+.sp-grid-column-filter__input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--grid-border-strong);
+  border-radius: 4px;
+  background: var(--grid-editor-bg);
+  color: var(--grid-cell-text);
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+.sp-grid-column-filter__input:focus {
+  border-color: var(--grid-accent);
+}
+.sp-grid-column-filter__input::placeholder {
+  color: var(--grid-cell-secondary);
+  opacity: 0.5;
+}
+.sp-grid-column-filter__footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+.sp-grid-column-filter__btn {
+  flex: 1;
+  padding: 6px 12px;
+  border: 1px solid var(--grid-border-strong);
+  border-radius: var(--sp-radius-md, 6px);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+.sp-grid-column-filter__btn--clear {
+  background: transparent;
+  color: var(--grid-header-text);
+}
+.sp-grid-column-filter__btn--clear:hover {
+  background: var(--grid-header-hover-bg);
+  color: var(--grid-cell-text);
+}
+.sp-grid-column-filter__btn--apply {
+  background: var(--grid-accent);
+  color: var(--sp-primary-text, #fff);
+  border-color: var(--grid-accent);
+}
+.sp-grid-column-filter__btn--apply:hover {
+  opacity: 0.9;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Keyframe animations
+   ═══════════════════════════════════════════════════════════════════════════ */
+@keyframes sp-grid-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes sp-grid-skeleton-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+@keyframes sp-grid-detail-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 600px;
+  }
+}
+
+@keyframes sp-grid-vs-skeleton-sweep {
+  0% {
+    background-position:
+      100% 0,
+      24px 0,
+      0 0;
+  }
+  100% {
+    background-position:
+      -100% 0,
+      24px 0,
+      0 0;
+  }
+}
+
+@keyframes sp-grid-vs-row-appear {
+  from {
+    opacity: 0.5;
+  }
+  to {
+    opacity: 1;
+  }
+}

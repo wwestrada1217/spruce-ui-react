@@ -1,0 +1,70 @@
+.sp-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-space-2, 8px);
+}
+
+.sp-radio-group--horizontal {
+  flex-direction: row;
+  gap: var(--sp-space-4, 16px);
+}
+
+.sp-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-space-2, 8px);
+  cursor: pointer;
+  font-size: var(--sp-text-sm, 13px);
+  color: var(--sp-text-color, #1a202c);
+  user-select: none;
+}
+
+.sp-radio--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sp-radio__input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.sp-radio__circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  border: 2px solid var(--sp-border-strong, rgba(0, 0, 0, 0.14));
+  background: var(--sp-surface-0, #fff);
+  flex-shrink: 0;
+  transition: border-color var(--sp-duration-fast, 100ms) var(--sp-ease-default, cubic-bezier(0.2, 0, 0, 1));
+}
+
+.sp-radio:hover:not(.sp-radio--disabled) .sp-radio__circle {
+  border-color: var(--sp-primary, #2563eb);
+}
+
+.sp-radio--checked .sp-radio__circle {
+  border-color: var(--sp-primary, #2563eb);
+}
+
+.sp-radio__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: transparent;
+  transition: background var(--sp-duration-fast, 100ms) var(--sp-ease-default, cubic-bezier(0.2, 0, 0, 1));
+}
+
+.sp-radio--checked .sp-radio__dot {
+  background: var(--sp-primary, #2563eb);
+}
+
+.sp-radio:focus-within .sp-radio__circle {
+  outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color, #2563eb);
+  outline-offset: var(--sp-focus-ring-offset, 2px);
+}

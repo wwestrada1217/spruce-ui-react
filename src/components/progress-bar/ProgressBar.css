@@ -1,0 +1,88 @@
+.sp-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.sp-progress__header {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--sp-text-xs, 0.75rem);
+}
+
+.sp-progress__label {
+  color: var(--sp-text-color, #1f2937);
+  font-weight: var(--sp-font-medium, 500);
+}
+
+.sp-progress__value {
+  color: var(--sp-text-muted, #6b7280);
+}
+
+.sp-progress__track {
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--sp-surface-200, #e5e7eb);
+  overflow: hidden;
+}
+
+.sp-progress__track--sm {
+  height: 4px;
+}
+
+.sp-progress__track--lg {
+  height: 12px;
+}
+
+.sp-progress__fill {
+  height: 100%;
+  border-radius: inherit;
+  transition: width var(--sp-duration-slow, 400ms) var(--sp-ease-in-out, ease-in-out);
+}
+
+/* ── Variants ──────────────────────────────────────────────────────────── */
+
+.sp-progress__fill--primary  { background: var(--sp-primary, #2563eb); }
+.sp-progress__fill--success  { background: var(--sp-success, #16a34a); }
+.sp-progress__fill--warning  { background: var(--sp-warning, #f59e0b); }
+.sp-progress__fill--danger   { background: var(--sp-danger, #dc2626); }
+.sp-progress__fill--info     { background: var(--sp-info, #0ea5e9); }
+
+/* ── Striped ───────────────────────────────────────────────────────────── */
+
+.sp-progress__fill--striped {
+  background-image: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.15) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.15) 50%,
+    rgba(255, 255, 255, 0.15) 75%,
+    transparent 75%
+  );
+  background-size: 1rem 1rem;
+}
+
+.sp-progress__fill--animated {
+  animation: sp-progress-stripe 1s linear infinite;
+}
+
+/* ── Indeterminate ─────────────────────────────────────────────────────── */
+
+.sp-progress__fill--indeterminate {
+  animation: sp-progress-indeterminate 1.5s ease infinite;
+}
+
+/* ── Animations ────────────────────────────────────────────────────────── */
+
+@keyframes sp-progress-stripe {
+  from { background-position: 1rem 0; }
+  to   { background-position: 0 0; }
+}
+
+@keyframes sp-progress-indeterminate {
+  0%   { width: 30%; margin-left: 0; }
+  50%  { width: 30%; margin-left: 70%; }
+  100% { width: 30%; margin-left: 0; }
+}

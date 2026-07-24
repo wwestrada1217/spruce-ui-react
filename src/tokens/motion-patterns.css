@@ -1,0 +1,119 @@
+/* ============================================================================
+   Spruce Motion Patterns — Keyframe Animations
+   ============================================================================
+   Pre-built keyframes that consume the motion tokens.
+
+   Usage:
+     import 'spruce-react/tokens/motion-patterns.css';
+   ============================================================================ */
+
+/* ── Fade ──────────────────────────────────────────────────────────────────── */
+@keyframes sp-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes sp-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* ── Slide — vertical ─────────────────────────────────────────────────────── */
+@keyframes sp-slide-up-in {
+  from { opacity: 0; transform: translateY(var(--sp-motion-distance-md, 8px)); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes sp-slide-up-out {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(calc(var(--sp-motion-distance-md, 8px) * -1)); }
+}
+@keyframes sp-slide-down-in {
+  from { opacity: 0; transform: translateY(calc(var(--sp-motion-distance-md, 8px) * -1)); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes sp-slide-down-out {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(var(--sp-motion-distance-md, 8px)); }
+}
+
+/* ── Slide — horizontal ───────────────────────────────────────────────────── */
+@keyframes sp-slide-left-in {
+  from { opacity: 0; transform: translateX(var(--sp-motion-distance-md, 8px)); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes sp-slide-left-out {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(calc(var(--sp-motion-distance-md, 8px) * -1)); }
+}
+@keyframes sp-slide-right-in {
+  from { opacity: 0; transform: translateX(calc(var(--sp-motion-distance-md, 8px) * -1)); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes sp-slide-right-out {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(var(--sp-motion-distance-md, 8px)); }
+}
+
+/* ── Scale ────────────────────────────────────────────────────────────────── */
+@keyframes sp-scale-in {
+  from { opacity: 0; transform: scale(var(--sp-motion-scale-in, 0.95)); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes sp-scale-out {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(var(--sp-motion-scale-in, 0.95)); }
+}
+@keyframes sp-scale-up-in {
+  from { opacity: 0; transform: scale(var(--sp-motion-scale-out, 1.05)); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── Expand / Collapse ────────────────────────────────────────────────────── */
+@keyframes sp-expand {
+  from { opacity: 0; max-height: 0;    overflow: hidden; }
+  to   { opacity: 1; max-height: 100vh; overflow: hidden; }
+}
+@keyframes sp-collapse {
+  from { opacity: 1; max-height: 100vh; overflow: hidden; }
+  to   { opacity: 0; max-height: 0;    overflow: hidden; }
+}
+
+/* ── Spin ─────────────────────────────────────────────────────────────────── */
+@keyframes sp-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── Brand micro-interactions ────────────────────────────────────────────── */
+@keyframes sp-press {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+
+@keyframes sp-stagger-in {
+  from { opacity: 0; transform: translateY(var(--sp-motion-distance-sm, 4px)); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Utility classes ─────────────────────────────────────────────────────── */
+.sp-fade-in        { animation: sp-fade-in        var(--sp-duration-normal) var(--sp-ease-out)    both; }
+.sp-fade-out       { animation: sp-fade-out       var(--sp-duration-normal) var(--sp-ease-in)     both; }
+.sp-slide-up-in    { animation: sp-slide-up-in    var(--sp-duration-normal) var(--sp-ease-out)    both; }
+.sp-slide-up-out   { animation: sp-slide-up-out   var(--sp-duration-normal) var(--sp-ease-in)     both; }
+.sp-slide-down-in  { animation: sp-slide-down-in  var(--sp-duration-normal) var(--sp-ease-out)    both; }
+.sp-slide-down-out { animation: sp-slide-down-out var(--sp-duration-normal) var(--sp-ease-in)     both; }
+.sp-slide-left-in  { animation: sp-slide-left-in  var(--sp-duration-normal) var(--sp-ease-out)    both; }
+.sp-slide-left-out { animation: sp-slide-left-out var(--sp-duration-normal) var(--sp-ease-in)     both; }
+.sp-slide-right-in { animation: sp-slide-right-in var(--sp-duration-normal) var(--sp-ease-out)    both; }
+.sp-slide-right-out{ animation: sp-slide-right-out var(--sp-duration-normal) var(--sp-ease-in)    both; }
+.sp-scale-in       { animation: sp-scale-in       var(--sp-duration-normal) var(--sp-ease-spring) both; }
+.sp-scale-out      { animation: sp-scale-out      var(--sp-duration-normal) var(--sp-ease-in)     both; }
+.sp-scale-up-in    { animation: sp-scale-up-in    var(--sp-duration-normal) var(--sp-ease-out)    both; }
+.sp-expand         { animation: sp-expand         var(--sp-duration-slow)   var(--sp-ease-out)    both; }
+.sp-collapse       { animation: sp-collapse       var(--sp-duration-slow)   var(--sp-ease-in)     both; }
+.sp-spin           { animation: sp-spin 0.8s var(--sp-ease-linear) infinite; }
+
+.sp-stagger-in {
+  animation: sp-stagger-in var(--sp-duration-normal) var(--sp-ease-out) both;
+  animation-delay: calc(var(--sp-stagger-index, 0) * 30ms);
+}

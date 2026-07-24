@@ -1,0 +1,75 @@
+/* ── ButtonGroup ───────────────────────────────────────────────────────── */
+
+.sp-button-group {
+  display: inline-flex;
+  flex-direction: row;
+}
+
+/* ── Horizontal: connected borders ────────────────────────────────────── */
+
+.sp-button-group > .sp-btn:not(:first-child) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.sp-button-group > .sp-btn:not(:last-child) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.sp-button-group > .sp-btn + .sp-btn {
+  margin-left: -1px;
+}
+
+/* ── Vertical ─────────────────────────────────────────────────────────── */
+
+.sp-button-group--vertical {
+  flex-direction: column;
+}
+
+.sp-button-group--vertical > .sp-btn:not(:first-child) {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  /* Reset horizontal overrides */
+  border-bottom-left-radius: var(--sp-btn-radius, 6px);
+}
+
+.sp-button-group--vertical > .sp-btn:not(:last-child) {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  /* Reset horizontal overrides */
+  border-top-right-radius: var(--sp-btn-radius, 6px);
+}
+
+.sp-button-group--vertical > .sp-btn:not(:first-child):not(:last-child) {
+  border-radius: 0;
+}
+
+.sp-button-group--vertical > .sp-btn:first-child {
+  border-top-left-radius: var(--sp-btn-radius, 6px);
+  border-top-right-radius: var(--sp-btn-radius, 6px);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.sp-button-group--vertical > .sp-btn:last-child {
+  border-bottom-left-radius: var(--sp-btn-radius, 6px);
+  border-bottom-right-radius: var(--sp-btn-radius, 6px);
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.sp-button-group--vertical > .sp-btn + .sp-btn {
+  margin-left: 0;
+  margin-top: -1px;
+}
+
+/* ── Hover z-index to show full border ────────────────────────────────── */
+
+.sp-button-group > .sp-btn:hover {
+  z-index: 1;
+}
+
+.sp-button-group > .sp-btn:focus-visible {
+  z-index: 2;
+}

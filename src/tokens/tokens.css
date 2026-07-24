@@ -1,0 +1,365 @@
+/* ============================================================================
+   Spruce Design Tokens — Master CSS
+   ============================================================================
+   Import this file in your application to activate all design tokens.
+
+   Usage:
+     import 'spruce-react/tokens/tokens.css';
+   ============================================================================ */
+
+/* ── Web Fonts ───────────────────────────────────────────────────────────────
+   Self-hosted League Spartan (variable, weight 100–900). No italics — the
+   family ships none. METRIC-PATCHED build (rebalanced vertical metrics so
+   centered UI text sits true — see spruce-ui tokens/scripts/patch-league-spartan-
+   metrics.mjs). Do NOT replace with a vanilla download. */
+@font-face {
+  font-family: 'League Spartan';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('./fonts/league-spartan-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0100-02BA, U+02BD-02C5, U+02C7-02CC,
+    U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F,
+    U+1EF2-1EFF, U+2000-206F, U+20A0-20C0, U+2113, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+2C60-2C7F, U+A720-A7FF, U+FEFF, U+FFFD;
+}
+
+/* ── Colors ──────────────────────────────────────────────────────────────── */
+:root {
+  /* Neutral surface scale (0 = lightest, 950 = darkest in light mode) */
+  --sp-surface-0: #ffffff;
+  --sp-surface-25: #fcfcfd;
+  --sp-surface-50: #f8f9fb;
+  --sp-surface-100: #f1f3f6;
+  --sp-surface-200: #e4e7ec;
+  --sp-surface-300: #cdd3dc;
+  --sp-surface-400: #9ca5b4;
+  --sp-surface-500: #6b7685;
+  --sp-surface-600: #4a5567;
+  --sp-surface-700: #374151;
+  --sp-surface-800: #1f2937;
+  --sp-surface-900: #151b2b;
+  --sp-surface-950: #0f1117;
+
+  /* Primary brand */
+  --sp-primary: #2563eb;
+  --sp-primary-hover: #1d4ed8;
+  --sp-primary-active: #1e40af;
+  --sp-primary-subtle: rgba(37, 99, 235, 0.1);
+  --sp-primary-text: #ffffff;
+
+  /* Semantic status */
+  --sp-success: #16a34a;
+  --sp-success-subtle: rgba(22, 163, 74, 0.1);
+  --sp-warning: #d97706;
+  --sp-warning-subtle: rgba(217, 119, 6, 0.1);
+  --sp-danger: #dc2626;
+  --sp-danger-subtle: rgba(220, 38, 38, 0.1);
+  --sp-info: #0891b2;
+  --sp-info-subtle: rgba(8, 145, 178, 0.1);
+
+  /* Text */
+  --sp-text-color: #1a202c;
+  --sp-text-muted: #4a5568;
+  --sp-text-subtle: #718096;
+  --sp-text-disabled: #a0aec0;
+  --sp-text-inverse: #ffffff;
+
+  /* Borders */
+  --sp-border: rgba(0, 0, 0, 0.08);
+  --sp-border-strong: rgba(0, 0, 0, 0.14);
+  --sp-border-focus: var(--sp-primary);
+
+  /* Interactive backgrounds */
+  --sp-content-hover-bg: rgba(0, 0, 0, 0.04);
+  --sp-content-active-bg: rgba(0, 0, 0, 0.07);
+
+  /* Overlay */
+  --sp-overlay-bg: rgba(0, 0, 0, 0.5);
+
+  /* Scrollbar */
+  --sp-scrollbar-track: rgba(0, 0, 0, 0.03);
+  --sp-scrollbar-thumb: rgba(0, 0, 0, 0.14);
+  --sp-scrollbar-hover: rgba(0, 0, 0, 0.25);
+
+  /* Icons (duotone) */
+  --sp-icon-secondary-color: currentColor;
+  --sp-icon-secondary-opacity: 0.2;
+
+  /* Focus ring ("Precision Glow") */
+  --sp-focus-ring-color: var(--sp-primary);
+  --sp-focus-ring-width: 2px;
+  --sp-focus-ring-offset: 2px;
+  --sp-focus-glow-color: var(--sp-primary-subtle);
+  --sp-focus-glow-spread: 6px;
+
+  /* Charts */
+  --sp-chart-title-color: #1e293b;
+  --sp-chart-subtitle-color: #64748b;
+  --sp-chart-axis-text: #64748b;
+  --sp-chart-axis-line: #e2e8f0;
+  --sp-chart-grid-line: #e2e8f0;
+  --sp-chart-value-label: #475569;
+  --sp-chart-axis-label: #94a3b8;
+  --sp-chart-legend-text: #64748b;
+  --sp-chart-dot-stroke: #ffffff;
+  --sp-chart-tooltip-bg: #1f2937;
+  --sp-chart-tooltip-text: #f9fafb;
+  --sp-chart-track-bg: #f1f5f9;
+}
+
+/* ── Typography ──────────────────────────────────────────────────────────── */
+:root {
+  --sp-font-sans: 'League Spartan', system-ui, -apple-system, 'Segoe UI',
+    Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji';
+  --sp-font-mono: ui-monospace, 'SFMono-Regular', 'SF Mono', Menlo, Consolas,
+    'Liberation Mono', monospace;
+
+  --sp-text-2xs: 0.625rem;   /* 10px */
+  --sp-text-xs: 0.6875rem;   /* 11px */
+  --sp-text-sm: 0.8125rem;   /* 13px */
+  --sp-text-base: 0.875rem;  /* 14px */
+  --sp-text-md: 1rem;        /* 16px */
+  --sp-text-lg: 1.125rem;    /* 18px */
+  --sp-text-xl: 1.25rem;     /* 20px */
+  --sp-text-2xl: 1.5rem;     /* 24px */
+  --sp-text-3xl: 1.875rem;   /* 30px */
+
+  --sp-font-normal: 400;
+  --sp-font-medium: 500;
+  --sp-font-semibold: 600;
+  --sp-font-bold: 700;
+
+  --sp-leading-none: 1;
+  --sp-leading-tight: 1.25;
+  --sp-leading-snug: 1.375;
+  --sp-leading-normal: 1.5;
+  --sp-leading-relaxed: 1.625;
+
+  --sp-tracking-tight: -0.02em;
+  --sp-tracking-normal: 0;
+  --sp-tracking-wide: 0.04em;
+  --sp-tracking-wider: 0.07em;
+}
+
+/* ── Spacing ─────────────────────────────────────────────────────────────── */
+:root {
+  --sp-space-0: 0px;
+  --sp-space-px: 1px;
+  --sp-space-0_5: 2px;
+  --sp-space-1: 4px;
+  --sp-space-1_5: 6px;
+  --sp-space-2: 8px;
+  --sp-space-2_5: 10px;
+  --sp-space-3: 12px;
+  --sp-space-3_5: 14px;
+  --sp-space-4: 16px;
+  --sp-space-5: 20px;
+  --sp-space-6: 24px;
+  --sp-space-7: 28px;
+  --sp-space-8: 32px;
+  --sp-space-9: 36px;
+  --sp-space-10: 40px;
+  --sp-space-12: 48px;
+  --sp-space-14: 56px;
+  --sp-space-16: 64px;
+  --sp-space-20: 80px;
+  --sp-space-24: 96px;
+}
+
+/* ── Border Radius ───────────────────────────────────────────────────────── */
+:root {
+  --sp-radius-none: 0;
+  --sp-radius-sm: 4px;
+  --sp-radius-md: 6px;
+  --sp-radius-lg: 8px;
+  --sp-radius-xl: 12px;
+  --sp-radius-2xl: 16px;
+  --sp-radius-full: 9999px;
+}
+
+/* ── Shadows ─────────────────────────────────────────────────────────────── */
+:root {
+  --sp-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --sp-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --sp-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --sp-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --sp-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --sp-shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+  --sp-shadow-none: none;
+}
+
+/* ── Z-Index Scale ───────────────────────────────────────────────────────── */
+:root {
+  --sp-z-base: 0;
+  --sp-z-dropdown: 100;
+  --sp-z-sticky: 200;
+  --sp-z-overlay: 300;
+  --sp-z-modal: 400;
+  --sp-z-popover: 500;
+  --sp-z-toast: 600;
+  --sp-z-tooltip: 700;
+}
+
+/* ── Motion ──────────────────────────────────────────────────────────────── */
+:root {
+  --sp-duration-instant: 50ms;
+  --sp-duration-fast: 100ms;
+  --sp-duration-normal: 200ms;
+  --sp-duration-slow: 300ms;
+  --sp-duration-slower: 500ms;
+
+  --sp-ease-default: cubic-bezier(0.2, 0, 0, 1);
+  --sp-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --sp-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --sp-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --sp-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --sp-ease-bounce: cubic-bezier(0.34, 1.8, 0.64, 1);
+  --sp-ease-linear: linear;
+
+  --sp-motion-distance-sm: 4px;
+  --sp-motion-distance-md: 8px;
+  --sp-motion-distance-lg: 16px;
+  --sp-motion-distance-xl: 24px;
+
+  --sp-motion-scale-in: 0.95;
+  --sp-motion-scale-out: 1.05;
+}
+
+/* ── Dark Theme Overrides ────────────────────────────────────────────────── */
+[data-theme='dark'],
+.dark {
+  --sp-surface-0: #0f1117;
+  --sp-surface-25: #12151d;
+  --sp-surface-50: #151b2b;
+  --sp-surface-100: #1a2236;
+  --sp-surface-200: #243044;
+  --sp-surface-300: #334155;
+  --sp-surface-400: #4b5c73;
+  --sp-surface-500: #6b7e96;
+  --sp-surface-600: #94a3b8;
+  --sp-surface-700: #bdc8d8;
+  --sp-surface-800: #d8dee8;
+  --sp-surface-900: #edf0f4;
+  --sp-surface-950: #f8f9fb;
+
+  --sp-primary: #4f8ef7;
+  --sp-primary-hover: #6ba1f9;
+  --sp-primary-active: #3b7de6;
+  --sp-primary-subtle: rgba(79, 142, 247, 0.12);
+
+  --sp-success: #4ade80;
+  --sp-success-subtle: rgba(74, 222, 128, 0.1);
+  --sp-warning: #fbbf24;
+  --sp-warning-subtle: rgba(251, 191, 36, 0.1);
+  --sp-danger: #f87171;
+  --sp-danger-subtle: rgba(248, 113, 113, 0.1);
+  --sp-info: #22d3ee;
+  --sp-info-subtle: rgba(34, 211, 238, 0.1);
+
+  --sp-text-color: #e2e8f0;
+  --sp-text-muted: #a0aec0;
+  --sp-text-subtle: #718096;
+  --sp-text-disabled: #4a5568;
+  --sp-text-inverse: #0f1117;
+
+  --sp-border: rgba(255, 255, 255, 0.07);
+  --sp-border-strong: rgba(255, 255, 255, 0.13);
+
+  --sp-content-hover-bg: rgba(255, 255, 255, 0.04);
+  --sp-content-active-bg: rgba(255, 255, 255, 0.07);
+
+  --sp-overlay-bg: rgba(0, 0, 0, 0.7);
+
+  --sp-scrollbar-track: rgba(255, 255, 255, 0.03);
+  --sp-scrollbar-thumb: rgba(255, 255, 255, 0.12);
+  --sp-scrollbar-hover: rgba(255, 255, 255, 0.22);
+
+  --sp-icon-secondary-opacity: 0.25;
+
+  --sp-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --sp-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --sp-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.35), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --sp-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.35);
+  --sp-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.45), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+
+  --sp-chart-title-color: #f1f5f9;
+  --sp-chart-subtitle-color: #94a3b8;
+  --sp-chart-axis-text: #94a3b8;
+  --sp-chart-axis-line: #334155;
+  --sp-chart-grid-line: #334155;
+  --sp-chart-value-label: #cbd5e1;
+  --sp-chart-axis-label: #64748b;
+  --sp-chart-legend-text: #94a3b8;
+  --sp-chart-dot-stroke: #1e293b;
+  --sp-chart-tooltip-bg: #1e293b;
+  --sp-chart-tooltip-text: #f1f5f9;
+  --sp-chart-track-bg: #1e293b;
+}
+
+/* ── Accessibility: prefers-reduced-motion ───────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --sp-duration-instant: 0ms;
+    --sp-duration-fast: 0ms;
+    --sp-duration-normal: 0ms;
+    --sp-duration-slow: 0ms;
+    --sp-duration-slower: 0ms;
+
+    --sp-motion-distance-sm: 0px;
+    --sp-motion-distance-md: 0px;
+    --sp-motion-distance-lg: 0px;
+    --sp-motion-distance-xl: 0px;
+
+    --sp-motion-scale-in: 1;
+    --sp-motion-scale-out: 1;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Manual reduce-motion override ──────────────────────────────────────── */
+:root[data-reduce-motion='true'] {
+  --sp-duration-instant: 0ms;
+  --sp-duration-fast: 0ms;
+  --sp-duration-normal: 0ms;
+  --sp-duration-slow: 0ms;
+  --sp-duration-slower: 0ms;
+
+  --sp-motion-distance-sm: 0px;
+  --sp-motion-distance-md: 0px;
+  --sp-motion-distance-lg: 0px;
+  --sp-motion-distance-xl: 0px;
+
+  --sp-motion-scale-in: 1;
+  --sp-motion-scale-out: 1;
+}
+
+:root[data-reduce-motion='true'] *,
+:root[data-reduce-motion='true'] *::before,
+:root[data-reduce-motion='true'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* ── Focus Ring ("Precision Glow") ───────────────────────────────────────── */
+@keyframes sp-focus-glow {
+  from { box-shadow: 0 0 0 0 var(--sp-focus-glow-color); }
+  to   { box-shadow: 0 0 0 var(--sp-focus-glow-spread) var(--sp-focus-glow-color); }
+}
+
+.sp-focus-ring:focus-visible {
+  outline: var(--sp-focus-ring-width) solid var(--sp-focus-ring-color);
+  outline-offset: var(--sp-focus-ring-offset);
+  animation: sp-focus-glow var(--sp-duration-normal, 200ms) var(--sp-ease-out, ease-out) forwards;
+}

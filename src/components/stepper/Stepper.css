@@ -1,0 +1,126 @@
+.sp-stepper {
+  display: flex;
+  align-items: flex-start;
+}
+
+.sp-stepper--vertical {
+  flex-direction: column;
+}
+
+/* ── Step (button) ────────────────────────────────────── */
+
+.sp-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  flex: 1;
+  position: relative;
+  border: none;
+  background: none;
+  padding: 4px;
+  border-radius: 4px;
+  font-family: inherit;
+}
+
+.sp-step:focus-visible {
+  outline: 2px solid var(--sp-primary);
+  outline-offset: 2px;
+}
+
+/* ── Connector line ───────────────────────────────────── */
+
+.sp-step__connector {
+  flex: 1;
+  height: 2px;
+  min-width: 16px;
+  background: var(--sp-border);
+  margin: 0 8px;
+}
+
+.sp-step--completed .sp-step__connector {
+  background: var(--sp-primary);
+}
+
+/* ── Indicator circle ─────────────────────────────────── */
+
+.sp-step__indicator {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--sp-border-strong);
+  background: var(--sp-surface-0);
+  color: var(--sp-text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+/* Active */
+.sp-step--active .sp-step__indicator {
+  border-color: var(--sp-primary);
+  background: var(--sp-primary);
+  color: #fff;
+}
+
+/* Completed */
+.sp-step--completed .sp-step__indicator {
+  border-color: var(--sp-primary);
+  background: var(--sp-primary-subtle, #dbeafe);
+  color: var(--sp-primary);
+}
+
+/* ── Disabled ─────────────────────────────────────────── */
+
+.sp-step--disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Content (label + description) ────────────────────── */
+
+.sp-step__content {
+  display: flex;
+  flex-direction: column;
+  text-align: start;
+}
+
+.sp-step__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--sp-text-color);
+}
+
+.sp-step__desc {
+  font-size: 11px;
+  color: var(--sp-text-muted);
+}
+
+.sp-step__number {
+  line-height: 1;
+}
+
+/* ── Vertical orientation ─────────────────────────────── */
+
+.sp-step--vertical {
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.sp-step--vertical .sp-step__connector {
+  width: 2px;
+  height: auto;
+  min-height: 16px;
+  min-width: unset;
+  flex: 1;
+  margin: 4px 0;
+  position: absolute;
+  left: calc(4px + 16px - 1px); /* padding + half indicator - half line */
+  top: 36px;
+  bottom: -4px;
+}

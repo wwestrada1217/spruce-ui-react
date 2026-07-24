@@ -1,0 +1,177 @@
+/* ── Container ─────────────────────────────────────────────────────── */
+
+.sp-gc {
+  position: relative;
+  display: block;
+}
+
+/* ── Input wrap ────────────────────────────────────────────────────── */
+
+.sp-gc__input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  height: 32px;
+  border: 1px solid var(--sp-border-strong, rgba(0, 0, 0, 0.14));
+  border-radius: var(--sp-radius-md, 6px);
+  background: var(--sp-surface-0, #fff);
+  transition: border-color var(--sp-duration-normal, 200ms) var(--sp-ease-default, ease);
+}
+
+.sp-gc--open .sp-gc__input-wrap {
+  border-color: var(--sp-focus-ring-color, #2563eb);
+  box-shadow: 0 0 0 3px var(--sp-focus-glow-color, rgba(37, 99, 235, 0.12));
+}
+
+.sp-gc--disabled .sp-gc__input-wrap {
+  opacity: 0.5;
+  background: var(--sp-surface-100, #f1f5f9);
+}
+
+/* ── Search icon ───────────────────────────────────────────────────── */
+
+.sp-gc__search-icon {
+  flex-shrink: 0;
+  color: var(--sp-text-subtle, #718096);
+}
+
+/* ── Text input ────────────────────────────────────────────────────── */
+
+.sp-gc__input {
+  flex: 1;
+  min-width: 60px;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--sp-text-color, #1a202c);
+}
+
+.sp-gc__input::placeholder {
+  color: var(--sp-text-disabled, #a0aec0);
+}
+
+.sp-gc__input:focus,
+.sp-gc__input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.sp-gc__input:disabled {
+  cursor: not-allowed;
+}
+
+/* ── Clear button ──────────────────────────────────────────────────── */
+
+.sp-gc__clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--sp-radius-full, 9999px);
+  border: none;
+  background: var(--sp-surface-200, #e2e6ec);
+  color: var(--sp-text-muted, #4a5568);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-gc__clear:hover {
+  background: var(--sp-surface-300, #cdd3dc);
+}
+
+/* ── Dropdown panel ────────────────────────────────────────────────── */
+
+.sp-gc__dropdown {
+  max-height: 320px;
+  overflow-y: auto;
+  overflow-x: auto;
+  background: var(--sp-surface-0, #fff);
+  border: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08));
+  border-radius: var(--sp-radius-md, 6px);
+  box-shadow: var(--sp-shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1));
+}
+
+/* ── Header row ────────────────────────────────────────────────────── */
+
+.sp-gc__header {
+  display: grid;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 6px 12px;
+  background: var(--sp-surface-50, #f8fafc);
+  border-bottom: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08));
+  gap: 12px;
+}
+
+.sp-gc__header-cell {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--sp-text-subtle, #718096);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Option rows ───────────────────────────────────────────────────── */
+
+.sp-gc__row {
+  display: grid;
+  align-items: center;
+  width: 100%;
+  padding: 6px 12px;
+  border: none;
+  background: none;
+  position: relative;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--sp-text-color, #1a202c);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+  gap: 12px;
+}
+
+.sp-gc__row:hover,
+.sp-gc__row--highlighted {
+  background: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04));
+}
+
+.sp-gc__row--selected {
+  font-weight: 600;
+  color: var(--sp-primary, #2563eb);
+}
+
+/* ── Cell ──────────────────────────────────────────────────────────── */
+
+.sp-gc__cell {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Check icon ────────────────────────────────────────────────────── */
+
+.sp-gc__check {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--sp-primary, #2563eb);
+}
+
+/* ── Empty state ───────────────────────────────────────────────────── */
+
+.sp-gc__empty {
+  padding: 12px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--sp-text-subtle, #718096);
+}

@@ -1,0 +1,59 @@
+.sp-timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Item ──────────────────────────────────────────────────────────────── */
+
+.sp-timeline-item {
+  display: flex;
+  gap: 12px;
+  min-height: 60px;
+}
+
+/* ── Indicator (dot + line) ────────────────────────────────────────────── */
+
+.sp-timeline-item__indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sp-timeline-item__dot {
+  border-radius: var(--sp-radius-full, 9999px);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  margin-top: var(--sp-space-1, 4px);
+}
+
+/* ── Dot colors ────────────────────────────────────────────────────────── */
+
+.sp-timeline-item__dot--primary  { background: var(--sp-primary, #2563eb); }
+.sp-timeline-item__dot--success  { background: var(--sp-success, #16a34a); }
+.sp-timeline-item__dot--warning  { background: var(--sp-warning, #d97706); }
+.sp-timeline-item__dot--danger   { background: var(--sp-danger,  #dc2626); }
+.sp-timeline-item__dot--neutral  { background: var(--sp-surface-400, #9ca3af); }
+
+/* ── Connector line ────────────────────────────────────────────────────── */
+
+.sp-timeline-item__line {
+  width: 2px;
+  flex: 1;
+  background: var(--sp-border, rgba(0, 0, 0, 0.08));
+  margin-top: var(--sp-space-1, 4px);
+}
+
+.sp-timeline-item:last-child .sp-timeline-item__line {
+  display: none;
+}
+
+/* ── Content ───────────────────────────────────────────────────────────── */
+
+.sp-timeline-item__content {
+  flex: 1;
+  padding-bottom: var(--sp-space-4, 16px);
+  font-size: var(--sp-text-sm, 13px);
+}

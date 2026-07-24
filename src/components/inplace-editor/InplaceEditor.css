@@ -1,0 +1,108 @@
+/* ── InplaceEditor ────────────────────────────────────────────────────────── */
+
+.sp-inplace-editor__display {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-space-1_5, 6px);
+  height: 32px;
+  padding: 0 var(--sp-space-2, 8px);
+  border: none;
+  border-radius: var(--sp-radius-md, 6px);
+  background: transparent;
+  font-family: inherit;
+  font-size: var(--sp-text-sm, 13px);
+  color: var(--sp-text-color, #1a202c);
+  cursor: pointer;
+  transition:
+    background var(--sp-duration-fast, 100ms) var(--sp-ease-default, cubic-bezier(0.2, 0, 0, 1));
+}
+
+.sp-inplace-editor__display:hover {
+  background: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04));
+}
+
+.sp-inplace-editor__display:focus-visible {
+  outline: 2px solid var(--sp-focus-ring-color, #2563eb);
+  outline-offset: 1px;
+}
+
+/* ── Indicator (dashed underline) ─────────────────────────────────────────── */
+
+.sp-inplace-editor__display--indicator {
+  border-bottom: 1px dashed var(--sp-border-strong, #cbd5e1);
+  border-radius: 0;
+}
+
+.sp-inplace-editor__display--indicator:hover {
+  border-radius: var(--sp-radius-md, 6px) var(--sp-radius-md, 6px) 0 0;
+}
+
+.sp-inplace-editor__display--indicator:focus-visible {
+  border-radius: var(--sp-radius-md, 6px);
+}
+
+/* ── Disabled ─────────────────────────────────────────────────────────────── */
+
+.sp-inplace-editor__display--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sp-inplace-editor__display--disabled:hover {
+  background: transparent;
+}
+
+/* ── Text ─────────────────────────────────────────────────────────────────── */
+
+.sp-inplace-editor__text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+/* ── Icon ─────────────────────────────────────────────────────────────────── */
+
+.sp-inplace-editor__icon {
+  flex-shrink: 0;
+  color: var(--sp-text-subtle, #718096);
+  opacity: 0;
+  transition: opacity var(--sp-duration-fast, 100ms) var(--sp-ease-default, cubic-bezier(0.2, 0, 0, 1));
+}
+
+.sp-inplace-editor__display:hover .sp-inplace-editor__icon,
+.sp-inplace-editor__display:focus-visible .sp-inplace-editor__icon {
+  opacity: 1;
+}
+
+/* ── Input (edit mode) ────────────────────────────────────────────────────── */
+
+.sp-inplace-editor__input {
+  display: inline-flex;
+  height: 32px;
+  padding: 0 var(--sp-space-2, 8px);
+  border: 1px solid var(--sp-primary, #2563eb);
+  border-radius: var(--sp-radius-md, 6px);
+  background: var(--sp-surface-0, #fff);
+  font-family: inherit;
+  font-size: var(--sp-text-sm, 13px);
+  color: var(--sp-text-color, #1a202c);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--sp-focus-glow-color, rgba(37, 99, 235, 0.12));
+}
+
+/* ── Size: sm ─────────────────────────────────────────────────────────────── */
+
+.sp-inplace-editor__display.sp-inplace-editor--sm,
+.sp-inplace-editor__input.sp-inplace-editor--sm {
+  height: 28px;
+  font-size: var(--sp-text-xs, 11px);
+}
+
+/* ── Size: lg ─────────────────────────────────────────────────────────────── */
+
+.sp-inplace-editor__display.sp-inplace-editor--lg,
+.sp-inplace-editor__input.sp-inplace-editor--lg {
+  height: 44px;
+  font-size: var(--sp-text-base, 14px);
+}
