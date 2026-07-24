@@ -18,7 +18,7 @@ Instead, use one of these private channels:
 
 - **GitHub private vulnerability reporting** (preferred): open a report via
   [Security Advisories](https://github.com/wwestrada1217/spruce-ui-react/security/advisories/new).
-- **Email**: <wendell.estrada@irely.com> with the subject line
+- **Email**: <support@sprucestack.com> with the subject line
   `[SECURITY] spruce-react`.
 
 Please include as much of the following as you can:
