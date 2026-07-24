@@ -100,11 +100,16 @@ jobs:
           path: site
 
       - name: Configure SSH
+        env:
+          # Secrets come in via env (not ${{ }} inside the script body) so the
+          # secret text is never substituted into the shell source itself.
+          SSH_KEY: ${{ secrets.HETZNER_SSH_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.HETZNER_SSH_KNOWN_HOSTS }}
         run: |
           mkdir -p ~/.ssh && chmod 700 ~/.ssh
           # Accept the key either raw (PEM/OpenSSH text) or base64-encoded, and
           # strip any CR so a key pasted with Windows line endings still parses.
-          RAW="${{ secrets.HETZNER_SSH_KEY }}"
+          RAW="$SSH_KEY"
           if printf '%s' "$RAW" | base64 -d 2>/dev/null | grep -q 'PRIVATE KEY'; then
             printf '%s' "$RAW" | base64 -d > ~/.ssh/id_deploy
           else
@@ -116,8 +121,8 @@ jobs:
             echo "::error::HETZNER_SSH_KEY did not parse as a valid, unencrypted private key. Re-add it with: gh secret set HETZNER_SSH_KEY < /path/to/private_key"
             exit 1
           fi
-          if [ -n "${{ secrets.HETZNER_SSH_KNOWN_HOSTS }}" ]; then
-            printf '%s\n' "${{ secrets.HETZNER_SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          if [ -n "$SSH_KNOWN_HOSTS" ]; then
+            printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
           else
             echo "::warning::HETZNER_SSH_KNOWN_HOSTS not set; trusting host key on first use."
             ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
