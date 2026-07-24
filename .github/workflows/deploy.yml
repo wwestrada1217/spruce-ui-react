@@ -1,0 +1,183 @@
+name: CI / Deploy to Hetzner
+
+# CI/CD for the Spruce React design system docs, modeled on the main spruce
+# repo's hetzner-deploy.yml (frontend path).
+#
+#   PRs            -> build only (library + docs must compile — that's the CI gate)
+#   push to main   -> build, then rsync docs/dist to the Hetzner server and
+#                     (re)start the nginx container that serves
+#                     https://designsystem-react.sprucestack.com
+#   workflow_dispatch -> same as main (manual redeploy)
+#
+# Server model (same as the Angular docs at designsystem.sprucestack.com):
+#   - bundle lives at   /opt/spruce/www/react-docs/   (bind-mounted, so a
+#     rsync is live immediately — rollback = redeploy an older commit)
+#   - compose + nginx config live at /opt/spruce/react-docs/ (this repo's own
+#     folder; the spruce repo's /opt/spruce/deploy is never touched)
+#   - TLS + routing via the shared Traefik on the external `traefik` network;
+#     the cert is issued automatically on first request.
+#
+# One-time setup:
+#   1. DNS: A/AAAA record designsystem-react.sprucestack.com -> server IP.
+#   2. Repository secrets (same values as the spruce repo):
+#        HETZNER_SSH_HOST         server hostname or IP
+#        HETZNER_SSH_USER         ssh user (e.g. root)
+#        HETZNER_SSH_KEY          private key authorized on the server
+#        HETZNER_SSH_PORT         (optional) ssh port, defaults to 22
+#        HETZNER_SSH_KNOWN_HOSTS  (optional) pinned known_hosts line; falls
+#                                 back to ssh-keyscan (trust-on-first-use)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Never run two deploys at once, never cancel one in flight.
+concurrency:
+  group: hetzner-deploy-react-docs
+  cancel-in-progress: false
+
+env:
+  SITE_HOST: designsystem-react.sprucestack.com
+
+jobs:
+  build:
+    name: Build library + docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Type-checks and builds the component library — the docs import it
+      # straight from src/, so this is the strictest compile gate we have.
+      - name: Build library
+        run: npm run build
+
+      - name: Build docs site
+        run: npm run docs:build
+
+      - name: Upload docs bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: react-docs
+          path: docs/dist
+          if-no-files-found: error
+
+  deploy:
+    name: Ship to Hetzner
+    needs: build
+    # PRs stop at the build gate; only main pushes / manual runs deploy.
+    if: ${{ github.event_name != 'pull_request' }}
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      SSH_HOST: ${{ secrets.HETZNER_SSH_HOST }}
+      SSH_USER: ${{ secrets.HETZNER_SSH_USER }}
+      SSH_PORT: ${{ secrets.HETZNER_SSH_PORT || '22' }}
+      DEPLOY_DIR: /opt/spruce/react-docs
+      WEB_ROOT: /opt/spruce/www/react-docs
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download docs bundle
+        uses: actions/download-artifact@v4
+        with:
+          name: react-docs
+          path: site
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          # Accept the key either raw (PEM/OpenSSH text) or base64-encoded, and
+          # strip any CR so a key pasted with Windows line endings still parses.
+          RAW="${{ secrets.HETZNER_SSH_KEY }}"
+          if printf '%s' "$RAW" | base64 -d 2>/dev/null | grep -q 'PRIVATE KEY'; then
+            printf '%s' "$RAW" | base64 -d > ~/.ssh/id_deploy
+          else
+            printf '%s\n' "$RAW" | tr -d '\r' > ~/.ssh/id_deploy
+          fi
+          chmod 600 ~/.ssh/id_deploy
+          # Fail early with a clear message instead of a cryptic libcrypto error.
+          if ! ssh-keygen -y -f ~/.ssh/id_deploy >/dev/null 2>&1; then
+            echo "::error::HETZNER_SSH_KEY did not parse as a valid, unencrypted private key. Re-add it with: gh secret set HETZNER_SSH_KEY < /path/to/private_key"
+            exit 1
+          fi
+          if [ -n "${{ secrets.HETZNER_SSH_KNOWN_HOSTS }}" ]; then
+            printf '%s\n' "${{ secrets.HETZNER_SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          else
+            echo "::warning::HETZNER_SSH_KNOWN_HOSTS not set; trusting host key on first use."
+            ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          fi
+          chmod 600 ~/.ssh/known_hosts
+          {
+            # ssh and rsync take a lowercase -p for the port; scp needs -P.
+            echo "SSH_OPTS=-i $HOME/.ssh/id_deploy -p $SSH_PORT -o StrictHostKeyChecking=yes"
+            echo "SCP_OPTS=-i $HOME/.ssh/id_deploy -P $SSH_PORT -o StrictHostKeyChecking=yes"
+            echo "RSYNC_RSH=ssh -i $HOME/.ssh/id_deploy -p $SSH_PORT -o StrictHostKeyChecking=yes"
+          } >> "$GITHUB_ENV"
+
+      - name: Ensure remote folders
+        run: ssh $SSH_OPTS "$SSH_USER@$SSH_HOST" "mkdir -p '$DEPLOY_DIR' '$WEB_ROOT'"
+
+      - name: Sync compose and nginx config
+        run: |
+          scp $SCP_OPTS \
+            deploy/docker-compose.react-docs.yml \
+            deploy/nginx-spa.conf \
+            "$SSH_USER@$SSH_HOST:$DEPLOY_DIR/"
+
+      - name: Sync docs bundle
+        run: rsync -az --delete site/ "$SSH_USER@$SSH_HOST:$WEB_ROOT/"
+
+      - name: Start / refresh the docs container
+        run: |
+          ssh $SSH_OPTS "$SSH_USER@$SSH_HOST" \
+            "docker compose -f '$DEPLOY_DIR/docker-compose.react-docs.yml' up -d"
+
+      # The bind mount serves new files immediately; this asserts the site is
+      # actually routable through Traefik (real routing, no dependency on
+      # public DNS or an already-issued cert from the server's own vantage).
+      - name: Smoke check
+        run: |
+          ssh $SSH_OPTS "$SSH_USER@$SSH_HOST" "SITE_HOST='$SITE_HOST' bash -s" <<'REMOTE'
+          set -euo pipefail
+          code=000
+          for attempt in $(seq 1 12); do
+            code="$(curl -sk --resolve "$SITE_HOST:443:127.0.0.1" --max-time 10 \
+              -o /dev/null -w '%{http_code}' "https://$SITE_HOST/" || echo 000)"
+            [ "$code" = "200" ] && break
+            sleep 5
+          done
+          if [ "$code" = "200" ]; then
+            echo "ok: https://$SITE_HOST/ -> 200"
+          else
+            echo "::error::https://$SITE_HOST/ -> $code via Traefik (502/000 = unroutable or container not serving)"
+            exit 1
+          fi
+          REMOTE
+
+      - name: Deploy summary
+        if: always()
+        run: |
+          {
+            echo "### Spruce React docs deploy"
+            echo ""
+            echo "- Site: https://$SITE_HOST"
+            echo "- Commit: \`${GITHUB_SHA}\`"
+            echo "- Triggered by: \`${{ github.actor }}\` via \`${{ github.event_name }}\`"
+            echo "- Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          } >> "$GITHUB_STEP_SUMMARY"

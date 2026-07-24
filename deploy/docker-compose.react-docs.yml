@@ -1,0 +1,38 @@
+# Spruce React docs — standalone compose stack for the Hetzner server.
+#
+# Mirrors the Angular docs service (spruce-docs) in the main spruce repo's
+# docker-compose.sprucestack.yml, but lives in its OWN compose project so
+# deploys from either repo never touch each other's services.
+#
+# Assumes the server already runs the shared Traefik reverse proxy on the
+# external `traefik` network (it does — every sprucestack.com frontend goes
+# through it). TLS is issued automatically by Traefik's letsencrypt resolver
+# on the first request to the host below.
+#
+# Server-side prerequisite (one-time): a DNS A/AAAA record for
+# designsystem-react.sprucestack.com pointing at the server.
+name: spruce-react-docs
+
+services:
+  spruce-react-docs:
+    image: nginx:1.27-alpine
+    container_name: spruce-react-docs
+    restart: unless-stopped
+    volumes:
+      - ${SPRUCE_WEB_ROOT:-/opt/spruce/www}/react-docs:/usr/share/nginx/html:ro
+      - ./nginx-spa.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - traefik
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=${TRAEFIK_NETWORK:-traefik}
+      - traefik.http.routers.spruce-react-docs.rule=Host(`designsystem-react.sprucestack.com`)
+      - traefik.http.routers.spruce-react-docs.entrypoints=${TRAEFIK_HTTPS_ENTRYPOINT:-websecure}
+      - traefik.http.routers.spruce-react-docs.tls=true
+      - traefik.http.routers.spruce-react-docs.tls.certresolver=${TRAEFIK_CERT_RESOLVER:-letsencrypt}
+      - traefik.http.services.spruce-react-docs.loadbalancer.server.port=80
+
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK:-traefik}

@@ -11,7 +11,7 @@ From the everyday essentials (buttons, inputs, cards, dialogs) to advanced appli
 - 🌗 **Theming built in** — light, dark, and system theme support via `SpruceProvider`.
 - 🧩 **80+ components** — accordion to wizard, including heavyweights like `Datagrid`, `GanttChart`, `CommandPalette`, and `CodeEditor`.
 - 🪶 **Zero runtime dependencies** — only `react` and `react-dom` as peers.
-- 📖 **Living documentation** — an interactive docs site with live demos and copy-paste examples for every component.
+- 📖 **Living documentation** — an interactive docs site at [designsystem-react.sprucestack.com](https://designsystem-react.sprucestack.com) with live demos and copy-paste examples for every component.
 
 ## Using Spruce in your app
 
@@ -105,3 +105,7 @@ npm run docs:preview
 ```
 
 Then open the printed URL to browse the complete component gallery — every component page includes live examples, prop tables, and ready-to-copy code snippets.
+
+## Documentation site
+
+The full documentation is available online at **https://designsystem-react.sprucestack.com** — browse every component with live examples, prop tables, and ready-to-copy code snippets.
