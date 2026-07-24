@@ -90,6 +90,8 @@ import { AspectRatioPage } from './pages/components/AspectRatioPage'
 import { CreditCardPage } from './pages/components/CreditCardPage'
 import { BarcodeQrPage } from './pages/components/BarcodeQrPage'
 import { GitGraphPage } from './pages/components/GitGraphPage'
+import { ChangelogPage } from './pages/ChangelogPage'
+import { DevelopmentPage } from './pages/DevelopmentPage'
 import { ComingSoonPage } from './pages/ComingSoonPage'
 
 function useHash(): string {
@@ -112,6 +114,8 @@ function renderPage(hash: string): React.ReactElement {
     case '#/':
     case '#':
     case '':                            return <HomePage />
+    case '#/changelog':                 return <ChangelogPage />
+    case '#/development':               return <DevelopmentPage />
     case '#/foundation/colors':         return <ColorsPage />
     case '#/foundation/typography':     return <TypographyPage />
     case '#/foundation/spacing':        return <SpacingPage />

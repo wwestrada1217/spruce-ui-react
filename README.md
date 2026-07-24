@@ -6,12 +6,12 @@ From the everyday essentials (buttons, inputs, cards, dialogs) to advanced appli
 
 ## Highlights
 
-- ⚛️ **React 19 + TypeScript** — fully typed props for every component, shipped with declaration files.
-- 🎨 **Design tokens** — colors, spacing, typography, and motion patterns exposed as CSS custom properties, bundled into a single stylesheet.
-- 🌗 **Theming built in** — light, dark, and system theme support via `SpruceProvider`.
-- 🧩 **80+ components** — accordion to wizard, including heavyweights like `Datagrid`, `GanttChart`, `CommandPalette`, and `CodeEditor`.
-- 🪶 **Zero runtime dependencies** — only `react` and `react-dom` as peers.
-- 📖 **Living documentation** — an interactive docs site at [designsystem-react.sprucestack.com](https://designsystem-react.sprucestack.com) with live demos and copy-paste examples for every component.
+- **React 19 + TypeScript** — fully typed props for every component, shipped with declaration files.
+- **Design tokens** — colors, spacing, typography, and motion patterns exposed as CSS custom properties, bundled into a single stylesheet.
+- **Theming built in** — light, dark, and system theme support via `SpruceProvider`.
+- **80+ components** — accordion to wizard, including heavyweights like `Datagrid`, `GanttChart`, `CommandPalette`, and `CodeEditor`.
+- **Zero runtime dependencies** — only `react` and `react-dom` as peers.
+- **Living documentation** — an interactive docs site at [designsystem-react.sprucestack.com](https://designsystem-react.sprucestack.com) with live demos and copy-paste examples for every component.
 
 ## Using Spruce in your app
 
@@ -43,7 +43,7 @@ import { Button, Card, CardHeader, Alert, Badge } from 'spruce-react';
 export function Example() {
   return (
     <Card>
-      <CardHeader title="Welcome to Spruce" />
+      <CardHeader>Welcome to Spruce</CardHeader>
       <Alert variant="info">Everything is themeable via design tokens.</Alert>
       <Badge variant="success">Ready</Badge>
       <Button variant="primary" onClick={() => console.log('planted 🌲')}>

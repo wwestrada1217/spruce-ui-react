@@ -12,7 +12,6 @@ import {
   draculaTheme,
   dimTheme,
   retroTheme,
-  bumblebeeTheme,
   nordTheme,
   shadcnTheme,
   shadcnDarkTheme,
@@ -21,7 +20,7 @@ import {
 // ── Theme registry ────────────────────────────────────────────────────────────
 
 const CUSTOM_THEMES = [
-  oceanTheme, forestTheme, roseTheme, corporateTheme, retroTheme, bumblebeeTheme, shadcnTheme,
+  oceanTheme, forestTheme, roseTheme, corporateTheme, retroTheme, shadcnTheme,
   nightTheme, draculaTheme, dimTheme, nordTheme, shadcnDarkTheme, corporateDarkTheme,
 ];
 
@@ -45,7 +44,6 @@ const LIGHT_OPTIONS: ThemeOption[] = [
   { id: 'rose',       label: 'Rose',      color: '#be185d', mode: 'light' },
   { id: 'corporate',  label: 'Corporate', color: '#1d3557', mode: 'light' },
   { id: 'retro',      label: 'Retro',     color: '#d97706', mode: 'light' },
-  { id: 'bumblebee',  label: 'Bumblebee', color: '#d99a00', mode: 'light' },
   { id: 'shadcn',     label: 'Shadcn',    color: '#18181b', mode: 'light' },
 ];
 
@@ -163,7 +161,7 @@ export function ThemeSwitcher() {
     for (const theme of CUSTOM_THEMES) {
       registerTheme(theme);
     }
-    setTheme(readStorage(THEME_KEY, 'light') as Parameters<typeof setTheme>[0]);
+    setTheme(readStorage(THEME_KEY, 'system') as Parameters<typeof setTheme>[0]);
     applyReduceMotion(readStorage(MOTION_KEY, 'false') === 'true');
     applyDensity(readStorage(DENSITY_KEY, 'default') as Density);
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
+import { computePosition, getScrollParents } from '../../utils/positioning.js';
 import './DatePicker.css';
 
 /* ── Public Types ────────────────────────────────────────────────────────── */
@@ -111,11 +112,6 @@ function parseInputValue(raw: string): string | null {
   return buildIso(year, month, day);
 }
 
-function computePosition(anchor: HTMLElement) {
-  const rect = anchor.getBoundingClientRect();
-  return { top: rect.bottom + 4, left: rect.left };
-}
-
 function clampDay(year: number, month: number, day: number): number {
   return Math.min(day, daysInMonth(year, month));
 }
@@ -168,6 +164,8 @@ export function DatePicker({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [panelPos, setPanelPos] = useState({ top: 0, left: 0 });
+  const [panelReady, setPanelReady] = useState(false);
+  const rafId = useRef(0);
 
   // Disabled-dates lookup set for O(1) checks
   const disabledSet = useMemo(
@@ -264,23 +262,37 @@ export function DatePicker({
   /* ── Positioning ─────────────────────────────────────────────────────── */
 
   const reposition = useCallback(() => {
-    if (!wrapRef.current) return;
-    setPanelPos(computePosition(wrapRef.current));
+    const anchor = wrapRef.current;
+    const panel = panelRef.current;
+    if (!anchor || !panel) return;
+    const result = computePosition(anchor, panel, 'bottom-start', 4);
+    setPanelPos({ top: result.top, left: result.left });
+    setPanelReady(true);
   }, []);
 
+  // Position after open, and re-measure when the sub-view changes panel height
   useEffect(() => {
     if (!open) return;
-    reposition();
-  }, [open, reposition]);
+    rafId.current = requestAnimationFrame(reposition);
+    return () => cancelAnimationFrame(rafId.current);
+  }, [open, view, viewMonth, viewYear, reposition]);
 
-  // Reposition on scroll
+  // Reposition on scroll / resize
   useEffect(() => {
     if (!open) return;
-    function onScroll() {
-      requestAnimationFrame(reposition);
-    }
-    window.addEventListener('scroll', onScroll, { passive: true, capture: true });
-    return () => window.removeEventListener('scroll', onScroll, true);
+    const onScroll = () => {
+      rafId.current = requestAnimationFrame(reposition);
+    };
+    const scrollables = wrapRef.current ? getScrollParents(wrapRef.current) : [];
+    scrollables.forEach((el) => el.addEventListener('scroll', onScroll, { passive: true }));
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    return () => {
+      scrollables.forEach((el) => el.removeEventListener('scroll', onScroll));
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      cancelAnimationFrame(rafId.current);
+    };
   }, [open, reposition]);
 
   /* ── Click outside ───────────────────────────────────────────────────── */
@@ -313,6 +325,7 @@ export function DatePicker({
       setViewMonth(now.getMonth() + 1);
       setFocusedDate(todayIso());
     }
+    setPanelReady(false);
     setOpen(true);
   }
 
@@ -839,6 +852,7 @@ export function DatePicker({
             top: panelPos.top,
             left: panelPos.left,
             zIndex: 999,
+            opacity: panelReady ? 1 : 0,
           }}
           role="dialog"
           aria-modal="true"

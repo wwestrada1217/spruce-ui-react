@@ -1,4 +1,5 @@
 import { Icon, Button } from 'spruce-react';
+import { SPRUCE_VERSION } from '../version';
 
 interface NavCard {
   icon: string;
@@ -181,6 +182,13 @@ export function HomePage() {
         </p>
 
         <div className="home__hero-pills" aria-label="Key features">
+          <a
+            className="home__hero-pill home__hero-pill--accent home__hero-pill--link"
+            href="#/changelog"
+            title="View the changelog"
+          >
+            v{SPRUCE_VERSION}
+          </a>
           <span className="home__hero-pill">TypeScript</span>
           <span className="home__hero-pill">React 19+</span>
           <span className="home__hero-pill home__hero-pill--accent">WCAG AA</span>

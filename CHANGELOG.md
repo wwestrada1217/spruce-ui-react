@@ -1,0 +1,34 @@
+# Changelog
+
+All notable changes to `spruce-react` are documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.1.1] - 2026-07-24
+
+### Added
+
+- Docs: global search with a command palette — press `Ctrl+K` (`⌘K` on Mac) or use the search box in the sidebar to jump to any page.
+- Docs: Changelog page rendering this file as a version timeline.
+- Docs: Development page covering installation, app setup with `SpruceProvider`, theming, and the design-system development workflow.
+
+### Changed
+
+- `Select`, `Combobox`, `DatePicker`, `TimePicker`, and `DateTimePicker` now use smart viewport-aware positioning: panels flip above the trigger when there is no room below, clamp into the viewport as a last resort, and reposition on scroll and resize — matching the behavior of `Popover`, `Dropdown`, `GridCombobox`, and `DateRangePicker`.
+
+### Fixed
+
+- README quick-start example used a non-existent `title` prop on `CardHeader` — it takes children.
+
+## [0.1.0] - 2026-07-24
+
+### Added
+
+- Initial public release of the Spruce React design system with 62+ components across data display, forms and inputs, actions and navigation, and layout and overlays.
+- Design tokens exposed as CSS custom properties (`--sp-*`) covering color, spacing, radius, shadows, typography, and motion.
+- Theming via `SpruceProvider` / `ThemeProvider` with light, dark, and system modes plus bundled color presets.
+- Built-in SVG icon registry with 180+ icons rendered through the `Icon` component.
+- Data layer primitives: `DataSource` and `DataContext`.
+- Documentation site with live examples for every component.
+- Dual publishing to npm and GitHub Packages.

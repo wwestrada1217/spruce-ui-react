@@ -1,7 +1,8 @@
 import './Select.css';
-import { useState, useRef, useEffect, useCallback, useId } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo, useId } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
+import { computePosition, getScrollParents } from '../../utils/positioning.js';
 
 /* ── Public types ────────────────────────────────────────────────────────── */
 
@@ -23,13 +24,6 @@ export interface SelectProps {
   disabled?: boolean;
   error?: string;
   className?: string;
-}
-
-/* ── Helpers ─────────────────────────────────────────────────────────────── */
-
-function computePosition(anchor: HTMLElement) {
-  const rect = anchor.getBoundingClientRect();
-  return { top: rect.bottom + 4, left: rect.left };
 }
 
 /* ── Component ───────────────────────────────────────────────────────────── */
@@ -54,11 +48,16 @@ export function Select({
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
   const [panelWidth, setPanelWidth] = useState(0);
+  const [ready, setReady] = useState(false);
+  const rafId = useRef(0);
 
   /* ── Derived state ───────────────────────────────────────────────────── */
 
   const selected: string = typeof value === 'string' ? value : '';
-  const selectedItems: string[] = Array.isArray(value) ? value : [];
+  const selectedItems: string[] = useMemo(
+    () => (Array.isArray(value) ? value : []),
+    [value],
+  );
   const hasValue = multiple ? selectedItems.length > 0 : !!selected;
 
   const selectedLabel =
@@ -81,17 +80,25 @@ export function Select({
 
   const reposition = useCallback(() => {
     const anchor = wrapperRef.current;
-    if (!anchor) return;
-    setDropdownPos(computePosition(anchor));
+    const panel = panelRef.current;
+    if (!anchor || !panel) return;
+    const result = computePosition(anchor, panel, 'bottom-start', 4);
+    setDropdownPos({ top: result.top, left: result.left });
     setPanelWidth(anchor.offsetWidth);
+    setReady(true);
   }, []);
 
   const openPanel = useCallback(() => {
-    reposition();
+    // Prime the panel width before first paint so the smart-position pass
+    // measures the panel at its real size.
+    if (wrapperRef.current) setPanelWidth(wrapperRef.current.offsetWidth);
+    setReady(false);
     setOpen(true);
-    const selectedIdx = options.findIndex((o) => isSelected(o.value));
+    const selectedIdx = options.findIndex((o) =>
+      multiple ? selectedItems.includes(o.value) : selected === o.value,
+    );
     setHighlightedIndex(selectedIdx >= 0 ? selectedIdx : 0);
-  }, [options, reposition]);
+  }, [options, multiple, selectedItems, selected]);
 
   const closePanel = useCallback(() => {
     setOpen(false);
@@ -100,7 +107,11 @@ export function Select({
 
   const toggle = useCallback(() => {
     if (disabled) return;
-    open ? closePanel() : openPanel();
+    if (open) {
+      closePanel();
+    } else {
+      openPanel();
+    }
   }, [disabled, open, openPanel, closePanel]);
 
   /* ── Click outside ───────────────────────────────────────────────────── */
@@ -117,16 +128,31 @@ export function Select({
     return () => document.removeEventListener('mousedown', handleMouseDown);
   }, [open, closePanel]);
 
+  /* ── Position panel after open ───────────────────────────────────────── */
+
+  useEffect(() => {
+    if (!open) return;
+    rafId.current = requestAnimationFrame(reposition);
+    return () => cancelAnimationFrame(rafId.current);
+  }, [open, reposition]);
+
   /* ── Reposition on scroll / resize ───────────────────────────────────── */
 
   useEffect(() => {
     if (!open) return;
-    const onScroll = () => reposition();
+    const anchor = wrapperRef.current;
+    const scrollables = anchor ? getScrollParents(anchor) : [];
+    const onScroll = () => {
+      rafId.current = requestAnimationFrame(reposition);
+    };
+    scrollables.forEach((el) => el.addEventListener('scroll', onScroll, { passive: true }));
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll, { passive: true });
     return () => {
+      scrollables.forEach((el) => el.removeEventListener('scroll', onScroll));
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
+      cancelAnimationFrame(rafId.current);
     };
   }, [open, reposition]);
 
@@ -326,6 +352,7 @@ export function Select({
               left: dropdownPos.left,
               width: panelWidth,
               zIndex: 999,
+              opacity: ready ? 1 : 0,
             }}
           >
             {options.length > 0 ? (

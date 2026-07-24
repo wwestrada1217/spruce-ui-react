@@ -10,7 +10,7 @@ a { color: inherit; }
   --sidebar-w: 252px;
   --content-max: 960px;
 
-  --bg:        var(--sp-surface-100);
+  --bg:        var(--sp-surface-50);
   --surface:   var(--sp-surface-0);
   --surface-2: var(--sp-surface-50);
   --border:    var(--sp-border);
@@ -45,7 +45,7 @@ a { color: inherit; }
   --font-mono: var(--sp-font-mono);
 
   font-family: var(--font);
-  font-size: 16px;
+  font-size: var(--sp-text-md);
   line-height: 1.6;
   color: var(--text-1);
   background: var(--bg);
@@ -148,6 +148,12 @@ a { color: inherit; }
   line-height: 1.2;
 }
 
+.docs-brand__name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .docs-brand__badge {
   font-size: 10px;
   font-weight: 600;
@@ -165,6 +171,52 @@ a { color: inherit; }
   color: var(--text-3);
   letter-spacing: 0.05em;
   text-transform: uppercase;
+}
+
+/* ── Docs search (sidebar trigger for the command palette) ──────────────────── */
+.docs-search-wrap {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.docs-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-2);
+  color: var(--text-3);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.docs-search:hover {
+  border-color: var(--border-2);
+  background: var(--surface);
+  color: var(--text-1);
+}
+
+.docs-search:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.docs-search__label {
+  flex: 1;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.docs-search__kbd {
+  flex-shrink: 0;
 }
 
 /* ── Sidebar ─────────────────────────────────────────────────────────────────── */
@@ -1103,6 +1155,54 @@ code {
   margin-left: -2px;
 }
 
+/* ── Changelog page ──────────────────────────────────────────────────────────── */
+.cl-release {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 40px;
+  scroll-margin-top: 24px;
+}
+
+.cl-release__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cl-release__version {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-1);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.cl-release__date {
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.cl-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.cl-list {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text-2);
+}
+
 /* ── Coming Soon badge (sidebar) ─────────────────────────────────────────────── */
 .docs-soon-badge {
   display: inline-flex;
@@ -1256,6 +1356,21 @@ code {
   background: var(--primary-bg);
   color: var(--primary-text);
   border-color: transparent;
+}
+
+.home__hero-pill--link {
+  text-decoration: none;
+  cursor: pointer;
+  transition: box-shadow 0.15s;
+}
+
+.home__hero-pill--link:hover {
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+.home__hero-pill--link:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .home__hero-stats {

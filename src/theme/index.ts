@@ -7,7 +7,6 @@ export { nightTheme } from './presets/night.js';
 export { draculaTheme } from './presets/dracula.js';
 export { dimTheme } from './presets/dim.js';
 export { retroTheme } from './presets/retro.js';
-export { bumblebeeTheme } from './presets/bumblebee.js';
 export { nordTheme } from './presets/nord.js';
 export { shadcnTheme } from './presets/shadcn.js';
 export { shadcnDarkTheme } from './presets/shadcn-dark.js';

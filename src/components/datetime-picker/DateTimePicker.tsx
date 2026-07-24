@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
+import { computePosition, getScrollParents } from '../../utils/positioning.js';
 import './DateTimePicker.css';
 
 export type DateTimePickerSize = 'sm' | 'md' | 'lg';
@@ -164,11 +165,6 @@ function parseInputString(
   return { date: { year, month, day }, hour, minute, second };
 }
 
-function computePosition(anchor: HTMLElement) {
-  const rect = anchor.getBoundingClientRect();
-  return { top: rect.bottom + 4, left: rect.left };
-}
-
 function wrap(value: number, delta: number, min: number, max: number): number {
   const range = max - min + 1;
   return ((value - min + delta) % range + range) % range + min;
@@ -213,6 +209,8 @@ export function DateTimePicker({
 
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0 });
+  const [panelReady, setPanelReady] = useState(false);
+  const rafId = useRef(0);
 
   const [viewMonth, setViewMonth] = useState(() => new Date().getMonth());
   const [viewYear, setViewYear] = useState(() => new Date().getFullYear());
@@ -257,13 +255,37 @@ export function DateTimePicker({
   /* ── Positioning ───────────────────────────────────────────────────────── */
 
   const reposition = useCallback(() => {
-    if (!wrapRef.current) return;
-    setPos(computePosition(wrapRef.current));
+    const anchor = wrapRef.current;
+    const panel = panelRef.current;
+    if (!anchor || !panel) return;
+    const result = computePosition(anchor, panel, 'bottom-start', 4);
+    setPos({ top: result.top, left: result.left });
+    setPanelReady(true);
   }, []);
 
+  // Position after open, and re-measure when the sub-view changes panel height
   useEffect(() => {
     if (!open) return;
-    reposition();
+    rafId.current = requestAnimationFrame(reposition);
+    return () => cancelAnimationFrame(rafId.current);
+  }, [open, viewMode, viewMonth, viewYear, reposition]);
+
+  // Reposition on scroll / resize
+  useEffect(() => {
+    if (!open) return;
+    const onScroll = () => {
+      rafId.current = requestAnimationFrame(reposition);
+    };
+    const scrollables = wrapRef.current ? getScrollParents(wrapRef.current) : [];
+    scrollables.forEach((el) => el.addEventListener('scroll', onScroll, { passive: true }));
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    return () => {
+      scrollables.forEach((el) => el.removeEventListener('scroll', onScroll));
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      cancelAnimationFrame(rafId.current);
+    };
   }, [open, reposition]);
 
   /* ── Apply / Close ─────────────────────────────────────────────────────── */
@@ -333,6 +355,7 @@ export function DateTimePicker({
       }
       setViewMode('days');
     }
+    setPanelReady(false);
     setOpen((v) => !v);
   }
 
@@ -794,6 +817,7 @@ export function DateTimePicker({
             top: pos.top,
             left: pos.left,
             zIndex: 999,
+            opacity: panelReady ? 1 : 0,
           }}
           role="dialog"
           aria-label="Date and time picker"

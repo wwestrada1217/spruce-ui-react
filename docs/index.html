@@ -9,6 +9,21 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&display=swap" rel="stylesheet" />
     <title>Spruce React — Design System</title>
+    <script>
+      // Apply the saved theme's base mode before first paint so the page
+      // background never flashes light. Must match the ids the docs
+      // ThemeSwitcher persists and the keys tokens.css themes hook into.
+      ;(function () {
+        var DARK_PRESETS = ['dark', 'night', 'dracula', 'dim', 'nord', 'shadcn-dark', 'corporate-dark']
+        var pref = 'system'
+        try { pref = localStorage.getItem('spruce-docs-theme-preference') || 'system' } catch (e) { /* noop */ }
+        var base = pref === 'system'
+          ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+          : (DARK_PRESETS.indexOf(pref) !== -1 ? 'dark' : 'light')
+        document.documentElement.setAttribute('data-theme', base)
+        document.documentElement.classList.toggle('dark', base === 'dark')
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

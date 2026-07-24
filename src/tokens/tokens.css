@@ -77,6 +77,10 @@
 
 /* ── Colors ──────────────────────────────────────────────────────────────── */
 :root {
+  /* Tells the browser the page is light so native UI (scrollbars, form
+     controls, overscroll) matches; the dark override flips it. */
+  color-scheme: light;
+
   /* Neutral surface scale (Spruce — cool, slate-tinted grays;
      0 = lightest, 950 = darkest in light mode) */
   --sp-surface-0: #f8fafc;
@@ -455,6 +459,8 @@
 /* ── Dark Theme Overrides ────────────────────────────────────────────────── */
 [data-theme='dark'],
 .dark {
+  color-scheme: dark;
+
   /* Neutral surface scale (Spruce — cool slate, inverted) */
   --sp-surface-0: #0f172a;
   --sp-surface-25: #131c30;

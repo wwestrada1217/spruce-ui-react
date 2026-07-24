@@ -14,7 +14,6 @@ const LIGHT_PRESETS: PresetDef[] = [
   { name: 'rose',       displayName: 'Rose',       base: 'light', color: '#be185d', importName: 'roseTheme' },
   { name: 'corporate',  displayName: 'Corporate',  base: 'light', color: '#1d3557', importName: 'corporateTheme' },
   { name: 'retro',      displayName: 'Retro',      base: 'light', color: '#d97706', importName: 'retroTheme' },
-  { name: 'bumblebee',  displayName: 'Bumblebee',  base: 'light', color: '#e5c700', importName: 'bumblebeeTheme' },
   { name: 'shadcn',     displayName: 'shadcn',     base: 'light', color: '#18181b', importName: 'shadcnTheme' },
 ]
 

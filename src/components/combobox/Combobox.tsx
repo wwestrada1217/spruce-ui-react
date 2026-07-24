@@ -9,6 +9,7 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
+import { computePosition, getScrollParents } from '../../utils/positioning.js';
 
 export interface ComboboxOption {
   label: string;
@@ -64,6 +65,7 @@ export function Combobox({
   const [open, setOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
+  const [ready, setReady] = useState(false);
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -87,13 +89,15 @@ export function Combobox({
 
   const reposition = useCallback(() => {
     const wrap = wrapRef.current;
-    if (!wrap) return;
-    const rect = wrap.getBoundingClientRect();
+    const dropdown = dropdownRef.current;
+    if (!wrap || !dropdown) return;
+    const result = computePosition(wrap, dropdown, 'bottom-start', 4);
     setDropdownPos({
-      top: rect.bottom + 4,
-      left: rect.left,
-      width: rect.width,
+      top: result.top,
+      left: result.left,
+      width: wrap.offsetWidth,
     });
+    setReady(true);
   }, []);
 
   useEffect(() => {
@@ -101,6 +105,13 @@ export function Combobox({
     rafId.current = requestAnimationFrame(reposition);
     return () => cancelAnimationFrame(rafId.current);
   }, [open, reposition]);
+
+  // Reposition when the filtered list changes size (matters when flipped above)
+  useEffect(() => {
+    if (!open) return;
+    rafId.current = requestAnimationFrame(reposition);
+    return () => cancelAnimationFrame(rafId.current);
+  }, [filteredOptions.length, open, reposition]);
 
   // Reposition on scroll / resize
   useEffect(() => {
@@ -110,22 +121,15 @@ export function Combobox({
       rafId.current = requestAnimationFrame(reposition);
     };
 
-    // Walk scroll parents
-    const scrollables: HTMLElement[] = [];
-    let current = wrapRef.current?.parentElement ?? null;
-    while (current) {
-      const { overflow, overflowX, overflowY } = getComputedStyle(current);
-      if (/(auto|scroll|overlay)/.test(overflow + overflowY + overflowX)) {
-        scrollables.push(current);
-      }
-      current = current.parentElement;
-    }
+    const scrollables = wrapRef.current ? getScrollParents(wrapRef.current) : [];
 
     scrollables.forEach((el) => el.addEventListener('scroll', onScroll, { passive: true }));
+    window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll, { passive: true });
 
     return () => {
       scrollables.forEach((el) => el.removeEventListener('scroll', onScroll));
+      window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
       cancelAnimationFrame(rafId.current);
     };
@@ -181,8 +185,14 @@ export function Combobox({
 
   function openPanel() {
     if (disabled) return;
+    // Prime width/position from the anchor so the first paint (invisible)
+    // measures the dropdown at its real size before the smart-position pass.
+    const rect = wrapRef.current?.getBoundingClientRect();
+    if (rect) {
+      setDropdownPos({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+    }
+    setReady(false);
     setOpen(true);
-    reposition();
   }
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -378,6 +388,7 @@ export function Combobox({
               left: dropdownPos.left,
               width: dropdownPos.width,
               zIndex: 999,
+              opacity: ready ? 1 : 0,
             }}
           >
             {filteredOptions.length === 0 && (
