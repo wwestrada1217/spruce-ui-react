@@ -1,4 +1,4 @@
-name: CI / Deploy to Hetzner
+name: CI
 
 # CI/CD for the Spruce React design system docs, modeled on the main spruce
 # repo's hetzner-deploy.yml (frontend path).
@@ -77,7 +77,7 @@ jobs:
           if-no-files-found: error
 
   deploy:
-    name: Ship to Hetzner
+    name: Deploy docs
     needs: build
     # PRs stop at the build gate; only main pushes / manual runs deploy.
     if: ${{ github.event_name != 'pull_request' }}
