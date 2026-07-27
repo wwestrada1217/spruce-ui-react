@@ -106,6 +106,8 @@
   left: 0;
   top: 0;
   height: 100vh;
+  width: var(--sp-sidebar-expanded-width, 256px);
+  max-width: 85vw;
   z-index: 50;
   box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
   visibility: hidden;

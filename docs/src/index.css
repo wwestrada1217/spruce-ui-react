@@ -933,7 +933,8 @@ code {
   }
 
   /* Make the actual sidebar fill the fixed-position wrap */
-  .docs-sidebar-wrap .sp-sidebar-host {
+  .docs-sidebar-wrap .sp-sidebar-host,
+  .docs-sidebar-wrap .sp-sidebar {
     position: static;
     width: 100%;
     height: 100%;
