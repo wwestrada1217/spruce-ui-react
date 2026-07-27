@@ -94,7 +94,7 @@ export const NAV_SECTIONS: NavSection[] = [
       { icon: 'clock',             label: 'Time Picker',       route: '#/components/time-picker'        },
       { icon: 'calendar-clock',    label: 'Datetime Picker',   route: '#/components/datetime-picker'    },
       { icon: 'sliders-horizontal',label: 'Slider & Range',    route: '#/components/slider-range'       },
-      { icon: 'upload',            label: 'File Upload',       route: '#/components/file-upload',        soon: true },
+      { icon: 'upload',            label: 'File Upload',       route: '#/components/file-upload'        },
       { icon: 'pen-tool',          label: 'Editor',            route: '#/components/editor',             soon: true },
       { icon: 'layout-list',       label: 'Block Editor',      route: '#/components/block-editor',       soon: true },
       { icon: 'heading',           label: 'Markdown Editor',   route: '#/components/markdown-editor',    soon: true },

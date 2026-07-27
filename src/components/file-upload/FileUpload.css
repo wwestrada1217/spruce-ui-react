@@ -1,0 +1,250 @@
+/*
+ * Copyright (c) 2026-2027 Sprucestack. All Rights Reserved.
+ * The term "Sprucestack" refers to Sprucestack Inc. and/or its subsidiaries.
+ * This software is released under Apache license.
+ * The full license information can be found in LICENSE in the root directory of this project.
+ */
+
+/* ─── File Upload Root ─── */
+.sp-file-upload {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-space-2, 8px);
+  width: 100%;
+}
+
+/* ─── Label ─── */
+.sp-file-upload__label {
+  font-size: var(--sp-text-sm, 13px);
+  font-weight: var(--sp-font-medium, 500);
+  color: var(--sp-text-color, #1a202c);
+}
+
+.sp-file-upload__required {
+  color: var(--sp-danger, #dc2626);
+  margin-left: 2px;
+}
+
+/* ─── Dropzone ─── */
+.sp-file-upload__dropzone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-space-6, 24px) var(--sp-space-4, 16px);
+  border: 2px dashed var(--sp-border-strong, rgba(15, 23, 42, 0.14));
+  border-radius: var(--sp-radius-xl, 12px);
+  background: var(--sp-surface-50, #f8f9fb);
+  cursor: pointer;
+  outline: none;
+  text-align: center;
+  user-select: none;
+  transition:
+    border-color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease),
+    background-color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease),
+    box-shadow var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-file-upload__dropzone:hover:not(.sp-file-upload__dropzone--disabled) {
+  border-color: var(--sp-primary, #0f766e);
+  background: var(--sp-surface-25, #f4f7fb);
+}
+
+.sp-file-upload__dropzone:focus-visible {
+  border-color: var(--sp-primary, #0f766e);
+  box-shadow: 0 0 0 3px var(--sp-focus-ring-color, rgba(15, 118, 110, 0.25));
+}
+
+/* Dragging state */
+.sp-file-upload__dropzone--dragging {
+  border-color: var(--sp-primary, #0f766e);
+  background: var(--sp-primary-subtle, rgba(15, 118, 110, 0.08));
+  border-style: solid;
+}
+
+/* Size variants */
+.sp-file-upload__dropzone--sm {
+  padding: var(--sp-space-3, 12px) var(--sp-space-3, 12px);
+}
+
+.sp-file-upload__dropzone--lg {
+  padding: var(--sp-space-8, 32px) var(--sp-space-6, 24px);
+}
+
+/* Disabled state */
+.sp-file-upload__dropzone--disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: var(--sp-surface-100, #e9eef5);
+}
+
+/* Error state */
+.sp-file-upload__dropzone--error {
+  border-color: var(--sp-danger, #dc2626);
+  background: var(--sp-danger-subtle, rgba(220, 38, 38, 0.05));
+}
+
+/* Hidden File Input */
+.sp-file-upload__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.sp-file-upload__input:disabled {
+  cursor: not-allowed;
+}
+
+/* Icon & Content */
+.sp-file-upload__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--sp-text-subtle, #64748b);
+  margin-bottom: var(--sp-space-2, 8px);
+  transition: color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-file-upload__dropzone:hover:not(.sp-file-upload__dropzone--disabled) .sp-file-upload__icon,
+.sp-file-upload__dropzone--dragging .sp-file-upload__icon {
+  color: var(--sp-primary, #0f766e);
+}
+
+.sp-file-upload__text {
+  font-size: var(--sp-text-base, 14px);
+  font-weight: var(--sp-font-medium, 500);
+  color: var(--sp-text-color, #0f172a);
+  margin-bottom: 2px;
+}
+
+.sp-file-upload__subtext {
+  font-size: var(--sp-text-xs, 11px);
+  color: var(--sp-text-subtle, #64748b);
+}
+
+/* ─── File List ─── */
+.sp-file-upload__file-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-space-2, 8px);
+  margin-top: var(--sp-space-1, 4px);
+}
+
+.sp-file-upload__file-card {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-space-3, 12px);
+  padding: var(--sp-space-2_5, 10px) var(--sp-space-3, 12px);
+  border: 1px solid var(--sp-border, rgba(15, 23, 42, 0.08));
+  border-radius: var(--sp-radius-lg, 8px);
+  background: var(--sp-surface-0, #ffffff);
+  transition: background-color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-file-upload__file-card:hover {
+  background: var(--sp-surface-25, #f4f7fb);
+}
+
+/* Image Thumbnail / Icon */
+.sp-file-upload__file-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--sp-radius-md, 6px);
+  background: var(--sp-surface-100, #e9eef5);
+  color: var(--sp-text-subtle, #64748b);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.sp-file-upload__file-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* File Info */
+.sp-file-upload__file-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sp-file-upload__file-name {
+  font-size: var(--sp-text-sm, 13px);
+  font-weight: var(--sp-font-medium, 500);
+  color: var(--sp-text-color, #0f172a);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sp-file-upload__file-size {
+  font-size: var(--sp-text-xs, 11px);
+  color: var(--sp-text-subtle, #64748b);
+}
+
+/* Progress bar */
+.sp-file-upload__progress-wrap {
+  width: 100%;
+  height: 4px;
+  background: var(--sp-surface-200, #e2e8f0);
+  border-radius: var(--sp-radius-full, 9999px);
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.sp-file-upload__progress-bar {
+  height: 100%;
+  background: var(--sp-primary, #0f766e);
+  transition: width var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+/* Action Buttons */
+.sp-file-upload__file-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-space-1, 4px);
+}
+
+.sp-file-upload__remove-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--sp-radius-md, 6px);
+  border: none;
+  background: transparent;
+  color: var(--sp-text-subtle, #64748b);
+  cursor: pointer;
+  transition:
+    background-color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease),
+    color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-file-upload__remove-btn:hover {
+  background: var(--sp-danger-subtle, rgba(220, 38, 38, 0.1));
+  color: var(--sp-danger, #dc2626);
+}
+
+/* ─── Error Message & Hint ─── */
+.sp-file-upload__error-msg {
+  font-size: var(--sp-text-xs, 11px);
+  color: var(--sp-danger, #dc2626);
+  margin-top: 2px;
+}
+
+.sp-file-upload__hint-msg {
+  font-size: var(--sp-text-xs, 11px);
+  color: var(--sp-text-subtle, #64748b);
+  margin-top: 2px;
+}

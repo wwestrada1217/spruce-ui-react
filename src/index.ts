@@ -433,5 +433,9 @@ export type {
   FieldType,
 } from './components/filter-expression/FilterExpression.js';
 
+// ─── FileUpload ──────────────────────────────────────────────────────────────
+export { FileUpload } from './components/file-upload/FileUpload.js';
+export type { FileUploadProps, FileUploadSize, UploadedFileItem } from './components/file-upload/FileUpload.js';
+
 // ─── Data ─────────────────────────────────────────────────────────────────────
 export * from './data/index.js';

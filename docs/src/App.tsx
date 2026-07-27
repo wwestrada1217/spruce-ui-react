@@ -90,6 +90,7 @@ import { AspectRatioPage } from './pages/components/AspectRatioPage'
 import { CreditCardPage } from './pages/components/CreditCardPage'
 import { BarcodeQrPage } from './pages/components/BarcodeQrPage'
 import { GitGraphPage } from './pages/components/GitGraphPage'
+import { FileUploadPage } from './pages/components/FileUploadPage'
 import { ChangelogPage } from './pages/ChangelogPage'
 import { DevelopmentPage } from './pages/DevelopmentPage'
 import { ComingSoonPage } from './pages/ComingSoonPage'
@@ -211,6 +212,7 @@ function renderPage(hash: string): React.ReactElement {
     case '#/components/credit-card':        return <CreditCardPage />
     case '#/components/barcode-qr':         return <BarcodeQrPage />
     case '#/components/git-graph':          return <GitGraphPage />
+    case '#/components/file-upload':        return <FileUploadPage />
     // Core (data) — support both old and new routes
     case '#/data/data-source':
     case '#/core/data-source':                return <DataSourcePage />
