@@ -437,5 +437,9 @@ export type {
 export { FileUpload } from './components/file-upload/FileUpload.js';
 export type { FileUploadProps, FileUploadSize, UploadedFileItem } from './components/file-upload/FileUpload.js';
 
+// ─── Editor ──────────────────────────────────────────────────────────────────
+export { Editor } from './components/editor/Editor.js';
+export type { EditorProps, EditorSize } from './components/editor/Editor.js';
+
 // ─── Data ─────────────────────────────────────────────────────────────────────
 export * from './data/index.js';

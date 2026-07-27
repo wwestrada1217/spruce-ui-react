@@ -1,0 +1,258 @@
+/*
+ * Copyright (c) 2026-2027 Sprucestack. All Rights Reserved.
+ * The term "Sprucestack" refers to Sprucestack Inc. and/or its subsidiaries.
+ * This software is released under Apache license.
+ * The full license information can be found in LICENSE in the root directory of this project.
+ */
+
+/* ─── Editor Root ─── */
+.sp-editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-space-2, 8px);
+  width: 100%;
+}
+
+/* Label */
+.sp-editor__label {
+  font-size: var(--sp-text-sm, 13px);
+  font-weight: var(--sp-font-medium, 500);
+  color: var(--sp-text-color, #1a202c);
+}
+
+.sp-editor__required {
+  color: var(--sp-danger, #dc2626);
+  margin-left: 2px;
+}
+
+/* Outer Frame / Container */
+.sp-editor__container {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--sp-border-strong, rgba(15, 23, 42, 0.14));
+  border-radius: var(--sp-radius-xl, 12px);
+  background: var(--sp-surface-0, #ffffff);
+  overflow: hidden;
+  transition:
+    border-color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease),
+    box-shadow var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-editor__container:focus-within {
+  border-color: var(--sp-border-focus, #0f766e);
+  box-shadow: 0 0 0 3px var(--sp-focus-ring-color, rgba(15, 118, 110, 0.25));
+}
+
+/* Disabled state */
+.sp-editor--disabled .sp-editor__container {
+  opacity: 0.6;
+  background: var(--sp-surface-100, #e9eef5);
+  cursor: not-allowed;
+}
+
+/* Readonly state */
+.sp-editor--readonly .sp-editor__container {
+  background: var(--sp-surface-25, #f4f7fb);
+}
+
+/* Error state */
+.sp-editor--error .sp-editor__container {
+  border-color: var(--sp-danger, #dc2626);
+}
+
+/* ─── Toolbar ─── */
+.sp-editor__toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sp-space-1, 4px);
+  padding: var(--sp-space-1_5, 6px) var(--sp-space-2, 8px);
+  background: var(--sp-surface-50, #f8f9fb);
+  border-bottom: 1px solid var(--sp-border, rgba(15, 23, 42, 0.08));
+  user-select: none;
+}
+
+.sp-editor__toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.sp-editor__divider {
+  width: 1px;
+  height: 18px;
+  background: var(--sp-border-strong, rgba(15, 23, 42, 0.14));
+  margin: 0 var(--sp-space-1, 4px);
+}
+
+/* Toolbar Buttons */
+.sp-editor__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--sp-radius-md, 6px);
+  border: none;
+  background: transparent;
+  color: var(--sp-text-subtle, #64748b);
+  cursor: pointer;
+  outline: none;
+  transition:
+    background-color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease),
+    color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-editor__btn:hover:not(:disabled) {
+  background: var(--sp-content-hover-bg, rgba(15, 23, 42, 0.06));
+  color: var(--sp-text-color, #0f172a);
+}
+
+.sp-editor__btn:focus-visible {
+  box-shadow: 0 0 0 2px var(--sp-focus-ring-color, rgba(15, 118, 110, 0.25));
+}
+
+.sp-editor__btn--active {
+  background: var(--sp-primary-subtle, rgba(15, 118, 110, 0.12)) !important;
+  color: var(--sp-primary, #0f766e) !important;
+  font-weight: 600;
+}
+
+.sp-editor__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Toolbar Dropdown / Format Selector */
+.sp-editor__select {
+  height: 28px;
+  padding: 0 var(--sp-space-2, 8px);
+  font-size: var(--sp-text-xs, 12px);
+  font-weight: var(--sp-font-medium, 500);
+  color: var(--sp-text-color, #0f172a);
+  background: var(--sp-surface-0, #ffffff);
+  border: 1px solid var(--sp-border, rgba(15, 23, 42, 0.1));
+  border-radius: var(--sp-radius-md, 6px);
+  cursor: pointer;
+  outline: none;
+
+  transition: border-color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-editor__select:focus-visible {
+  border-color: var(--sp-primary, #0f766e);
+}
+
+/* ─── Content Editable Area ─── */
+.sp-editor__content {
+  flex: 1;
+  padding: var(--sp-space-3, 12px) var(--sp-space-4, 16px);
+  font-size: var(--sp-text-base, 14px);
+  line-height: var(--sp-leading-normal, 1.5);
+  color: var(--sp-text-color, #0f172a);
+  outline: none;
+  overflow-y: auto;
+  min-height: 140px;
+}
+
+/* Placeholder support */
+.sp-editor__content[data-placeholder]:empty::before {
+  content: attr(data-placeholder);
+  color: var(--sp-text-disabled, #94a3b8);
+  pointer-events: none;
+}
+
+/* Formatting within content */
+.sp-editor__content h1 {
+  font-size: var(--sp-text-2xl, 24px);
+  font-weight: 700;
+  margin-top: 0.5em;
+  margin-bottom: 0.3em;
+}
+
+.sp-editor__content h2 {
+  font-size: var(--sp-text-xl, 20px);
+  font-weight: 600;
+  margin-top: 0.5em;
+  margin-bottom: 0.3em;
+}
+
+.sp-editor__content h3 {
+  font-size: var(--sp-text-lg, 18px);
+  font-weight: 600;
+  margin-top: 0.4em;
+  margin-bottom: 0.2em;
+}
+
+.sp-editor__content p {
+  margin-bottom: 0.5em;
+}
+
+.sp-editor__content ul,
+.sp-editor__content ol {
+  padding-left: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.sp-editor__content blockquote {
+  border-left: 3px solid var(--sp-primary, #0f766e);
+  padding-left: var(--sp-space-3, 12px);
+  margin-left: 0;
+  margin-right: 0;
+  color: var(--sp-text-muted, #334155);
+  font-style: italic;
+}
+
+.sp-editor__content pre {
+  background: var(--sp-surface-100, #e9eef5);
+  padding: var(--sp-space-2_5, 10px);
+  border-radius: var(--sp-radius-md, 6px);
+  font-family: var(--sp-font-mono, monospace);
+  font-size: var(--sp-text-xs, 12px);
+  overflow-x: auto;
+  margin-bottom: 0.5em;
+}
+
+.sp-editor__content a {
+  color: var(--sp-primary, #0f766e);
+  text-decoration: underline;
+}
+
+/* ─── Source View Textarea ─── */
+.sp-editor__source {
+  width: 100%;
+  padding: var(--sp-space-3, 12px) var(--sp-space-4, 16px);
+  font-family: var(--sp-font-mono, monospace);
+  font-size: var(--sp-text-xs, 12px);
+  color: var(--sp-text-color, #0f172a);
+  background: var(--sp-surface-900, #0f172a);
+  color: var(--sp-text-inverse, #f8fafc);
+  border: none;
+  outline: none;
+  resize: vertical;
+  min-height: 140px;
+}
+
+/* ─── Size Variants ─── */
+.sp-editor--sm .sp-editor__content {
+  padding: var(--sp-space-2, 8px) var(--sp-space-3, 12px);
+  font-size: var(--sp-text-sm, 13px);
+  min-height: 100px;
+}
+
+.sp-editor--lg .sp-editor__content {
+  padding: var(--sp-space-4, 16px) var(--sp-space-5, 20px);
+  font-size: var(--sp-text-md, 16px);
+  min-height: 200px;
+}
+
+/* ─── Error & Hint Messages ─── */
+.sp-editor__error-msg {
+  font-size: var(--sp-text-xs, 11px);
+  color: var(--sp-danger, #dc2626);
+}
+
+.sp-editor__hint-msg {
+  font-size: var(--sp-text-xs, 11px);
+  color: var(--sp-text-subtle, #64748b);
+}
