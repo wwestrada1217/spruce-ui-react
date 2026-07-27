@@ -122,9 +122,14 @@ export function TimePicker({
   const [panelReady, setPanelReady] = useState(false);
   const rafId = useRef(0);
 
+  const [uncontrolledValue, setUncontrolledValue] = useState<string | null>(value ?? null);
+
   const [prevValue, setPrevValue] = useState(value);
   if (value !== prevValue) {
     setPrevValue(value);
+    if (value !== undefined) {
+      setUncontrolledValue(value);
+    }
     const parsed = parseTime(value);
     if (parsed) {
       setHour(parsed.hour);
@@ -133,7 +138,8 @@ export function TimePicker({
     }
   }
 
-  const displayValue = value ?? '';
+  const currentValue = value !== undefined ? value : uncontrolledValue;
+  const displayValue = currentValue ?? '';
 
   /* ── Positioning ──────────────────────────────────────────────────────── */
 
@@ -174,6 +180,7 @@ export function TimePicker({
 
   const applyAndClose = useCallback(() => {
     const formatted = formatTime(hour, minute, second, use24Hour, showSeconds);
+    setUncontrolledValue(formatted);
     onChange?.(formatted);
     setOpen(false);
   }, [hour, minute, second, use24Hour, showSeconds, onChange]);
@@ -182,6 +189,7 @@ export function TimePicker({
     setHour(0);
     setMinute(0);
     setSecond(0);
+    setUncontrolledValue(null);
     onChange?.(null);
     setOpen(false);
   }, [onChange]);
@@ -240,8 +248,11 @@ export function TimePicker({
       setHour(parsed.hour);
       setMinute(parsed.minute);
       setSecond(parsed.second);
-      onChange?.(formatTime(parsed.hour, parsed.minute, parsed.second, use24Hour, showSeconds));
+      const formatted = formatTime(parsed.hour, parsed.minute, parsed.second, use24Hour, showSeconds);
+      setUncontrolledValue(formatted);
+      onChange?.(formatted);
     } else {
+      setUncontrolledValue(raw || null);
       // Pass raw through so onChange reflects partial edits as null
       onChange?.(raw || null);
     }

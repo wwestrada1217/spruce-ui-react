@@ -61,7 +61,7 @@ export function TimePickerPage() {
           <h2 id="basic-heading">Basic Usage</h2>
           <p className="section-desc">Click the trigger to open the time spinner. Adjust hours and minutes, then click Apply.</p>
           <CodePreview code={BASIC_CODE}>
-            <TimePicker placeholder="Select time" onChange={setTime1} />
+            <TimePicker value={time1} placeholder="Select time" onChange={setTime1} />
           </CodePreview>
           {time1 && <p style={{ fontSize: 13, color: 'var(--sp-text-subtle)' }}>Selected: <code>{time1}</code></p>}
         </section>
@@ -70,7 +70,7 @@ export function TimePickerPage() {
           <h2 id="format-heading">24-Hour Format</h2>
           <p className="section-desc">Set <code>use24Hour</code> to display time in 24-hour format without AM/PM.</p>
           <CodePreview code={FORMAT_CODE}>
-            <TimePicker use24Hour placeholder="Select time (24h)" onChange={setTime2} />
+            <TimePicker value={time2} use24Hour placeholder="Select time (24h)" onChange={setTime2} />
           </CodePreview>
           {time2 && <p style={{ fontSize: 13, color: 'var(--sp-text-subtle)' }}>Selected: <code>{time2}</code></p>}
         </section>
