@@ -84,7 +84,7 @@ export function Sparkline({
       width={width}
       height={height}
       viewBox={`0 0 ${svgWidth} ${svgHeight}`}
-      preserveAspectRatio="none"
+      preserveAspectRatio="xMidYMid meet"
       style={style}
     >
       {type === 'area' && (
