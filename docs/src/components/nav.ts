@@ -131,6 +131,7 @@ export const NAV_SECTIONS: NavSection[] = [
       { icon: 'grip-vertical',  label: 'Splitter',          route: '#/components/splitter'         },
       { icon: 'sidebar-left',   label: 'Sidebar',           route: '#/components/sidebar'          },
       { icon: 'credit-card',    label: 'App Header',        route: '#/components/app-header'       },
+      { icon: 'layout',         label: 'App Shell',         route: '#/components/app-shell'        },
       { icon: 'panel-right',    label: 'Drawer',            route: '#/components/drawer'           },
       { icon: 'maximize',       label: 'Modal',             route: '#/components/modal'            },
       { icon: 'minimize',       label: 'Window',            route: '#/components/window'           },

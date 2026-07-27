@@ -76,6 +76,10 @@ export type { SidebarItemProps } from './components/sidebar/SidebarItem.js';
 export { SidebarMenu, SidebarMenuGroup } from './components/sidebar/SidebarMenu.js';
 export { SidebarSeparator } from './components/sidebar/SidebarSeparator.js';
 
+// ─── AppShell ─────────────────────────────────────────────────────────────────
+export { AppShell, AppShellHamburger } from './components/app-shell/AppShell.js';
+export type { AppShellProps, AppShellHamburgerProps } from './components/app-shell/AppShell.js';
+
 // ─── Theme ────────────────────────────────────────────────────────────────────
 export { ThemeProvider, useTheme } from './theme/theme-context.js';
 export type { ThemeContextValue, ThemeProviderProps } from './theme/theme-context.js';

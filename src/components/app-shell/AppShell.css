@@ -1,0 +1,109 @@
+/*
+ * Copyright (c) 2026-2027 Sprucestack. All Rights Reserved.
+ * The term "Sprucestack" refers to Sprucestack Inc. and/or its subsidiaries.
+ * This software is released under Apache license.
+ * The full license information can be found in LICENSE in the root directory of this project.
+ */
+
+/* ── AppShell ─────────────────────────────────────────────────────────────────
+ * A full-viewport application shell layout with:
+ *   • An optional sidebar on the left
+ *   • An optional header pinned to the top
+ *   • A main content area filling the remaining space
+ *
+ * The layout adapts responsively:
+ *   • Desktop: sidebar visible side-by-side with the header + content column
+ *   • Mobile (below breakpoint): sidebar collapses to off-canvas overlay
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+/* ── Root container ─── */
+.sp-app-shell {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+  background: var(--sp-surface, #fff);
+  color: var(--sp-text-color, #1a202c);
+}
+
+/* ── Body: the column to the right of the sidebar ─── */
+.sp-app-shell__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  transition: margin-left var(--sp-duration-slow, 300ms) var(--sp-ease-in-out, ease-in-out);
+}
+
+/* ── Header slot ─── */
+.sp-app-shell__header {
+  flex-shrink: 0;
+  z-index: 30;
+}
+
+/* ── Main content area ─── */
+.sp-app-shell__main {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--sp-scrollbar-thumb, rgba(0, 0, 0, 0.14)) var(--sp-scrollbar-track, rgba(0, 0, 0, 0.03));
+}
+
+.sp-app-shell__main::-webkit-scrollbar { width: 8px; }
+.sp-app-shell__main::-webkit-scrollbar-track {
+  background: var(--sp-scrollbar-track, rgba(0, 0, 0, 0.03));
+}
+.sp-app-shell__main::-webkit-scrollbar-thumb {
+  background: var(--sp-scrollbar-thumb, rgba(0, 0, 0, 0.14));
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+.sp-app-shell__main::-webkit-scrollbar-thumb:hover {
+  background: var(--sp-scrollbar-hover, rgba(0, 0, 0, 0.25));
+  background-clip: content-box;
+}
+
+/* ── Padding variants ─── */
+.sp-app-shell__main--padded {
+  padding: var(--sp-space-6, 24px);
+}
+
+/* ── Mobile hamburger button ─── */
+.sp-app-shell__hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: var(--sp-radius-md, 6px);
+  background: transparent;
+  color: var(--sp-text-color, #1a202c);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-app-shell__hamburger:hover {
+  background: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04));
+}
+
+.sp-app-shell__hamburger:active {
+  background: var(--sp-content-active-bg, rgba(0, 0, 0, 0.07));
+}
+
+.sp-app-shell__hamburger-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* ── Responsive: show hamburger on small screens ─── */
+@media (max-width: 768px) {
+  .sp-app-shell__hamburger {
+    display: inline-flex;
+  }
+}
