@@ -97,7 +97,7 @@ export const NAV_SECTIONS: NavSection[] = [
       { icon: 'upload',            label: 'File Upload',       route: '#/components/file-upload'        },
       { icon: 'pen-tool',          label: 'Editor',            route: '#/components/editor'        },
       { icon: 'layout-list',       label: 'Block Editor',      route: '#/components/block-editor',       soon: true },
-      { icon: 'heading',           label: 'Markdown Editor',   route: '#/components/markdown-editor',    soon: true },
+      { icon: 'heading',           label: 'Markdown Editor',   route: '#/components/markdown-editor' },
       { icon: 'braces',            label: 'Code Editor',       route: '#/components/code-editor'        },
       { icon: 'square-split-horizontal',         label: 'Diff Editor',       route: '#/components/diff-editor',        soon: true },
       { icon: 'map-pin',           label: 'In-place Editor',   route: '#/components/inplace-editor'     },

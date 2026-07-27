@@ -441,5 +441,9 @@ export type { FileUploadProps, FileUploadSize, UploadedFileItem } from './compon
 export { Editor } from './components/editor/Editor.js';
 export type { EditorProps, EditorSize } from './components/editor/Editor.js';
 
+// ─── MarkdownEditor ──────────────────────────────────────────────────────────
+export { MarkdownEditor } from './components/markdown-editor/MarkdownEditor.js';
+export type { MarkdownEditorProps, MarkdownEditorMode, MarkdownEditorSize } from './components/markdown-editor/MarkdownEditor.js';
+
 // ─── Data ─────────────────────────────────────────────────────────────────────
 export * from './data/index.js';

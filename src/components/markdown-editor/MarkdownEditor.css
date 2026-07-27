@@ -1,0 +1,356 @@
+/*
+ * Copyright (c) 2026-2027 Sprucestack. All Rights Reserved.
+ * The term "Sprucestack" refers to Sprucestack Inc. and/or its subsidiaries.
+ * This software is released under Apache license.
+ * The full license information can be found in LICENSE in the root directory of this project.
+ */
+
+/* ─── Markdown Editor Root ─── */
+.sp-markdown-editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-space-2, 8px);
+  width: 100%;
+}
+
+/* Label */
+.sp-markdown-editor__label {
+  font-size: var(--sp-text-sm, 13px);
+  font-weight: var(--sp-font-medium, 500);
+  color: var(--sp-text-color, #1a202c);
+}
+
+.sp-markdown-editor__required {
+  color: var(--sp-danger, #dc2626);
+  margin-left: 2px;
+}
+
+/* Container */
+.sp-markdown-editor__container {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--sp-border-strong, rgba(15, 23, 42, 0.14));
+  border-radius: var(--sp-radius-xl, 12px);
+  background: var(--sp-surface-0, #ffffff);
+  overflow: hidden;
+  transition:
+    border-color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease),
+    box-shadow var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-markdown-editor__container:focus-within {
+  border-color: var(--sp-border-focus, #0f766e);
+  box-shadow: 0 0 0 3px var(--sp-focus-ring-color, rgba(15, 118, 110, 0.25));
+}
+
+/* Disabled state */
+.sp-markdown-editor--disabled .sp-markdown-editor__container {
+  opacity: 0.6;
+  background: var(--sp-surface-100, #e9eef5);
+  cursor: not-allowed;
+}
+
+/* Readonly state */
+.sp-markdown-editor--readonly .sp-markdown-editor__container {
+  background: var(--sp-surface-25, #f4f7fb);
+}
+
+/* Error state */
+.sp-markdown-editor--error .sp-markdown-editor__container {
+  border-color: var(--sp-danger, #dc2626);
+}
+
+/* ─── Header & Mode Switcher ─── */
+.sp-markdown-editor__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-space-1_5, 6px) var(--sp-space-2, 8px);
+  background: var(--sp-surface-50, #f8f9fb);
+  border-bottom: 1px solid var(--sp-border, rgba(15, 23, 42, 0.08));
+  user-select: none;
+  flex-wrap: wrap;
+  gap: var(--sp-space-2, 8px);
+}
+
+.sp-markdown-editor__toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sp-space-1, 4px);
+}
+
+.sp-markdown-editor__toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.sp-markdown-editor__divider {
+  width: 1px;
+  height: 18px;
+  background: var(--sp-border-strong, rgba(15, 23, 42, 0.14));
+  margin: 0 var(--sp-space-1, 4px);
+}
+
+/* Mode Switcher Tabs */
+.sp-markdown-editor__modes {
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  background: var(--sp-surface-200, #e2e8f0);
+  border-radius: var(--sp-radius-lg, 8px);
+  gap: 2px;
+  margin-left: auto;
+}
+
+.sp-markdown-editor__mode-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-space-1_5, 6px);
+  padding: 4px 10px;
+  font-size: var(--sp-text-xs, 12px);
+  font-weight: var(--sp-font-medium, 500);
+  color: var(--sp-text-subtle, #64748b);
+  border: none;
+  background: transparent;
+  border-radius: var(--sp-radius-md, 6px);
+  cursor: pointer;
+  outline: none;
+  transition:
+    background-color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease),
+    color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-markdown-editor__mode-btn:hover:not(.sp-markdown-editor__mode-btn--active) {
+  color: var(--sp-text-color, #0f172a);
+}
+
+.sp-markdown-editor__mode-btn--active {
+  background: var(--sp-surface-0, #ffffff);
+  color: var(--sp-primary, #0f766e);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  font-weight: 600;
+}
+
+/* Toolbar Buttons */
+.sp-markdown-editor__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--sp-radius-md, 6px);
+  border: none;
+  background: transparent;
+  color: var(--sp-text-subtle, #64748b);
+  cursor: pointer;
+  outline: none;
+  transition:
+    background-color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease),
+    color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-markdown-editor__btn:hover:not(:disabled) {
+  background: var(--sp-content-hover-bg, rgba(15, 23, 42, 0.06));
+  color: var(--sp-text-color, #0f172a);
+}
+
+.sp-markdown-editor__btn:focus-visible {
+  box-shadow: 0 0 0 2px var(--sp-focus-ring-color, rgba(15, 118, 110, 0.25));
+}
+
+.sp-markdown-editor__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ─── Body Area (Write / Preview / Split) ─── */
+.sp-markdown-editor__body {
+  display: flex;
+  flex: 1;
+  min-height: 160px;
+  position: relative;
+}
+
+.sp-markdown-editor__pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sp-markdown-editor__pane--split {
+  border-right: 1px solid var(--sp-border, rgba(15, 23, 42, 0.08));
+}
+
+/* Textarea Write Mode */
+.sp-markdown-editor__textarea {
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  padding: var(--sp-space-3, 12px) var(--sp-space-4, 16px);
+  font-family: var(--sp-font-mono, monospace);
+  font-size: var(--sp-text-sm, 13px);
+  line-height: var(--sp-leading-relaxed, 1.6);
+  color: var(--sp-text-color, #0f172a);
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: vertical;
+  min-height: 160px;
+}
+
+.sp-markdown-editor__textarea::placeholder {
+  color: var(--sp-text-disabled, #94a3b8);
+}
+
+/* Rendered Preview Mode */
+.sp-markdown-editor__preview {
+  flex: 1;
+  padding: var(--sp-space-3, 12px) var(--sp-space-4, 16px);
+  font-size: var(--sp-text-base, 14px);
+  line-height: var(--sp-leading-relaxed, 1.6);
+  color: var(--sp-text-color, #0f172a);
+  overflow-y: auto;
+  min-height: 160px;
+}
+
+.sp-markdown-editor__preview:empty::before {
+  content: 'Nothing to preview';
+  color: var(--sp-text-disabled, #94a3b8);
+  font-style: italic;
+}
+
+/* Rendered Markdown Styles inside preview */
+.sp-markdown-editor__preview h1 {
+  font-size: var(--sp-text-2xl, 24px);
+  font-weight: 700;
+  margin-top: 0.6em;
+  margin-bottom: 0.4em;
+  border-bottom: 1px solid var(--sp-border, rgba(15, 23, 42, 0.08));
+  padding-bottom: 0.3em;
+}
+
+.sp-markdown-editor__preview h2 {
+  font-size: var(--sp-text-xl, 20px);
+  font-weight: 600;
+  margin-top: 0.5em;
+  margin-bottom: 0.3em;
+  border-bottom: 1px solid var(--sp-border, rgba(15, 23, 42, 0.08));
+  padding-bottom: 0.2em;
+}
+
+.sp-markdown-editor__preview h3 {
+  font-size: var(--sp-text-lg, 18px);
+  font-weight: 600;
+  margin-top: 0.4em;
+  margin-bottom: 0.2em;
+}
+
+.sp-markdown-editor__preview p {
+  margin-bottom: 0.6em;
+}
+
+.sp-markdown-editor__preview ul,
+.sp-markdown-editor__preview ol {
+  padding-left: 1.6em;
+  margin-bottom: 0.6em;
+}
+
+.sp-markdown-editor__preview blockquote {
+  border-left: 4px solid var(--sp-primary, #0f766e);
+  padding-left: var(--sp-space-3, 12px);
+  margin: 0.6em 0;
+  color: var(--sp-text-muted, #334155);
+  background: var(--sp-surface-50, #f8f9fb);
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-radius: 0 var(--sp-radius-md, 6px) var(--sp-radius-md, 6px) 0;
+}
+
+.sp-markdown-editor__preview code {
+  font-family: var(--sp-font-mono, monospace);
+  font-size: 0.9em;
+  background: var(--sp-surface-100, #e9eef5);
+  padding: 2px 6px;
+  border-radius: var(--sp-radius-sm, 4px);
+}
+
+.sp-markdown-editor__preview pre {
+  background: var(--sp-surface-900, #0f172a);
+  color: var(--sp-text-inverse, #f8fafc);
+  padding: var(--sp-space-3, 12px);
+  border-radius: var(--sp-radius-lg, 8px);
+  overflow-x: auto;
+  margin: 0.6em 0;
+}
+
+.sp-markdown-editor__preview pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+.sp-markdown-editor__preview table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.6em 0;
+  font-size: var(--sp-text-sm, 13px);
+}
+
+.sp-markdown-editor__preview th,
+.sp-markdown-editor__preview td {
+  border: 1px solid var(--sp-border-strong, rgba(15, 23, 42, 0.14));
+  padding: var(--sp-space-2, 8px) var(--sp-space-3, 12px);
+  text-align: left;
+}
+
+.sp-markdown-editor__preview th {
+  background: var(--sp-surface-50, #f8f9fb);
+  font-weight: 600;
+}
+
+.sp-markdown-editor__preview hr {
+  border: none;
+  border-top: 1px solid var(--sp-border-strong, rgba(15, 23, 42, 0.14));
+  margin: 1em 0;
+}
+
+.sp-markdown-editor__preview img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--sp-radius-md, 6px);
+  margin: 0.5em 0;
+}
+
+.sp-markdown-editor__preview a {
+  color: var(--sp-primary, #0f766e);
+  text-decoration: underline;
+}
+
+/* ─── Size Variants ─── */
+.sp-markdown-editor--sm .sp-markdown-editor__textarea,
+.sp-markdown-editor--sm .sp-markdown-editor__preview {
+  padding: var(--sp-space-2, 8px) var(--sp-space-3, 12px);
+  font-size: var(--sp-text-xs, 12px);
+  min-height: 120px;
+}
+
+.sp-markdown-editor--lg .sp-markdown-editor__textarea,
+.sp-markdown-editor--lg .sp-markdown-editor__preview {
+  padding: var(--sp-space-4, 16px) var(--sp-space-5, 20px);
+  font-size: var(--sp-text-base, 14px);
+  min-height: 220px;
+}
+
+/* ─── Error & Hint Messages ─── */
+.sp-markdown-editor__error-msg {
+  font-size: var(--sp-text-xs, 11px);
+  color: var(--sp-danger, #dc2626);
+}
+
+.sp-markdown-editor__hint-msg {
+  font-size: var(--sp-text-xs, 11px);
+  color: var(--sp-text-subtle, #64748b);
+}
