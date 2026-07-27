@@ -25,7 +25,7 @@
   margin-left: 2px;
 }
 
-/* Document Canvas Container */
+/* Document Canvas Container with dedicated left gutter padding for side handles */
 .sp-block-editor__canvas {
   display: flex;
   flex-direction: column;
@@ -33,7 +33,7 @@
   border: 1px solid var(--sp-border-strong, rgba(15, 23, 42, 0.14));
   border-radius: var(--sp-radius-xl, 12px);
   background: var(--sp-surface-0, #ffffff);
-  padding: var(--sp-space-6, 24px) var(--sp-space-8, 32px);
+  padding: var(--sp-space-6, 24px) var(--sp-space-8, 32px) var(--sp-space-6, 24px) 56px;
   gap: var(--sp-space-1, 4px);
   position: relative;
   transition:
@@ -86,10 +86,10 @@
   background: var(--sp-content-hover-bg, rgba(15, 23, 42, 0.025));
 }
 
-/* Left Notion-style Side Controls (Grip + Plus) */
+/* Left Notion-style Side Controls (Grip + Plus) - Positioned neatly in left gutter */
 .sp-block-editor__side-handle {
   position: absolute;
-  left: -28px;
+  left: -48px;
   top: 4px;
   display: flex;
   align-items: center;
@@ -205,17 +205,44 @@
   font-size: 14px;
 }
 
-/* Callout Box */
+/* Callout Box - Straight vertical left accent stripe via ::before pseudo-element */
 .sp-block-editor__callout-card {
   display: flex;
   align-items: flex-start;
   gap: var(--sp-space-2_5, 10px);
   width: 100%;
-  padding: var(--sp-space-3, 12px) var(--sp-space-4, 16px);
+  padding: var(--sp-space-3, 12px) var(--sp-space-4, 16px) var(--sp-space-3, 12px) var(--sp-space-5, 20px);
   border-radius: var(--sp-radius-lg, 8px);
   background: var(--sp-info-surface, #f0f9ff);
-  border-left: 4px solid var(--sp-info, #0284c7);
+  position: relative;
+  overflow: hidden;
   margin: 4px 0;
+}
+
+.sp-block-editor__callout-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 4px;
+  background: var(--sp-info, #0284c7);
+}
+
+.sp-block-editor__callout-card--info::before {
+  background: var(--sp-info, #0284c7);
+}
+
+.sp-block-editor__callout-card--warning::before {
+  background: var(--sp-warning, #d97706);
+}
+
+.sp-block-editor__callout-card--danger::before {
+  background: var(--sp-danger, #dc2626);
+}
+
+.sp-block-editor__callout-card--success::before {
+  background: var(--sp-success, #16a34a);
 }
 
 .sp-block-editor__callout-icon {
@@ -237,6 +264,7 @@
   font-family: var(--sp-font-mono, monospace);
   font-size: var(--sp-text-xs, 12px);
   color: var(--sp-text-inverse, #f8fafc);
+  white-space: pre;
 }
 
 /* Divider Line */
@@ -247,10 +275,10 @@
   margin: 12px 0;
 }
 
-/* ─── Notion Slash Command Menu Popover ─── */
+/* ─── Smart-Positioned Notion Slash Command Menu Popover ─── */
 .sp-block-editor__slash-menu {
-  position: absolute;
-  z-index: 1000;
+  position: fixed;
+  z-index: 9999;
   width: 240px;
   max-height: 280px;
   overflow-y: auto;
@@ -320,12 +348,10 @@
   display: block;
 }
 
-/* ─── Context Options Menu Popover (Grip Click) ─── */
+/* ─── Smart-Positioned Context Options Menu Popover (Grip Click) ─── */
 .sp-block-editor__context-menu {
-  position: absolute;
-  z-index: 1000;
-  left: -28px;
-  top: 28px;
+  position: fixed;
+  z-index: 9999;
   width: 170px;
   background: var(--sp-surface-0, #ffffff);
   border: 1px solid var(--sp-border-strong, rgba(15, 23, 42, 0.14));
@@ -366,11 +392,11 @@
 
 /* ─── Size Variants ─── */
 .sp-block-editor--sm .sp-block-editor__canvas {
-  padding: var(--sp-space-4, 16px) var(--sp-space-6, 24px);
+  padding: var(--sp-space-4, 16px) var(--sp-space-6, 24px) var(--sp-space-4, 16px) 50px;
 }
 
 .sp-block-editor--lg .sp-block-editor__canvas {
-  padding: var(--sp-space-8, 32px) var(--sp-space-10, 40px);
+  padding: var(--sp-space-8, 32px) var(--sp-space-10, 40px) var(--sp-space-8, 32px) 64px;
 }
 
 /* ─── Error & Hint Messages ─── */

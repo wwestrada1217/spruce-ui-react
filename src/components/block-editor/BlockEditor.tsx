@@ -9,10 +9,13 @@ import './BlockEditor.css';
 import {
   useState,
   useRef,
+  useLayoutEffect,
   type ChangeEvent,
   type KeyboardEvent,
 } from 'react';
+import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
+import { computePosition } from '../../utils/positioning.js';
 
 export type BlockType =
   | 'paragraph'
@@ -117,9 +120,15 @@ export function BlockEditor({
   const [activeSlashBlockId, setActiveSlashBlockId] = useState<string | null>(null);
   const [slashQuery, setSlashQuery] = useState('');
   const [slashSelectedIndex, setSlashSelectedIndex] = useState(0);
+  const [slashPos, setSlashPos] = useState({ top: 0, left: 0 });
+
   const [activeContextMenuBlockId, setActiveContextMenuBlockId] = useState<string | null>(null);
+  const [contextPos, setContextPos] = useState({ top: 0, left: 0 });
 
   const inputRefs = useRef<Record<string, HTMLInputElement | HTMLTextAreaElement | null>>({});
+  const gripRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const slashMenuRef = useRef<HTMLDivElement>(null);
+  const contextMenuRef = useRef<HTMLDivElement>(null);
 
   // Sync propBlocks
   const [prevPropBlocks, setPrevPropBlocks] = useState(propBlocks);
@@ -204,13 +213,33 @@ export function BlockEditor({
     setActiveContextMenuBlockId(null);
   }
 
-  /* ── Slash Menu Filtering & Selection ────────────────────────────────────── */
+  /* ── Slash Menu Filtering & Smart Positioning ────────────────────────────── */
 
   const filteredSlashCommands = SLASH_COMMANDS.filter(
     (cmd) =>
       cmd.label.toLowerCase().includes(slashQuery.toLowerCase()) ||
       cmd.type.toLowerCase().includes(slashQuery.toLowerCase()),
   );
+
+  useLayoutEffect(() => {
+    if (!activeSlashBlockId) return;
+    const anchor = inputRefs.current[activeSlashBlockId];
+    const popover = slashMenuRef.current;
+    if (anchor && popover) {
+      const pos = computePosition(anchor, popover, 'bottom-start', 4);
+      setSlashPos({ top: pos.top, left: pos.left });
+    }
+  }, [activeSlashBlockId, slashQuery, currentBlocks]);
+
+  useLayoutEffect(() => {
+    if (!activeContextMenuBlockId) return;
+    const anchor = gripRefs.current[activeContextMenuBlockId];
+    const popover = contextMenuRef.current;
+    if (anchor && popover) {
+      const pos = computePosition(anchor, popover, 'bottom-start', 4);
+      setContextPos({ top: pos.top, left: pos.left });
+    }
+  }, [activeContextMenuBlockId]);
 
   function applySlashCommand(blockId: string, type: BlockType) {
     const block = currentBlocks.find((b) => b.id === blockId);
@@ -272,11 +301,22 @@ export function BlockEditor({
       }
     }
 
-    // Enter Key: Create New Block Below
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleAddBlock('paragraph', index);
-      return;
+    // Enter Key Handling
+    if (e.key === 'Enter') {
+      // (3) Fix: Code blocks allow newline on Enter, and Ctrl/Cmd+Enter creates a new block below!
+      if (block.type === 'code') {
+        if (e.ctrlKey || e.metaKey) {
+          e.preventDefault();
+          handleAddBlock('paragraph', index);
+        }
+        return; // Allow standard newline in code block textarea
+      }
+
+      if (!e.shiftKey) {
+        e.preventDefault();
+        handleAddBlock('paragraph', index);
+        return;
+      }
     }
 
     // Backspace Key on Empty Block: Delete and Focus Previous
@@ -321,11 +361,10 @@ export function BlockEditor({
         ) : (
           currentBlocks.map((block, index) => {
             const inputCls = `sp-block-editor__input sp-block-editor__input--${block.type}`;
-            const isSlashActive = activeSlashBlockId === block.id;
 
             return (
               <div key={block.id} className="sp-block-editor__line">
-                {/* Notion Side Handle (Grip + Add Button) */}
+                {/* (1) Notion Side Handle (Grip + Add Button) in clear left gutter */}
                 {isInteractive && (
                   <div className="sp-block-editor__side-handle">
                     <button
@@ -338,6 +377,7 @@ export function BlockEditor({
                       <Icon name="plus" size={14} />
                     </button>
                     <button
+                      ref={(el) => { gripRefs.current[block.id] = el; }}
                       type="button"
                       className="sp-block-editor__handle-btn"
                       onClick={() =>
@@ -350,42 +390,6 @@ export function BlockEditor({
                     >
                       <Icon name="grip-vertical" size={14} />
                     </button>
-
-                    {/* Context Menu Popover */}
-                    {activeContextMenuBlockId === block.id && (
-                      <div className="sp-block-editor__context-menu">
-                        <button
-                          type="button"
-                          className="sp-block-editor__menu-btn"
-                          onClick={() => handleMoveBlock(index, -1)}
-                          disabled={index === 0}
-                        >
-                          <Icon name="arrow-up" size={14} /> Move Up
-                        </button>
-                        <button
-                          type="button"
-                          className="sp-block-editor__menu-btn"
-                          onClick={() => handleMoveBlock(index, 1)}
-                          disabled={index === currentBlocks.length - 1}
-                        >
-                          <Icon name="arrow-down" size={14} /> Move Down
-                        </button>
-                        <button
-                          type="button"
-                          className="sp-block-editor__menu-btn"
-                          onClick={() => handleDuplicateBlock(block.id)}
-                        >
-                          <Icon name="copy" size={14} /> Duplicate
-                        </button>
-                        <button
-                          type="button"
-                          className="sp-block-editor__menu-btn sp-block-editor__menu-btn--danger"
-                          onClick={() => handleDeleteBlock(block.id)}
-                        >
-                          <Icon name="trash" size={14} /> Delete
-                        </button>
-                      </div>
-                    )}
                   </div>
                 )}
 
@@ -441,6 +445,7 @@ export function BlockEditor({
                       />
                     </div>
                   ) : block.type === 'callout' ? (
+                    /* (2) Callout with straight vertical accent line */
                     <div className="sp-block-editor__callout-card">
                       <Icon name="info" size={18} className="sp-block-editor__callout-icon" />
                       <input
@@ -457,11 +462,12 @@ export function BlockEditor({
                       />
                     </div>
                   ) : block.type === 'code' ? (
+                    /* (3) Code block textarea allows multiline newlines */
                     <div className="sp-block-editor__code-card">
                       <textarea
                         ref={(el) => { inputRefs.current[block.id] = el; }}
                         className={inputCls}
-                        rows={2}
+                        rows={3}
                         value={block.content}
                         onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
                           handleInputChange(block.id, e.target.value)
@@ -486,36 +492,88 @@ export function BlockEditor({
                     />
                   )}
                 </div>
-
-                {/* Notion Slash Command Menu Popover */}
-                {isSlashActive && filteredSlashCommands.length > 0 && (
-                  <div className="sp-block-editor__slash-menu">
-                    <div className="sp-block-editor__slash-title">Basic Blocks</div>
-                    {filteredSlashCommands.map((cmd, cmdIdx) => (
-                      <button
-                        key={cmd.type}
-                        type="button"
-                        className={`sp-block-editor__slash-item${
-                          cmdIdx === slashSelectedIndex ? ' sp-block-editor__slash-item--active' : ''
-                        }`}
-                        onClick={() => applySlashCommand(block.id, cmd.type)}
-                      >
-                        <div className="sp-block-editor__slash-icon">
-                          <Icon name={cmd.iconName} size={14} />
-                        </div>
-                        <div>
-                          <strong>{cmd.label}</strong>
-                          <span className="sp-block-editor__slash-desc">{cmd.desc}</span>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
               </div>
             );
           })
         )}
       </div>
+
+      {/* (4) Smart Positioned Portal: Slash Command Menu Popover */}
+      {activeSlashBlockId && filteredSlashCommands.length > 0 && typeof document !== 'undefined' &&
+        createPortal(
+          <div
+            ref={slashMenuRef}
+            className="sp-block-editor__slash-menu"
+            style={{ top: `${slashPos.top}px`, left: `${slashPos.left}px` }}
+          >
+            <div className="sp-block-editor__slash-title">Basic Blocks</div>
+            {filteredSlashCommands.map((cmd, cmdIdx) => (
+              <button
+                key={cmd.type}
+                type="button"
+                className={`sp-block-editor__slash-item${
+                  cmdIdx === slashSelectedIndex ? ' sp-block-editor__slash-item--active' : ''
+                }`}
+                onClick={() => applySlashCommand(activeSlashBlockId, cmd.type)}
+              >
+                <div className="sp-block-editor__slash-icon">
+                  <Icon name={cmd.iconName} size={14} />
+                </div>
+                <div>
+                  <strong>{cmd.label}</strong>
+                  <span className="sp-block-editor__slash-desc">{cmd.desc}</span>
+                </div>
+              </button>
+            ))}
+          </div>,
+          document.body,
+        )}
+
+      {/* (4) Smart Positioned Portal: Context Menu Popover */}
+      {activeContextMenuBlockId && typeof document !== 'undefined' &&
+        createPortal(
+          <div
+            ref={contextMenuRef}
+            className="sp-block-editor__context-menu"
+            style={{ top: `${contextPos.top}px`, left: `${contextPos.left}px` }}
+          >
+            <button
+              type="button"
+              className="sp-block-editor__menu-btn"
+              onClick={() => {
+                const idx = currentBlocks.findIndex((b) => b.id === activeContextMenuBlockId);
+                if (idx !== -1) handleMoveBlock(idx, -1);
+              }}
+            >
+              <Icon name="arrow-up" size={14} /> Move Up
+            </button>
+            <button
+              type="button"
+              className="sp-block-editor__menu-btn"
+              onClick={() => {
+                const idx = currentBlocks.findIndex((b) => b.id === activeContextMenuBlockId);
+                if (idx !== -1) handleMoveBlock(idx, 1);
+              }}
+            >
+              <Icon name="arrow-down" size={14} /> Move Down
+            </button>
+            <button
+              type="button"
+              className="sp-block-editor__menu-btn"
+              onClick={() => handleDuplicateBlock(activeContextMenuBlockId)}
+            >
+              <Icon name="copy" size={14} /> Duplicate
+            </button>
+            <button
+              type="button"
+              className="sp-block-editor__menu-btn sp-block-editor__menu-btn--danger"
+              onClick={() => handleDeleteBlock(activeContextMenuBlockId)}
+            >
+              <Icon name="trash" size={14} /> Delete
+            </button>
+          </div>,
+          document.body,
+        )}
 
       {/* Error message */}
       {propError && (
