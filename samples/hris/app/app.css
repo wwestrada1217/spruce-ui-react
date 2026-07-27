@@ -13,11 +13,19 @@
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 html,
 body {
   margin: 0;
   padding: 0;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
+  min-height: 100vh;
   overflow: hidden;
   font-family: var(--font-sans);
   background-color: var(--sp-surface, #ffffff);
