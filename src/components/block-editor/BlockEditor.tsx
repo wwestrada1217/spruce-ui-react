@@ -8,10 +8,11 @@
 import './BlockEditor.css';
 import {
   useState,
+  useRef,
   type ChangeEvent,
+  type KeyboardEvent,
 } from 'react';
 import { Icon } from '../../icons/Icon.js';
-import { Select, type SelectOption } from '../select/Select.js';
 
 export type BlockType =
   | 'paragraph'
@@ -21,6 +22,7 @@ export type BlockType =
   | 'quote'
   | 'callout'
   | 'list'
+  | 'list-ordered'
   | 'code'
   | 'divider';
 
@@ -30,7 +32,6 @@ export interface BlockItem {
   content: string;
   metadata?: {
     calloutType?: 'info' | 'warning' | 'success' | 'danger';
-    listType?: 'unordered' | 'ordered';
     language?: string;
   };
 }
@@ -64,33 +65,34 @@ export interface BlockEditorProps {
   style?: React.CSSProperties;
 }
 
-const BLOCK_TYPE_OPTIONS: SelectOption[] = [
-  { label: 'Paragraph', value: 'paragraph' },
-  { label: 'Heading 1', value: 'h1' },
-  { label: 'Heading 2', value: 'h2' },
-  { label: 'Heading 3', value: 'h3' },
-  { label: 'Quote',     value: 'quote' },
-  { label: 'Callout',   value: 'callout' },
-  { label: 'List Item', value: 'list' },
-  { label: 'Code',      value: 'code' },
-  { label: 'Divider',   value: 'divider' },
+interface SlashCommandOption {
+  type: BlockType;
+  label: string;
+  desc: string;
+  iconName: string;
+}
+
+const SLASH_COMMANDS: SlashCommandOption[] = [
+  { type: 'paragraph',    label: 'Text',           desc: 'Just start typing with plain text.', iconName: 'type' },
+  { type: 'h1',           label: 'Heading 1',      desc: 'Big section heading.',               iconName: 'heading' },
+  { type: 'h2',           label: 'Heading 2',      desc: 'Medium section heading.',            iconName: 'heading' },
+  { type: 'h3',           label: 'Heading 3',      desc: 'Small section heading.',             iconName: 'heading' },
+  { type: 'list',         label: 'Bulleted List',  desc: 'Create a simple bulleted list.',    iconName: 'list' },
+  { type: 'list-ordered', label: 'Numbered List',  desc: 'Create a numbered list.',            iconName: 'list-ordered' },
+  { type: 'quote',        label: 'Quote',          desc: 'Capture a quote or highlight text.', iconName: 'quote' },
+  { type: 'callout',      label: 'Callout',        desc: 'Make text stand out with a box.',    iconName: 'info' },
+  { type: 'code',         label: 'Code Block',     desc: 'Capture code snippet.',              iconName: 'code' },
+  { type: 'divider',      label: 'Divider',        desc: 'Visually divide blocks with a line.',iconName: 'minus' },
 ];
 
 function generateId(): string {
   return `block_${Math.random().toString(36).substring(2, 9)}_${Date.now()}`;
 }
 
-const DEFAULT_INITIAL_BLOCKS: BlockItem[] = [
-  {
-    id: generateId(),
-    type: 'h1',
-    content: 'Welcome to Spruce Block Editor',
-  },
-  {
-    id: generateId(),
-    type: 'paragraph',
-    content: 'Add, reorder, duplicate, and format content blocks easily.',
-  },
+const NOTION_DEFAULT_BLOCKS: BlockItem[] = [
+  { id: generateId(), type: 'h1',        content: 'Notion & TipTap Style Block Editor' },
+  { id: generateId(), type: 'paragraph', content: 'Type "/" anywhere to open the Notion slash command menu.' },
+  { id: generateId(), type: 'callout',   content: 'Pro tip: Press Enter to create a new block, or Backspace on an empty block to delete it.', metadata: { calloutType: 'info' } },
 ];
 
 /* ── Component ───────────────────────────────────────────────────────────── */
@@ -98,7 +100,7 @@ const DEFAULT_INITIAL_BLOCKS: BlockItem[] = [
 export function BlockEditor({
   blocks: propBlocks,
   onChange,
-  placeholder = 'Type block content...',
+  placeholder = "Type '/' for commands...",
   disabled = false,
   readOnly = false,
   label,
@@ -110,8 +112,14 @@ export function BlockEditor({
   style,
 }: BlockEditorProps) {
   const [internalBlocks, setInternalBlocks] = useState<BlockItem[]>(
-    propBlocks ?? DEFAULT_INITIAL_BLOCKS,
+    propBlocks ?? NOTION_DEFAULT_BLOCKS,
   );
+  const [activeSlashBlockId, setActiveSlashBlockId] = useState<string | null>(null);
+  const [slashQuery, setSlashQuery] = useState('');
+  const [slashSelectedIndex, setSlashSelectedIndex] = useState(0);
+  const [activeContextMenuBlockId, setActiveContextMenuBlockId] = useState<string | null>(null);
+
+  const inputRefs = useRef<Record<string, HTMLInputElement | HTMLTextAreaElement | null>>({});
 
   // Sync propBlocks
   const [prevPropBlocks, setPrevPropBlocks] = useState(propBlocks);
@@ -129,6 +137,13 @@ export function BlockEditor({
     onChange?.(nextBlocks);
   }
 
+  function focusBlock(id: string) {
+    requestAnimationFrame(() => {
+      const el = inputRefs.current[id];
+      if (el) el.focus();
+    });
+  }
+
   function handleAddBlock(type: BlockType = 'paragraph', index?: number) {
     if (disabled || readOnly) return;
     const newBlock: BlockItem = {
@@ -136,13 +151,13 @@ export function BlockEditor({
       type,
       content: '',
       ...(type === 'callout' ? { metadata: { calloutType: 'info' } } : {}),
-      ...(type === 'list' ? { metadata: { listType: 'unordered' } } : {}),
     };
 
     const targetIndex = index !== undefined ? index + 1 : currentBlocks.length;
     const nextBlocks = [...currentBlocks];
     nextBlocks.splice(targetIndex, 0, newBlock);
     updateBlocks(nextBlocks);
+    focusBlock(newBlock.id);
   }
 
   function handleUpdateBlock(id: string, updates: Partial<BlockItem>) {
@@ -160,6 +175,7 @@ export function BlockEditor({
     const [moved] = nextBlocks.splice(index, 1);
     nextBlocks.splice(targetIndex, 0, moved);
     updateBlocks(nextBlocks);
+    setActiveContextMenuBlockId(null);
   }
 
   function handleDuplicateBlock(id: string) {
@@ -177,17 +193,106 @@ export function BlockEditor({
     const nextBlocks = [...currentBlocks];
     nextBlocks.splice(index + 1, 0, clonedBlock);
     updateBlocks(nextBlocks);
+    setActiveContextMenuBlockId(null);
+    focusBlock(clonedBlock.id);
   }
 
   function handleDeleteBlock(id: string) {
     if (disabled || readOnly) return;
     const nextBlocks = currentBlocks.filter((b) => b.id !== id);
     updateBlocks(nextBlocks);
+    setActiveContextMenuBlockId(null);
+  }
+
+  /* ── Slash Menu Filtering & Selection ────────────────────────────────────── */
+
+  const filteredSlashCommands = SLASH_COMMANDS.filter(
+    (cmd) =>
+      cmd.label.toLowerCase().includes(slashQuery.toLowerCase()) ||
+      cmd.type.toLowerCase().includes(slashQuery.toLowerCase()),
+  );
+
+  function applySlashCommand(blockId: string, type: BlockType) {
+    const block = currentBlocks.find((b) => b.id === blockId);
+    if (!block) return;
+
+    // Strip slash command text from content
+    let cleanContent = block.content;
+    const slashIdx = cleanContent.indexOf('/');
+    if (slashIdx !== -1) {
+      cleanContent = cleanContent.substring(0, slashIdx);
+    }
+
+    handleUpdateBlock(blockId, { type, content: cleanContent });
+    setActiveSlashBlockId(null);
+    setSlashQuery('');
+    setSlashSelectedIndex(0);
+    focusBlock(blockId);
+  }
+
+  /* ── Input Event Handlers & Hotkeys ──────────────────────────────────────── */
+
+  function handleInputChange(id: string, newContent: string) {
+    handleUpdateBlock(id, { content: newContent });
+
+    // Check for Slash Command trigger
+    if (newContent.includes('/')) {
+      setActiveSlashBlockId(id);
+      const slashText = newContent.substring(newContent.lastIndexOf('/') + 1);
+      setSlashQuery(slashText);
+    } else if (activeSlashBlockId === id) {
+      setActiveSlashBlockId(null);
+      setSlashQuery('');
+    }
+  }
+
+  function handleKeyDown(e: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>, block: BlockItem, index: number) {
+    // Handling Slash Menu Keyboard Navigation
+    if (activeSlashBlockId === block.id && filteredSlashCommands.length > 0) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSlashSelectedIndex((prev) => (prev + 1) % filteredSlashCommands.length);
+        return;
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSlashSelectedIndex((prev) => (prev - 1 + filteredSlashCommands.length) % filteredSlashCommands.length);
+        return;
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const selectedCmd = filteredSlashCommands[slashSelectedIndex] || filteredSlashCommands[0];
+        if (selectedCmd) applySlashCommand(block.id, selectedCmd.type);
+        return;
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setActiveSlashBlockId(null);
+        return;
+      }
+    }
+
+    // Enter Key: Create New Block Below
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleAddBlock('paragraph', index);
+      return;
+    }
+
+    // Backspace Key on Empty Block: Delete and Focus Previous
+    if (e.key === 'Backspace' && block.content === '') {
+      e.preventDefault();
+      if (currentBlocks.length > 1) {
+        handleDeleteBlock(block.id);
+        const prevBlock = currentBlocks[index - 1] || currentBlocks[index + 1];
+        if (prevBlock) focusBlock(prevBlock.id);
+      }
+    }
   }
 
   const isInteractive = !disabled && !readOnly;
-
   const sizeCls = size === 'sm' ? 'sp-block-editor--sm' : size === 'lg' ? 'sp-block-editor--lg' : '';
+
   const rootCls = [
     'sp-block-editor',
     sizeCls,
@@ -208,151 +313,207 @@ export function BlockEditor({
         </label>
       )}
 
-      <div className="sp-block-editor__container">
+      <div className="sp-block-editor__canvas">
         {currentBlocks.length === 0 ? (
-          <div className="sp-block-editor__empty">
-            <p>No content blocks yet</p>
-            {isInteractive && (
-              <button
-                type="button"
-                className="sp-block-editor__add-btn"
-                onClick={() => handleAddBlock('paragraph')}
-              >
-                <Icon name="plus" size={14} />
-                Add First Block
-              </button>
-            )}
+          <div className="sp-block-editor__empty-hint" onClick={() => handleAddBlock('paragraph')}>
+            Click to start typing or enter '/' for commands...
           </div>
         ) : (
-          <div className="sp-block-editor__list">
-            {currentBlocks.map((block, index) => {
-              const inputCls = `sp-block-editor__input sp-block-editor__input--${block.type}`;
+          currentBlocks.map((block, index) => {
+            const inputCls = `sp-block-editor__input sp-block-editor__input--${block.type}`;
+            const isSlashActive = activeSlashBlockId === block.id;
 
-              return (
-                <div key={block.id} className="sp-block-editor__block">
-                  {/* Block Type Selector */}
-                  <div className="sp-block-editor__type-wrap">
-                    <Select
-                      options={BLOCK_TYPE_OPTIONS}
-                      value={block.type}
-                      onChange={(val) => {
-                        const selectedType = (Array.isArray(val) ? val[0] : val) as BlockType;
-                        handleUpdateBlock(block.id, { type: selectedType });
-                      }}
-                      disabled={!isInteractive}
-                      size="sm"
-                    />
-                  </div>
+            return (
+              <div key={block.id} className="sp-block-editor__line">
+                {/* Notion Side Handle (Grip + Add Button) */}
+                {isInteractive && (
+                  <div className="sp-block-editor__side-handle">
+                    <button
+                      type="button"
+                      className="sp-block-editor__handle-btn"
+                      onClick={() => handleAddBlock('paragraph', index)}
+                      title="Add Block Below"
+                      aria-label="Add Block Below"
+                    >
+                      <Icon name="plus" size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      className="sp-block-editor__handle-btn"
+                      onClick={() =>
+                        setActiveContextMenuBlockId(
+                          activeContextMenuBlockId === block.id ? null : block.id,
+                        )
+                      }
+                      title="Block Options"
+                      aria-label="Block Options"
+                    >
+                      <Icon name="grip-vertical" size={14} />
+                    </button>
 
-                  {/* Block Content Input */}
-                  <div className="sp-block-editor__content-wrap">
-                    {block.type === 'divider' ? (
-                      <div className="sp-block-editor__divider-line" />
-                    ) : block.type === 'callout' ? (
-                      <div
-                        className={`sp-block-editor__callout sp-block-editor__callout--${
-                          block.metadata?.calloutType || 'info'
-                        }`}
-                      >
-                        <Icon name="info" size={18} />
-                        <input
-                          type="text"
-                          className="sp-block-editor__input sp-block-editor__input--paragraph"
-                          value={block.content}
-                          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                            handleUpdateBlock(block.id, { content: e.target.value })
-                          }
-                          placeholder={placeholder}
-                          disabled={!isInteractive}
-                          aria-label="Callout content"
-                        />
+                    {/* Context Menu Popover */}
+                    {activeContextMenuBlockId === block.id && (
+                      <div className="sp-block-editor__context-menu">
+                        <button
+                          type="button"
+                          className="sp-block-editor__menu-btn"
+                          onClick={() => handleMoveBlock(index, -1)}
+                          disabled={index === 0}
+                        >
+                          <Icon name="arrow-up" size={14} /> Move Up
+                        </button>
+                        <button
+                          type="button"
+                          className="sp-block-editor__menu-btn"
+                          onClick={() => handleMoveBlock(index, 1)}
+                          disabled={index === currentBlocks.length - 1}
+                        >
+                          <Icon name="arrow-down" size={14} /> Move Down
+                        </button>
+                        <button
+                          type="button"
+                          className="sp-block-editor__menu-btn"
+                          onClick={() => handleDuplicateBlock(block.id)}
+                        >
+                          <Icon name="copy" size={14} /> Duplicate
+                        </button>
+                        <button
+                          type="button"
+                          className="sp-block-editor__menu-btn sp-block-editor__menu-btn--danger"
+                          onClick={() => handleDeleteBlock(block.id)}
+                        >
+                          <Icon name="trash" size={14} /> Delete
+                        </button>
                       </div>
-                    ) : block.type === 'code' ? (
-                      <textarea
-                        className={inputCls}
-                        rows={2}
-                        value={block.content}
-                        onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-                          handleUpdateBlock(block.id, { content: e.target.value })
-                        }
-                        placeholder="// Enter code snippet..."
-                        disabled={!isInteractive}
-                        aria-label="Code block content"
-                      />
-                    ) : (
+                    )}
+                  </div>
+                )}
+
+                {/* Content Node */}
+                <div className="sp-block-editor__node">
+                  {block.type === 'divider' ? (
+                    <div className="sp-block-editor__divider-bar" />
+                  ) : block.type === 'list' ? (
+                    <>
+                      <span className="sp-block-editor__list-bullet">•</span>
                       <input
+                        ref={(el) => { inputRefs.current[block.id] = el; }}
                         type="text"
                         className={inputCls}
                         value={block.content}
                         onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                          handleUpdateBlock(block.id, { content: e.target.value })
+                          handleInputChange(block.id, e.target.value)
                         }
+                        onKeyDown={(e) => handleKeyDown(e, block, index)}
                         placeholder={placeholder}
                         disabled={!isInteractive}
-                        aria-label="Block content"
                       />
-                    )}
-                  </div>
-
-                  {/* Block Actions Toolbar */}
-                  {isInteractive && (
-                    <div className="sp-block-editor__actions">
-                      <button
-                        type="button"
-                        className="sp-block-editor__action-btn"
-                        onClick={() => handleMoveBlock(index, -1)}
-                        disabled={index === 0}
-                        title="Move Up"
-                        aria-label="Move Block Up"
-                      >
-                        <Icon name="arrow-up" size={14} />
-                      </button>
-                      <button
-                        type="button"
-                        className="sp-block-editor__action-btn"
-                        onClick={() => handleMoveBlock(index, 1)}
-                        disabled={index === currentBlocks.length - 1}
-                        title="Move Down"
-                        aria-label="Move Block Down"
-                      >
-                        <Icon name="arrow-down" size={14} />
-                      </button>
-                      <button
-                        type="button"
-                        className="sp-block-editor__action-btn"
-                        onClick={() => handleDuplicateBlock(block.id)}
-                        title="Duplicate Block"
-                        aria-label="Duplicate Block"
-                      >
-                        <Icon name="copy" size={14} />
-                      </button>
-                      <button
-                        type="button"
-                        className="sp-block-editor__action-btn sp-block-editor__action-btn--danger"
-                        onClick={() => handleDeleteBlock(block.id)}
-                        title="Delete Block"
-                        aria-label="Delete Block"
-                      >
-                        <Icon name="trash" size={14} />
-                      </button>
+                    </>
+                  ) : block.type === 'list-ordered' ? (
+                    <>
+                      <span className="sp-block-editor__list-bullet">{index + 1}.</span>
+                      <input
+                        ref={(el) => { inputRefs.current[block.id] = el; }}
+                        type="text"
+                        className={inputCls}
+                        value={block.content}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                          handleInputChange(block.id, e.target.value)
+                        }
+                        onKeyDown={(e) => handleKeyDown(e, block, index)}
+                        placeholder={placeholder}
+                        disabled={!isInteractive}
+                      />
+                    </>
+                  ) : block.type === 'quote' ? (
+                    <div className="sp-block-editor__quote-wrap">
+                      <input
+                        ref={(el) => { inputRefs.current[block.id] = el; }}
+                        type="text"
+                        className={inputCls}
+                        value={block.content}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                          handleInputChange(block.id, e.target.value)
+                        }
+                        onKeyDown={(e) => handleKeyDown(e, block, index)}
+                        placeholder="Quote text..."
+                        disabled={!isInteractive}
+                      />
                     </div>
+                  ) : block.type === 'callout' ? (
+                    <div className="sp-block-editor__callout-card">
+                      <Icon name="info" size={18} className="sp-block-editor__callout-icon" />
+                      <input
+                        ref={(el) => { inputRefs.current[block.id] = el; }}
+                        type="text"
+                        className="sp-block-editor__input sp-block-editor__input--paragraph"
+                        value={block.content}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                          handleInputChange(block.id, e.target.value)
+                        }
+                        onKeyDown={(e) => handleKeyDown(e, block, index)}
+                        placeholder="Callout note..."
+                        disabled={!isInteractive}
+                      />
+                    </div>
+                  ) : block.type === 'code' ? (
+                    <div className="sp-block-editor__code-card">
+                      <textarea
+                        ref={(el) => { inputRefs.current[block.id] = el; }}
+                        className={inputCls}
+                        rows={2}
+                        value={block.content}
+                        onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
+                          handleInputChange(block.id, e.target.value)
+                        }
+                        onKeyDown={(e) => handleKeyDown(e, block, index)}
+                        placeholder="// Enter code snippet..."
+                        disabled={!isInteractive}
+                      />
+                    </div>
+                  ) : (
+                    <input
+                      ref={(el) => { inputRefs.current[block.id] = el; }}
+                      type="text"
+                      className={inputCls}
+                      value={block.content}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        handleInputChange(block.id, e.target.value)
+                      }
+                      onKeyDown={(e) => handleKeyDown(e, block, index)}
+                      placeholder={placeholder}
+                      disabled={!isInteractive}
+                    />
                   )}
                 </div>
-              );
-            })}
-          </div>
-        )}
 
-        {/* Add Block Footer Button */}
-        {isInteractive && currentBlocks.length > 0 && (
-          <button
-            type="button"
-            className="sp-block-editor__add-btn"
-            onClick={() => handleAddBlock('paragraph')}
-          >
-            <Icon name="plus" size={14} />
-            Add Block
-          </button>
+                {/* Notion Slash Command Menu Popover */}
+                {isSlashActive && filteredSlashCommands.length > 0 && (
+                  <div className="sp-block-editor__slash-menu">
+                    <div className="sp-block-editor__slash-title">Basic Blocks</div>
+                    {filteredSlashCommands.map((cmd, cmdIdx) => (
+                      <button
+                        key={cmd.type}
+                        type="button"
+                        className={`sp-block-editor__slash-item${
+                          cmdIdx === slashSelectedIndex ? ' sp-block-editor__slash-item--active' : ''
+                        }`}
+                        onClick={() => applySlashCommand(block.id, cmd.type)}
+                      >
+                        <div className="sp-block-editor__slash-icon">
+                          <Icon name={cmd.iconName} size={14} />
+                        </div>
+                        <div>
+                          <strong>{cmd.label}</strong>
+                          <span className="sp-block-editor__slash-desc">{cmd.desc}</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })
         )}
       </div>
 

@@ -5,7 +5,7 @@
  * The full license information can be found in LICENSE in the root directory of this project.
  */
 
-/* ─── Block Editor Root ─── */
+/* ─── Notion / TipTap Style Block Editor Root ─── */
 .sp-block-editor {
   display: flex;
   flex-direction: column;
@@ -25,261 +25,352 @@
   margin-left: 2px;
 }
 
-/* Container */
-.sp-block-editor__container {
+/* Document Canvas Container */
+.sp-block-editor__canvas {
   display: flex;
   flex-direction: column;
+  min-height: 240px;
   border: 1px solid var(--sp-border-strong, rgba(15, 23, 42, 0.14));
   border-radius: var(--sp-radius-xl, 12px);
   background: var(--sp-surface-0, #ffffff);
-  padding: var(--sp-space-4, 16px);
-  gap: var(--sp-space-3, 12px);
+  padding: var(--sp-space-6, 24px) var(--sp-space-8, 32px);
+  gap: var(--sp-space-1, 4px);
+  position: relative;
   transition:
     border-color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease),
     box-shadow var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
 }
 
-.sp-block-editor__container:focus-within {
+.sp-block-editor__canvas:focus-within {
   border-color: var(--sp-border-focus, #0f766e);
-  box-shadow: 0 0 0 3px var(--sp-focus-ring-color, rgba(15, 118, 110, 0.25));
+  box-shadow: 0 0 0 3px var(--sp-focus-ring-color, rgba(15, 118, 110, 0.2));
 }
 
 /* Disabled state */
-.sp-block-editor--disabled .sp-block-editor__container {
+.sp-block-editor--disabled .sp-block-editor__canvas {
   opacity: 0.6;
   background: var(--sp-surface-100, #e9eef5);
   cursor: not-allowed;
 }
 
 /* Readonly state */
-.sp-block-editor--readonly .sp-block-editor__container {
+.sp-block-editor--readonly .sp-block-editor__canvas {
   background: var(--sp-surface-25, #f4f7fb);
 }
 
 /* Error state */
-.sp-block-editor--error .sp-block-editor__container {
+.sp-block-editor--error .sp-block-editor__canvas {
   border-color: var(--sp-danger, #dc2626);
 }
 
-/* Empty State */
-.sp-block-editor__empty {
+/* Empty Canvas Hint */
+.sp-block-editor__empty-hint {
+  color: var(--sp-text-disabled, #94a3b8);
+  font-size: var(--sp-text-sm, 13px);
+  font-style: italic;
+  padding: var(--sp-space-4, 16px) 0;
+  text-align: center;
+}
+
+/* ─── Block Line Item ─── */
+.sp-block-editor__line {
   display: flex;
-  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+  padding: 2px 0;
+  border-radius: var(--sp-radius-md, 6px);
+  transition: background-color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-block-editor__line:hover {
+  background: var(--sp-content-hover-bg, rgba(15, 23, 42, 0.025));
+}
+
+/* Left Notion-style Side Controls (Grip + Plus) */
+.sp-block-editor__side-handle {
+  position: absolute;
+  left: -28px;
+  top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+  user-select: none;
+  z-index: 2;
+}
+
+.sp-block-editor__line:hover .sp-block-editor__side-handle,
+.sp-block-editor__line:focus-within .sp-block-editor__side-handle {
+  opacity: 1;
+}
+
+.sp-block-editor__handle-btn {
+  display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--sp-space-8, 32px) var(--sp-space-4, 16px);
-  border: 2px dashed var(--sp-border, rgba(15, 23, 42, 0.1));
-  border-radius: var(--sp-radius-lg, 8px);
-  color: var(--sp-text-muted, #64748b);
-  font-size: var(--sp-text-sm, 13px);
-  text-align: center;
-  gap: var(--sp-space-2, 8px);
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  color: var(--sp-text-subtle, #94a3b8);
+  border-radius: var(--sp-radius-sm, 4px);
+  cursor: pointer;
+  padding: 0;
+  transition: background-color var(--sp-duration-fast, 100ms), color var(--sp-duration-fast, 100ms);
 }
 
-/* Block List */
-.sp-block-editor__list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-space-2, 8px);
+.sp-block-editor__handle-btn:hover {
+  background: var(--sp-content-hover-bg, rgba(15, 23, 42, 0.08));
+  color: var(--sp-text-color, #0f172a);
 }
 
-/* ─── Individual Block Card ─── */
-.sp-block-editor__block {
+/* Block Content Node */
+.sp-block-editor__node {
+  flex: 1;
   display: flex;
   align-items: flex-start;
   gap: var(--sp-space-2, 8px);
-  padding: var(--sp-space-2_5, 10px) var(--sp-space-3, 12px);
-  border: 1px solid var(--sp-border, rgba(15, 23, 42, 0.08));
-  border-radius: var(--sp-radius-lg, 8px);
-  background: var(--sp-surface-0, #ffffff);
-  transition:
-    border-color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease),
-    box-shadow var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
-  position: relative;
-}
-
-.sp-block-editor__block:hover {
-  border-color: var(--sp-border-strong, rgba(15, 23, 42, 0.18));
-}
-
-.sp-block-editor__block--focused {
-  border-color: var(--sp-primary, #0f766e);
-}
-
-/* Block Type Selector dropdown wrapper */
-.sp-block-editor__type-wrap {
-  flex-shrink: 0;
-  width: 120px;
-}
-
-/* Block Content Input Container */
-.sp-block-editor__content-wrap {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
   min-width: 0;
 }
 
-/* Inputs for different block types */
+/* Content Editable Input Elements */
 .sp-block-editor__input {
   width: 100%;
   border: none;
-  background: transparent;
   outline: none;
+  background: transparent;
   font-family: inherit;
   color: var(--sp-text-color, #0f172a);
-  resize: vertical;
+  resize: none;
+  padding: 4px 0;
+  line-height: var(--sp-leading-relaxed, 1.6);
+  margin: 0;
 }
 
+.sp-block-editor__input::placeholder {
+  color: var(--sp-text-disabled, #cbd5e1);
+}
+
+/* Block Type Variants */
 .sp-block-editor__input--h1 {
-  font-size: var(--sp-text-2xl, 24px);
+  font-size: var(--sp-text-2xl, 26px);
   font-weight: 700;
+  line-height: 1.3;
+  margin-top: 10px;
+  margin-bottom: 2px;
 }
 
 .sp-block-editor__input--h2 {
-  font-size: var(--sp-text-xl, 20px);
+  font-size: var(--sp-text-xl, 21px);
   font-weight: 600;
+  line-height: 1.35;
+  margin-top: 8px;
+  margin-bottom: 2px;
 }
 
 .sp-block-editor__input--h3 {
-  font-size: var(--sp-text-lg, 18px);
+  font-size: var(--sp-text-lg, 17px);
   font-weight: 600;
+  line-height: 1.4;
+  margin-top: 6px;
+  margin-bottom: 2px;
 }
 
 .sp-block-editor__input--paragraph {
   font-size: var(--sp-text-base, 14px);
-  line-height: var(--sp-leading-relaxed, 1.6);
 }
 
 .sp-block-editor__input--quote {
   font-size: var(--sp-text-base, 14px);
   font-style: italic;
+  color: var(--sp-text-muted, #475569);
+}
+
+/* Quote container */
+.sp-block-editor__quote-wrap {
+  width: 100%;
   border-left: 3px solid var(--sp-primary, #0f766e);
   padding-left: var(--sp-space-3, 12px);
+  margin: 4px 0;
+}
+
+/* List Item prefix */
+.sp-block-editor__list-bullet {
+  flex-shrink: 0;
+  font-weight: 600;
+  color: var(--sp-primary, #0f766e);
+  user-select: none;
+  padding-top: 4px;
+  font-size: 14px;
+}
+
+/* Callout Box */
+.sp-block-editor__callout-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-space-2_5, 10px);
+  width: 100%;
+  padding: var(--sp-space-3, 12px) var(--sp-space-4, 16px);
+  border-radius: var(--sp-radius-lg, 8px);
+  background: var(--sp-info-surface, #f0f9ff);
+  border-left: 4px solid var(--sp-info, #0284c7);
+  margin: 4px 0;
+}
+
+.sp-block-editor__callout-icon {
+  flex-shrink: 0;
+  color: var(--sp-info, #0284c7);
+  margin-top: 2px;
+}
+
+/* Code Block Box */
+.sp-block-editor__code-card {
+  width: 100%;
+  background: var(--sp-surface-900, #0f172a);
+  border-radius: var(--sp-radius-lg, 8px);
+  padding: var(--sp-space-3, 12px) var(--sp-space-4, 16px);
+  margin: 6px 0;
 }
 
 .sp-block-editor__input--code {
   font-family: var(--sp-font-mono, monospace);
   font-size: var(--sp-text-xs, 12px);
-  background: var(--sp-surface-900, #0f172a);
   color: var(--sp-text-inverse, #f8fafc);
-  padding: var(--sp-space-2_5, 10px) var(--sp-space-3, 12px);
-  border-radius: var(--sp-radius-md, 6px);
 }
 
-/* Callout block container */
-.sp-block-editor__callout {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--sp-space-2_5, 10px);
-  padding: var(--sp-space-2_5, 10px) var(--sp-space-3, 12px);
-  border-radius: var(--sp-radius-md, 6px);
-  background: var(--sp-surface-50, #f8f9fb);
-  border-left: 4px solid var(--sp-info, #0284c7);
-}
-
-.sp-block-editor__callout--info {
-  background: var(--sp-info-surface, #f0f9ff);
-  border-left-color: var(--sp-info, #0284c7);
-}
-
-.sp-block-editor__callout--warning {
-  background: var(--sp-warning-surface, #fffbe6);
-  border-left-color: var(--sp-warning, #d97706);
-}
-
-.sp-block-editor__callout--danger {
-  background: var(--sp-danger-surface, #fef2f2);
-  border-left-color: var(--sp-danger, #dc2626);
-}
-
-.sp-block-editor__callout--success {
-  background: var(--sp-success-surface, #f0fdf4);
-  border-left-color: var(--sp-success, #16a34a);
-}
-
-/* Divider Block */
-.sp-block-editor__divider-line {
+/* Divider Line */
+.sp-block-editor__divider-bar {
   width: 100%;
   height: 1px;
   background: var(--sp-border-strong, rgba(15, 23, 42, 0.14));
-  margin: var(--sp-space-2, 8px) 0;
+  margin: 12px 0;
 }
 
-/* Block Actions Toolbar */
-.sp-block-editor__actions {
+/* ─── Notion Slash Command Menu Popover ─── */
+.sp-block-editor__slash-menu {
+  position: absolute;
+  z-index: 1000;
+  width: 240px;
+  max-height: 280px;
+  overflow-y: auto;
+  background: var(--sp-surface-0, #ffffff);
+  border: 1px solid var(--sp-border-strong, rgba(15, 23, 42, 0.14));
+  border-radius: var(--sp-radius-xl, 12px);
+  box-shadow: var(--sp-shadow-lg, 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.06));
+  padding: var(--sp-space-1_5, 6px);
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 2px;
-  flex-shrink: 0;
-  opacity: 0.4;
-  transition: opacity var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
 }
 
-.sp-block-editor__block:hover .sp-block-editor__actions,
-.sp-block-editor__block:focus-within .sp-block-editor__actions {
-  opacity: 1;
+.sp-block-editor__slash-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--sp-text-subtle, #94a3b8);
+  padding: 4px 8px;
 }
 
-.sp-block-editor__action-btn {
+.sp-block-editor__slash-item {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
+  gap: var(--sp-space-2_5, 10px);
+  padding: var(--sp-space-2, 8px) var(--sp-space-2_5, 10px);
   border-radius: var(--sp-radius-md, 6px);
   border: none;
   background: transparent;
-  color: var(--sp-text-subtle, #64748b);
-  cursor: pointer;
-  outline: none;
-  transition:
-    background-color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease),
-    color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
-}
-
-.sp-block-editor__action-btn:hover:not(:disabled) {
-  background: var(--sp-content-hover-bg, rgba(15, 23, 42, 0.06));
   color: var(--sp-text-color, #0f172a);
+  font-size: var(--sp-text-xs, 12px);
+  font-weight: var(--sp-font-medium, 500);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background-color var(--sp-duration-fast, 100ms);
 }
 
-.sp-block-editor__action-btn--danger:hover:not(:disabled) {
-  background: var(--sp-danger-surface, #fef2f2);
+.sp-block-editor__slash-item:hover,
+.sp-block-editor__slash-item--active {
+  background: var(--sp-content-hover-bg, rgba(15, 23, 42, 0.06));
+  color: var(--sp-primary, #0f766e);
+}
+
+.sp-block-editor__slash-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--sp-radius-sm, 4px);
+  background: var(--sp-surface-100, #e9eef5);
+  color: var(--sp-text-subtle, #64748b);
+  flex-shrink: 0;
+}
+
+.sp-block-editor__slash-item:hover .sp-block-editor__slash-icon,
+.sp-block-editor__slash-item--active .sp-block-editor__slash-icon {
+  background: var(--sp-primary-surface, #e6f4f2);
+  color: var(--sp-primary, #0f766e);
+}
+
+.sp-block-editor__slash-desc {
+  font-size: 11px;
+  color: var(--sp-text-subtle, #94a3b8);
+  display: block;
+}
+
+/* ─── Context Options Menu Popover (Grip Click) ─── */
+.sp-block-editor__context-menu {
+  position: absolute;
+  z-index: 1000;
+  left: -28px;
+  top: 28px;
+  width: 170px;
+  background: var(--sp-surface-0, #ffffff);
+  border: 1px solid var(--sp-border-strong, rgba(15, 23, 42, 0.14));
+  border-radius: var(--sp-radius-lg, 8px);
+  box-shadow: var(--sp-shadow-md, 0 4px 12px rgba(0, 0, 0, 0.08));
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sp-block-editor__menu-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-space-2, 8px);
+  padding: 6px 10px;
+  font-size: var(--sp-text-xs, 12px);
+  border: none;
+  background: transparent;
+  color: var(--sp-text-color, #0f172a);
+  border-radius: var(--sp-radius-md, 6px);
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+.sp-block-editor__menu-btn:hover {
+  background: var(--sp-content-hover-bg, rgba(15, 23, 42, 0.06));
+}
+
+.sp-block-editor__menu-btn--danger {
   color: var(--sp-danger, #dc2626);
 }
 
-/* Add Block Footer Button */
-.sp-block-editor__add-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--sp-space-1_5, 6px);
-  padding: var(--sp-space-2, 8px) var(--sp-space-4, 16px);
-  font-size: var(--sp-text-xs, 12px);
-  font-weight: var(--sp-font-medium, 500);
-  color: var(--sp-primary, #0f766e);
-  background: var(--sp-surface-50, #f8f9fb);
-  border: 1px dashed var(--sp-primary, #0f766e);
-  border-radius: var(--sp-radius-lg, 8px);
-  cursor: pointer;
-  outline: none;
-  transition:
-    background-color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease),
-    box-shadow var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
-  align-self: flex-start;
-}
-
-.sp-block-editor__add-btn:hover:not(:disabled) {
-  background: var(--sp-surface-100, #e9eef5);
+.sp-block-editor__menu-btn--danger:hover {
+  background: var(--sp-danger-surface, #fef2f2);
 }
 
 /* ─── Size Variants ─── */
-.sp-block-editor--sm .sp-block-editor__container {
-  padding: var(--sp-space-2_5, 10px);
+.sp-block-editor--sm .sp-block-editor__canvas {
+  padding: var(--sp-space-4, 16px) var(--sp-space-6, 24px);
 }
 
-.sp-block-editor--lg .sp-block-editor__container {
-  padding: var(--sp-space-5, 20px);
+.sp-block-editor--lg .sp-block-editor__canvas {
+  padding: var(--sp-space-8, 32px) var(--sp-space-10, 40px);
 }
 
 /* ─── Error & Hint Messages ─── */
