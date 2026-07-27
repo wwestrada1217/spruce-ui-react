@@ -29,7 +29,9 @@ export type BlockType =
   | 'list'
   | 'list-ordered'
   | 'code'
-  | 'divider';
+  | 'divider'
+  | 'image'
+  | 'table';
 
 export interface BlockItem {
   id: string;
@@ -38,6 +40,8 @@ export interface BlockItem {
   metadata?: {
     calloutType?: 'info' | 'warning' | 'success' | 'danger';
     language?: string;
+    imageWidth?: number; // 25, 50, 75, 100
+    tableData?: string[][];
   };
 }
 
@@ -83,6 +87,13 @@ const CODE_LANGUAGES: SelectOption[] = [
   { label: 'Plain Text', value: 'plaintext' },
 ];
 
+const CALLOUT_VARIANTS: SelectOption[] = [
+  { label: 'Information', value: 'info' },
+  { label: 'Warning',     value: 'warning' },
+  { label: 'Danger',      value: 'danger' },
+  { label: 'Success',     value: 'success' },
+];
+
 interface SlashCommandOption {
   type: BlockType;
   label: string;
@@ -99,7 +110,9 @@ const SLASH_COMMANDS: SlashCommandOption[] = [
   { type: 'list-ordered', label: 'Numbered List',  desc: 'Create a numbered list.',            iconName: 'list-ordered' },
   { type: 'quote',        label: 'Quote',          desc: 'Capture a quote or highlight text.', iconName: 'quote' },
   { type: 'callout',      label: 'Callout',        desc: 'Make text stand out with a box.',    iconName: 'info' },
-  { type: 'code',         label: 'Code Block',     desc: 'Capture code snippet with autogrow.',iconName: 'code' },
+  { type: 'code',         label: 'Code Block',     desc: 'Capture code with syntax highlighting.', iconName: 'code' },
+  { type: 'image',        label: 'Image',          desc: 'Insert an image with resizable width.', iconName: 'image' },
+  { type: 'table',        label: 'Table',          desc: 'Add interactive table with rows & cols.', iconName: 'table' },
   { type: 'divider',      label: 'Divider',        desc: 'Visually divide blocks with a line.',iconName: 'minus' },
 ];
 
@@ -107,11 +120,52 @@ function generateId(): string {
   return `block_${Math.random().toString(36).substring(2, 9)}_${Date.now()}`;
 }
 
+/* ── (3) Zero-Dependency Syntax Highlighting Helper ─────────────────────── */
+
+function highlightCode(code: string): string {
+  if (!code) return ' ';
+
+  let html = code
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  // Strings
+  html = html.replace(/(["'`])(.*?)\1/g, '<span class="sp-token-string">$1$2$1</span>');
+
+  // Comments
+  html = html.replace(/(\/\/.*$)/gm, '<span class="sp-token-comment">$1</span>');
+
+  // Keywords
+  const keywords = /\b(const|let|var|function|return|import|export|from|if|else|for|while|type|interface|class|def|async|await|default|case|switch|try|catch|new|select|where|from)\b/g;
+  html = html.replace(keywords, '<span class="sp-token-keyword">$1</span>');
+
+  // Numbers
+  html = html.replace(/\b(\d+)\b/g, '<span class="sp-token-number">$1</span>');
+
+  // Function calls: foo(...)
+  html = html.replace(/\b([a-zA-Z_$][a-zA-Z0-9_$]*)(?=\()/g, '<span class="sp-token-function">$1</span>');
+
+  return html;
+}
+
 const NOTION_DEFAULT_BLOCKS: BlockItem[] = [
   { id: generateId(), type: 'h1',        content: 'Notion & TipTap Style Block Editor' },
   { id: generateId(), type: 'paragraph', content: 'Type "/" anywhere to open the Notion slash command menu.' },
   { id: generateId(), type: 'callout',   content: 'Pro tip: Press Enter to create a new block, or Backspace on an empty block to delete it.', metadata: { calloutType: 'info' } },
   { id: generateId(), type: 'code',      content: 'function helloWorld() {\n  console.log("Hello from Spruce Block Editor!");\n}', metadata: { language: 'typescript' } },
+  {
+    id: generateId(),
+    type: 'table',
+    content: '',
+    metadata: {
+      tableData: [
+        ['Component', 'Feature', 'Status'],
+        ['BlockEditor', 'Notion Slash Menu', 'Ready'],
+        ['BlockEditor', 'Syntax Highlighting', 'Ready'],
+      ],
+    },
+  },
 ];
 
 /* ── Component ───────────────────────────────────────────────────────────── */
@@ -206,7 +260,7 @@ export function BlockEditor({
         const el = inputRefs.current[block.id];
         if (el) {
           el.style.height = 'auto';
-          el.style.height = `${Math.max(52, el.scrollHeight)}px`;
+          el.style.height = `${Math.max(60, el.scrollHeight)}px`;
         }
       }
     });
@@ -214,7 +268,7 @@ export function BlockEditor({
 
   function adjustTextareaHeight(target: HTMLTextAreaElement) {
     target.style.height = 'auto';
-    target.style.height = `${Math.max(52, target.scrollHeight)}px`;
+    target.style.height = `${Math.max(60, target.scrollHeight)}px`;
   }
 
   function handleAddBlock(type: BlockType = 'paragraph', index?: number) {
@@ -225,6 +279,17 @@ export function BlockEditor({
       content: '',
       ...(type === 'callout' ? { metadata: { calloutType: 'info' } } : {}),
       ...(type === 'code' ? { metadata: { language: 'typescript' } } : {}),
+      ...(type === 'image' ? { metadata: { imageWidth: 100 } } : {}),
+      ...(type === 'table'
+        ? {
+            metadata: {
+              tableData: [
+                ['Header 1', 'Header 2'],
+                ['Row 1', 'Row 2'],
+              ],
+            },
+          }
+        : {}),
     };
 
     const targetIndex = index !== undefined ? index + 1 : currentBlocks.length;
@@ -261,7 +326,7 @@ export function BlockEditor({
     const clonedBlock: BlockItem = {
       ...target,
       id: generateId(),
-      metadata: target.metadata ? { ...target.metadata } : undefined,
+      metadata: target.metadata ? JSON.parse(JSON.stringify(target.metadata)) : undefined,
     };
 
     const nextBlocks = [...currentBlocks];
@@ -284,6 +349,65 @@ export function BlockEditor({
       setCopiedCodeId(blockId);
       setTimeout(() => setCopiedCodeId(null), 2000);
     }
+  }
+
+  /* ── (6) Interactive Table Block Actions ────────────────────────────────── */
+
+  function handleTableAddRow(blockId: string) {
+    const block = currentBlocks.find((b) => b.id === blockId);
+    if (!block || !block.metadata?.tableData) return;
+    const grid = block.metadata.tableData;
+    const colCount = grid[0]?.length || 2;
+    const newRow = Array(colCount).fill('Cell');
+    handleUpdateBlock(blockId, {
+      metadata: { ...block.metadata, tableData: [...grid, newRow] },
+    });
+  }
+
+  function handleTableRemoveRow(blockId: string) {
+    const block = currentBlocks.find((b) => b.id === blockId);
+    if (!block || !block.metadata?.tableData || block.metadata.tableData.length <= 1) return;
+    const grid = [...block.metadata.tableData];
+    grid.pop();
+    handleUpdateBlock(blockId, {
+      metadata: { ...block.metadata, tableData: grid },
+    });
+  }
+
+  function handleTableAddCol(blockId: string) {
+    const block = currentBlocks.find((b) => b.id === blockId);
+    if (!block || !block.metadata?.tableData) return;
+    const grid = block.metadata.tableData.map((row, idx) => [
+      ...row,
+      idx === 0 ? `Header ${row.length + 1}` : 'Cell',
+    ]);
+    handleUpdateBlock(blockId, {
+      metadata: { ...block.metadata, tableData: grid },
+    });
+  }
+
+  function handleTableRemoveCol(blockId: string) {
+    const block = currentBlocks.find((b) => b.id === blockId);
+    if (!block || !block.metadata?.tableData || (block.metadata.tableData[0]?.length || 0) <= 1) return;
+    const grid = block.metadata.tableData.map((row) => {
+      const nextRow = [...row];
+      nextRow.pop();
+      return nextRow;
+    });
+    handleUpdateBlock(blockId, {
+      metadata: { ...block.metadata, tableData: grid },
+    });
+  }
+
+  function handleTableCellChange(blockId: string, rowIndex: number, colIndex: number, value: string) {
+    const block = currentBlocks.find((b) => b.id === blockId);
+    if (!block || !block.metadata?.tableData) return;
+    const grid = block.metadata.tableData.map((row, rIdx) =>
+      row.map((cell, cIdx) => (rIdx === rowIndex && cIdx === colIndex ? value : cell)),
+    );
+    handleUpdateBlock(blockId, {
+      metadata: { ...block.metadata, tableData: grid },
+    });
   }
 
   /* ── Slash Menu Filtering & Smart Positioning ────────────────────────────── */
@@ -328,6 +452,18 @@ export function BlockEditor({
       type,
       content: cleanContent,
       ...(type === 'code' ? { metadata: { language: 'typescript' } } : {}),
+      ...(type === 'callout' ? { metadata: { calloutType: 'info' } } : {}),
+      ...(type === 'image' ? { metadata: { imageWidth: 100 } } : {}),
+      ...(type === 'table'
+        ? {
+            metadata: {
+              tableData: [
+                ['Header 1', 'Header 2'],
+                ['Row 1', 'Row 2'],
+              ],
+            },
+          }
+        : {}),
     });
 
     setActiveSlashBlockId(null);
@@ -386,7 +522,7 @@ export function BlockEditor({
           e.preventDefault();
           handleAddBlock('paragraph', index);
         }
-        return; // Allow standard newline in code block textarea
+        return;
       }
 
       if (!e.shiftKey) {
@@ -395,10 +531,8 @@ export function BlockEditor({
         // Bulleted and Numbered list continuation
         if (block.type === 'list' || block.type === 'list-ordered') {
           if (block.content.trim() === '') {
-            // Convert empty list item to paragraph (exit list)
             handleUpdateBlock(block.id, { type: 'paragraph' });
           } else {
-            // Continue list creation of same list type
             handleAddBlock(block.type, index);
           }
           return;
@@ -468,7 +602,7 @@ export function BlockEditor({
 
             return (
               <div key={block.id} className="sp-block-editor__line">
-                {/* Notion Side Handle (Grip + Add Button) in clear left gutter */}
+                {/* Notion Side Handle in clear left gutter */}
                 {isInteractive && (
                   <div className="sp-block-editor__side-handle">
                     <button
@@ -549,23 +683,47 @@ export function BlockEditor({
                       />
                     </div>
                   ) : block.type === 'callout' ? (
-                    <div className="sp-block-editor__callout-card">
-                      <Icon name="info" size={18} className="sp-block-editor__callout-icon" />
-                      <input
-                        ref={(el) => { inputRefs.current[block.id] = el; }}
-                        type="text"
-                        className="sp-block-editor__input sp-block-editor__input--paragraph"
-                        value={block.content}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                          handleInputChange(block.id, e.target.value)
-                        }
-                        onKeyDown={(e) => handleKeyDown(e, block, index)}
-                        placeholder="Callout note..."
-                        disabled={!isInteractive}
-                      />
+                    /* (1) Callout with Variant Selector and straight accent line */
+                    <div
+                      className={`sp-block-editor__callout-card sp-block-editor__callout-card--${
+                        block.metadata?.calloutType || 'info'
+                      }`}
+                    >
+                      <div className="sp-block-editor__callout-header">
+                        <div className="sp-block-editor__callout-main">
+                          <Icon name="info" size={18} className="sp-block-editor__callout-icon" />
+                          <input
+                            ref={(el) => { inputRefs.current[block.id] = el; }}
+                            type="text"
+                            className="sp-block-editor__input sp-block-editor__input--paragraph"
+                            value={block.content}
+                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                              handleInputChange(block.id, e.target.value)
+                            }
+                            onKeyDown={(e) => handleKeyDown(e, block, index)}
+                            placeholder="Callout note..."
+                            disabled={!isInteractive}
+                          />
+                        </div>
+                        {isInteractive && (
+                          <div style={{ width: 110 }}>
+                            <Select
+                              options={CALLOUT_VARIANTS}
+                              value={block.metadata?.calloutType || 'info'}
+                              onChange={(val) => {
+                                const selectedVal = (Array.isArray(val) ? val[0] : val) as 'info' | 'warning' | 'danger' | 'success';
+                                handleUpdateBlock(block.id, {
+                                  metadata: { ...block.metadata, calloutType: selectedVal },
+                                });
+                              }}
+                              size="sm"
+                            />
+                          </div>
+                        )}
+                      </div>
                     </div>
                   ) : block.type === 'code' ? (
-                    /* (2) Code Block with Header, Language Selector & Autogrow Textarea */
+                    /* (2 & 3) Theme-Aware Code Block with Real-Time Syntax Highlighting */
                     <div className="sp-block-editor__code-card">
                       <div className="sp-block-editor__code-header">
                         <div className="sp-block-editor__code-lang-wrap">
@@ -592,9 +750,13 @@ export function BlockEditor({
                         </button>
                       </div>
                       <div className="sp-block-editor__code-body">
+                        <pre
+                          className="sp-block-editor__code-highlight"
+                          dangerouslySetInnerHTML={{ __html: highlightCode(block.content) }}
+                        />
                         <textarea
                           ref={(el) => { inputRefs.current[block.id] = el; }}
-                          className={inputCls}
+                          className="sp-block-editor__code-textarea"
                           value={block.content}
                           onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
                             adjustTextareaHeight(e.target);
@@ -605,6 +767,141 @@ export function BlockEditor({
                           disabled={!isInteractive}
                         />
                       </div>
+                    </div>
+                  ) : block.type === 'image' ? (
+                    /* (5) Resizable Image Block */
+                    <div className="sp-block-editor__image-card">
+                      {block.content ? (
+                        <div
+                          className="sp-block-editor__image-wrap"
+                          style={{ width: `${block.metadata?.imageWidth || 100}%` }}
+                        >
+                          <img
+                            src={block.content}
+                            alt="Block image preview"
+                            className="sp-block-editor__image-img"
+                          />
+                        </div>
+                      ) : null}
+                      <input
+                        ref={(el) => { inputRefs.current[block.id] = el; }}
+                        type="text"
+                        className="sp-block-editor__input sp-block-editor__input--paragraph"
+                        value={block.content}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                          handleInputChange(block.id, e.target.value)
+                        }
+                        onKeyDown={(e) => handleKeyDown(e, block, index)}
+                        placeholder="Enter image URL (e.g. https://images.unsplash.com/...)"
+                        disabled={!isInteractive}
+                      />
+                      {isInteractive && block.content && (
+                        <div className="sp-block-editor__image-toolbar">
+                          <span style={{ fontSize: 11, color: 'var(--sp-text-subtle)' }}>Width:</span>
+                          {[25, 50, 75, 100].map((w) => (
+                            <button
+                              key={w}
+                              type="button"
+                              className={`sp-block-editor__image-size-btn${
+                                (block.metadata?.imageWidth || 100) === w
+                                  ? ' sp-block-editor__image-size-btn--active'
+                                  : ''
+                              }`}
+                              onClick={() =>
+                                handleUpdateBlock(block.id, {
+                                  metadata: { ...block.metadata, imageWidth: w },
+                                })
+                              }
+                            >
+                              {w}%
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ) : block.type === 'table' ? (
+                    /* (6) Interactive Table Block with Add/Remove Rows and Columns */
+                    <div className="sp-block-editor__table-card">
+                      <table className="sp-block-editor__table">
+                        <thead>
+                          <tr>
+                            {(block.metadata?.tableData?.[0] || ['Header 1', 'Header 2']).map(
+                              (cell, colIdx) => (
+                                <th key={colIdx}>
+                                  <input
+                                    type="text"
+                                    className="sp-block-editor__table-cell"
+                                    value={cell}
+                                    onChange={(e) =>
+                                      handleTableCellChange(block.id, 0, colIdx, e.target.value)
+                                    }
+                                    disabled={!isInteractive}
+                                  />
+                                </th>
+                              ),
+                            )}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(block.metadata?.tableData?.slice(1) || [['Cell 1', 'Cell 2']]).map(
+                            (row, rIdx) => (
+                              <tr key={rIdx + 1}>
+                                {row.map((cell, colIdx) => (
+                                  <td key={colIdx}>
+                                    <input
+                                      type="text"
+                                      className="sp-block-editor__table-cell"
+                                      value={cell}
+                                      onChange={(e) =>
+                                        handleTableCellChange(
+                                          block.id,
+                                          rIdx + 1,
+                                          colIdx,
+                                          e.target.value,
+                                        )
+                                      }
+                                      disabled={!isInteractive}
+                                    />
+                                  </td>
+                                ))}
+                              </tr>
+                            ),
+                          )}
+                        </tbody>
+                      </table>
+
+                      {isInteractive && (
+                        <div className="sp-block-editor__table-toolbar">
+                          <button
+                            type="button"
+                            className="sp-block-editor__table-btn"
+                            onClick={() => handleTableAddRow(block.id)}
+                          >
+                            <Icon name="plus" size={12} /> Row
+                          </button>
+                          <button
+                            type="button"
+                            className="sp-block-editor__table-btn"
+                            onClick={() => handleTableRemoveRow(block.id)}
+                          >
+                            <Icon name="minus" size={12} /> Row
+                          </button>
+                          <button
+                            type="button"
+                            className="sp-block-editor__table-btn"
+                            onClick={() => handleTableAddCol(block.id)}
+                          >
+                            <Icon name="plus" size={12} /> Column
+                          </button>
+                          <button
+                            type="button"
+                            className="sp-block-editor__table-btn"
+                            onClick={() => handleTableRemoveCol(block.id)}
+                          >
+                            <Icon name="minus" size={12} /> Column
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <input
@@ -627,7 +924,7 @@ export function BlockEditor({
         )}
       </div>
 
-      {/* (1) Smart Positioned Portal: Slash Command Menu Popover with Click-Outside Dismissal */}
+      {/* Smart Positioned Portal: Slash Command Menu Popover with Click-Outside Dismissal */}
       {activeSlashBlockId && filteredSlashCommands.length > 0 && typeof document !== 'undefined' &&
         createPortal(
           <div
@@ -658,7 +955,7 @@ export function BlockEditor({
           document.body,
         )}
 
-      {/* (1) Smart Positioned Portal: Context Menu Popover with Click-Outside Dismissal */}
+      {/* Smart Positioned Portal: Context Menu Popover with Click-Outside Dismissal */}
       {activeContextMenuBlockId && typeof document !== 'undefined' &&
         createPortal(
           <div

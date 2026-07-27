@@ -79,11 +79,7 @@
   position: relative;
   padding: 2px 0;
   border-radius: var(--sp-radius-md, 6px);
-  transition: background-color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
-}
-
-.sp-block-editor__line:hover {
-  background: var(--sp-content-hover-bg, rgba(15, 23, 42, 0.025));
+  /* (4) Removed background color on hover */
 }
 
 /* Left Notion-style Side Controls (Grip + Plus) - Positioned neatly in left gutter */
@@ -205,11 +201,11 @@
   font-size: 14px;
 }
 
-/* Callout Box - Straight vertical left accent stripe via ::before pseudo-element */
+/* (1) Callout Box - Straight vertical left accent stripe via ::before pseudo-element without curved caps */
 .sp-block-editor__callout-card {
   display: flex;
-  align-items: flex-start;
-  gap: var(--sp-space-2_5, 10px);
+  flex-direction: column;
+  gap: var(--sp-space-2, 8px);
   width: 100%;
   padding: var(--sp-space-3, 12px) var(--sp-space-4, 16px) var(--sp-space-3, 12px) var(--sp-space-5, 20px);
   border-radius: var(--sp-radius-lg, 8px);
@@ -226,51 +222,79 @@
   bottom: 0;
   left: 0;
   width: 4px;
-  background: var(--sp-info, #0284c7);
+  border-radius: 0 !important;
 }
 
+.sp-block-editor__callout-card--info {
+  background: var(--sp-info-surface, #f0f9ff);
+}
 .sp-block-editor__callout-card--info::before {
   background: var(--sp-info, #0284c7);
 }
 
+.sp-block-editor__callout-card--warning {
+  background: var(--sp-warning-surface, #fffbe6);
+}
 .sp-block-editor__callout-card--warning::before {
   background: var(--sp-warning, #d97706);
 }
 
+.sp-block-editor__callout-card--danger {
+  background: var(--sp-danger-surface, #fef2f2);
+}
 .sp-block-editor__callout-card--danger::before {
   background: var(--sp-danger, #dc2626);
 }
 
+.sp-block-editor__callout-card--success {
+  background: var(--sp-success-surface, #f0fdf4);
+}
 .sp-block-editor__callout-card--success::before {
   background: var(--sp-success, #16a34a);
 }
 
-.sp-block-editor__callout-icon {
-  flex-shrink: 0;
-  color: var(--sp-info, #0284c7);
-  margin-top: 2px;
+.sp-block-editor__callout-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
-/* Code Block Card with Header & Autogrowing Editor */
+.sp-block-editor__callout-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.sp-block-editor__callout-icon {
+  flex-shrink: 0;
+}
+
+.sp-block-editor__callout-card--info .sp-block-editor__callout-icon { color: var(--sp-info, #0284c7); }
+.sp-block-editor__callout-card--warning .sp-block-editor__callout-icon { color: var(--sp-warning, #d97706); }
+.sp-block-editor__callout-card--danger .sp-block-editor__callout-icon { color: var(--sp-danger, #dc2626); }
+.sp-block-editor__callout-card--success .sp-block-editor__callout-icon { color: var(--sp-success, #16a34a); }
+
+/* (2 & 3) Theme-Aware Code Block with Syntax Highlighting Overlay */
 .sp-block-editor__code-card {
   width: 100%;
-  background: var(--sp-surface-900, #0f172a);
+  background: var(--sp-surface-100, #f1f5f9);
+  border: 1px solid var(--sp-border, rgba(15, 23, 42, 0.1));
   border-radius: var(--sp-radius-lg, 8px);
   overflow: hidden;
   margin: 6px 0;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-/* Code Block Header (Language Selector + Copy Action) */
 .sp-block-editor__code-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: var(--sp-space-1_5, 6px) var(--sp-space-3, 12px);
-  background: rgba(255, 255, 255, 0.06);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--sp-surface-200, #e2e8f0);
+  border-bottom: 1px solid var(--sp-border, rgba(15, 23, 42, 0.08));
   user-select: none;
 }
 
@@ -284,7 +308,7 @@
   gap: 4px;
   font-size: 11px;
   font-weight: 500;
-  color: var(--sp-text-subtle, #94a3b8);
+  color: var(--sp-text-subtle, #64748b);
   background: transparent;
   border: none;
   cursor: pointer;
@@ -294,39 +318,172 @@
 }
 
 .sp-block-editor__code-copy-btn:hover {
-  color: #f8fafc;
-  background: rgba(255, 255, 255, 0.1);
+  color: var(--sp-text-color, #0f172a);
+  background: var(--sp-content-hover-bg, rgba(15, 23, 42, 0.06));
 }
 
-/* Code Editor Area (Autogrowing Textarea) */
+/* Dual-Layer Code Editor Container for Real-time Syntax Highlighting */
 .sp-block-editor__code-body {
-  padding: var(--sp-space-3, 12px) var(--sp-space-4, 16px);
   position: relative;
-  display: flex;
-  flex-direction: column;
-}
-
-.sp-block-editor__input--code {
+  width: 100%;
+  min-height: 60px;
+  padding: var(--sp-space-3, 12px) var(--sp-space-4, 16px);
   font-family: var(--sp-font-mono, monospace);
   font-size: var(--sp-text-xs, 12px);
   line-height: 1.6;
-  color: var(--sp-text-inverse, #f8fafc);
-  white-space: pre;
-  overflow: hidden;
-  resize: none;
-  min-height: 52px;
-  background: transparent;
+}
+
+.sp-block-editor__code-highlight,
+.sp-block-editor__code-textarea {
+  font-family: var(--sp-font-mono, monospace);
+  font-size: var(--sp-text-xs, 12px);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+  padding: 0;
   border: none;
   outline: none;
   width: 100%;
 }
 
-/* Syntax Highlighting Tokens */
-.sp-token-keyword  { color: #f472b6; font-weight: 600; }
-.sp-token-string   { color: #a3e635; }
+.sp-block-editor__code-highlight {
+  pointer-events: none;
+  color: var(--sp-text-color, #0f172a);
+}
+
+.sp-block-editor__code-textarea {
+  position: absolute;
+  inset: 0;
+  padding: var(--sp-space-3, 12px) var(--sp-space-4, 16px);
+  background: transparent;
+  color: transparent;
+  caret-color: var(--sp-text-color, #0f172a);
+  resize: none;
+  overflow: hidden;
+  min-height: 60px;
+}
+
+/* Syntax Highlighting Token Colors */
+.sp-token-keyword  { color: #d97706; font-weight: 600; }
+.sp-token-string   { color: #16a34a; }
 .sp-token-comment  { color: #94a3b8; font-style: italic; }
-.sp-token-number   { color: #fb923c; }
-.sp-token-function { color: #60a5fa; }
+.sp-token-number   { color: #2563eb; }
+.sp-token-function { color: #0f766e; }
+
+/* (5) Resizable Image Block */
+.sp-block-editor__image-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-space-2, 8px);
+  width: 100%;
+  margin: 6px 0;
+}
+
+.sp-block-editor__image-wrap {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  border-radius: var(--sp-radius-lg, 8px);
+  overflow: hidden;
+  border: 1px solid var(--sp-border, rgba(15, 23, 42, 0.08));
+}
+
+.sp-block-editor__image-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--sp-radius-lg, 8px);
+}
+
+.sp-block-editor__image-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-space-2, 8px);
+  padding: 4px 8px;
+  background: var(--sp-surface-50, #f8f9fb);
+  border-radius: var(--sp-radius-md, 6px);
+  width: fit-content;
+}
+
+.sp-block-editor__image-size-btn {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border: 1px solid var(--sp-border-strong, rgba(15, 23, 42, 0.14));
+  border-radius: var(--sp-radius-sm, 4px);
+  background: var(--sp-surface-0, #ffffff);
+  color: var(--sp-text-color, #0f172a);
+  cursor: pointer;
+}
+
+.sp-block-editor__image-size-btn--active {
+  background: var(--sp-primary, #0f766e);
+  color: #ffffff;
+  border-color: var(--sp-primary, #0f766e);
+}
+
+/* (6) Interactive Table Block */
+.sp-block-editor__table-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-space-2, 8px);
+  width: 100%;
+  margin: 6px 0;
+  overflow-x: auto;
+}
+
+.sp-block-editor__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--sp-text-sm, 13px);
+}
+
+.sp-block-editor__table th,
+.sp-block-editor__table td {
+  border: 1px solid var(--sp-border-strong, rgba(15, 23, 42, 0.14));
+  padding: 0;
+}
+
+.sp-block-editor__table th {
+  background: var(--sp-surface-50, #f8f9fb);
+}
+
+.sp-block-editor__table-cell {
+  width: 100%;
+  padding: var(--sp-space-2, 8px) var(--sp-space-3, 12px);
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  color: var(--sp-text-color, #0f172a);
+}
+
+.sp-block-editor__table-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-space-2, 8px);
+  padding: 4px;
+}
+
+.sp-block-editor__table-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border: 1px solid var(--sp-border-strong, rgba(15, 23, 42, 0.14));
+  border-radius: var(--sp-radius-sm, 4px);
+  background: var(--sp-surface-0, #ffffff);
+  color: var(--sp-text-color, #0f172a);
+  cursor: pointer;
+}
+
+.sp-block-editor__table-btn:hover {
+  background: var(--sp-content-hover-bg, rgba(15, 23, 42, 0.06));
+}
 
 /* Divider Line */
 .sp-block-editor__divider-bar {
