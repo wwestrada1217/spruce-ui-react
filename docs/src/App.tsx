@@ -94,7 +94,6 @@ import { FileUploadPage } from './pages/components/FileUploadPage'
 import { EditorPage } from './pages/components/EditorPage'
 import { MarkdownEditorPage } from './pages/components/MarkdownEditorPage'
 import { BlockEditorPage } from './pages/components/BlockEditorPage'
-import { AppShellPage } from './pages/components/AppShellPage'
 import { BarChartPage } from './pages/charts/BarChartPage'
 import { PieChartPage } from './pages/charts/PieChartPage'
 import { LineChartPage } from './pages/charts/LineChartPage'
@@ -228,7 +227,6 @@ function renderPage(hash: string): React.ReactElement {
     case '#/components/editor':             return <EditorPage />
     case '#/components/markdown-editor':    return <MarkdownEditorPage />
     case '#/components/block-editor':       return <BlockEditorPage />
-    case '#/components/app-shell':          return <AppShellPage />
     // Charts
     case '#/charts/bar-chart':              return <BarChartPage />
     case '#/charts/pie-chart':              return <PieChartPage />
