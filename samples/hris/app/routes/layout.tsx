@@ -27,7 +27,7 @@ import {
   Select,
 } from 'spruce-react';
 
-export function HRISLayout() {
+export default function HRISLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [addModalOpen, setAddModalOpen] = useState(false);

@@ -8,7 +8,7 @@
 import { type RouteConfig, index, route, layout } from "@react-router/dev/routes";
 
 export default [
-  layout("components/HRISLayout.tsx", [
+  layout("routes/layout.tsx", [
     index("routes/home.tsx"),
     route("employees", "routes/employees.tsx"),
     route("time-off", "routes/time-off.tsx"),
