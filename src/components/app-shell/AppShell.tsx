@@ -9,7 +9,6 @@ import './AppShell.css';
 import {
   useEffect,
   useState,
-  useCallback,
   type ReactNode,
   type CSSProperties,
 } from 'react';
@@ -106,7 +105,7 @@ function AppShellInner({
   className,
   style,
 }: Omit<AppShellProps, 'sidebarCollapsible' | 'sidebarResponsive'>) {
-  const { toggleMobile, allowResponsive } = useSidebar();
+  const { allowResponsive } = useSidebar();
   const [isSmallScreen, setIsSmallScreen] = useState(
     typeof window !== 'undefined' ? window.matchMedia(`(max-width: ${breakpoint}px)`).matches : false,
   );
@@ -120,10 +119,6 @@ function AppShellInner({
   }, [breakpoint]);
 
   const showHamburger = allowResponsive && isSmallScreen && !!sidebar;
-
-  const handleHamburger = useCallback(() => {
-    toggleMobile();
-  }, [toggleMobile]);
 
   const rootCls = ['sp-app-shell', className].filter(Boolean).join(' ');
   const mainCls = ['sp-app-shell__main', padded && 'sp-app-shell__main--padded']
@@ -139,16 +134,9 @@ function AppShellInner({
       <div className="sp-app-shell__body">
         {(header || showHamburger) && (
           <div className="sp-app-shell__header">
-            {showHamburger && !header && (
-              <div style={{ padding: 'var(--sp-space-2, 8px)' }}>
-                <button
-                  type="button"
-                  className="sp-app-shell__hamburger"
-                  onClick={handleHamburger}
-                  aria-label="Toggle navigation menu"
-                >
-                  <HamburgerIcon />
-                </button>
+            {showHamburger && (
+              <div style={{ display: 'flex', alignItems: 'center', paddingLeft: 8 }}>
+                <AppShellHamburger />
               </div>
             )}
             {header}

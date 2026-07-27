@@ -28,7 +28,7 @@ import { CodePreview } from '../../components/CodePreview';
 
 // ── Code Samples ──────────────────────────────────────────────────────────────
 
-const BLOCK_CODE = `import {
+const FULL_SHELL_CODE = `import {
   AppShell,
   AppShellHamburger,
   Sidebar,
@@ -43,26 +43,32 @@ const BLOCK_CODE = `import {
   Button,
   Badge,
   StatCard,
+  Avatar,
 } from 'spruce-react';
 
-export function ApplicationShellBlock() {
+export function ApplicationShellDemo() {
   return (
     <AppShell
       headerHeight={52}
       sidebar={
         <Sidebar>
+          {/* Sidebar Header Sample */}
           <SidebarHeader showBorders>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 8px', width: '100%', height: 44 }}>
-              <div style={{ width: 28, height: 28, borderRadius: 6, background: 'var(--sp-primary)', display: 'grid', placeItems: 'center', color: '#fff', fontWeight: 'bold', fontSize: 14 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0 8px', width: '100%', height: 44 }}>
+              <div style={{ width: 28, height: 28, borderRadius: 6, background: 'var(--sp-primary)', display: 'grid', placeItems: 'center', color: '#fff', fontWeight: 700, fontSize: 14 }}>
                 S
               </div>
-              <span style={{ fontWeight: 600, fontSize: 15 }}>Spruce Studio</span>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span style={{ fontWeight: 600, fontSize: 14, lineHeight: 1.2 }}>Spruce Studio</span>
+                <span style={{ fontSize: 10, color: 'var(--sp-text-muted)' }}>v2.4.0 Pro</span>
+              </div>
             </div>
           </SidebarHeader>
 
+          {/* Sidebar Content */}
           <SidebarContent>
             <SidebarGroup>
-              <SidebarGroupLabel>Main Menu</SidebarGroupLabel>
+              <SidebarGroupLabel>Application</SidebarGroupLabel>
               <SidebarItem icon="layout-dashboard" active>Dashboard</SidebarItem>
               <SidebarItem icon="folder">Projects</SidebarItem>
               <SidebarItem icon="bar-chart">Analytics</SidebarItem>
@@ -70,14 +76,24 @@ export function ApplicationShellBlock() {
             </SidebarGroup>
             <SidebarSeparator />
             <SidebarGroup>
-              <SidebarGroupLabel>Preferences</SidebarGroupLabel>
-              <SidebarItem icon="settings">Settings</SidebarItem>
+              <SidebarGroupLabel>Settings</SidebarGroupLabel>
+              <SidebarItem icon="settings">Preferences</SidebarItem>
               <SidebarItem icon="bell">Notifications</SidebarItem>
             </SidebarGroup>
           </SidebarContent>
 
+          {/* Sidebar Footer Sample */}
           <SidebarFooter showBorders>
-            <SidebarItem icon="log-out">Sign Out</SidebarItem>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 8px', width: '100%' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Avatar name="Alex Johnson" size="sm" />
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontWeight: 600, fontSize: 13, lineHeight: 1.2 }}>Alex Johnson</span>
+                  <span style={{ fontSize: 10, color: 'var(--sp-text-muted)' }}>Admin</span>
+                </div>
+              </div>
+              <Button size="sm" variant="ghost" iconLeft="log-out" aria-label="Sign Out" />
+            </div>
           </SidebarFooter>
         </Sidebar>
       }
@@ -97,12 +113,41 @@ export function ApplicationShellBlock() {
       }
     >
       <div style={{ padding: 24 }}>
-        <h1>Welcome Back</h1>
-        <p>Here is your daily activity overview.</p>
+        <h2>Scrollable Main Container</h2>
+        <p>Content inside the container scrolls independently while header and sidebar stay fixed.</p>
       </div>
     </AppShell>
   );
 }`;
+
+const SCROLLABLE_CONTAINER_CODE = `/* The main content container in AppShell features an independent scrollbar */
+<AppShell
+  headerHeight={52}
+  sidebar={<Sidebar>...</Sidebar>}
+  header={<AppHeader title="Scrollable Container" height={52} />}
+>
+  <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+    {/* Long list of cards or data items */}
+    {Array.from({ length: 25 }).map((_, idx) => (
+      <Card key={idx}>
+        <div style={{ padding: 16 }}>Item #{idx + 1}</div>
+      </Card>
+    ))}
+  </div>
+</AppShell>`;
+
+const MOBILE_DRAWER_CODE = `/* Below the 768px breakpoint, the sidebar transforms into an off-canvas drawer
+   and a hamburger button automatically appears in the app header */
+<AppShell
+  breakpoint={768}
+  headerHeight={52}
+  sidebar={<Sidebar>...</Sidebar>}
+  header={<AppHeader title="Mobile Responsive App" height={52} />}
+>
+  <div style={{ padding: 16 }}>
+    <p>Tap the hamburger icon in the header on mobile screens to toggle the sidebar drawer.</p>
+  </div>
+</AppShell>`;
 
 interface Section {
   id: string;
@@ -110,8 +155,10 @@ interface Section {
 }
 
 const SECTIONS: Section[] = [
-  { id: 'overview', label: 'Live Block Demo' },
-  { id: 'mobile-preview', label: 'Mobile Responsive View' },
+  { id: 'overview', label: 'Interactive App Shell Demo' },
+  { id: 'scrollable', label: 'Scrollable Container' },
+  { id: 'mobile-drawer', label: 'Mobile Drawer & Hamburger' },
+  { id: 'header-footer', label: 'Sidebar Header & Footer' },
   { id: 'code', label: 'Implementation Code' },
   { id: 'api', label: 'API Reference' },
 ];
@@ -150,19 +197,20 @@ export function AppShellBlockPage() {
         </div>
         <p className="docs-desc">
           Application Shell layout block combining a collapsible, responsive Sidebar on the left,
-          a top AppHeader with aligned height (52px), and a scrollable main content container. Includes a mobile hamburger menu toggle button.
+          a top AppHeader with aligned height (52px), and an independently scrollable main content container.
+          When in mobile size, the sidebar transforms into an off-canvas drawer controlled by a hamburger menu in the app header.
         </p>
 
-        {/* ── Live Block Demo ───────────────────────────────────────────── */}
+        {/* ── Interactive Demo ─────────────────────────────────────────── */}
         <section id="overview">
-          <h2>Live Block Demo</h2>
+          <h2>Interactive App Shell Demo</h2>
           <p>
-            An interactive application shell layout block. You can collapse the sidebar using the right-edge rail handle, or toggle the responsive mobile drawer.
+            Full-featured application layout block. Hover over the sidebar rail handle to collapse/expand on desktop, or toggle the responsive mobile drawer.
           </p>
 
           <div
             style={{
-              height: 520,
+              height: 540,
               border: '1px solid var(--sp-border)',
               borderRadius: 'var(--sp-radius-lg, 8px)',
               overflow: 'hidden',
@@ -174,6 +222,7 @@ export function AppShellBlockPage() {
               headerHeight={52}
               sidebar={
                 <Sidebar>
+                  {/* Sidebar Header Sample */}
                   <SidebarHeader showBorders>
                     <div
                       style={{
@@ -200,12 +249,18 @@ export function AppShellBlockPage() {
                       >
                         S
                       </div>
-                      <span style={{ fontWeight: 600, fontSize: 14, whiteSpace: 'nowrap' }}>
-                        Spruce Studio
-                      </span>
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span style={{ fontWeight: 600, fontSize: 14, lineHeight: 1.2, whiteSpace: 'nowrap' }}>
+                          Spruce Studio
+                        </span>
+                        <span style={{ fontSize: 10, color: 'var(--sp-text-muted)', whiteSpace: 'nowrap' }}>
+                          v2.4.0 Pro
+                        </span>
+                      </div>
                     </div>
                   </SidebarHeader>
 
+                  {/* Sidebar Content Sample */}
                   <SidebarContent>
                     <SidebarGroup>
                       <SidebarGroupLabel>Main Menu</SidebarGroupLabel>
@@ -224,8 +279,30 @@ export function AppShellBlockPage() {
                     </SidebarGroup>
                   </SidebarContent>
 
+                  {/* Sidebar Footer Sample */}
                   <SidebarFooter showBorders>
-                    <SidebarItem icon="log-out">Sign Out</SidebarItem>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '4px 6px',
+                        width: '100%',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <Avatar name="Alex Johnson" size="sm" />
+                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                          <span style={{ fontWeight: 600, fontSize: 12, lineHeight: 1.2, whiteSpace: 'nowrap' }}>
+                            Alex Johnson
+                          </span>
+                          <span style={{ fontSize: 10, color: 'var(--sp-text-muted)', whiteSpace: 'nowrap' }}>
+                            Admin
+                          </span>
+                        </div>
+                      </div>
+                      <Button size="sm" variant="ghost" iconLeft="log-out" aria-label="Sign Out" />
+                    </div>
                   </SidebarFooter>
                 </Sidebar>
               }
@@ -238,7 +315,6 @@ export function AppShellBlockPage() {
                   actions={
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <Badge variant="success">Online</Badge>
-                      <Avatar name="Alex Johnson" size="sm" />
                       <Button size="sm" variant="primary">
                         New Project
                       </Button>
@@ -249,9 +325,9 @@ export function AppShellBlockPage() {
             >
               <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
                 <div>
-                  <h2 style={{ margin: '0 0 4px', fontSize: 20 }}>Workspace Dashboard</h2>
+                  <h2 style={{ margin: '0 0 4px', fontSize: 20 }}>Workspace Overview</h2>
                   <p style={{ margin: 0, color: 'var(--sp-text-muted)', fontSize: 14 }}>
-                    Overview of recent activity, active projects, and system metrics.
+                    Real-time performance and system stats. Scroll down to test container scrolling.
                   </p>
                 </div>
 
@@ -263,25 +339,105 @@ export function AppShellBlockPage() {
                   <StatCard label="Server Load" value="28%" change="Optimal" trend="neutral" />
                 </div>
 
-                {/* Sample Container Card */}
-                <Card>
-                  <div style={{ padding: 20 }}>
-                    <h3 style={{ margin: '0 0 12px', fontSize: 16 }}>Recent Activity</h3>
-                    <p style={{ margin: 0, color: 'var(--sp-text-subtle)', fontSize: 13 }}>
-                      All systems operating within normal parameters. Last deployment completed successfully 12 minutes ago.
-                    </p>
-                  </div>
-                </Card>
+                {/* Scrollable Container Cards */}
+                {Array.from({ length: 8 }).map((_, idx) => (
+                  <Card key={idx}>
+                    <div style={{ padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <h4 style={{ margin: '0 0 4px', fontSize: 14 }}>Project Module #{idx + 1}</h4>
+                        <p style={{ margin: 0, fontSize: 12, color: 'var(--sp-text-subtle)' }}>
+                          System task build process completed successfully.
+                        </p>
+                      </div>
+                      <Badge variant={idx % 2 === 0 ? 'primary' : 'default'}>
+                        {idx % 2 === 0 ? 'Active' : 'Pending'}
+                      </Badge>
+                    </div>
+                  </Card>
+                ))}
               </div>
             </AppShell>
           </div>
         </section>
 
-        {/* ── Mobile Responsive View Demo ───────────────────────────────── */}
-        <section id="mobile-preview">
-          <h2>Mobile Responsive Preview</h2>
+        {/* ── Scrollable Content Container ─────────────────────────────── */}
+        <section id="scrollable">
+          <h2>1. Scrollable Content Container</h2>
           <p>
-            Toggle mobile viewport simulation to see how the left sidebar collapses into an off-canvas drawer controlled by the header's hamburger menu button.
+            The main content area (`.sp-app-shell__main`) is independently scrollable with custom styled scrollbars. The header and sidebar remain fixed in position while the content scrolls smoothly underneath.
+          </p>
+
+          <div
+            style={{
+              height: 380,
+              border: '1px solid var(--sp-border)',
+              borderRadius: 'var(--sp-radius-lg, 8px)',
+              overflow: 'hidden',
+              boxShadow: 'var(--sp-shadow-sm)',
+            }}
+          >
+            <AppShell
+              headerHeight={52}
+              sidebar={
+                <Sidebar allowResponsive={false} allowCollapsible={false}>
+                  <SidebarHeader showBorders>
+                    <div style={{ padding: '0 12px', fontWeight: 600, fontSize: 13, height: 44, display: 'flex', alignItems: 'center' }}>
+                      Fixed Sidebar
+                    </div>
+                  </SidebarHeader>
+                  <SidebarContent>
+                    <SidebarItem icon="file-text" active>
+                      Document Stream
+                    </SidebarItem>
+                    <SidebarItem icon="database">Records</SidebarItem>
+                    <SidebarItem icon="archive">Archives</SidebarItem>
+                  </SidebarContent>
+                </Sidebar>
+              }
+              header={
+                <AppHeader
+                  height={52}
+                  title="Scrollable Content Demo"
+                  subtitle="Scroll down to test independent content scrolling"
+                />
+              }
+            >
+              <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {Array.from({ length: 15 }).map((_, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      padding: '12px 16px',
+                      borderRadius: 6,
+                      background: 'var(--sp-surface)',
+                      border: '1px solid var(--sp-border)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <span style={{ fontSize: 13, fontWeight: 500 }}>
+                      Scrollable Row Item #{idx + 1}
+                    </span>
+                    <span style={{ fontSize: 12, color: 'var(--sp-text-muted)' }}>
+                      Timestamp 14:38:{10 + idx}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </AppShell>
+          </div>
+
+          <div style={{ marginTop: 16 }}>
+            <CodePreview code={SCROLLABLE_CONTAINER_CODE} />
+          </div>
+        </section>
+
+        {/* ── Mobile Responsive Drawer & Hamburger Menu ────────────────── */}
+        <section id="mobile-drawer">
+          <h2>2. Mobile Responsive View & Hamburger Menu</h2>
+          <p>
+            When in mobile view (below 768px), the sidebar automatically transforms into an off-canvas drawer overlay, and a hamburger menu button shows up in the app header to open/close the sidebar drawer.
           </p>
 
           <div style={{ marginBottom: 12 }}>
@@ -290,14 +446,14 @@ export function AppShellBlockPage() {
               variant={mobileSim ? 'primary' : 'secondary'}
               onClick={() => setMobileSim(!mobileSim)}
             >
-              {mobileSim ? 'Switch to Desktop Mode' : 'Simulate Mobile View (375px)'}
+              {mobileSim ? 'Switch to Desktop Mode' : 'Simulate Mobile Viewpoint (375px)'}
             </Button>
           </div>
 
           <div
             style={{
               width: mobileSim ? 375 : '100%',
-              height: 480,
+              height: 440,
               margin: mobileSim ? '0 auto' : undefined,
               border: '1px solid var(--sp-border)',
               borderRadius: 'var(--sp-radius-lg, 8px)',
@@ -313,42 +469,111 @@ export function AppShellBlockPage() {
                 <Sidebar breakpoint={mobileSim ? 9999 : 768}>
                   <SidebarHeader showBorders>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 8px', width: '100%', height: 44 }}>
-                      <span style={{ fontWeight: 600, fontSize: 14 }}>🌲 Mobile App</span>
+                      <span style={{ fontWeight: 600, fontSize: 14 }}>🌲 Mobile Drawer</span>
                     </div>
                   </SidebarHeader>
                   <SidebarContent>
                     <SidebarItem icon="home" active>
-                      Home
+                      Home Feed
                     </SidebarItem>
                     <SidebarItem icon="search">Search</SidebarItem>
                     <SidebarItem icon="bell">Notifications</SidebarItem>
-                    <SidebarItem icon="user">Profile</SidebarItem>
+                    <SidebarItem icon="user">Profile Settings</SidebarItem>
                   </SidebarContent>
+                  <SidebarFooter showBorders>
+                    <SidebarItem icon="log-out">Logout</SidebarItem>
+                  </SidebarFooter>
                 </Sidebar>
               }
               header={
                 <AppHeader
                   height={52}
-                  logo={<AppShellHamburger />}
-                  title="Mobile App Shell"
-                  actions={<Badge variant="primary">Mobile</Badge>}
+                  title="Mobile App Header"
+                  actions={<Badge variant="primary">Mobile Size</Badge>}
                 />
               }
             >
               <div style={{ padding: 16 }}>
-                <h3>Mobile Container</h3>
+                <h3 style={{ margin: '0 0 8px' }}>Mobile Container View</h3>
                 <p style={{ fontSize: 13, color: 'var(--sp-text-muted)' }}>
-                  Tap the hamburger icon in the top header to open the responsive sidebar drawer.
+                  Notice the hamburger menu button automatically positioned in the top header. Tapping it slides in the sidebar drawer with a dark backdrop.
                 </p>
               </div>
             </AppShell>
+          </div>
+
+          <div style={{ marginTop: 16 }}>
+            <CodePreview code={MOBILE_DRAWER_CODE} />
+          </div>
+        </section>
+
+        {/* ── Sidebar Header & Footer Samples ─────────────────────────── */}
+        <section id="header-footer">
+          <h2>3. Sidebar Header & Footer Samples</h2>
+          <p>
+            The layout supports structured header and footer slots inside the sidebar component using <code>SidebarHeader</code> and <code>SidebarFooter</code>.
+          </p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
+            {/* Sample 1: Brand Header + Profile Footer */}
+            <Card>
+              <div style={{ padding: 16 }}>
+                <h4 style={{ margin: '0 0 12px', fontSize: 14 }}>Brand Header & Profile Footer</h4>
+                <div style={{ border: '1px solid var(--sp-border)', borderRadius: 8, height: 260, overflow: 'hidden' }}>
+                  <Sidebar allowResponsive={false} allowCollapsible={false}>
+                    <SidebarHeader showBorders>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px', width: '100%' }}>
+                        <div style={{ width: 24, height: 24, borderRadius: 4, background: 'var(--sp-primary)', color: '#fff', display: 'grid', placeItems: 'center', fontWeight: 'bold', fontSize: 12 }}>
+                          A
+                        </div>
+                        <span style={{ fontWeight: 600, fontSize: 13 }}>Acme Cloud</span>
+                      </div>
+                    </SidebarHeader>
+                    <SidebarContent>
+                      <SidebarItem icon="home" active>Home</SidebarItem>
+                      <SidebarItem icon="layers">Services</SidebarItem>
+                    </SidebarContent>
+                    <SidebarFooter showBorders>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px' }}>
+                        <Avatar name="Jane Doe" size="sm" />
+                        <span style={{ fontSize: 12, fontWeight: 500 }}>Jane Doe</span>
+                      </div>
+                    </SidebarFooter>
+                  </Sidebar>
+                </div>
+              </div>
+            </Card>
+
+            {/* Sample 2: Workspace Switcher Header + Action Footer */}
+            <Card>
+              <div style={{ padding: 16 }}>
+                <h4 style={{ margin: '0 0 12px', fontSize: 14 }}>Workspace Switcher & Action Footer</h4>
+                <div style={{ border: '1px solid var(--sp-border)', borderRadius: 8, height: 260, overflow: 'hidden' }}>
+                  <Sidebar allowResponsive={false} allowCollapsible={false}>
+                    <SidebarHeader showBorders>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px', width: '100%' }}>
+                        <span style={{ fontWeight: 600, fontSize: 13 }}>⚡ Team Space</span>
+                        <Badge variant="success">Pro</Badge>
+                      </div>
+                    </SidebarHeader>
+                    <SidebarContent>
+                      <SidebarItem icon="folder" active>Projects</SidebarItem>
+                      <SidebarItem icon="settings">Settings</SidebarItem>
+                    </SidebarContent>
+                    <SidebarFooter showBorders>
+                      <SidebarItem icon="plus-circle">Add Workspace</SidebarItem>
+                    </SidebarFooter>
+                  </Sidebar>
+                </div>
+              </div>
+            </Card>
           </div>
         </section>
 
         {/* ── Implementation Code ────────────────────────────────────────── */}
         <section id="code">
           <h2>Implementation Code</h2>
-          <CodePreview code={BLOCK_CODE} />
+          <CodePreview code={FULL_SHELL_CODE} />
         </section>
 
         {/* ── API Reference ──────────────────────────────────────────────── */}
@@ -382,7 +607,7 @@ export function AppShellBlockPage() {
                 <td><code>children</code></td>
                 <td><code>ReactNode</code></td>
                 <td>—</td>
-                <td>Main content container slot.</td>
+                <td>Scrollable main content container slot.</td>
               </tr>
               <tr>
                 <td><code>sidebarCollapsible</code></td>
