@@ -10,12 +10,21 @@ import {
   useState,
   useRef,
   useEffect,
-  type FormEvent,
   type MouseEvent,
 } from 'react';
 import { Icon } from '../../icons/Icon.js';
+import { Select, type SelectOption } from '../select/Select.js';
 
 export type EditorSize = 'sm' | 'md' | 'lg';
+
+const FORMAT_BLOCK_OPTIONS: SelectOption[] = [
+  { label: 'Paragraph', value: 'p' },
+  { label: 'Heading 1', value: 'h1' },
+  { label: 'Heading 2', value: 'h2' },
+  { label: 'Heading 3', value: 'h3' },
+  { label: 'Quote', value: 'blockquote' },
+  { label: 'Code Block', value: 'pre' },
+];
 
 export interface EditorProps {
   /** HTML string content value */
@@ -69,6 +78,7 @@ export function Editor({
 }: EditorProps) {
   const [internalHtml, setInternalHtml] = useState<string>(value ?? '');
   const [isSourceView, setIsSourceView] = useState(false);
+  const [blockFormat, setBlockFormat] = useState<string>('p');
   const [activeFormats, setActiveFormats] = useState<Record<string, boolean>>({});
   const editorRef = useRef<HTMLDivElement>(null);
 
@@ -159,9 +169,10 @@ export function Editor({
     }
   }
 
-  function handleFormatBlock(e: FormEvent<HTMLSelectElement>) {
-    const val = (e.target as HTMLSelectElement).value;
-    execCmd('formatBlock', `<${val}>`);
+  function handleFormatBlockChange(val: string | string[]) {
+    const selectedValue = Array.isArray(val) ? val[0] : val;
+    setBlockFormat(selectedValue);
+    execCmd('formatBlock', `<${selectedValue}>`);
   }
 
   const isInteractive = !disabled && !readOnly;
@@ -198,21 +209,16 @@ export function Editor({
         {/* Toolbar */}
         {!hideToolbar && (
           <div className="sp-editor__toolbar" role="toolbar" aria-label="Formatting options">
-            {/* Heading / Block selector */}
-            <select
-              className="sp-editor__select"
-              onChange={handleFormatBlock}
-              disabled={!isInteractive || isSourceView}
-              aria-label="Text format"
-              defaultValue="p"
-            >
-              <option value="p">Paragraph</option>
-              <option value="h1">Heading 1</option>
-              <option value="h2">Heading 2</option>
-              <option value="h3">Heading 3</option>
-              <option value="blockquote">Quote</option>
-              <option value="pre">Code Block</option>
-            </select>
+            {/* Spruce Select Heading / Block selector */}
+            <div style={{ width: 130 }}>
+              <Select
+                options={FORMAT_BLOCK_OPTIONS}
+                value={blockFormat}
+                onChange={handleFormatBlockChange}
+                disabled={!isInteractive || isSourceView}
+                size="sm"
+              />
+            </div>
 
             <div className="sp-editor__divider" aria-hidden="true" />
 
