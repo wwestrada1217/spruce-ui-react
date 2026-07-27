@@ -61,7 +61,7 @@ export default function Attendance() {
       <Card>
         <div style={{ padding: 20 }}>
           <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 600 }}>Daily Clock-in / Timesheet Log</h3>
-          <Datagrid columns={columns} rowData={logs} options={{ pagination: true, pageSize: 10 }} />
+          <Datagrid columns={columns} rowData={logs} autoHeightRow options={{ pagination: true, pageSize: 10 }} />
         </div>
       </Card>
     </div>

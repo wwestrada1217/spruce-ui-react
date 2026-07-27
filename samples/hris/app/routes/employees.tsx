@@ -148,6 +148,7 @@ export default function Employees() {
           <Datagrid
             columns={columns}
             rowData={filteredEmployees}
+            autoHeightRow
             options={{ pagination: true, pageSize: 10 }}
           />
         </div>

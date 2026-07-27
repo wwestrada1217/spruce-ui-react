@@ -13,7 +13,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
-import { SpruceProvider } from "spruce-react";
+import { SpruceProvider, corporateTheme } from "spruce-react";
 
 import type { Route } from "./+types/root";
 import "./app.css";
@@ -41,7 +41,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body style={{ margin: 0, padding: 0, width: '100vw', height: '100vh', overflow: 'hidden' }}>
-        <SpruceProvider>
+        <SpruceProvider theme={corporateTheme}>
           {children}
         </SpruceProvider>
         <ScrollRestoration />

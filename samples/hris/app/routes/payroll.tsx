@@ -80,7 +80,7 @@ export default function Payroll() {
       <Card>
         <div style={{ padding: 20 }}>
           <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 600 }}>Historical Payroll Batches</h3>
-          <Datagrid columns={columns} rowData={records} options={{ pagination: true, pageSize: 5 }} />
+          <Datagrid columns={columns} rowData={records} autoHeightRow options={{ pagination: true, pageSize: 5 }} />
         </div>
       </Card>
     </div>

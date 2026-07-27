@@ -2,6 +2,7 @@ import { type ReactNode } from 'react';
 import { IconRegistryProvider } from './icons/icon-registry.js';
 import { ThemeProvider } from './theme/theme-context.js';
 import type { ThemeProviderProps } from './theme/theme-context.js';
+import type { SpruceTheme } from './theme/types.js';
 import { DEFAULT_ICONS } from './icons/default-icons.js';
 
 export interface SpruceProviderProps {
@@ -13,6 +14,8 @@ export interface SpruceProviderProps {
   icons?: Record<string, string>;
   /** Initial theme preference. Defaults to 'system'. */
   defaultTheme?: ThemeProviderProps['defaultTheme'];
+  /** Theme preset object to activate as default theme. */
+  theme?: SpruceTheme;
   children: ReactNode;
 }
 
@@ -39,10 +42,11 @@ export interface SpruceProviderProps {
 export function SpruceProvider({
   icons = DEFAULT_ICONS,
   defaultTheme = 'system',
+  theme,
   children,
 }: SpruceProviderProps) {
   return (
-    <ThemeProvider defaultTheme={defaultTheme}>
+    <ThemeProvider defaultTheme={defaultTheme} theme={theme}>
       <IconRegistryProvider icons={icons}>
         {children}
       </IconRegistryProvider>
