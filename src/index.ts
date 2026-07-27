@@ -449,5 +449,18 @@ export type { MarkdownEditorProps, MarkdownEditorMode, MarkdownEditorSize } from
 export { BlockEditor } from './components/block-editor/BlockEditor.js';
 export type { BlockEditorProps, BlockItem, BlockType, BlockEditorSize } from './components/block-editor/BlockEditor.js';
 
+// ─── Charts Framework ────────────────────────────────────────────────────────
+export { ChartContainer } from './charts/ChartContainer.js';
+export type { ChartContainerProps, LegendItem } from './charts/ChartContainer.js';
+export { BarChart } from './charts/BarChart.js';
+export type { BarChartProps } from './charts/BarChart.js';
+export { PieChart } from './charts/PieChart.js';
+export type { PieChartProps } from './charts/PieChart.js';
+export { LineChart } from './charts/LineChart.js';
+export type { LineChartProps } from './charts/LineChart.js';
+export { AreaChart } from './charts/AreaChart.js';
+export type { AreaChartProps } from './charts/AreaChart.js';
+export type { ChartDataItem, ChartSeries, ChartLegendPosition, ChartTooltipData } from './charts/types.js';
+
 // ─── Data ─────────────────────────────────────────────────────────────────────
 export * from './data/index.js';

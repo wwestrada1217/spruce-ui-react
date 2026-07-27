@@ -147,10 +147,10 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     label: 'Charts',
     items: [
-      { icon: 'bar-chart',    label: 'Bar Chart',         route: '#/charts/bar-chart',             soon: true },
-      { icon: 'pie-chart',    label: 'Pie Chart',         route: '#/charts/pie-chart',             soon: true },
-      { icon: 'trending-up',  label: 'Line Chart',        route: '#/charts/line-chart',            soon: true },
-      { icon: 'activity',     label: 'Area Chart',        route: '#/charts/area-chart',            soon: true },
+      { icon: 'bar-chart',    label: 'Bar Chart',         route: '#/charts/bar-chart' },
+      { icon: 'pie-chart',    label: 'Pie Chart',         route: '#/charts/pie-chart' },
+      { icon: 'trending-up',  label: 'Line Chart',        route: '#/charts/line-chart' },
+      { icon: 'activity',     label: 'Area Chart',        route: '#/charts/area-chart' },
       { icon: 'bar-chart',    label: 'Stacked Bar',       route: '#/charts/stacked-bar-chart',     soon: true },
       { icon: 'layers',       label: 'Stacked Area',      route: '#/charts/stacked-area-chart',    soon: true },
       { icon: 'circle-dot',   label: 'Bubble Chart',      route: '#/charts/bubble-chart',          soon: true },

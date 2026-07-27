@@ -1,0 +1,17 @@
+/*
+ * Copyright (c) 2026-2027 Sprucestack. All Rights Reserved.
+ * The term "Sprucestack" refers to Sprucestack Inc. and/or its subsidiaries.
+ * This software is released under Apache license.
+ * The full license information can be found in LICENSE in the root directory of this project.
+ */
+
+.sp-pie-slice {
+  transition: transform 150ms ease, opacity 150ms ease;
+  cursor: pointer;
+  transform-origin: center;
+}
+
+.sp-pie-slice:hover {
+  opacity: 0.88;
+  transform: scale(1.03);
+}

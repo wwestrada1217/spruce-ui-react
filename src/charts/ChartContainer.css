@@ -1,0 +1,131 @@
+/*
+ * Copyright (c) 2026-2027 Sprucestack. All Rights Reserved.
+ * The term "Sprucestack" refers to Sprucestack Inc. and/or its subsidiaries.
+ * This software is released under Apache license.
+ * The full license information can be found in LICENSE in the root directory of this project.
+ */
+
+.sp-chart-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-space-3, 12px);
+  width: 100%;
+  position: relative;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.sp-chart-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sp-chart-title {
+  font-size: var(--sp-text-base, 15px);
+  font-weight: var(--sp-font-semibold, 600);
+  color: var(--sp-text-color, #0f172a);
+  margin: 0;
+}
+
+.sp-chart-subtitle {
+  font-size: var(--sp-text-xs, 12px);
+  color: var(--sp-text-subtle, #64748b);
+  margin: 0;
+}
+
+.sp-chart-body {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sp-chart-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Axis & Grid lines */
+.sp-chart-gridline {
+  stroke: var(--sp-border, rgba(15, 23, 42, 0.08));
+  stroke-dasharray: 4 4;
+}
+
+.sp-chart-axis-line {
+  stroke: var(--sp-border-strong, rgba(15, 23, 42, 0.16));
+  stroke-width: 1;
+}
+
+.sp-chart-axis-label {
+  font-size: 11px;
+  fill: var(--sp-text-subtle, #64748b);
+  user-select: none;
+}
+
+/* Legend */
+.sp-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-space-3, 12px);
+  align-items: center;
+}
+
+.sp-chart-legend--top {
+  margin-bottom: var(--sp-space-2, 8px);
+}
+
+.sp-chart-legend--bottom {
+  margin-top: var(--sp-space-2, 8px);
+}
+
+.sp-chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-space-1_5, 6px);
+  font-size: var(--sp-text-xs, 12px);
+  color: var(--sp-text-color, #0f172a);
+}
+
+.sp-chart-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--sp-radius-xs, 3px);
+  flex-shrink: 0;
+}
+
+/* Floating Hover Tooltip */
+.sp-chart-tooltip {
+  position: absolute;
+  pointer-events: none;
+  z-index: 100;
+  background: var(--sp-surface-900, #0f172a);
+  color: var(--sp-text-inverse, #f8fafc);
+  padding: var(--sp-space-2, 8px) var(--sp-space-3, 12px);
+  border-radius: var(--sp-radius-md, 6px);
+  font-size: var(--sp-text-xs, 12px);
+  box-shadow: var(--sp-shadow-md, 0 4px 12px rgba(0, 0, 0, 0.15));
+  transform: translate(-50%, -100%);
+  margin-top: -8px;
+  white-space: nowrap;
+  transition: opacity 100ms ease, transform 100ms ease;
+}
+
+.sp-chart-tooltip-header {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.sp-chart-tooltip-body {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sp-chart-tooltip-badge {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
