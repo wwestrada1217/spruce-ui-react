@@ -98,6 +98,10 @@ import { BarChartPage } from './pages/charts/BarChartPage'
 import { PieChartPage } from './pages/charts/PieChartPage'
 import { LineChartPage } from './pages/charts/LineChartPage'
 import { AreaChartPage } from './pages/charts/AreaChartPage'
+import { SparklinePage } from './pages/charts/SparklinePage'
+import { StackedBarChartPage } from './pages/charts/StackedBarChartPage'
+import { StackedAreaChartPage } from './pages/charts/StackedAreaChartPage'
+import { GroupedBarChartPage } from './pages/charts/GroupedBarChartPage'
 import { ChangelogPage } from './pages/ChangelogPage'
 import { DevelopmentPage } from './pages/DevelopmentPage'
 import { ComingSoonPage } from './pages/ComingSoonPage'
@@ -228,6 +232,10 @@ function renderPage(hash: string): React.ReactElement {
     case '#/charts/pie-chart':              return <PieChartPage />
     case '#/charts/line-chart':             return <LineChartPage />
     case '#/charts/area-chart':             return <AreaChartPage />
+    case '#/charts/sparkline-chart':        return <SparklinePage />
+    case '#/charts/stacked-bar-chart':     return <StackedBarChartPage />
+    case '#/charts/stacked-area-chart':    return <StackedAreaChartPage />
+    case '#/charts/grouped-bar-chart':     return <GroupedBarChartPage />
     // Core (data) — support both old and new routes
     case '#/data/data-source':
     case '#/core/data-source':                return <DataSourcePage />

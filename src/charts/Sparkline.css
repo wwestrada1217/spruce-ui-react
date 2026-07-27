@@ -1,0 +1,32 @@
+/*
+ * Copyright (c) 2026-2027 Sprucestack. All Rights Reserved.
+ * The term "Sprucestack" refers to Sprucestack Inc. and/or its subsidiaries.
+ * This software is released under Apache license.
+ * The full license information can be found in LICENSE in the root directory of this project.
+ */
+
+.sp-sparkline {
+  display: inline-block;
+  vertical-align: middle;
+  overflow: visible;
+}
+
+.sp-sparkline-line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sp-sparkline-bar {
+  transition: opacity 150ms ease;
+  cursor: pointer;
+}
+
+.sp-sparkline-bar:hover {
+  opacity: 0.8;
+}
+
+.sp-sparkline-dot {
+  transition: r 150ms ease;
+}

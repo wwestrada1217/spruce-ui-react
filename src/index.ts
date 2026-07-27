@@ -460,6 +460,14 @@ export { LineChart } from './charts/LineChart.js';
 export type { LineChartProps } from './charts/LineChart.js';
 export { AreaChart } from './charts/AreaChart.js';
 export type { AreaChartProps } from './charts/AreaChart.js';
+export { Sparkline } from './charts/Sparkline.js';
+export type { SparklineProps } from './charts/Sparkline.js';
+export { StackedBarChart } from './charts/StackedBarChart.js';
+export type { StackedBarChartProps } from './charts/StackedBarChart.js';
+export { StackedAreaChart } from './charts/StackedAreaChart.js';
+export type { StackedAreaChartProps } from './charts/StackedAreaChart.js';
+export { GroupedBarChart } from './charts/GroupedBarChart.js';
+export type { GroupedBarChartProps } from './charts/GroupedBarChart.js';
 export type { ChartDataItem, ChartSeries, ChartLegendPosition, ChartTooltipData } from './charts/types.js';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
