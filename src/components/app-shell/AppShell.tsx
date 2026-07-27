@@ -105,20 +105,20 @@ function AppShellInner({
   className,
   style,
 }: Omit<AppShellProps, 'sidebarCollapsible' | 'sidebarResponsive'>) {
-  const { allowResponsive } = useSidebar();
-  const [isSmallScreen, setIsSmallScreen] = useState(
+  const { allowResponsive, isSmallScreen: ctxSmall, isMobileOpen } = useSidebar();
+  const [localSmallScreen, setLocalSmallScreen] = useState(
     typeof window !== 'undefined' ? window.matchMedia(`(max-width: ${breakpoint}px)`).matches : false,
   );
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const mq = window.matchMedia(`(max-width: ${breakpoint}px)`);
-    const handler = (e: MediaQueryListEvent) => setIsSmallScreen(e.matches);
+    const handler = (e: MediaQueryListEvent) => setLocalSmallScreen(e.matches);
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);
   }, [breakpoint]);
 
-  const showHamburger = allowResponsive && isSmallScreen && !!sidebar;
+  const showHamburger = allowResponsive && (ctxSmall || localSmallScreen || isMobileOpen) && !!sidebar;
 
   const rootCls = ['sp-app-shell', className].filter(Boolean).join(' ');
   const mainCls = ['sp-app-shell__main', padded && 'sp-app-shell__main--padded']
@@ -161,11 +161,16 @@ function AppShellInner({
 export function AppShell({
   sidebarCollapsible = true,
   sidebarResponsive = true,
+  breakpoint = 768,
   ...rest
 }: AppShellProps) {
   return (
-    <SidebarProvider allowCollapsible={sidebarCollapsible} allowResponsive={sidebarResponsive}>
-      <AppShellInner {...rest} />
+    <SidebarProvider
+      allowCollapsible={sidebarCollapsible}
+      allowResponsive={sidebarResponsive}
+      breakpoint={breakpoint}
+    >
+      <AppShellInner breakpoint={breakpoint} {...rest} />
     </SidebarProvider>
   );
 }
