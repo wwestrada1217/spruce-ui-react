@@ -303,7 +303,7 @@ export function BlockEditor({
 
     // Enter Key Handling
     if (e.key === 'Enter') {
-      // (3) Fix: Code blocks allow newline on Enter, and Ctrl/Cmd+Enter creates a new block below!
+      // Code blocks allow newline on Enter, and Ctrl/Cmd+Enter creates a new block below
       if (block.type === 'code') {
         if (e.ctrlKey || e.metaKey) {
           e.preventDefault();
@@ -314,6 +314,19 @@ export function BlockEditor({
 
       if (!e.shiftKey) {
         e.preventDefault();
+
+        // Bulleted and Numbered list continuation
+        if (block.type === 'list' || block.type === 'list-ordered') {
+          if (block.content.trim() === '') {
+            // Convert empty list item to paragraph (exit list)
+            handleUpdateBlock(block.id, { type: 'paragraph' });
+          } else {
+            // Continue list creation of same list type
+            handleAddBlock(block.type, index);
+          }
+          return;
+        }
+
         handleAddBlock('paragraph', index);
         return;
       }
@@ -361,6 +374,20 @@ export function BlockEditor({
         ) : (
           currentBlocks.map((block, index) => {
             const inputCls = `sp-block-editor__input sp-block-editor__input--${block.type}`;
+
+            // Calculate contiguous sequence number for numbered list items starting at 1
+            let orderedListIndex = 1;
+            if (block.type === 'list-ordered') {
+              let count = 1;
+              for (let i = index - 1; i >= 0; i--) {
+                if (currentBlocks[i].type === 'list-ordered') {
+                  count++;
+                } else {
+                  break;
+                }
+              }
+              orderedListIndex = count;
+            }
 
             return (
               <div key={block.id} className="sp-block-editor__line">
@@ -415,7 +442,7 @@ export function BlockEditor({
                     </>
                   ) : block.type === 'list-ordered' ? (
                     <>
-                      <span className="sp-block-editor__list-bullet">{index + 1}.</span>
+                      <span className="sp-block-editor__list-bullet">{orderedListIndex}.</span>
                       <input
                         ref={(el) => { inputRefs.current[block.id] = el; }}
                         type="text"
