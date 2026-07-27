@@ -1,0 +1,294 @@
+/*
+ * Copyright (c) 2026-2027 Sprucestack. All Rights Reserved.
+ * The term "Sprucestack" refers to Sprucestack Inc. and/or its subsidiaries.
+ * This software is released under Apache license.
+ * The full license information can be found in LICENSE in the root directory of this project.
+ */
+
+/* ─── Block Editor Root ─── */
+.sp-block-editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-space-2, 8px);
+  width: 100%;
+}
+
+/* Label */
+.sp-block-editor__label {
+  font-size: var(--sp-text-sm, 13px);
+  font-weight: var(--sp-font-medium, 500);
+  color: var(--sp-text-color, #1a202c);
+}
+
+.sp-block-editor__required {
+  color: var(--sp-danger, #dc2626);
+  margin-left: 2px;
+}
+
+/* Container */
+.sp-block-editor__container {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--sp-border-strong, rgba(15, 23, 42, 0.14));
+  border-radius: var(--sp-radius-xl, 12px);
+  background: var(--sp-surface-0, #ffffff);
+  padding: var(--sp-space-4, 16px);
+  gap: var(--sp-space-3, 12px);
+  transition:
+    border-color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease),
+    box-shadow var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-block-editor__container:focus-within {
+  border-color: var(--sp-border-focus, #0f766e);
+  box-shadow: 0 0 0 3px var(--sp-focus-ring-color, rgba(15, 118, 110, 0.25));
+}
+
+/* Disabled state */
+.sp-block-editor--disabled .sp-block-editor__container {
+  opacity: 0.6;
+  background: var(--sp-surface-100, #e9eef5);
+  cursor: not-allowed;
+}
+
+/* Readonly state */
+.sp-block-editor--readonly .sp-block-editor__container {
+  background: var(--sp-surface-25, #f4f7fb);
+}
+
+/* Error state */
+.sp-block-editor--error .sp-block-editor__container {
+  border-color: var(--sp-danger, #dc2626);
+}
+
+/* Empty State */
+.sp-block-editor__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-space-8, 32px) var(--sp-space-4, 16px);
+  border: 2px dashed var(--sp-border, rgba(15, 23, 42, 0.1));
+  border-radius: var(--sp-radius-lg, 8px);
+  color: var(--sp-text-muted, #64748b);
+  font-size: var(--sp-text-sm, 13px);
+  text-align: center;
+  gap: var(--sp-space-2, 8px);
+}
+
+/* Block List */
+.sp-block-editor__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-space-2, 8px);
+}
+
+/* ─── Individual Block Card ─── */
+.sp-block-editor__block {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-space-2, 8px);
+  padding: var(--sp-space-2_5, 10px) var(--sp-space-3, 12px);
+  border: 1px solid var(--sp-border, rgba(15, 23, 42, 0.08));
+  border-radius: var(--sp-radius-lg, 8px);
+  background: var(--sp-surface-0, #ffffff);
+  transition:
+    border-color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease),
+    box-shadow var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+  position: relative;
+}
+
+.sp-block-editor__block:hover {
+  border-color: var(--sp-border-strong, rgba(15, 23, 42, 0.18));
+}
+
+.sp-block-editor__block--focused {
+  border-color: var(--sp-primary, #0f766e);
+}
+
+/* Block Type Selector dropdown wrapper */
+.sp-block-editor__type-wrap {
+  flex-shrink: 0;
+  width: 120px;
+}
+
+/* Block Content Input Container */
+.sp-block-editor__content-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* Inputs for different block types */
+.sp-block-editor__input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: inherit;
+  color: var(--sp-text-color, #0f172a);
+  resize: vertical;
+}
+
+.sp-block-editor__input--h1 {
+  font-size: var(--sp-text-2xl, 24px);
+  font-weight: 700;
+}
+
+.sp-block-editor__input--h2 {
+  font-size: var(--sp-text-xl, 20px);
+  font-weight: 600;
+}
+
+.sp-block-editor__input--h3 {
+  font-size: var(--sp-text-lg, 18px);
+  font-weight: 600;
+}
+
+.sp-block-editor__input--paragraph {
+  font-size: var(--sp-text-base, 14px);
+  line-height: var(--sp-leading-relaxed, 1.6);
+}
+
+.sp-block-editor__input--quote {
+  font-size: var(--sp-text-base, 14px);
+  font-style: italic;
+  border-left: 3px solid var(--sp-primary, #0f766e);
+  padding-left: var(--sp-space-3, 12px);
+}
+
+.sp-block-editor__input--code {
+  font-family: var(--sp-font-mono, monospace);
+  font-size: var(--sp-text-xs, 12px);
+  background: var(--sp-surface-900, #0f172a);
+  color: var(--sp-text-inverse, #f8fafc);
+  padding: var(--sp-space-2_5, 10px) var(--sp-space-3, 12px);
+  border-radius: var(--sp-radius-md, 6px);
+}
+
+/* Callout block container */
+.sp-block-editor__callout {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-space-2_5, 10px);
+  padding: var(--sp-space-2_5, 10px) var(--sp-space-3, 12px);
+  border-radius: var(--sp-radius-md, 6px);
+  background: var(--sp-surface-50, #f8f9fb);
+  border-left: 4px solid var(--sp-info, #0284c7);
+}
+
+.sp-block-editor__callout--info {
+  background: var(--sp-info-surface, #f0f9ff);
+  border-left-color: var(--sp-info, #0284c7);
+}
+
+.sp-block-editor__callout--warning {
+  background: var(--sp-warning-surface, #fffbe6);
+  border-left-color: var(--sp-warning, #d97706);
+}
+
+.sp-block-editor__callout--danger {
+  background: var(--sp-danger-surface, #fef2f2);
+  border-left-color: var(--sp-danger, #dc2626);
+}
+
+.sp-block-editor__callout--success {
+  background: var(--sp-success-surface, #f0fdf4);
+  border-left-color: var(--sp-success, #16a34a);
+}
+
+/* Divider Block */
+.sp-block-editor__divider-line {
+  width: 100%;
+  height: 1px;
+  background: var(--sp-border-strong, rgba(15, 23, 42, 0.14));
+  margin: var(--sp-space-2, 8px) 0;
+}
+
+/* Block Actions Toolbar */
+.sp-block-editor__actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  opacity: 0.4;
+  transition: opacity var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-block-editor__block:hover .sp-block-editor__actions,
+.sp-block-editor__block:focus-within .sp-block-editor__actions {
+  opacity: 1;
+}
+
+.sp-block-editor__action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--sp-radius-md, 6px);
+  border: none;
+  background: transparent;
+  color: var(--sp-text-subtle, #64748b);
+  cursor: pointer;
+  outline: none;
+  transition:
+    background-color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease),
+    color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-block-editor__action-btn:hover:not(:disabled) {
+  background: var(--sp-content-hover-bg, rgba(15, 23, 42, 0.06));
+  color: var(--sp-text-color, #0f172a);
+}
+
+.sp-block-editor__action-btn--danger:hover:not(:disabled) {
+  background: var(--sp-danger-surface, #fef2f2);
+  color: var(--sp-danger, #dc2626);
+}
+
+/* Add Block Footer Button */
+.sp-block-editor__add-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-space-1_5, 6px);
+  padding: var(--sp-space-2, 8px) var(--sp-space-4, 16px);
+  font-size: var(--sp-text-xs, 12px);
+  font-weight: var(--sp-font-medium, 500);
+  color: var(--sp-primary, #0f766e);
+  background: var(--sp-surface-50, #f8f9fb);
+  border: 1px dashed var(--sp-primary, #0f766e);
+  border-radius: var(--sp-radius-lg, 8px);
+  cursor: pointer;
+  outline: none;
+  transition:
+    background-color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease),
+    box-shadow var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+  align-self: flex-start;
+}
+
+.sp-block-editor__add-btn:hover:not(:disabled) {
+  background: var(--sp-surface-100, #e9eef5);
+}
+
+/* ─── Size Variants ─── */
+.sp-block-editor--sm .sp-block-editor__container {
+  padding: var(--sp-space-2_5, 10px);
+}
+
+.sp-block-editor--lg .sp-block-editor__container {
+  padding: var(--sp-space-5, 20px);
+}
+
+/* ─── Error & Hint Messages ─── */
+.sp-block-editor__error-msg {
+  font-size: var(--sp-text-xs, 11px);
+  color: var(--sp-danger, #dc2626);
+}
+
+.sp-block-editor__hint-msg {
+  font-size: var(--sp-text-xs, 11px);
+  color: var(--sp-text-subtle, #64748b);
+}

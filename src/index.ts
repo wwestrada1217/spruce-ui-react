@@ -445,5 +445,9 @@ export type { EditorProps, EditorSize } from './components/editor/Editor.js';
 export { MarkdownEditor } from './components/markdown-editor/MarkdownEditor.js';
 export type { MarkdownEditorProps, MarkdownEditorMode, MarkdownEditorSize } from './components/markdown-editor/MarkdownEditor.js';
 
+// ─── BlockEditor ─────────────────────────────────────────────────────────────
+export { BlockEditor } from './components/block-editor/BlockEditor.js';
+export type { BlockEditorProps, BlockItem, BlockType, BlockEditorSize } from './components/block-editor/BlockEditor.js';
+
 // ─── Data ─────────────────────────────────────────────────────────────────────
 export * from './data/index.js';

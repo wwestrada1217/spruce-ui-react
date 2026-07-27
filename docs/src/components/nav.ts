@@ -96,7 +96,7 @@ export const NAV_SECTIONS: NavSection[] = [
       { icon: 'sliders-horizontal',label: 'Slider & Range',    route: '#/components/slider-range'       },
       { icon: 'upload',            label: 'File Upload',       route: '#/components/file-upload'        },
       { icon: 'pen-tool',          label: 'Editor',            route: '#/components/editor'        },
-      { icon: 'layout-list',       label: 'Block Editor',      route: '#/components/block-editor',       soon: true },
+      { icon: 'layout-list',       label: 'Block Editor',      route: '#/components/block-editor' },
       { icon: 'heading',           label: 'Markdown Editor',   route: '#/components/markdown-editor' },
       { icon: 'braces',            label: 'Code Editor',       route: '#/components/code-editor'        },
       { icon: 'square-split-horizontal',         label: 'Diff Editor',       route: '#/components/diff-editor',        soon: true },
