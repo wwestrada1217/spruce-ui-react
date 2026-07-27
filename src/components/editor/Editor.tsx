@@ -100,6 +100,8 @@ export function Editor({
         italic: document.queryCommandState('italic'),
         underline: document.queryCommandState('underline'),
         strikethrough: document.queryCommandState('strikethrough'),
+        subscript: document.queryCommandState('subscript'),
+        superscript: document.queryCommandState('superscript'),
         insertUnorderedList: document.queryCommandState('insertUnorderedList'),
         insertOrderedList: document.queryCommandState('insertOrderedList'),
         justifyLeft: document.queryCommandState('justifyLeft'),
@@ -146,6 +148,14 @@ export function Editor({
     const url = window.prompt('Enter link URL:');
     if (url) {
       execCmd('createLink', url);
+    }
+  }
+
+  function handleInsertImage() {
+    if (disabled || readOnly || isSourceView) return;
+    const url = window.prompt('Enter image URL:');
+    if (url) {
+      execCmd('insertImage', url);
     }
   }
 
@@ -260,6 +270,74 @@ export function Editor({
               >
                 <Icon name="strikethrough" size={16} />
               </button>
+              <button
+                type="button"
+                className={`sp-editor__btn${activeFormats.subscript ? ' sp-editor__btn--active' : ''}`}
+                onClick={(e: MouseEvent) => {
+                  e.preventDefault();
+                  execCmd('subscript');
+                }}
+                disabled={!isInteractive || isSourceView}
+                title="Subscript"
+                aria-label="Subscript"
+              >
+                <Icon name="subscript" size={16} />
+              </button>
+              <button
+                type="button"
+                className={`sp-editor__btn${activeFormats.superscript ? ' sp-editor__btn--active' : ''}`}
+                onClick={(e: MouseEvent) => {
+                  e.preventDefault();
+                  execCmd('superscript');
+                }}
+                disabled={!isInteractive || isSourceView}
+                title="Superscript"
+                aria-label="Superscript"
+              >
+                <Icon name="superscript" size={16} />
+              </button>
+            </div>
+
+            <div className="sp-editor__divider" aria-hidden="true" />
+
+            {/* Colors Group */}
+            <div className="sp-editor__toolbar-group">
+              <label className="sp-editor__color-wrap" title="Text Color">
+                <button
+                  type="button"
+                  className="sp-editor__btn"
+                  disabled={!isInteractive || isSourceView}
+                  tabIndex={-1}
+                  aria-hidden="true"
+                >
+                  <Icon name="palette" size={16} />
+                </button>
+                <input
+                  type="color"
+                  className="sp-editor__color-input"
+                  disabled={!isInteractive || isSourceView}
+                  onChange={(e) => execCmd('foreColor', e.target.value)}
+                  aria-label="Text Color"
+                />
+              </label>
+              <label className="sp-editor__color-wrap" title="Highlight Color">
+                <button
+                  type="button"
+                  className="sp-editor__btn"
+                  disabled={!isInteractive || isSourceView}
+                  tabIndex={-1}
+                  aria-hidden="true"
+                >
+                  <Icon name="highlighter" size={16} />
+                </button>
+                <input
+                  type="color"
+                  className="sp-editor__color-input"
+                  disabled={!isInteractive || isSourceView}
+                  onChange={(e) => execCmd('hiliteColor', e.target.value)}
+                  aria-label="Highlight Color"
+                />
+              </label>
             </div>
 
             <div className="sp-editor__divider" aria-hidden="true" />
@@ -291,6 +369,51 @@ export function Editor({
                 aria-label="Numbered List"
               >
                 <Icon name="list-ordered" size={16} />
+              </button>
+            </div>
+
+            <div className="sp-editor__divider" aria-hidden="true" />
+
+            {/* Blocks Group */}
+            <div className="sp-editor__toolbar-group">
+              <button
+                type="button"
+                className="sp-editor__btn"
+                onClick={(e: MouseEvent) => {
+                  e.preventDefault();
+                  execCmd('formatBlock', 'blockquote');
+                }}
+                disabled={!isInteractive || isSourceView}
+                title="Blockquote"
+                aria-label="Blockquote"
+              >
+                <Icon name="quote" size={16} />
+              </button>
+              <button
+                type="button"
+                className="sp-editor__btn"
+                onClick={(e: MouseEvent) => {
+                  e.preventDefault();
+                  execCmd('formatBlock', 'pre');
+                }}
+                disabled={!isInteractive || isSourceView}
+                title="Code Block"
+                aria-label="Code Block"
+              >
+                <Icon name="code" size={16} />
+              </button>
+              <button
+                type="button"
+                className="sp-editor__btn"
+                onClick={(e: MouseEvent) => {
+                  e.preventDefault();
+                  execCmd('insertHorizontalRule');
+                }}
+                disabled={!isInteractive || isSourceView}
+                title="Horizontal Line"
+                aria-label="Horizontal Line"
+              >
+                <Icon name="minus" size={16} />
               </button>
             </div>
 
@@ -355,6 +478,19 @@ export function Editor({
                 aria-label="Insert Link"
               >
                 <Icon name="link" size={16} />
+              </button>
+              <button
+                type="button"
+                className="sp-editor__btn"
+                onClick={(e: MouseEvent) => {
+                  e.preventDefault();
+                  handleInsertImage();
+                }}
+                disabled={!isInteractive || isSourceView}
+                title="Insert Image"
+                aria-label="Insert Image"
+              >
+                <Icon name="image" size={16} />
               </button>
               <button
                 type="button"

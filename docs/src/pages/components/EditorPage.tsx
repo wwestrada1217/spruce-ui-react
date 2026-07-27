@@ -9,6 +9,27 @@ const BASIC_CODE = `import { Editor } from 'spruce-react';
   onChange={(html) => console.log(html)}
 />`;
 
+const RICH_FORMATTING_CODE = `import { useState } from 'react';
+import { Editor } from 'spruce-react';
+
+const RICH_HTML = \`
+  <h1>Spruce Rich Text Editor</h1>
+  <p>Format text with <strong>bold</strong>, <em>italic</em>, <u>underline</u>, <s>strikethrough</s>, <sub>subscript</sub> (H<sub>2</sub>O), and <sup>superscript</sup> (E = mc<sup>2</sup>).</p>
+  <hr />
+  <blockquote>"Design is not just what it looks like and feels like. Design is how it works."</blockquote>
+  <ul>
+    <li>Bullet list item 1</li>
+    <li>Bullet list item 2</li>
+  </ul>
+  <ol>
+    <li>First step</li>
+    <li>Second step</li>
+  </ol>
+  <pre><code>console.log("Hello from Spruce Editor!");</code></pre>
+\`;
+
+<Editor value={RICH_HTML} />`;
+
 const CONTROLLED_CODE = `import { useState } from 'react';
 import { Editor } from 'spruce-react';
 
@@ -60,6 +81,7 @@ interface Section {
 
 const SECTIONS: Section[] = [
   { id: 'basic',      label: 'Basic Editor' },
+  { id: 'formatting', label: 'Rich Formatting' },
   { id: 'controlled', label: 'Controlled Value' },
   { id: 'sizes',      label: 'Sizes' },
   { id: 'heights',    label: 'Custom Heights' },
@@ -68,10 +90,27 @@ const SECTIONS: Section[] = [
   { id: 'api',        label: 'API' },
 ];
 
+const RICH_SAMPLE_HTML = `
+  <h1>Spruce Rich Text Editor</h1>
+  <p>Format text with <strong>bold</strong>, <em>italic</em>, <u>underline</u>, <s>strikethrough</s>, <sub>subscript</sub> (H<sub>2</sub>O), and <sup>superscript</sup> (E = mc<sup>2</sup>).</p>
+  <hr />
+  <blockquote>"Design is not just what it looks like and feels like. Design is how it works."</blockquote>
+  <ul>
+    <li>Bullet list item 1</li>
+    <li>Bullet list item 2</li>
+  </ul>
+  <ol>
+    <li>First step</li>
+    <li>Second step</li>
+  </ol>
+  <pre><code>console.log("Hello from Spruce Editor!");</code></pre>
+  <p><img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&auto=format&fit=crop&q=80" alt="Dashboard demo" /></p>
+`.trim();
+
 export function EditorPage() {
   const [activeSection, setActiveSection] = useState('basic');
   const [content, setContent] = useState(
-    '<h1>Welcome to Spruce Editor</h1><p>A powerful, lightweight HTML editor with formatting tools, lists, links, and source view.</p>',
+    '<h1>Welcome to Spruce Editor</h1><p>A powerful, lightweight HTML editor with formatting tools, lists, links, images, blockquotes, codeblocks, superscripts/subscripts, and source view.</p>',
   );
   const mainRef = useRef<HTMLDivElement>(null);
 
@@ -98,7 +137,7 @@ export function EditorPage() {
       <div className="features-main" ref={mainRef}>
         <h1>Editor</h1>
         <p className="docs-desc">
-          A rich HTML / WYSIWYG text editor component with formatting toolbar, headings, lists, alignment, links, and source code view.
+          A rich HTML / WYSIWYG text editor component with full formatting toolbar, superscript, subscript, text &amp; highlight colors, bullet/numbered lists, blockquotes, codeblocks, images, horizontal rules, and HTML source view.
         </p>
 
         {/* Basic Editor */}
@@ -107,6 +146,15 @@ export function EditorPage() {
           <p className="section-desc">Default rich text editor with interactive formatting toolbar.</p>
           <CodePreview code={BASIC_CODE} language="typescript">
             <Editor placeholder="Type your content here..." />
+          </CodePreview>
+        </section>
+
+        {/* Rich Formatting */}
+        <section id="formatting" className="demo-section" aria-labelledby="formatting-heading">
+          <h2 id="formatting-heading">Rich Formatting</h2>
+          <p className="section-desc">Supports superscripts, subscripts, text &amp; highlight colors, bullet/numbered lists, blockquotes, codeblocks, images, and horizontal rules.</p>
+          <CodePreview code={RICH_FORMATTING_CODE} language="typescript">
+            <Editor value={RICH_SAMPLE_HTML} minHeight={260} />
           </CodePreview>
         </section>
 

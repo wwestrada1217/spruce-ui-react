@@ -218,6 +218,35 @@
   text-decoration: underline;
 }
 
+.sp-editor__content hr {
+  border: none;
+  border-top: 1px solid var(--sp-border-strong, rgba(15, 23, 42, 0.14));
+  margin: 1em 0;
+}
+
+.sp-editor__content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--sp-radius-md, 6px);
+  margin: 0.5em 0;
+}
+
+.sp-editor__color-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sp-editor__color-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
 /* ─── Source View Textarea ─── */
 .sp-editor__source {
   width: 100%;

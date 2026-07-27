@@ -50,6 +50,15 @@ export const iconHighlighter: IconDefinition = ['highlighter',
 export const iconKeyboard: IconDefinition = ['keyboard',
   '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 8h.01"/><path d="M12 12h.01"/><path d="M14 8h.01"/><path d="M16 12h.01"/><path d="M18 8h.01"/><path d="M6 8h.01"/><path d="M7 16h10"/><path d="M8 12h.01"/><rect width="20" height="16" x="2" y="4" rx="2"/></svg>'];
 
+export const iconSubscript: IconDefinition = ['subscript',
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 5 8 8"/><path d="m12 5-8 8"/><path d="M20 19h-4c0-1.5 1-2.5 2-3.5s2-1 2-2.5c0-.8-.7-1.5-1.5-1.5s-1.5.7-1.5 1.5"/></svg>'];
+
+export const iconSuperscript: IconDefinition = ['superscript',
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 19 8-8"/><path d="m12 19-8-8"/><path d="M20 9h-4c0-1.5 1-2.5 2-3.5s2-1 2-2.5c0-.8-.7-1.5-1.5-1.5s-1.5.7-1.5 1.5"/></svg>'];
+
+export const iconPalette: IconDefinition = ['palette',
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.92 0 1.7-.62 1.91-1.52.17-.74.63-1.38 1.28-1.78.68-.42 1.5-.56 2.27-.38.8.19 1.54.71 1.95 1.45.39.71 1.09 1.23 1.89 1.23 1.1 0 2-.9 2-2 0-8.28-5.37-15-11.3-15z"/></svg>'];
+
 // ── Collection ──────────────────────────────────────────────────────────
 
 export const EDITOR_ICONS: readonly IconDefinition[] = [
@@ -69,4 +78,7 @@ export const EDITOR_ICONS: readonly IconDefinition[] = [
   iconTextCursorInput,
   iconHighlighter,
   iconKeyboard,
+  iconSubscript,
+  iconSuperscript,
+  iconPalette,
 ];
