@@ -192,6 +192,7 @@ export interface GridOptions<T = unknown> {
   density?: GridDensity;
   rowHeight?: number;
   autoRowHeight?: boolean;
+  autoHeightRow?: boolean;
   headerHeight?: number;
   striped?: boolean;
   borderless?: boolean;
