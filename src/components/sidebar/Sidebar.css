@@ -107,13 +107,23 @@
   top: 0;
   height: 100vh;
   z-index: 50;
-  box-shadow: var(--sp-shadow-lg);
+  box-shadow: none;
+  visibility: hidden;
   transform: translateX(-100%);
-  transition: transform var(--sp-duration-slow, 300ms) var(--sp-ease-in-out, ease-in-out);
+  transition:
+    transform var(--sp-duration-slow, 300ms) var(--sp-ease-in-out, ease-in-out),
+    box-shadow var(--sp-duration-slow, 300ms) var(--sp-ease-in-out, ease-in-out),
+    visibility var(--sp-duration-slow, 300ms) step-after;
 }
 
 .sp-sidebar--mobile.sp-sidebar--mobile-visible {
   transform: translateX(0);
+  box-shadow: var(--sp-shadow-lg);
+  visibility: visible;
+  transition:
+    transform var(--sp-duration-slow, 300ms) var(--sp-ease-in-out, ease-in-out),
+    box-shadow var(--sp-duration-slow, 300ms) var(--sp-ease-in-out, ease-in-out),
+    visibility 0s;
 }
 
 /* ─── Header ─── */

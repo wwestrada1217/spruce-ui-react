@@ -50,7 +50,6 @@ function SidebarInner({
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const mm = window.matchMedia(`(max-width: ${breakpoint}px)`);
-    setIsSmallScreen(mm.matches);
     const handler = (e: MediaQueryListEvent) => {
       setIsSmallScreen(e.matches);
       if (e.matches) {
