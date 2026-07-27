@@ -8,7 +8,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
-import { computePosition, getScrollParents } from '../../utils/positioning.js';
+import { computePosition, getScrollParents, onClickOutside } from '../../utils/positioning.js';
 import './DateTimePicker.css';
 
 export type DateTimePickerSize = 'sm' | 'md' | 'lg';
@@ -241,7 +241,9 @@ export function DateTimePicker({
 
   /* ── Sync from value prop ──────────────────────────────────────────────── */
 
-  useEffect(() => {
+  const [prevValue, setPrevValue] = useState(value);
+  if (value !== prevValue) {
+    setPrevValue(value);
     const parsed = parseISO(value);
     if (parsed) {
       setSelectedDate(parsed.date);
@@ -251,7 +253,7 @@ export function DateTimePicker({
       setViewMonth(parsed.date.month);
       setViewYear(parsed.date.year);
     }
-  }, [value]);
+  }
 
   /* ── Display value ─────────────────────────────────────────────────────── */
 
@@ -318,17 +320,8 @@ export function DateTimePicker({
 
   useEffect(() => {
     if (!open) return;
-    function handler(e: MouseEvent) {
-      const target = e.target as Node;
-      if (
-        wrapRef.current && !wrapRef.current.contains(target) &&
-        panelRef.current && !panelRef.current.contains(target)
-      ) {
-        applyAndClose();
-      }
-    }
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    const els = [wrapRef.current, panelRef.current].filter(Boolean) as HTMLElement[];
+    return onClickOutside(els, applyAndClose);
   }, [open, applyAndClose]);
 
   /* ── Keyboard ──────────────────────────────────────────────────────────── */

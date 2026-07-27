@@ -8,7 +8,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
-import { computePosition, getScrollParents } from '../../utils/positioning.js';
+import { computePosition, getScrollParents, onClickOutside } from '../../utils/positioning.js';
 import './TimePicker.css';
 
 export type TimePickerSize = 'sm' | 'md' | 'lg';
@@ -122,15 +122,16 @@ export function TimePicker({
   const [panelReady, setPanelReady] = useState(false);
   const rafId = useRef(0);
 
-  // Sync internal state when value prop changes
-  useEffect(() => {
+  const [prevValue, setPrevValue] = useState(value);
+  if (value !== prevValue) {
+    setPrevValue(value);
     const parsed = parseTime(value);
     if (parsed) {
       setHour(parsed.hour);
       setMinute(parsed.minute);
       setSecond(parsed.second);
     }
-  }, [value]);
+  }
 
   const displayValue = value ?? '';
 
@@ -189,13 +190,8 @@ export function TimePicker({
 
   useEffect(() => {
     if (!open) return;
-    function handler(e: MouseEvent) {
-      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
-        applyAndClose();
-      }
-    }
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    const els = [wrapRef.current, panelRef.current].filter(Boolean) as HTMLElement[];
+    return onClickOutside(els, applyAndClose);
   }, [open, applyAndClose]);
 
   /* ── Keyboard ─────────────────────────────────────────────────────────── */
@@ -217,17 +213,22 @@ export function TimePicker({
 
   function toggleOpen() {
     if (disabled) return;
-    if (!open) {
-      // When opening, seed from current value
-      const parsed = parseTime(value);
-      if (parsed) {
-        setHour(parsed.hour);
-        setMinute(parsed.minute);
-        setSecond(parsed.second);
-      }
+    if (open) {
+      applyAndClose();
+      return;
+    }
+    const parsed = parseTime(value);
+    if (parsed) {
+      setHour(parsed.hour);
+      setMinute(parsed.minute);
+      setSecond(parsed.second);
+    } else {
+      setHour(0);
+      setMinute(0);
+      setSecond(0);
     }
     setPanelReady(false);
-    setOpen((v) => !v);
+    setOpen(true);
   }
 
   /* ── Input mode typing ────────────────────────────────────────────────── */
@@ -252,12 +253,13 @@ export function TimePicker({
 
   // Cleanup all hold timers on unmount
   useEffect(() => {
+    const timers = holdTimers.current;
     return () => {
-      holdTimers.current.forEach((entry) => {
+      timers.forEach((entry) => {
         clearTimeout(entry.timeout);
         clearInterval(entry.interval);
       });
-      holdTimers.current.clear();
+      timers.clear();
     };
   }, []);
 
@@ -281,7 +283,13 @@ export function TimePicker({
       }
     }
 
-    return { onMouseDown: start, onMouseUp: stop, onMouseLeave: stop };
+    function handleClick(e: React.MouseEvent) {
+      if (e.detail === 0) {
+        action();
+      }
+    }
+
+    return { onMouseDown: start, onMouseUp: stop, onMouseLeave: stop, onClick: handleClick };
   }
 
   /* ── Step buttons ─────────────────────────────────────────────────────── */

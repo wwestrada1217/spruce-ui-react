@@ -8,7 +8,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
-import { computePosition, getScrollParents } from '../../utils/positioning.js';
+import { computePosition, getScrollParents, onClickOutside } from '../../utils/positioning.js';
 import './DatePicker.css';
 
 /* ── Public Types ────────────────────────────────────────────────────────── */
@@ -182,20 +182,18 @@ export function DatePicker({
 
   /* ── Sync view when value changes externally ─────────────────────────── */
 
-  useEffect(() => {
+  const [prevValue, setPrevValue] = useState(value);
+  if (value !== prevValue) {
+    setPrevValue(value);
     const p = parseIso(value);
     if (p) {
       setViewYear(p.year);
       setViewMonth(p.month);
     }
-  }, [value]);
-
-  // Sync input text field from value
-  useEffect(() => {
     if (inputMode) {
       setInputText(formatInputValue(value));
     }
-  }, [value, inputMode]);
+  }
 
   /* ── Date constraint helpers ─────────────────────────────────────────── */
 
@@ -306,13 +304,8 @@ export function DatePicker({
 
   useEffect(() => {
     if (!open) return;
-    function handler(e: MouseEvent) {
-      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    const els = [wrapRef.current, panelRef.current].filter(Boolean) as HTMLElement[];
+    return onClickOutside(els, () => setOpen(false));
   }, [open]);
 
   /* ── Open / Close ────────────────────────────────────────────────────── */
