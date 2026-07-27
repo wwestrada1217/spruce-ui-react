@@ -1117,60 +1117,83 @@ code {
   border-bottom: none;
 }
 
-/* ── Table of Contents ────────────────────────────────────────────────────────── */
+/* ── Table of Contents / Section Navigation ──────────────────────────────────── */
 .features-toc {
   position: sticky;
-  top: 52px;
-  width: 180px;
+  top: 80px;
+  width: 200px;
   flex-shrink: 0;
   align-self: flex-start;
-  max-height: calc(100vh - 104px);
+  max-height: calc(100vh - 120px);
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
 }
 
 .features-toc:hover {
-  scrollbar-color: var(--border-2) transparent;
+  scrollbar-color: var(--border, rgba(0, 0, 0, 0.15)) transparent;
 }
 
 .features-toc__title {
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--text-4);
-  margin: 0 0 10px;
+  letter-spacing: 0.08em;
+  color: var(--text-muted, #718096);
+  margin: 0 0 10px 0;
 }
 
-.toc-list {
+.features-toc ul,
+.features-toc .toc-list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  border-left: 2px solid var(--border);
+  border-left: 2px solid var(--border, rgba(0, 0, 0, 0.08));
 }
 
-.toc-link {
+.features-toc li {
+  margin: 0;
+  padding: 0;
+}
+
+.features-toc a,
+.features-toc button,
+.features-toc .toc-link {
   display: block;
-  padding: 4px 8px 4px 12px;
-  font-size: 12.5px;
-  color: var(--text-3);
+  width: 100%;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-muted, #64748b);
+  text-align: left;
   text-decoration: none;
-  transition: color 0.1s;
-  cursor: pointer;
-  line-height: 1.5;
-}
-
-.toc-link:hover,
-.toc-link.active {
-  color: var(--primary-text);
-}
-
-.toc-link.active {
-  border-left: 2px solid var(--primary);
+  background: transparent;
+  border: none;
+  border-left: 2px solid transparent;
   margin-left: -2px;
+  cursor: pointer;
+  line-height: 1.4;
+  font-family: inherit;
+  transition: color 150ms ease, background 150ms ease, border-color 150ms ease;
+  border-radius: 0 4px 4px 0;
+}
+
+.features-toc a:hover,
+.features-toc button:hover,
+.features-toc .toc-link:hover {
+  color: var(--sp-primary, #2563eb);
+  background: var(--sp-content-hover-bg, rgba(37, 99, 235, 0.04));
+}
+
+.features-toc a.active,
+.features-toc button.active,
+.features-toc .toc-link.active {
+  color: var(--sp-primary, #2563eb);
+  font-weight: 600;
+  border-left-color: var(--sp-primary, #2563eb);
+  background: var(--sp-primary-subtle, rgba(37, 99, 235, 0.08));
 }
 
 /* ── Changelog page ──────────────────────────────────────────────────────────── */
