@@ -9,12 +9,14 @@ import './BlockEditor.css';
 import {
   useState,
   useRef,
+  useEffect,
   useLayoutEffect,
   type ChangeEvent,
   type KeyboardEvent,
 } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
+import { Select, type SelectOption } from '../select/Select.js';
 import { computePosition } from '../../utils/positioning.js';
 
 export type BlockType =
@@ -68,6 +70,19 @@ export interface BlockEditorProps {
   style?: React.CSSProperties;
 }
 
+const CODE_LANGUAGES: SelectOption[] = [
+  { label: 'TypeScript', value: 'typescript' },
+  { label: 'JavaScript', value: 'javascript' },
+  { label: 'HTML',       value: 'html' },
+  { label: 'CSS',        value: 'css' },
+  { label: 'Python',     value: 'python' },
+  { label: 'JSON',       value: 'json' },
+  { label: 'Markdown',   value: 'markdown' },
+  { label: 'SQL',        value: 'sql' },
+  { label: 'Bash',       value: 'bash' },
+  { label: 'Plain Text', value: 'plaintext' },
+];
+
 interface SlashCommandOption {
   type: BlockType;
   label: string;
@@ -84,7 +99,7 @@ const SLASH_COMMANDS: SlashCommandOption[] = [
   { type: 'list-ordered', label: 'Numbered List',  desc: 'Create a numbered list.',            iconName: 'list-ordered' },
   { type: 'quote',        label: 'Quote',          desc: 'Capture a quote or highlight text.', iconName: 'quote' },
   { type: 'callout',      label: 'Callout',        desc: 'Make text stand out with a box.',    iconName: 'info' },
-  { type: 'code',         label: 'Code Block',     desc: 'Capture code snippet.',              iconName: 'code' },
+  { type: 'code',         label: 'Code Block',     desc: 'Capture code snippet with autogrow.',iconName: 'code' },
   { type: 'divider',      label: 'Divider',        desc: 'Visually divide blocks with a line.',iconName: 'minus' },
 ];
 
@@ -96,6 +111,7 @@ const NOTION_DEFAULT_BLOCKS: BlockItem[] = [
   { id: generateId(), type: 'h1',        content: 'Notion & TipTap Style Block Editor' },
   { id: generateId(), type: 'paragraph', content: 'Type "/" anywhere to open the Notion slash command menu.' },
   { id: generateId(), type: 'callout',   content: 'Pro tip: Press Enter to create a new block, or Backspace on an empty block to delete it.', metadata: { calloutType: 'info' } },
+  { id: generateId(), type: 'code',      content: 'function helloWorld() {\n  console.log("Hello from Spruce Block Editor!");\n}', metadata: { language: 'typescript' } },
 ];
 
 /* ── Component ───────────────────────────────────────────────────────────── */
@@ -124,6 +140,7 @@ export function BlockEditor({
 
   const [activeContextMenuBlockId, setActiveContextMenuBlockId] = useState<string | null>(null);
   const [contextPos, setContextPos] = useState({ top: 0, left: 0 });
+  const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
 
   const inputRefs = useRef<Record<string, HTMLInputElement | HTMLTextAreaElement | null>>({});
   const gripRefs = useRef<Record<string, HTMLButtonElement | null>>({});
@@ -153,6 +170,53 @@ export function BlockEditor({
     });
   }
 
+  /* ── 1. Click-Outside Dismissal ─────────────────────────────────────────── */
+  useEffect(() => {
+    function handlePointerDown(e: PointerEvent) {
+      const target = e.target as Node;
+
+      // Dismiss Slash Command Menu when clicking outside
+      if (
+        activeSlashBlockId &&
+        slashMenuRef.current &&
+        !slashMenuRef.current.contains(target)
+      ) {
+        setActiveSlashBlockId(null);
+      }
+
+      // Dismiss Context Options Menu when clicking outside
+      if (
+        activeContextMenuBlockId &&
+        contextMenuRef.current &&
+        !contextMenuRef.current.contains(target) &&
+        !Object.values(gripRefs.current).some((el) => el?.contains(target))
+      ) {
+        setActiveContextMenuBlockId(null);
+      }
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => document.removeEventListener('pointerdown', handlePointerDown);
+  }, [activeSlashBlockId, activeContextMenuBlockId]);
+
+  /* ── Code Block Textarea Autogrow Layout ────────────────────────────────── */
+  useLayoutEffect(() => {
+    currentBlocks.forEach((block) => {
+      if (block.type === 'code') {
+        const el = inputRefs.current[block.id];
+        if (el) {
+          el.style.height = 'auto';
+          el.style.height = `${Math.max(52, el.scrollHeight)}px`;
+        }
+      }
+    });
+  }, [currentBlocks]);
+
+  function adjustTextareaHeight(target: HTMLTextAreaElement) {
+    target.style.height = 'auto';
+    target.style.height = `${Math.max(52, target.scrollHeight)}px`;
+  }
+
   function handleAddBlock(type: BlockType = 'paragraph', index?: number) {
     if (disabled || readOnly) return;
     const newBlock: BlockItem = {
@@ -160,6 +224,7 @@ export function BlockEditor({
       type,
       content: '',
       ...(type === 'callout' ? { metadata: { calloutType: 'info' } } : {}),
+      ...(type === 'code' ? { metadata: { language: 'typescript' } } : {}),
     };
 
     const targetIndex = index !== undefined ? index + 1 : currentBlocks.length;
@@ -213,6 +278,14 @@ export function BlockEditor({
     setActiveContextMenuBlockId(null);
   }
 
+  function handleCopyCode(blockId: string, content: string) {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(content);
+      setCopiedCodeId(blockId);
+      setTimeout(() => setCopiedCodeId(null), 2000);
+    }
+  }
+
   /* ── Slash Menu Filtering & Smart Positioning ────────────────────────────── */
 
   const filteredSlashCommands = SLASH_COMMANDS.filter(
@@ -245,14 +318,18 @@ export function BlockEditor({
     const block = currentBlocks.find((b) => b.id === blockId);
     if (!block) return;
 
-    // Strip slash command text from content
     let cleanContent = block.content;
     const slashIdx = cleanContent.indexOf('/');
     if (slashIdx !== -1) {
       cleanContent = cleanContent.substring(0, slashIdx);
     }
 
-    handleUpdateBlock(blockId, { type, content: cleanContent });
+    handleUpdateBlock(blockId, {
+      type,
+      content: cleanContent,
+      ...(type === 'code' ? { metadata: { language: 'typescript' } } : {}),
+    });
+
     setActiveSlashBlockId(null);
     setSlashQuery('');
     setSlashSelectedIndex(0);
@@ -303,7 +380,7 @@ export function BlockEditor({
 
     // Enter Key Handling
     if (e.key === 'Enter') {
-      // Code blocks allow newline on Enter, and Ctrl/Cmd+Enter creates a new block below
+      // Code blocks allow newline on Enter, Ctrl/Cmd+Enter creates a new block below
       if (block.type === 'code') {
         if (e.ctrlKey || e.metaKey) {
           e.preventDefault();
@@ -391,7 +468,7 @@ export function BlockEditor({
 
             return (
               <div key={block.id} className="sp-block-editor__line">
-                {/* (1) Notion Side Handle (Grip + Add Button) in clear left gutter */}
+                {/* Notion Side Handle (Grip + Add Button) in clear left gutter */}
                 {isInteractive && (
                   <div className="sp-block-editor__side-handle">
                     <button
@@ -472,7 +549,6 @@ export function BlockEditor({
                       />
                     </div>
                   ) : block.type === 'callout' ? (
-                    /* (2) Callout with straight vertical accent line */
                     <div className="sp-block-editor__callout-card">
                       <Icon name="info" size={18} className="sp-block-editor__callout-icon" />
                       <input
@@ -489,20 +565,46 @@ export function BlockEditor({
                       />
                     </div>
                   ) : block.type === 'code' ? (
-                    /* (3) Code block textarea allows multiline newlines */
+                    /* (2) Code Block with Header, Language Selector & Autogrow Textarea */
                     <div className="sp-block-editor__code-card">
-                      <textarea
-                        ref={(el) => { inputRefs.current[block.id] = el; }}
-                        className={inputCls}
-                        rows={3}
-                        value={block.content}
-                        onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-                          handleInputChange(block.id, e.target.value)
-                        }
-                        onKeyDown={(e) => handleKeyDown(e, block, index)}
-                        placeholder="// Enter code snippet..."
-                        disabled={!isInteractive}
-                      />
+                      <div className="sp-block-editor__code-header">
+                        <div className="sp-block-editor__code-lang-wrap">
+                          <Select
+                            options={CODE_LANGUAGES}
+                            value={block.metadata?.language || 'typescript'}
+                            onChange={(val) => {
+                              const selectedLang = Array.isArray(val) ? val[0] : val;
+                              handleUpdateBlock(block.id, {
+                                metadata: { ...block.metadata, language: selectedLang },
+                              });
+                            }}
+                            disabled={!isInteractive}
+                            size="sm"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          className="sp-block-editor__code-copy-btn"
+                          onClick={() => handleCopyCode(block.id, block.content)}
+                        >
+                          <Icon name={copiedCodeId === block.id ? 'check' : 'copy'} size={12} />
+                          {copiedCodeId === block.id ? 'Copied' : 'Copy'}
+                        </button>
+                      </div>
+                      <div className="sp-block-editor__code-body">
+                        <textarea
+                          ref={(el) => { inputRefs.current[block.id] = el; }}
+                          className={inputCls}
+                          value={block.content}
+                          onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
+                            adjustTextareaHeight(e.target);
+                            handleInputChange(block.id, e.target.value);
+                          }}
+                          onKeyDown={(e) => handleKeyDown(e, block, index)}
+                          placeholder="// Type code here..."
+                          disabled={!isInteractive}
+                        />
+                      </div>
                     </div>
                   ) : (
                     <input
@@ -525,7 +627,7 @@ export function BlockEditor({
         )}
       </div>
 
-      {/* (4) Smart Positioned Portal: Slash Command Menu Popover */}
+      {/* (1) Smart Positioned Portal: Slash Command Menu Popover with Click-Outside Dismissal */}
       {activeSlashBlockId && filteredSlashCommands.length > 0 && typeof document !== 'undefined' &&
         createPortal(
           <div
@@ -556,7 +658,7 @@ export function BlockEditor({
           document.body,
         )}
 
-      {/* (4) Smart Positioned Portal: Context Menu Popover */}
+      {/* (1) Smart Positioned Portal: Context Menu Popover with Click-Outside Dismissal */}
       {activeContextMenuBlockId && typeof document !== 'undefined' &&
         createPortal(
           <div

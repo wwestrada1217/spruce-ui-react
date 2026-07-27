@@ -251,21 +251,82 @@
   margin-top: 2px;
 }
 
-/* Code Block Box */
+/* Code Block Card with Header & Autogrowing Editor */
 .sp-block-editor__code-card {
   width: 100%;
   background: var(--sp-surface-900, #0f172a);
   border-radius: var(--sp-radius-lg, 8px);
-  padding: var(--sp-space-3, 12px) var(--sp-space-4, 16px);
+  overflow: hidden;
   margin: 6px 0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Code Block Header (Language Selector + Copy Action) */
+.sp-block-editor__code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-space-1_5, 6px) var(--sp-space-3, 12px);
+  background: rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  user-select: none;
+}
+
+.sp-block-editor__code-lang-wrap {
+  width: 130px;
+}
+
+.sp-block-editor__code-copy-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--sp-text-subtle, #94a3b8);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: var(--sp-radius-sm, 4px);
+  transition: color var(--sp-duration-fast, 100ms), background-color var(--sp-duration-fast, 100ms);
+}
+
+.sp-block-editor__code-copy-btn:hover {
+  color: #f8fafc;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Code Editor Area (Autogrowing Textarea) */
+.sp-block-editor__code-body {
+  padding: var(--sp-space-3, 12px) var(--sp-space-4, 16px);
+  position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .sp-block-editor__input--code {
   font-family: var(--sp-font-mono, monospace);
   font-size: var(--sp-text-xs, 12px);
+  line-height: 1.6;
   color: var(--sp-text-inverse, #f8fafc);
   white-space: pre;
+  overflow: hidden;
+  resize: none;
+  min-height: 52px;
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
 }
+
+/* Syntax Highlighting Tokens */
+.sp-token-keyword  { color: #f472b6; font-weight: 600; }
+.sp-token-string   { color: #a3e635; }
+.sp-token-comment  { color: #94a3b8; font-style: italic; }
+.sp-token-number   { color: #fb923c; }
+.sp-token-function { color: #60a5fa; }
 
 /* Divider Line */
 .sp-block-editor__divider-bar {
