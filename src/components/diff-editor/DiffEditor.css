@@ -1,0 +1,53 @@
+.sp-diff-editor {
+  border: 1px solid var(--sp-border-subtle, #e2e8f0);
+  border-radius: var(--sp-radius-md, 8px);
+  background-color: var(--sp-bg-surface, #ffffff);
+  font-family: var(--sp-font-mono, monospace);
+  font-size: 13px;
+  overflow: auto;
+}
+
+.sp-diff-container {
+  display: flex;
+  flex-direction: column;
+  min-width: 100%;
+}
+
+.sp-diff-row {
+  display: flex;
+  align-items: center;
+  line-height: 1.5;
+  white-space: pre;
+}
+
+.sp-diff-row--added {
+  background-color: rgba(16, 185, 129, 0.12);
+  color: var(--sp-success-text, #065f46);
+}
+
+.sp-diff-row--removed {
+  background-color: rgba(239, 68, 68, 0.12);
+  color: var(--sp-danger-text, #991b1b);
+}
+
+.sp-diff-num {
+  width: 40px;
+  text-align: right;
+  padding-right: 8px;
+  user-select: none;
+  color: var(--sp-text-subtle, #94a3b8);
+  border-right: 1px solid var(--sp-border-subtle, #e2e8f0);
+}
+
+.sp-diff-sign {
+  width: 24px;
+  text-align: center;
+  user-select: none;
+  font-weight: bold;
+}
+
+.sp-diff-code {
+  flex: 1;
+  padding-left: 8px;
+  overflow-x: auto;
+}

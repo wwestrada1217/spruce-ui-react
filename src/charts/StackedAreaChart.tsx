@@ -122,12 +122,33 @@ export function StackedAreaChart({
 
   function getStackedAreaPath(pts: { x: number; yBottom: number; yTop: number }[]): string {
     const topPts = pts.map((p) => ({ x: p.x, y: p.yTop }));
-    const bottomPts = pts.map((p) => ({ x: p.x, y: p.yBottom })).reverse();
+    const bottomPts = pts.map((p) => ({ x: p.x, y: p.yBottom }));
 
     const topPath = getLinePath(topPts);
-    const bottomLine = bottomPts.reduce((acc, p) => `${acc} L ${p.x} ${p.y}`, '');
 
-    return `${topPath} ${bottomLine} Z`;
+    if (!curved) {
+      const bottomLine = bottomPts.slice().reverse().reduce((acc, p) => `${acc} L ${p.x} ${p.y}`, '');
+      return `${topPath} ${bottomLine} Z`;
+    }
+
+    // For curved paths, traverse bottom points in reverse while tracing identical cubic Bezier segments backward
+    let bottomPath = '';
+    for (let idx = bottomPts.length - 1; idx > 0; idx--) {
+      const pCurrent = bottomPts[idx];
+      const pPrev = bottomPts[idx - 1];
+
+      // Reconstruct control points of forward segment (idx - 1 -> idx)
+      const cp1X = pPrev.x + (pCurrent.x - pPrev.x) / 2;
+      const cp1Y = pPrev.y;
+      const cp2X = pPrev.x + (pCurrent.x - pPrev.x) / 2;
+      const cp2Y = pCurrent.y;
+
+      // In reverse (pCurrent -> pPrev), control points are cp2 and cp1
+      bottomPath += ` C ${cp2X} ${cp2Y}, ${cp1X} ${cp1Y}, ${pPrev.x} ${pPrev.y}`;
+    }
+
+    const firstBottom = bottomPts[bottomPts.length - 1];
+    return `${topPath} L ${firstBottom.x} ${firstBottom.y}${bottomPath} Z`;
   }
 
   return (

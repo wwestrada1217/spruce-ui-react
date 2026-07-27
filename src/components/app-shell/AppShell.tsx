@@ -76,7 +76,17 @@ export function AppShellHamburger({
   className,
   style,
 }: AppShellHamburgerProps) {
-  const { toggleMobile } = useSidebar();
+  const { toggle, toggleMobile, allowResponsive, allowCollapsible } = useSidebar();
+
+  function handleClick() {
+    if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+      if (allowResponsive) toggleMobile();
+      else if (allowCollapsible) toggle();
+    } else {
+      if (allowCollapsible) toggle();
+      else if (allowResponsive) toggleMobile();
+    }
+  }
 
   const cls = ['sp-app-shell__hamburger', className].filter(Boolean).join(' ');
 
@@ -85,7 +95,7 @@ export function AppShellHamburger({
       type="button"
       className={cls}
       style={style}
-      onClick={toggleMobile}
+      onClick={handleClick}
       aria-label={label}
     >
       <HamburgerIcon />
@@ -105,20 +115,20 @@ function AppShellInner({
   className,
   style,
 }: Omit<AppShellProps, 'sidebarCollapsible' | 'sidebarResponsive'>) {
-  const { allowResponsive, isSmallScreen: ctxSmall, isMobileOpen } = useSidebar();
-  const [localSmallScreen, setLocalSmallScreen] = useState(
+  const { allowResponsive } = useSidebar();
+  const [isSmallScreen, setIsSmallScreen] = useState(
     typeof window !== 'undefined' ? window.matchMedia(`(max-width: ${breakpoint}px)`).matches : false,
   );
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const mq = window.matchMedia(`(max-width: ${breakpoint}px)`);
-    const handler = (e: MediaQueryListEvent) => setLocalSmallScreen(e.matches);
+    const handler = (e: MediaQueryListEvent) => setIsSmallScreen(e.matches);
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);
   }, [breakpoint]);
 
-  const showHamburger = allowResponsive && (ctxSmall || localSmallScreen || isMobileOpen) && !!sidebar;
+  const showHamburger = allowResponsive && isSmallScreen && !!sidebar;
 
   const rootCls = ['sp-app-shell', className].filter(Boolean).join(' ');
   const mainCls = ['sp-app-shell__main', padded && 'sp-app-shell__main--padded']
@@ -161,16 +171,11 @@ function AppShellInner({
 export function AppShell({
   sidebarCollapsible = true,
   sidebarResponsive = true,
-  breakpoint = 768,
   ...rest
 }: AppShellProps) {
   return (
-    <SidebarProvider
-      allowCollapsible={sidebarCollapsible}
-      allowResponsive={sidebarResponsive}
-      breakpoint={breakpoint}
-    >
-      <AppShellInner breakpoint={breakpoint} {...rest} />
+    <SidebarProvider allowCollapsible={sidebarCollapsible} allowResponsive={sidebarResponsive}>
+      <AppShellInner {...rest} />
     </SidebarProvider>
   );
 }

@@ -94,7 +94,16 @@ import { FileUploadPage } from './pages/components/FileUploadPage'
 import { EditorPage } from './pages/components/EditorPage'
 import { MarkdownEditorPage } from './pages/components/MarkdownEditorPage'
 import { BlockEditorPage } from './pages/components/BlockEditorPage'
+import { DiffEditorPage } from './pages/components/DiffEditorPage'
+import { SignaturePadPage } from './pages/components/SignaturePadPage'
 import { AppShellBlockPage } from './pages/blocks/AppShellBlockPage'
+import { DashboardBlockPage } from './pages/blocks/DashboardBlockPage'
+import { AuthenticationBlockPage } from './pages/blocks/AuthenticationBlockPage'
+import { SettingsBlockPage } from './pages/blocks/SettingsBlockPage'
+import { EmailBlockPage } from './pages/blocks/EmailBlockPage'
+import { FeedsBlockPage } from './pages/blocks/FeedsBlockPage'
+import { ProjectWorkspaceBlockPage } from './pages/blocks/ProjectWorkspaceBlockPage'
+import { SupportDeskBlockPage } from './pages/blocks/SupportDeskBlockPage'
 import { BarChartPage } from './pages/charts/BarChartPage'
 import { PieChartPage } from './pages/charts/PieChartPage'
 import { LineChartPage } from './pages/charts/LineChartPage'
@@ -103,6 +112,34 @@ import { SparklinePage } from './pages/charts/SparklinePage'
 import { StackedBarChartPage } from './pages/charts/StackedBarChartPage'
 import { StackedAreaChartPage } from './pages/charts/StackedAreaChartPage'
 import { GroupedBarChartPage } from './pages/charts/GroupedBarChartPage'
+import { BubbleChartPage } from './pages/charts/BubbleChartPage'
+import { GaugeChartPage } from './pages/charts/GaugeChartPage'
+import { ScatterChartPage } from './pages/charts/ScatterChartPage'
+import { HeatmapChartPage } from './pages/charts/HeatmapChartPage'
+import { RadarChartPage } from './pages/charts/RadarChartPage'
+import { SunburstChartPage } from './pages/charts/SunburstChartPage'
+import { SankeyChartPage } from './pages/charts/SankeyChartPage'
+import { PolarLineChartPage } from './pages/charts/PolarLineChartPage'
+import { WaterfallChartPage } from './pages/charts/WaterfallChartPage'
+import { FunnelChartPage } from './pages/charts/FunnelChartPage'
+import { CandlestickChartPage } from './pages/charts/CandlestickChartPage'
+import { TreemapChartPage } from './pages/charts/TreemapChartPage'
+import { BarRaceChartPage } from './pages/charts/BarRaceChartPage'
+import { HistogramChartPage } from './pages/charts/HistogramChartPage'
+import { CalendarHeatmapChartPage } from './pages/charts/CalendarHeatmapChartPage'
+import { ComboChartPage } from './pages/charts/ComboChartPage'
+import { OrgChartPage } from './pages/charts/OrgChartPage'
+import { SparklesPage } from './pages/effects/SparklesPage'
+import { ConfettiPage } from './pages/effects/ConfettiPage'
+import { ShimmerPage } from './pages/effects/ShimmerPage'
+import { RainbowPage } from './pages/effects/RainbowPage'
+import { ShinePage } from './pages/effects/ShinePage'
+import { GlowPage } from './pages/effects/GlowPage'
+import { MarqueePage } from './pages/effects/MarqueePage'
+import { FadePage } from './pages/effects/FadePage'
+import { FocusUtilitiesPage } from './pages/utils/FocusUtilitiesPage'
+import { HighlightPage } from './pages/utils/HighlightPage'
+import { CodePreviewUtilPage } from './pages/utils/CodePreviewUtilPage'
 import { ChangelogPage } from './pages/ChangelogPage'
 import { DevelopmentPage } from './pages/DevelopmentPage'
 import { ComingSoonPage } from './pages/ComingSoonPage'
@@ -228,8 +265,17 @@ function renderPage(hash: string): React.ReactElement {
     case '#/components/editor':             return <EditorPage />
     case '#/components/markdown-editor':    return <MarkdownEditorPage />
     case '#/components/block-editor':       return <BlockEditorPage />
+    case '#/components/diff-editor':        return <DiffEditorPage />
+    case '#/components/signature-pad':      return <SignaturePadPage />
     case '#/blocks/app-shell':
     case '#/components/app-shell':          return <AppShellBlockPage />
+    case '#/blocks/dashboard':               return <DashboardBlockPage />
+    case '#/blocks/authentication':          return <AuthenticationBlockPage />
+    case '#/blocks/settings':                return <SettingsBlockPage />
+    case '#/blocks/email':                   return <EmailBlockPage />
+    case '#/blocks/feeds':                   return <FeedsBlockPage />
+    case '#/blocks/project-workspace':       return <ProjectWorkspaceBlockPage />
+    case '#/blocks/support-desk':            return <SupportDeskBlockPage />
     // Charts
     case '#/charts/bar-chart':              return <BarChartPage />
     case '#/charts/pie-chart':              return <PieChartPage />
@@ -239,6 +285,37 @@ function renderPage(hash: string): React.ReactElement {
     case '#/charts/stacked-bar-chart':     return <StackedBarChartPage />
     case '#/charts/stacked-area-chart':    return <StackedAreaChartPage />
     case '#/charts/grouped-bar-chart':     return <GroupedBarChartPage />
+    case '#/charts/bubble-chart':          return <BubbleChartPage />
+    case '#/charts/gauge-chart':           return <GaugeChartPage />
+    case '#/charts/scatter-chart':         return <ScatterChartPage />
+    case '#/charts/heatmap-chart':         return <HeatmapChartPage />
+    case '#/charts/radar-chart':           return <RadarChartPage />
+    case '#/charts/sunburst-chart':        return <SunburstChartPage />
+    case '#/charts/sankey-chart':          return <SankeyChartPage />
+    case '#/charts/polar-line-chart':      return <PolarLineChartPage />
+    case '#/charts/waterfall-chart':       return <WaterfallChartPage />
+    case '#/charts/funnel-chart':          return <FunnelChartPage />
+    case '#/charts/candlestick-chart':     return <CandlestickChartPage />
+    case '#/charts/treemap-chart':         return <TreemapChartPage />
+    case '#/charts/bar-race-chart':        return <BarRaceChartPage />
+    case '#/charts/histogram-chart':       return <HistogramChartPage />
+    case '#/charts/calendar-heatmap-chart':return <CalendarHeatmapChartPage />
+    case '#/charts/combo-chart':           return <ComboChartPage />
+    case '#/charts/org-chart':             return <OrgChartPage />
+    // Effects & Animations
+    case '#/effects/sparkles':             return <SparklesPage />
+    case '#/effects/confetti':             return <ConfettiPage />
+    case '#/effects/shimmer':              return <ShimmerPage />
+    case '#/effects/rainbow':              return <RainbowPage />
+    case '#/effects/shine':                return <ShinePage />
+    case '#/effects/glow':                 return <GlowPage />
+    case '#/effects/marquee':              return <MarqueePage />
+    case '#/effects/fade':                 return <FadePage />
+    // Utilities
+    case '#/utils/focus-utilities':
+    case '#/utils/focus-directives':       return <FocusUtilitiesPage />
+    case '#/utils/highlight':              return <HighlightPage />
+    case '#/utils/code-preview':           return <CodePreviewUtilPage />
     // Core (data) — support both old and new routes
     case '#/data/data-source':
     case '#/core/data-source':                return <DataSourcePage />

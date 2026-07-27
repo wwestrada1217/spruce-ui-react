@@ -10,12 +10,13 @@ import { useSidebar } from './SidebarContext.js';
 
 export interface SidebarFooterProps {
   showBorders?: boolean;
-  children?: ReactNode;
+  children?: ReactNode | ((props: { collapsed: boolean; isMobileOpen: boolean }) => ReactNode);
 }
 
 export function SidebarFooter({ showBorders = false, children }: SidebarFooterProps) {
   const { collapsed, isMobileOpen } = useSidebar();
   const isExpanded = !collapsed || isMobileOpen;
+  const isCollapsedView = !isExpanded;
 
   const cls = [
     'sp-sidebar-footer',
@@ -23,5 +24,7 @@ export function SidebarFooter({ showBorders = false, children }: SidebarFooterPr
     showBorders ? 'sp-sidebar-footer--bordered' : '',
   ].filter(Boolean).join(' ');
 
-  return <div className={cls}>{children}</div>;
+  const content = typeof children === 'function' ? children({ collapsed: isCollapsedView, isMobileOpen }) : children;
+
+  return <div className={cls}>{content}</div>;
 }

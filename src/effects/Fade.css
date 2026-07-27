@@ -1,0 +1,30 @@
+.sp-fade {
+  transition-property: opacity, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-block;
+}
+
+.sp-fade--out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sp-fade--in {
+  opacity: 1;
+}
+
+.sp-fade--up.sp-fade--out {
+  transform: translateY(12px);
+}
+
+.sp-fade--down.sp-fade--out {
+  transform: translateY(-12px);
+}
+
+.sp-fade--left.sp-fade--out {
+  transform: translateX(12px);
+}
+
+.sp-fade--right.sp-fade--out {
+  transform: translateX(-12px);
+}

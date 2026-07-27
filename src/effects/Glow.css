@@ -1,0 +1,19 @@
+.sp-glow {
+  display: inline-block;
+  border-radius: var(--sp-radius-md, 8px);
+}
+
+.sp-glow--pulse {
+  animation: sp-glow-pulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes sp-glow-pulse {
+  0% {
+    filter: brightness(1);
+    opacity: 0.8;
+  }
+  100% {
+    filter: brightness(1.25);
+    opacity: 1;
+  }
+}

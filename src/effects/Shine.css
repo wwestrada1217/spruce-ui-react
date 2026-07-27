@@ -1,0 +1,31 @@
+.sp-shine {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+}
+
+.sp-shine--active::after {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    60deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 70%
+  );
+  transform: rotate(30deg) translateY(-100%);
+  animation: sp-shine-sweep 3s ease-in-out infinite;
+  content: '';
+}
+
+@keyframes sp-shine-sweep {
+  0% {
+    transform: rotate(30deg) translateY(-100%);
+  }
+  100% {
+    transform: rotate(30deg) translateY(100%);
+  }
+}

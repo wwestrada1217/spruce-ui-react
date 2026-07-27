@@ -1,0 +1,31 @@
+.sp-sparkles-container {
+  position: relative;
+  display: inline-block;
+}
+
+.sp-sparkle-icon {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  animation: sp-sparkle-spin 1.8s ease-in-out infinite alternate;
+}
+
+.sp-sparkles-child {
+  position: relative;
+  z-index: 0;
+}
+
+@keyframes sp-sparkle-spin {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1) rotate(90deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0) rotate(180deg);
+    opacity: 0;
+  }
+}

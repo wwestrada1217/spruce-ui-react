@@ -453,6 +453,14 @@ export type { MarkdownEditorProps, MarkdownEditorMode, MarkdownEditorSize } from
 export { BlockEditor } from './components/block-editor/BlockEditor.js';
 export type { BlockEditorProps, BlockItem, BlockType, BlockEditorSize } from './components/block-editor/BlockEditor.js';
 
+// ─── DiffEditor ──────────────────────────────────────────────────────────────
+export { DiffEditor } from './components/diff-editor/DiffEditor.js';
+export type { DiffEditorProps } from './components/diff-editor/DiffEditor.js';
+
+// ─── SignaturePad ────────────────────────────────────────────────────────────
+export { SignaturePad } from './components/signature-pad/SignaturePad.js';
+export type { SignaturePadProps } from './components/signature-pad/SignaturePad.js';
+
 // ─── Charts Framework ────────────────────────────────────────────────────────
 export { ChartContainer } from './charts/ChartContainer.js';
 export type { ChartContainerProps, LegendItem } from './charts/ChartContainer.js';
@@ -472,7 +480,65 @@ export { StackedAreaChart } from './charts/StackedAreaChart.js';
 export type { StackedAreaChartProps } from './charts/StackedAreaChart.js';
 export { GroupedBarChart } from './charts/GroupedBarChart.js';
 export type { GroupedBarChartProps } from './charts/GroupedBarChart.js';
+export { BubbleChart } from './charts/BubbleChart.js';
+export type { BubbleChartProps, BubbleSeries, BubblePoint } from './charts/BubbleChart.js';
+export { GaugeChart } from './charts/GaugeChart.js';
+export type { GaugeChartProps } from './charts/GaugeChart.js';
+export { ScatterChart } from './charts/ScatterChart.js';
+export type { ScatterChartProps, ScatterSeries, ScatterPoint } from './charts/ScatterChart.js';
+export { HeatmapChart } from './charts/HeatmapChart.js';
+export type { HeatmapChartProps, HeatmapItem } from './charts/HeatmapChart.js';
+export { RadarChart } from './charts/RadarChart.js';
+export type { RadarChartProps, RadarSeries } from './charts/RadarChart.js';
+export { SunburstChart } from './charts/SunburstChart.js';
+export type { SunburstChartProps, SunburstNode } from './charts/SunburstChart.js';
+export { SankeyChart } from './charts/SankeyChart.js';
+export type { SankeyChartProps, SankeyNode, SankeyLink } from './charts/SankeyChart.js';
+export { PolarLineChart } from './charts/PolarLineChart.js';
+export type { PolarLineChartProps, PolarSeries } from './charts/PolarLineChart.js';
+export { WaterfallChart } from './charts/WaterfallChart.js';
+export type { WaterfallChartProps, WaterfallDataItem } from './charts/WaterfallChart.js';
+export { FunnelChart } from './charts/FunnelChart.js';
+export type { FunnelChartProps } from './charts/FunnelChart.js';
+export { CandlestickChart } from './charts/CandlestickChart.js';
+export type { CandlestickChartProps, CandlestickDataItem } from './charts/CandlestickChart.js';
+export { TreemapChart } from './charts/TreemapChart.js';
+export type { TreemapChartProps, TreemapNode } from './charts/TreemapChart.js';
+export { BarRaceChart } from './charts/BarRaceChart.js';
+export type { BarRaceChartProps, BarRaceFrame } from './charts/BarRaceChart.js';
+export { HistogramChart } from './charts/HistogramChart.js';
+export type { HistogramChartProps, HistogramBin } from './charts/HistogramChart.js';
+export { CalendarHeatmapChart } from './charts/CalendarHeatmapChart.js';
+export type { CalendarHeatmapChartProps, CalendarHeatmapDay } from './charts/CalendarHeatmapChart.js';
+export { ComboChart } from './charts/ComboChart.js';
+export type { ComboChartProps, ComboSeries } from './charts/ComboChart.js';
+export { OrgChart } from './charts/OrgChart.js';
+export type { OrgChartProps, OrgNode } from './charts/OrgChart.js';
 export type { ChartDataItem, ChartSeries, ChartLegendPosition, ChartTooltipData } from './charts/types.js';
+
+// ─── Effects & Animations ───────────────────────────────────────────────────
+export { Sparkles } from './effects/Sparkles.js';
+export type { SparklesProps } from './effects/Sparkles.js';
+export { Confetti } from './effects/Confetti.js';
+export type { ConfettiProps } from './effects/Confetti.js';
+export { Shimmer } from './effects/Shimmer.js';
+export type { ShimmerProps } from './effects/Shimmer.js';
+export { Rainbow } from './effects/Rainbow.js';
+export type { RainbowProps } from './effects/Rainbow.js';
+export { Shine } from './effects/Shine.js';
+export type { ShineProps } from './effects/Shine.js';
+export { Glow } from './effects/Glow.js';
+export type { GlowProps } from './effects/Glow.js';
+export { Marquee } from './effects/Marquee.js';
+export type { MarqueeProps } from './effects/Marquee.js';
+export { Fade } from './effects/Fade.js';
+export type { FadeProps } from './effects/Fade.js';
+
+// ─── Utilities ────────────────────────────────────────────────────────────────
+export { FocusTrap, AutoFocus } from './utils/FocusUtils.js';
+export type { FocusTrapProps, AutoFocusProps } from './utils/FocusUtils.js';
+export { Highlight } from './utils/Highlight.js';
+export type { HighlightProps } from './utils/Highlight.js';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 export * from './data/index.js';

@@ -5,6 +5,27 @@ All notable changes to `spruce-react` are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.4] - 2026-07-27
+
+### Added
+
+- 12 new native SVG chart components: `GaugeChart` (with needle option), `SunburstChart`, `OrgChart`, `SankeyChart`, `PolarLineChart`, `WaterfallChart`, `FunnelChart`, `CandlestickChart`, `TreemapChart`, `BarRaceChart`, `HistogramChart`, `CalendarHeatmapChart`, and `ComboChart`.
+- 8 Effects & Animations components: `Sparkles`, `Confetti`, `Shimmer`, `Rainbow`, `Shine`, `Glow`, `Marquee`, and `Fade`.
+- New UI utilities: `FocusTrap`, `AutoFocus`, and `Highlight`.
+- New layout & editor components: `DiffEditor` and `SignaturePad`.
+- 3 new application block pages: `Feeds & Lists`, `Project Workspace`, and `Support Desk`.
+- `codeOnly` mode support in `<CodePreview>` to render syntax-highlighted code blocks without preview panels.
+
+### Changed
+
+- Made `GaugeChart`, `SunburstChart`, and `OrgChart` fully theme-aware with dynamic CSS variables for text, backgrounds, and node borders across light and dark modes.
+- `SidebarHeader` and `SidebarFooter` now support render functions (`({ collapsed }) => ReactNode`) to conditionally render brand and profile text in collapsed state.
+- `AppShellHamburger` now toggles desktop sidebar collapse as well as mobile drawer slide-out.
+
+### Removed
+
+- Removed obsolete `Map Chart` and `Diagram Editor` sidebar entries.
+
 ## [0.1.3] - 2026-07-24
 
 ### Added

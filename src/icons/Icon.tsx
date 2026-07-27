@@ -1,7 +1,19 @@
 import { useIconRegistry } from './icon-registry.js';
 
-const DUOTONE_STYLE = `
-  [data-duotone="secondary"] {
+const ICON_STYLE = `
+  .sp-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+  .sp-icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .sp-icon [data-duotone="secondary"] {
     fill: var(--sp-icon-secondary-color, currentColor);
     opacity: var(--sp-icon-secondary-opacity, 0.2);
     stroke: none;
@@ -38,10 +50,6 @@ export function Icon({ name, size = 16, ariaLabel, className, style }: IconProps
   const svg = registry.get(name);
 
   const containerStyle: React.CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
     width: size,
     height: size,
     fill: 'currentColor',
@@ -53,11 +61,13 @@ export function Icon({ name, size = 16, ariaLabel, className, style }: IconProps
       ? { role: 'img' as const, 'aria-label': ariaLabel }
       : { role: 'img' as const, 'aria-hidden': true };
 
+  const rootClass = ['sp-icon', className].filter(Boolean).join(' ');
+
   if (!svg) {
     return (
       <span
         {...accessibilityProps}
-        className={className}
+        className={rootClass}
         style={containerStyle}
       />
     );
@@ -66,10 +76,10 @@ export function Icon({ name, size = 16, ariaLabel, className, style }: IconProps
   return (
     <span
       {...accessibilityProps}
-      className={className}
+      className={rootClass}
       style={containerStyle}
       dangerouslySetInnerHTML={{
-        __html: `<style>${DUOTONE_STYLE}</style>${svg}`,
+        __html: `<style>${ICON_STYLE}</style>${svg}`,
       }}
     />
   );

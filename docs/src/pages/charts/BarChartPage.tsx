@@ -1,14 +1,36 @@
-/*
- * Copyright (c) 2026-2027 Sprucestack. All Rights Reserved.
- * The term "Sprucestack" refers to Sprucestack Inc. and/or its subsidiaries.
- * This software is released under Apache license.
- * The full license information can be found in LICENSE in the root directory of this project.
- */
-
+import { useState, useEffect, useRef } from 'react';
 import { BarChart } from 'spruce-react';
 import { CodePreview } from '../../components/CodePreview';
 
+interface Section { id: string; label: string }
+const SECTIONS: Section[] = [
+  { id: 'single-series', label: 'Single Series' },
+  { id: 'grouped-bar',    label: 'Grouped Bar' },
+  { id: 'api',           label: 'API' },
+];
+
 export function BarChartPage() {
+  const [activeSection, setActiveSection] = useState('single-series');
+  const mainRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) setActiveSection(entry.target.id);
+        }
+      },
+      { threshold: 0.3 },
+    );
+    const sections = mainRef.current?.querySelectorAll('[id]') ?? [];
+    sections.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
+  function scrollTo(id: string) {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   const singleData = [
     { label: 'Jan', value: 400 },
     { label: 'Feb', value: 300 },
@@ -25,18 +47,17 @@ export function BarChartPage() {
   const categories = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6'];
 
   return (
-    <div className="doc-page">
-      <div className="doc-header">
+    <div className="features-layout">
+      <div className="features-main" ref={mainRef}>
         <h1>Bar Chart</h1>
-        <p>
+        <p className="docs-desc">
           Native SVG bar chart component for displaying comparative metrics across discrete categories with multi-series support.
         </p>
-      </div>
 
-      <section className="doc-section">
-        <h2>Single Series Bar Chart</h2>
-        <CodePreview
-          code={`import { BarChart } from 'spruce-react';
+        <section id="single-series" className="demo-section" aria-labelledby="single-series-heading">
+          <h2 id="single-series-heading">Single Series Bar Chart</h2>
+          <CodePreview
+            code={`import { BarChart } from 'spruce-react';
 
 const data = [
   { label: 'Jan', value: 400 },
@@ -57,20 +78,20 @@ export function Example() {
     />
   );
 }`}
-        >
-          <BarChart
-            title="Monthly Sales Overview"
-            subtitle="Total units sold per month in 2026"
-            data={singleData}
-            height={300}
-          />
-        </CodePreview>
-      </section>
+          >
+            <BarChart
+              title="Monthly Sales Overview"
+              subtitle="Total units sold per month in 2026"
+              data={singleData}
+              height={300}
+            />
+          </CodePreview>
+        </section>
 
-      <section className="doc-section">
-        <h2>Multi-Series Grouped Bar Chart</h2>
-        <CodePreview
-          code={`import { BarChart } from 'spruce-react';
+        <section id="grouped-bar" className="demo-section" aria-labelledby="grouped-bar-heading">
+          <h2 id="grouped-bar-heading">Multi-Series Grouped Bar Chart</h2>
+          <CodePreview
+            code={`import { BarChart } from 'spruce-react';
 
 const series = [
   { name: 'Revenue', data: [440, 550, 570, 560, 610, 580] },
@@ -89,80 +110,100 @@ export function Example() {
     />
   );
 }`}
-        >
-          <BarChart
-            title="Quarterly Revenue vs Expenses"
-            subtitle="Financial breakdown comparison"
-            series={multiSeriesData}
-            categories={categories}
-            height={320}
-          />
-        </CodePreview>
-      </section>
+          >
+            <BarChart
+              title="Quarterly Revenue vs Expenses"
+              subtitle="Financial breakdown comparison"
+              series={multiSeriesData}
+              categories={categories}
+              height={320}
+            />
+          </CodePreview>
+        </section>
 
-      <section className="doc-section">
-        <h2>API Reference</h2>
-        <table className="doc-table">
-          <thead>
-            <tr>
-              <th>Prop</th>
-              <th>Type</th>
-              <th>Default</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>data</code></td>
-              <td><code>ChartDataItem[]</code></td>
-              <td><code>undefined</code></td>
-              <td>Single-series data items array.</td>
-            </tr>
-            <tr>
-              <td><code>series</code></td>
-              <td><code>ChartSeries[]</code></td>
-              <td><code>undefined</code></td>
-              <td>Multi-series data array.</td>
-            </tr>
-            <tr>
-              <td><code>categories</code></td>
-              <td><code>string[]</code></td>
-              <td><code>[]</code></td>
-              <td>Category names for multi-series charts.</td>
-            </tr>
-            <tr>
-              <td><code>title</code></td>
-              <td><code>string</code></td>
-              <td><code>undefined</code></td>
-              <td>Chart title string.</td>
-            </tr>
-            <tr>
-              <td><code>subtitle</code></td>
-              <td><code>string</code></td>
-              <td><code>undefined</code></td>
-              <td>Chart subtitle string.</td>
-            </tr>
-            <tr>
-              <td><code>height</code></td>
-              <td><code>number | string</code></td>
-              <td><code>300</code></td>
-              <td>Chart container height.</td>
-            </tr>
-            <tr>
-              <td><code>showGrid</code></td>
-              <td><code>boolean</code></td>
-              <td><code>true</code></td>
-              <td>Show background grid lines.</td>
-            </tr>
-            <tr>
-              <td><code>showLegend</code></td>
-              <td><code>boolean</code></td>
-              <td><code>true</code></td>
-              <td>Show chart legend.</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
+        <section id="api" className="demo-section">
+          <h2>API</h2>
+          <h3>Props</h3>
+          <div className="api-table-wrap">
+            <table className="api-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Default</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>data</code></td>
+                  <td><code>ChartDataItem[]</code></td>
+                  <td><code>undefined</code></td>
+                  <td>Single-series data items array.</td>
+                </tr>
+                <tr>
+                  <td><code>series</code></td>
+                  <td><code>ChartSeries[]</code></td>
+                  <td><code>undefined</code></td>
+                  <td>Multi-series data array.</td>
+                </tr>
+                <tr>
+                  <td><code>categories</code></td>
+                  <td><code>string[]</code></td>
+                  <td><code>[]</code></td>
+                  <td>Category names for multi-series charts.</td>
+                </tr>
+                <tr>
+                  <td><code>title</code></td>
+                  <td><code>string</code></td>
+                  <td><code>undefined</code></td>
+                  <td>Chart title string.</td>
+                </tr>
+                <tr>
+                  <td><code>subtitle</code></td>
+                  <td><code>string</code></td>
+                  <td><code>undefined</code></td>
+                  <td>Chart subtitle string.</td>
+                </tr>
+                <tr>
+                  <td><code>height</code></td>
+                  <td><code>number | string</code></td>
+                  <td><code>300</code></td>
+                  <td>Chart container height.</td>
+                </tr>
+                <tr>
+                  <td><code>showGrid</code></td>
+                  <td><code>boolean</code></td>
+                  <td><code>true</code></td>
+                  <td>Show background grid lines.</td>
+                </tr>
+                <tr>
+                  <td><code>showLegend</code></td>
+                  <td><code>boolean</code></td>
+                  <td><code>true</code></td>
+                  <td>Show chart legend.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <nav className="features-toc" aria-label="Table of contents">
+        <p className="features-toc__title">On this page</p>
+        <ul className="toc-list">
+          {SECTIONS.map((s) => (
+            <li key={s.id}>
+              <a
+                className={`toc-link${activeSection === s.id ? ' active' : ''}`}
+                onClick={() => scrollTo(s.id)}
+              >
+                {s.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </div>
   );
 }

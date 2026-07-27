@@ -65,9 +65,13 @@ export const iconTable: IconDefinition = ['table',
 export const iconRatio: IconDefinition = ['ratio',
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="14" x="3" y="5" rx="2"/><path d="M7 12h10"/><circle cx="7" cy="12" r="1" fill="currentColor"/><circle cx="17" cy="12" r="1" fill="currentColor"/></svg>'];
 
+export const iconLayout: IconDefinition = ['layout',
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>'];
+
 // ── Collection ──────────────────────────────────────────────────────────
 
 export const LAYOUT_ICONS: readonly IconDefinition[] = [
+  iconLayout,
   iconLayoutDashboard,
   iconLayoutGrid,
   iconLayoutList,

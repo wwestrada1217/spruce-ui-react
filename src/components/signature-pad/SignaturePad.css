@@ -1,0 +1,19 @@
+.sp-signature-pad {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.sp-signature-canvas {
+  border: 1px dashed var(--sp-border-subtle, #cbd5e1);
+  border-radius: var(--sp-radius-md, 8px);
+  background-color: var(--sp-bg-surface, #ffffff);
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.sp-signature-actions {
+  display: flex;
+  gap: 8px;
+}

@@ -1,0 +1,25 @@
+.sp-confetti-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.sp-confetti-piece {
+  position: absolute;
+  top: -20px;
+  border-radius: 2px;
+  animation: sp-confetti-fall linear forwards;
+}
+
+@keyframes sp-confetti-fall {
+  0% {
+    top: -20px;
+    opacity: 1;
+  }
+  100% {
+    top: 105%;
+    opacity: 0;
+  }
+}

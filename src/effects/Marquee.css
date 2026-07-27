@@ -1,0 +1,36 @@
+.sp-marquee {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  display: flex;
+}
+
+.sp-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: sp-marquee-scroll linear infinite;
+}
+
+.sp-marquee--right .sp-marquee-track {
+  animation-direction: reverse;
+}
+
+.sp-marquee--pause-hover:hover .sp-marquee-track {
+  animation-play-state: paused;
+}
+
+.sp-marquee-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-right: 16px;
+}
+
+@keyframes sp-marquee-scroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}

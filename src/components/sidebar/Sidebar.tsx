@@ -9,11 +9,10 @@ import {
   useEffect,
   useState,
   useRef,
-  useContext,
   type CSSProperties,
   type ReactNode,
 } from 'react';
-import { SidebarContext, SidebarProvider, useSidebar } from './SidebarContext.js';
+import { SidebarProvider, useSidebar } from './SidebarContext.js';
 import './Sidebar.css';
 
 export interface SidebarProps {
@@ -42,17 +41,8 @@ function SidebarInner({
   onCollapsedChange,
   children,
 }: Omit<SidebarProps, 'allowCollapsible' | 'allowResponsive'>) {
-  const {
-    collapsed,
-    isMobileOpen,
-    isSmallScreen: ctxSmallScreen,
-    allowCollapsible,
-    allowResponsive,
-    toggle,
-    setMobileOpen,
-  } = useSidebar();
-
-  const [localSmallScreen, setLocalSmallScreen] = useState(
+  const { collapsed, isMobileOpen, allowCollapsible, allowResponsive, toggle, setMobileOpen, setCollapsed } = useSidebar();
+  const [isSmallScreen, setIsSmallScreen] = useState(
     typeof window !== 'undefined' ? window.matchMedia(`(max-width: ${breakpoint}px)`).matches : false,
   );
   const prevCollapsed = useRef(collapsed);
@@ -60,10 +50,16 @@ function SidebarInner({
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const mm = window.matchMedia(`(max-width: ${breakpoint}px)`);
-    const handler = (e: MediaQueryListEvent) => setLocalSmallScreen(e.matches);
+    const handler = (e: MediaQueryListEvent) => {
+      setIsSmallScreen(e.matches);
+      if (e.matches) {
+        if (allowCollapsible) setCollapsed(true);
+        setMobileOpen(false);
+      }
+    };
     mm.addEventListener('change', handler);
     return () => mm.removeEventListener('change', handler);
-  }, [breakpoint]);
+  }, [breakpoint, allowCollapsible, setCollapsed, setMobileOpen]);
 
   useEffect(() => {
     if (prevCollapsed.current !== collapsed) {
@@ -73,29 +69,26 @@ function SidebarInner({
   }, [collapsed, onCollapsedChange]);
 
   const collapsedEffective = allowCollapsible ? collapsed : false;
-  const isSmall = allowResponsive && (ctxSmallScreen || localSmallScreen);
-  const isMobileView = isSmall || isMobileOpen;
-  const isExpanded = isMobileView || (!collapsedEffective && !isMobileView);
+  const smallEffective = allowResponsive ? isSmallScreen : false;
+  const isExpanded = smallEffective || (!collapsedEffective && !smallEffective);
 
   const hostStyle: CSSProperties = {
-    ...(expandedWidth ? ({ '--sp-sidebar-expanded-width': `${expandedWidth}px` } as CSSProperties) : {}),
-    ...(collapsedWidth ? ({ '--sp-sidebar-collapsed-width': `${collapsedWidth}px` } as CSSProperties) : {}),
-    ...(isMobileView ? { width: 0, overflow: 'visible', flexShrink: 0 } : {}),
+    ...(expandedWidth ? { '--sp-sidebar-expanded-width': `${expandedWidth}px` } as CSSProperties : {}),
+    ...(collapsedWidth ? { '--sp-sidebar-collapsed-width': `${collapsedWidth}px` } as CSSProperties : {}),
+    ...(smallEffective ? { width: 0, overflow: 'visible', flexShrink: 0 } : {}),
   };
 
   const asideClass = [
     'sp-sidebar',
-    isMobileView ? 'sp-sidebar--mobile' : '',
+    smallEffective ? 'sp-sidebar--mobile' : '',
     isExpanded ? 'sp-sidebar--expanded' : '',
-    collapsedEffective && !isMobileView ? 'sp-sidebar--collapsed' : '',
-    isMobileOpen ? 'sp-sidebar--mobile-visible' : '',
-  ]
-    .filter(Boolean)
-    .join(' ');
+    collapsedEffective && !smallEffective ? 'sp-sidebar--collapsed' : '',
+    smallEffective && isMobileOpen ? 'sp-sidebar--mobile-visible' : '',
+  ].filter(Boolean).join(' ');
 
   return (
     <div className="sp-sidebar-host" style={hostStyle}>
-      {isMobileOpen && (
+      {isMobileOpen && smallEffective && (
         <button
           type="button"
           className="sp-sidebar-backdrop"
@@ -105,7 +98,7 @@ function SidebarInner({
       )}
       <aside className={asideClass} aria-label={label}>
         {children}
-        {enableRail && allowCollapsible && !isMobileView && (
+        {enableRail && allowCollapsible && (
           <button
             type="button"
             className="sp-sidebar__rail"
@@ -125,22 +118,11 @@ function SidebarInner({
 export function Sidebar({
   allowCollapsible = true,
   allowResponsive = true,
-  breakpoint = 768,
   ...rest
 }: SidebarProps) {
-  const parentContext = useContext(SidebarContext);
-
-  if (parentContext) {
-    return <SidebarInner breakpoint={breakpoint} {...rest} />;
-  }
-
   return (
-    <SidebarProvider
-      allowCollapsible={allowCollapsible}
-      allowResponsive={allowResponsive}
-      breakpoint={breakpoint}
-    >
-      <SidebarInner breakpoint={breakpoint} {...rest} />;
+    <SidebarProvider allowCollapsible={allowCollapsible} allowResponsive={allowResponsive}>
+      <SidebarInner {...rest} />
     </SidebarProvider>
   );
 }

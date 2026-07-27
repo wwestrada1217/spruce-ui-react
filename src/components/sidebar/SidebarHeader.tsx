@@ -10,7 +10,7 @@ import { useSidebar } from './SidebarContext.js';
 
 export interface SidebarHeaderProps {
   showBorders?: boolean;
-  children?: ReactNode;
+  children?: ReactNode | ((props: { collapsed: boolean; isMobileOpen: boolean }) => ReactNode);
 }
 
 export function SidebarHeader({ showBorders = false, children }: SidebarHeaderProps) {
@@ -23,5 +23,7 @@ export function SidebarHeader({ showBorders = false, children }: SidebarHeaderPr
     isCollapsedView ? 'sp-sidebar-header--collapsed' : '',
   ].filter(Boolean).join(' ');
 
-  return <div className={cls}>{children}</div>;
+  const content = typeof children === 'function' ? children({ collapsed: isCollapsedView, isMobileOpen }) : children;
+
+  return <div className={cls}>{content}</div>;
 }

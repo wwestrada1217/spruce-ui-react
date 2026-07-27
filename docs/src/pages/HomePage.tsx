@@ -119,43 +119,64 @@ const COMPONENT_SECTIONS: NavSection[] = [
 ];
 
 const CHARTS: NavCard[] = [
-  { icon: 'bar-chart',   label: 'Bar Chart',      route: '#/charts/bar-chart',      description: 'Vertical and horizontal bar charts' },
-  { icon: 'pie-chart',   label: 'Pie Chart',      route: '#/charts/pie-chart',      description: 'Pie and donut charts' },
-  { icon: 'trending-up', label: 'Line Chart',     route: '#/charts/line-chart',     description: 'Line and multi-series line charts' },
-  { icon: 'activity',    label: 'Area Chart',     route: '#/charts/area-chart',     description: 'Filled area charts' },
-  { icon: 'gauge',       label: 'Gauge Chart',    route: '#/charts/gauge-chart',    description: 'Radial gauge indicators' },
-  { icon: 'activity',    label: 'Sparkline',      route: '#/charts/sparkline-chart', description: 'Inline mini charts' },
-  { icon: 'layout-grid', label: 'Heatmap',        route: '#/charts/heatmap-chart',  description: 'Color-encoded grid visualizations' },
-  { icon: 'hexagon',     label: 'Radar Chart',    route: '#/charts/radar-chart',    description: 'Multi-axis radar/spider charts' },
+  { icon: 'bar-chart',      label: 'Bar Chart',         route: '#/charts/bar-chart',         description: 'Vertical and horizontal bar charts' },
+  { icon: 'pie-chart',      label: 'Pie Chart',         route: '#/charts/pie-chart',         description: 'Pie and donut charts' },
+  { icon: 'trending-up',    label: 'Line Chart',        route: '#/charts/line-chart',        description: 'Line and multi-series line charts' },
+  { icon: 'activity',       label: 'Area Chart',        route: '#/charts/area-chart',        description: 'Filled area charts' },
+  { icon: 'bar-chart',      label: 'Stacked Bar',       route: '#/charts/stacked-bar-chart',  description: 'Stacked bar visualization' },
+  { icon: 'layers',         label: 'Stacked Area',      route: '#/charts/stacked-area-chart', description: 'Stacked area visualization' },
+  { icon: 'circle-dot',     label: 'Bubble Chart',      route: '#/charts/bubble-chart',      description: 'Bubble chart with 3D value sizing' },
+  { icon: 'gauge',          label: 'Gauge Chart',       route: '#/charts/gauge-chart',       description: 'Radial gauge indicators with optional needle' },
+  { icon: 'chart-scatter',  label: 'Scatter Chart',     route: '#/charts/scatter-chart',     description: 'Scatter plots with multi-series data' },
+  { icon: 'layout-grid',    label: 'Heatmap',           route: '#/charts/heatmap-chart',     description: 'Color-encoded matrix grid' },
+  { icon: 'bar-chart',      label: 'Grouped Bar',       route: '#/charts/grouped-bar-chart',  description: 'Grouped bar comparison' },
+  { icon: 'bar-chart-2',    label: 'Candlestick',       route: '#/charts/candlestick-chart',  description: 'Financial candlestick chart' },
+  { icon: 'layout-grid',    label: 'Treemap',           route: '#/charts/treemap-chart',      description: 'Hierarchical rectangle treemap' },
+  { icon: 'play',           label: 'Bar Race',          route: '#/charts/bar-race-chart',     description: 'Animated bar race timeline' },
+  { icon: 'activity',       label: 'Sparkline',         route: '#/charts/sparkline-chart',   description: 'Inline mini trend lines' },
+  { icon: 'filter',         label: 'Funnel',            route: '#/charts/funnel-chart',       description: 'Sales & conversion funnel chart' },
+  { icon: 'bar-chart-2',    label: 'Histogram',         route: '#/charts/histogram-chart',    description: 'Distribution histogram' },
+  { icon: 'calendar',       label: 'Calendar Heatmap',  route: '#/charts/calendar-heatmap-chart', description: 'GitHub-style activity calendar' },
+  { icon: 'bar-chart-2',    label: 'Combo Chart',       route: '#/charts/combo-chart',      description: 'Combined bar & line chart' },
+  { icon: 'hexagon',        label: 'Radar Chart',       route: '#/charts/radar-chart',       description: 'Multi-axis radar/spider charts' },
+  { icon: 'git-merge',      label: 'Sankey Chart',      route: '#/charts/sankey-chart',      description: 'Flow & node connectivity diagram' },
+  { icon: 'sun',            label: 'Sunburst Chart',    route: '#/charts/sunburst-chart',    description: 'Concentric multi-level sunburst' },
+  { icon: 'compass',        label: 'Polar Line Chart',  route: '#/charts/polar-line-chart',  description: 'Polar coordinate line chart' },
+  { icon: 'bar-chart-2',    label: 'Waterfall Chart',   route: '#/charts/waterfall-chart',   description: 'Sequential financial delta waterfall' },
+  { icon: 'users',          label: 'Org Chart',         route: '#/charts/org-chart',         description: 'Interactive hierarchy tree' },
 ];
 
 const EFFECTS: NavCard[] = [
-  { icon: 'sparkles',        label: 'Sparkles',  route: '#/effects/sparkles', description: 'Animated sparkle particles' },
-  { icon: 'zap',             label: 'Confetti',  route: '#/effects/confetti', description: 'Celebration confetti burst' },
-  { icon: 'scan-line',       label: 'Shimmer',   route: '#/effects/shimmer',  description: 'Loading shimmer placeholder' },
-  { icon: 'move-horizontal', label: 'Marquee',   route: '#/effects/marquee',  description: 'Scrolling text ticker' },
+  { icon: 'sparkles',        label: 'Sparkles', route: '#/effects/sparkles', description: 'Animated sparkle particles' },
+  { icon: 'zap',             label: 'Confetti', route: '#/effects/confetti', description: 'Celebration confetti burst' },
+  { icon: 'scan-line',       label: 'Shimmer',  route: '#/effects/shimmer',  description: 'Loading shimmer placeholder' },
+  { icon: 'sparkles',        label: 'Rainbow',  route: '#/effects/rainbow',  description: 'Dynamic rainbow border' },
+  { icon: 'sun',             label: 'Shine',    route: '#/effects/shine',    description: 'Light reflection pass effect' },
+  { icon: 'lightbulb',       label: 'Glow',     route: '#/effects/glow',     description: 'Ambient neon glow backlight' },
+  { icon: 'move-horizontal', label: 'Marquee',  route: '#/effects/marquee',  description: 'Continuous smooth scrolling marquee' },
+  { icon: 'eye',             label: 'Fade',     route: '#/effects/fade',     description: 'Smooth opacity & scale transition' },
 ];
 
 const UTILITIES: NavCard[] = [
-  { icon: 'panel-right',    label: 'Scrollbar',        route: '#/utils/scrollbar',        description: 'Custom scrollbar styling' },
-  { icon: 'more-vertical',  label: 'Overflow',         route: '#/utils/overflow',         description: 'Overflow menu for truncated items' },
-  { icon: 'focus',      label: 'Focus Directives', route: '#/utils/focus-directives', description: 'Focus trap and focus ring helpers' },
-  { icon: 'highlighter',    label: 'Highlight',        route: '#/utils/highlight',        description: 'Text search highlight' },
+  { icon: 'focus',        label: 'Focus Utilities', route: '#/utils/focus-utilities', description: 'Focus trap and autofocus directives' },
+  { icon: 'highlighter',  label: 'Highlight',       route: '#/utils/highlight',        description: 'Query substring text highlight' },
+  { icon: 'panel-right',  label: 'Scrollbar',       route: '#/utils/scrollbar',        description: 'Custom scrollbar styling' },
+  { icon: 'more-vertical',label: 'Overflow',        route: '#/utils/overflow',         description: 'Overflow menu for truncated items' },
+  { icon: 'app-window',   label: 'Code Preview',    route: '#/utils/code-preview',    description: 'Live interactive code snippet viewer' },
 ];
 
 const BLOCKS: NavCard[] = [
-  { icon: 'layout-dashboard', label: 'Dashboard',         route: '#/blocks/dashboard',         description: 'Analytics dashboard layout' },
-  { icon: 'lock',             label: 'Authentication',    route: '#/blocks/authentication',    description: 'Login, register, and reset forms' },
-  { icon: 'settings',         label: 'Settings',          route: '#/blocks/settings',          description: 'Settings page templates' },
-  { icon: 'list',             label: 'Feeds & Lists',     route: '#/blocks/feeds',             description: 'Activity feeds and list views' },
-  { icon: 'clipboard-check',  label: 'Project Workspace', route: '#/blocks/project-workspace', description: 'Project management views' },
-  { icon: 'help-circle',      label: 'Support Desk',      route: '#/blocks/support-desk',      description: 'Help desk and ticketing' },
-  { icon: 'mail',             label: 'Email App',         route: '#/blocks/email',             description: 'Email client layout' },
-  { icon: 'bar-chart',        label: 'Charts',            route: '#/blocks/charts',            description: 'Chart dashboard blocks' },
-  { icon: 'trending-up',      label: 'Stocks App',        route: '#/blocks/stocks',            description: 'Stock market dashboard' },
+  { icon: 'layout',          label: 'App Shell',         route: '#/blocks/app-shell',          description: 'Full application shell with header and sidebar' },
+  { icon: 'layout-dashboard',label: 'Dashboard',         route: '#/blocks/dashboard',          description: 'Analytics dashboard layout' },
+  { icon: 'lock',            label: 'Authentication',    route: '#/blocks/authentication',     description: 'Login, register, and reset forms' },
+  { icon: 'settings',        label: 'Settings',          route: '#/blocks/settings',           description: 'Settings page templates' },
+  { icon: 'list',            label: 'Feeds & Lists',     route: '#/blocks/feeds',              description: 'Activity feeds and list views' },
+  { icon: 'clipboard-check', label: 'Project Workspace', route: '#/blocks/project-workspace', description: 'Project management views' },
+  { icon: 'help-circle',     label: 'Support Desk',      route: '#/blocks/support-desk',      description: 'Help desk and ticketing' },
+  { icon: 'mail',            label: 'Email App',         route: '#/blocks/email',              description: 'Email client layout' },
 ];
 
-const COMPONENT_COUNT = COMPONENT_SECTIONS.reduce((sum, s) => sum + s.items.length, 0);
+const COMPONENT_COUNT = COMPONENT_SECTIONS.reduce((sum, s) => sum + s.items.length, 0) + CHARTS.length + EFFECTS.length + UTILITIES.length;
 const FOUNDATION_COUNT = FOUNDATIONS.length;
 const BLOCK_COUNT = BLOCKS.length;
 
