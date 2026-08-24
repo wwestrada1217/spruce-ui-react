@@ -7,6 +7,7 @@
 
 import React from 'react';
 import './Range.css';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 export interface RangeValue {
   low: number;
@@ -36,6 +37,7 @@ export function Range({
   showValues = true,
   className,
 }: RangeProps) {
+  const { t } = useI18n();
   const [internal, setInternal] = React.useState(defaultValue);
   const isControlled = value !== undefined;
   const current = isControlled ? value : internal;
@@ -129,7 +131,7 @@ export function Range({
           aria-valuenow={current.low}
           aria-valuemin={min}
           aria-valuemax={current.high}
-          aria-label="Low value"
+          aria-label={t('min')}
           tabIndex={0}
           onMouseDown={(e) => onThumbDown(e, 'low')}
           onTouchStart={(e) => onThumbDown(e, 'low')}
@@ -142,7 +144,7 @@ export function Range({
           aria-valuenow={current.high}
           aria-valuemin={current.low}
           aria-valuemax={max}
-          aria-label="High value"
+          aria-label={t('max')}
           tabIndex={0}
           onMouseDown={(e) => onThumbDown(e, 'high')}
           onTouchStart={(e) => onThumbDown(e, 'high')}

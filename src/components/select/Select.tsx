@@ -10,6 +10,7 @@ import { useState, useRef, useEffect, useCallback, useMemo, useId } from 'react'
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
 import { computePosition, getScrollParents } from '../../utils/positioning.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 /* ── Public types ────────────────────────────────────────────────────────── */
 
@@ -46,6 +47,8 @@ export function Select({
   error,
   className,
 }: SelectProps) {
+  const { t } = useI18n();
+  const resolvedPlaceholder = placeholder === 'Select...' ? t('select') : placeholder;
   const instanceId = useId();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -71,8 +74,8 @@ export function Select({
     options.find((o) => o.value === selected)?.label ?? '';
 
   const displayLabel = multiple
-    ? placeholder
-    : selectedLabel || placeholder;
+    ? resolvedPlaceholder
+    : selectedLabel || resolvedPlaceholder;
 
   const selectedChips = selectedItems.map((v) => ({
     value: v,
@@ -322,7 +325,7 @@ export function Select({
                     className="sp-select__chip-remove"
                     type="button"
                     tabIndex={-1}
-                    aria-label="Remove"
+                    aria-label={t('remove')}
                     onClick={(e) => removeChip(e, chip.value)}
                   >
                     <Icon name="x" size={10} />
@@ -408,7 +411,7 @@ export function Select({
                 </button>
               ))
             ) : (
-              <div className="sp-select__empty">No options</div>
+              <div className="sp-select__empty">{t('noOptions')}</div>
             )}
           </div>,
           document.body,

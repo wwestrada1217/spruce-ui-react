@@ -16,7 +16,7 @@
       ;(function () {
         var DARK_PRESETS = ['dark', 'night', 'dracula', 'dim', 'nord', 'shadcn-dark', 'corporate-dark']
         var pref = 'system'
-        try { pref = localStorage.getItem('spruce-docs-theme-preference') || 'system' } catch (e) { /* noop */ }
+        try { pref = localStorage.getItem('spruce-theme-preference') || 'system' } catch (e) { /* noop */ }
         var base = pref === 'system'
           ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
           : (DARK_PRESETS.indexOf(pref) !== -1 ? 'dark' : 'light')

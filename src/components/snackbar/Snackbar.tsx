@@ -17,6 +17,7 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -74,6 +75,7 @@ export interface SnackbarProviderProps {
  * ```
  */
 export function SnackbarProvider({ children }: SnackbarProviderProps) {
+  const { t } = useI18n();
   const [current, setCurrent] = useState<SnackbarConfig | null>(null);
   const [removing, setRemoving] = useState(false);
   const autoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -167,7 +169,7 @@ export function SnackbarProvider({ children }: SnackbarProviderProps) {
           {current.dismissible !== false && (
             <button
               className="sp-snackbar__close"
-              aria-label="Dismiss"
+              aria-label={t('dismiss')}
               onClick={dismiss}
             >
               <Icon name="x" size={14} />

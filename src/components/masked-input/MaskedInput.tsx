@@ -7,6 +7,7 @@
 
 import React from 'react';
 import { Icon } from '../../icons/Icon.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 import './MaskedInput.css';
 
 export type MaskedInputSize = 'sm' | 'md' | 'lg';
@@ -112,6 +113,7 @@ export function MaskedInput({
   id,
   name,
 }: MaskedInputProps) {
+  const { t } = useI18n();
   const [displayValue, setDisplayValue] = React.useState(() => {
     if (value) {
       const raw = stripLiterals(value, mask);
@@ -218,7 +220,7 @@ export function MaskedInput({
             type="button"
             tabIndex={-1}
             onClick={handleClear}
-            aria-label="Clear"
+            aria-label={t('clear')}
           >
             <Icon name="x" size={12} />
           </button>

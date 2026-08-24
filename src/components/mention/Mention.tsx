@@ -14,6 +14,7 @@ import {
   useMemo,
 } from 'react';
 import { createPortal } from 'react-dom';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 /* ── Public types ──────────────────────────────────────────────────────── */
 
@@ -125,6 +126,7 @@ export function Mention({
   onInsert,
   onSearch,
 }: MentionProps) {
+  const { t } = useI18n();
   const [internalValue, setInternalValue] = useState('');
   const isControlled = controlledValue !== undefined;
   const currentValue = isControlled ? controlledValue : internalValue;
@@ -410,7 +412,7 @@ export function Mention({
             ref={panelRef}
             className="sp-mention__panel"
             role="listbox"
-            aria-label="Suggestions"
+          aria-label={t('suggestions')}
             style={{
               position: 'fixed',
               top: panelPos.top,
@@ -451,7 +453,7 @@ export function Mention({
                 </button>
               ))
             ) : (
-              <div className="sp-mention__empty">No results</div>
+              <div className="sp-mention__empty">{t('noResults')}</div>
             )}
           </div>,
           document.body,

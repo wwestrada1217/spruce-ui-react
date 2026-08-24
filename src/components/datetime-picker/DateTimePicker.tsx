@@ -9,6 +9,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
 import { computePosition, getScrollParents, onClickOutside } from '../../utils/positioning.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 import './DateTimePicker.css';
 
 export type DateTimePickerSize = 'sm' | 'md' | 'lg';
@@ -35,18 +36,6 @@ export interface DateTimePickerProps {
 }
 
 /* ── Helpers ──────────────────────────────────────────────────────────────── */
-
-const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
-];
-
-const MONTH_SHORT = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-];
-
-const WEEKDAY_SHORT = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
 function pad(n: number): string {
   return String(n).padStart(2, '0');
@@ -78,10 +67,11 @@ function formatDisplay(
   second: number,
   use24: boolean,
   showSec: boolean,
+  monthShort: string[],
 ): string {
   if (!date) return '';
   const timePart = formatTime(hour, minute, second, use24, showSec);
-  return `${MONTH_SHORT[date.month]} ${pad(date.day)}, ${date.year} ${timePart}`;
+  return `${monthShort[date.month]} ${pad(date.day)}, ${date.year} ${timePart}`;
 }
 
 function buildISOValue(
@@ -181,10 +171,6 @@ function getDaysInMonth(year: number, month: number): number {
   return new Date(year, month + 1, 0).getDate();
 }
 
-function getFirstDayOfWeek(year: number, month: number): number {
-  return new Date(year, month, 1).getDay();
-}
-
 /* ── Component ────────────────────────────────────────────────────────────── */
 
 /**
@@ -212,6 +198,8 @@ export function DateTimePicker({
   disabled = false,
   className,
 }: DateTimePickerProps) {
+  const { monthNames, monthLabels, dayLabels, t, formatDayLabel, leadingBlankDays } = useI18n();
+  const resolvedPlaceholder = placeholder === 'Select date & time' ? t('dateTimeInput') : placeholder;
   /* ── State ─────────────────────────────────────────────────────────────── */
 
   const [open, setOpen] = useState(false);
@@ -258,7 +246,7 @@ export function DateTimePicker({
   /* ── Display value ─────────────────────────────────────────────────────── */
 
   const displayValue = selectedDate
-    ? formatDisplay(selectedDate, hour24, minute, second, use24Hour, showSeconds)
+    ? formatDisplay(selectedDate, hour24, minute, second, use24Hour, showSeconds, monthLabels)
     : '';
 
   /* ── Positioning ───────────────────────────────────────────────────────── */
@@ -481,7 +469,7 @@ export function DateTimePicker({
   /* ── Calendar grid data ────────────────────────────────────────────────── */
 
   const daysInMonth = getDaysInMonth(viewYear, viewMonth);
-  const firstDay = getFirstDayOfWeek(viewYear, viewMonth);
+  const firstDay = leadingBlankDays(viewYear, viewMonth);
 
   const today = new Date();
   const todayYear = today.getFullYear();
@@ -517,7 +505,7 @@ export function DateTimePicker({
               type="button"
               className="sp-dtp__nav"
               onClick={prevMonth}
-              aria-label="Previous month"
+              aria-label={t('previousMonth')}
             >
               <Icon name="chevron-left" size={14} />
             </button>
@@ -526,23 +514,23 @@ export function DateTimePicker({
               className="sp-dtp__header-label"
               onClick={headerLabelClick}
             >
-              {MONTH_NAMES[viewMonth]} {viewYear}
+              {monthNames[viewMonth]} {viewYear}
             </button>
             <button
               type="button"
               className="sp-dtp__nav"
               onClick={nextMonth}
-              aria-label="Next month"
+              aria-label={t('nextMonth')}
             >
               <Icon name="chevron-right" size={14} />
             </button>
           </div>
           <div className="sp-dtp__weekdays">
-            {WEEKDAY_SHORT.map((wd) => (
+            {dayLabels.map((wd) => (
               <div key={wd} className="sp-dtp__weekday">{wd}</div>
             ))}
           </div>
-          <div className="sp-dtp__grid" role="grid" aria-label="Calendar">
+          <div className="sp-dtp__grid" role="grid" aria-label={t('calendar')}>
             {emptySlots.map((_, i) => (
               <div key={`e${i}`} className="sp-dtp__day sp-dtp__day--empty" />
             ))}
@@ -567,7 +555,7 @@ export function DateTimePicker({
                   type="button"
                   className={cls}
                   onClick={() => selectDay(d)}
-                  aria-label={`${MONTH_NAMES[viewMonth]} ${d}, ${viewYear}`}
+                  aria-label={formatDayLabel(d, viewMonth, viewYear)}
                   aria-pressed={isSelected}
                 >
                   {d}
@@ -587,7 +575,7 @@ export function DateTimePicker({
               type="button"
               className="sp-dtp__nav"
               onClick={() => setViewYear((y) => y - 1)}
-              aria-label="Previous year"
+              aria-label={t('previousYear')}
             >
               <Icon name="chevron-left" size={14} />
             </button>
@@ -602,13 +590,13 @@ export function DateTimePicker({
               type="button"
               className="sp-dtp__nav"
               onClick={() => setViewYear((y) => y + 1)}
-              aria-label="Next year"
+              aria-label={t('nextYear')}
             >
               <Icon name="chevron-right" size={14} />
             </button>
           </div>
           <div className="sp-dtp__cell-grid">
-            {MONTH_SHORT.map((name, i) => {
+            {monthLabels.map((name, i) => {
               const isCurrent = viewYear === todayYear && i === todayMonth;
               const isSelected =
                 selectedDate !== null &&
@@ -646,7 +634,7 @@ export function DateTimePicker({
             type="button"
             className="sp-dtp__nav"
             onClick={prevYearRange}
-            aria-label="Previous year range"
+            aria-label={t('previousYears')}
           >
             <Icon name="chevron-left" size={14} />
           </button>
@@ -657,7 +645,7 @@ export function DateTimePicker({
             type="button"
             className="sp-dtp__nav"
             onClick={nextYearRange}
-            aria-label="Next year range"
+            aria-label={t('nextYears')}
           >
             <Icon name="chevron-right" size={14} />
           </button>
@@ -689,27 +677,27 @@ export function DateTimePicker({
   function renderTimeSpinners() {
     return (
       <div className="sp-dtp__time">
-        <div className="sp-dtp__time-label">Time</div>
+        <div className="sp-dtp__time-label">{t('time')}</div>
         <div className="sp-dtp__columns">
           {/* Hour */}
           <div className="sp-tp__col">
             <button
               type="button"
               className="sp-tp__step"
-              aria-label="Increase hour"
+                aria-label={t('increaseHours')}
               onMouseDown={(e) => startRepeat(incHour, e)}
               onMouseUp={stopRepeat}
               onMouseLeave={stopRepeat}
             >
               <Icon name="chevron-up" size={14} />
             </button>
-            <div className="sp-tp__digit" aria-label={`Hour: ${displayHour}`}>
+            <div className="sp-tp__digit" aria-label={`${t('hour')}: ${displayHour}`}>
               {displayHour}
             </div>
             <button
               type="button"
               className="sp-tp__step"
-              aria-label="Decrease hour"
+                aria-label={t('decreaseHours')}
               onMouseDown={(e) => startRepeat(decHour, e)}
               onMouseUp={stopRepeat}
               onMouseLeave={stopRepeat}
@@ -725,20 +713,20 @@ export function DateTimePicker({
             <button
               type="button"
               className="sp-tp__step"
-              aria-label="Increase minute"
+                aria-label={t('increaseMinutes')}
               onMouseDown={(e) => startRepeat(incMinute, e)}
               onMouseUp={stopRepeat}
               onMouseLeave={stopRepeat}
             >
               <Icon name="chevron-up" size={14} />
             </button>
-            <div className="sp-tp__digit" aria-label={`Minute: ${pad(minute)}`}>
+            <div className="sp-tp__digit" aria-label={`${t('minutes')}: ${pad(minute)}`}>
               {pad(minute)}
             </div>
             <button
               type="button"
               className="sp-tp__step"
-              aria-label="Decrease minute"
+                aria-label={t('decreaseMinutes')}
               onMouseDown={(e) => startRepeat(decMinute, e)}
               onMouseUp={stopRepeat}
               onMouseLeave={stopRepeat}
@@ -755,20 +743,20 @@ export function DateTimePicker({
                 <button
                   type="button"
                   className="sp-tp__step"
-                  aria-label="Increase second"
+                    aria-label={t('increaseSeconds')}
                   onMouseDown={(e) => startRepeat(incSecond, e)}
                   onMouseUp={stopRepeat}
                   onMouseLeave={stopRepeat}
                 >
                   <Icon name="chevron-up" size={14} />
                 </button>
-                <div className="sp-tp__digit" aria-label={`Second: ${pad(second)}`}>
+                <div className="sp-tp__digit" aria-label={`${t('seconds')}: ${pad(second)}`}>
                   {pad(second)}
                 </div>
                 <button
                   type="button"
                   className="sp-tp__step"
-                  aria-label="Decrease second"
+                    aria-label={t('decreaseSeconds')}
                   onMouseDown={(e) => startRepeat(decSecond, e)}
                   onMouseUp={stopRepeat}
                   onMouseLeave={stopRepeat}
@@ -820,7 +808,7 @@ export function DateTimePicker({
             opacity: panelReady ? 1 : 0,
           }}
           role="dialog"
-          aria-label="Date and time picker"
+            aria-label={t('dateTimeInput')}
         >
           {/* Calendar */}
           {renderCalendar()}
@@ -885,18 +873,18 @@ export function DateTimePicker({
           <input
             className="sp-dtp__input"
             type="text"
-            placeholder={inputPlaceholder}
+            placeholder={inputPlaceholder || resolvedPlaceholder}
             value={displayValue}
             disabled={disabled}
             onChange={handleInputChange}
-            aria-label="Date and time"
+            aria-label={t('dateTimeInput')}
           />
           <button
             type="button"
             className="sp-dtp__input-toggle"
             onClick={toggleOpen}
             disabled={disabled}
-            aria-label="Toggle date time picker"
+            aria-label={open ? t('close') : t('openDateTimePicker')}
             aria-expanded={open}
           >
             <Icon name="chevron-down" size={12} />
@@ -926,7 +914,7 @@ export function DateTimePicker({
       >
         <Icon name="calendar" size={iconSize} />
         <span className="sp-dtp__value">
-          {displayValue || placeholder}
+          {displayValue || resolvedPlaceholder}
         </span>
         <Icon name="chevron-down" size={12} />
       </button>

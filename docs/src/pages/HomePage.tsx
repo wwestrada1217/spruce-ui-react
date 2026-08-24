@@ -26,6 +26,7 @@ const FOUNDATIONS: NavCard[] = [
   { icon: 'brush',          label: 'Theming',      route: '#/foundation/theming',        description: 'Customize themes, color presets, and design tokens' },
   { icon: 'play',           label: 'Motion',       route: '#/foundation/motion',         description: 'Duration, easing, and animation tokens with accessibility fallbacks' },
   { icon: 'message-circle', label: 'Voice & Tone', route: '#/foundation/voice-and-tone', description: 'Writing guidelines for clear, consistent, and human interface copy' },
+  { icon: 'globe',          label: 'Internationalization', route: '#/foundation/internationalization', description: 'Locale packs, formatting, labels, and right-to-left layout guidance' },
 ];
 
 const CORE: NavCard[] = [

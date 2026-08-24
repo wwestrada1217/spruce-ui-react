@@ -7,6 +7,7 @@
 
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { Icon } from '../../icons/Icon.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 import './RangeCalendar.css';
 
 /* ── Types ── */
@@ -33,18 +34,6 @@ export interface RangeCalendarProps {
 
 /* ── Constants ── */
 
-const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
-];
-
-const SHORT_MONTHS = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-];
-
-const DAY_LABELS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-
 /* ── Helpers ── */
 
 function toISO(y: number, m: number, d: number): string {
@@ -67,8 +56,7 @@ interface DayEntry {
   empty: boolean;
 }
 
-function buildDays(year: number, month: number): DayEntry[] {
-  const firstDay = new Date(year, month, 1).getDay();
+function buildDays(year: number, month: number, firstDay: number): DayEntry[] {
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const days: DayEntry[] = [];
 
@@ -121,6 +109,7 @@ export function RangeCalendar({
   disabled = false,
   className = '',
 }: RangeCalendarProps) {
+  const { monthNames, monthLabels, dayLabels, t, formatDayLabel, leadingBlankDays } = useI18n();
   const today = useMemo(() => todayISO(), []);
   const todayParsed = useMemo(() => parseISO(today), [today]);
 
@@ -165,9 +154,9 @@ export function RangeCalendar({
       const total = baseYear * 12 + baseMonth + i;
       const month = total % 12;
       const year = Math.floor(total / 12);
-      return { index: i, month, year, days: buildDays(year, month) };
+      return { index: i, month, year, days: buildDays(year, month, leadingBlankDays(year, month)) };
     });
-  }, [baseMonth, baseYear, monthCount]);
+  }, [baseMonth, baseYear, leadingBlankDays, monthCount]);
 
   // Navigation
   const goToPrevMonth = useCallback(() => {
@@ -395,12 +384,12 @@ export function RangeCalendar({
         ref={containerRef}
         tabIndex={0}
         role="application"
-        aria-label="Range calendar month picker"
+          aria-label={`${t('dateRangeCalendar')} ${t('month')}`}
         aria-disabled={disabled || undefined}
       >
         <div className="sp-rcal__body">
           {presets && presets.length > 0 && (
-            <div className="sp-rcal__presets" role="listbox" aria-label="Date range presets">
+            <div className="sp-rcal__presets" role="listbox" aria-label={t('dateRangePresets')}>
               {presets.map((preset) => (
                 <button
                   key={preset.label}
@@ -421,7 +410,7 @@ export function RangeCalendar({
                 <button
                   type="button"
                   className="sp-rcal__nav"
-                  aria-label="Previous year"
+                  aria-label={t('previousYear')}
                   onClick={() => setEditYear((y) => y - 1)}
                 >
                   <Icon name="chevron-left" size={14} />
@@ -439,14 +428,14 @@ export function RangeCalendar({
                 <button
                   type="button"
                   className="sp-rcal__nav"
-                  aria-label="Next year"
+                  aria-label={t('nextYear')}
                   onClick={() => setEditYear((y) => y + 1)}
                 >
                   <Icon name="chevron-right" size={14} />
                 </button>
               </div>
-              <div className="sp-rcal__cell-grid" role="grid" aria-label="Month picker">
-                {SHORT_MONTHS.map((label, i) => {
+              <div className="sp-rcal__cell-grid" role="grid" aria-label={t('month')}>
+                {monthLabels.map((label, i) => {
                   const isCurrent = i === nowMonth && editYear === nowYear;
                   // A month is "selected" if it matches the panel being edited
                   const panelTotal = baseYear * 12 + baseMonth + editingPanel;
@@ -465,7 +454,7 @@ export function RangeCalendar({
                       type="button"
                       className={cls}
                       role="gridcell"
-                      aria-label={MONTH_NAMES[i]}
+                      aria-label={monthNames[i]}
                       onClick={() => handleMonthSelect(i)}
                     >
                       {label}
@@ -480,14 +469,14 @@ export function RangeCalendar({
         {showFooter && (
           <div className="sp-rcal__footer">
             <button type="button" className="sp-rcal__action" onClick={handleClear}>
-              Clear
+              {t('clear')}
             </button>
             <button
               type="button"
               className="sp-rcal__action sp-rcal__action--primary"
               onClick={handleApply}
             >
-              Apply
+              {t('apply')}
             </button>
           </div>
         )}
@@ -505,12 +494,12 @@ export function RangeCalendar({
         ref={containerRef}
         tabIndex={0}
         role="application"
-        aria-label="Range calendar year picker"
+          aria-label={`${t('dateRangeCalendar')} ${t('year')}`}
         aria-disabled={disabled || undefined}
       >
         <div className="sp-rcal__body">
           {presets && presets.length > 0 && (
-            <div className="sp-rcal__presets" role="listbox" aria-label="Date range presets">
+            <div className="sp-rcal__presets" role="listbox" aria-label={t('dateRangePresets')}>
               {presets.map((preset) => (
                 <button
                   key={preset.label}
@@ -531,7 +520,7 @@ export function RangeCalendar({
                 <button
                   type="button"
                   className="sp-rcal__nav"
-                  aria-label="Previous 12 years"
+                  aria-label={t('previousYears')}
                   onClick={() => setYearRangeStart((s) => s - 12)}
                 >
                   <Icon name="chevron-left" size={14} />
@@ -542,13 +531,13 @@ export function RangeCalendar({
                 <button
                   type="button"
                   className="sp-rcal__nav"
-                  aria-label="Next 12 years"
+                  aria-label={t('nextYears')}
                   onClick={() => setYearRangeStart((s) => s + 12)}
                 >
                   <Icon name="chevron-right" size={14} />
                 </button>
               </div>
-              <div className="sp-rcal__cell-grid" role="grid" aria-label="Year picker">
+              <div className="sp-rcal__cell-grid" role="grid" aria-label={t('year')}>
                 {years.map((yr) => {
                   const isCurrent = yr === nowYear;
                   const isSelected = yr === editYear;
@@ -581,14 +570,14 @@ export function RangeCalendar({
         {showFooter && (
           <div className="sp-rcal__footer">
             <button type="button" className="sp-rcal__action" onClick={handleClear}>
-              Clear
+              {t('clear')}
             </button>
             <button
               type="button"
               className="sp-rcal__action sp-rcal__action--primary"
               onClick={handleApply}
             >
-              Apply
+              {t('apply')}
             </button>
           </div>
         )}
@@ -604,14 +593,14 @@ export function RangeCalendar({
       ref={containerRef}
       tabIndex={0}
       role="application"
-      aria-label="Range calendar"
+        aria-label={t('dateRangeCalendar')}
       aria-disabled={disabled || undefined}
       onKeyDown={handleKeyDown}
     >
       <div className="sp-rcal__body">
         {/* Presets sidebar */}
         {presets && presets.length > 0 && (
-          <div className="sp-rcal__presets" role="listbox" aria-label="Date range presets">
+          <div className="sp-rcal__presets" role="listbox" aria-label={t('dateRangePresets')}>
             {presets.map((preset) => (
               <button
                 key={preset.label}
@@ -638,7 +627,7 @@ export function RangeCalendar({
                     <button
                       type="button"
                       className="sp-rcal__nav"
-                      aria-label="Previous month"
+                        aria-label={t('previousMonth')}
                       onClick={goToPrevMonth}
                     >
                       <Icon name="chevron-left" size={14} />
@@ -649,16 +638,16 @@ export function RangeCalendar({
                   <button
                     type="button"
                     className="sp-rcal__header-label"
-                    aria-label={`${MONTH_NAMES[panel.month]} ${panel.year}, click to pick month`}
+                      aria-label={`${monthNames[panel.month]} ${panel.year}`}
                     onClick={() => handleHeaderLabelClick(panel.index, panel.year)}
                   >
-                    {MONTH_NAMES[panel.month]} {panel.year}
+                    {monthNames[panel.month]} {panel.year}
                   </button>
                   {panel.index === monthCount - 1 ? (
                     <button
                       type="button"
                       className="sp-rcal__nav"
-                      aria-label="Next month"
+                        aria-label={t('nextMonth')}
                       onClick={goToNextMonth}
                     >
                       <Icon name="chevron-right" size={14} />
@@ -670,7 +659,7 @@ export function RangeCalendar({
 
                 {/* Weekday headers */}
                 <div className="sp-rcal__weekdays" role="row">
-                  {DAY_LABELS.map((label) => (
+                  {dayLabels.map((label) => (
                     <span key={label} className="sp-rcal__weekday" role="columnheader" aria-label={label}>
                       {label}
                     </span>
@@ -678,7 +667,7 @@ export function RangeCalendar({
                 </div>
 
                 {/* Day grid */}
-                <div className="sp-rcal__grid" role="grid" aria-label={`${MONTH_NAMES[panel.month]} ${panel.year}`}>
+                <div className="sp-rcal__grid" role="grid" aria-label={`${monthNames[panel.month]} ${panel.year}`}>
                   {panel.days.map((day, i) => {
                     if (day.empty) {
                       return <span key={`empty-${i}`} className="sp-rcal__day sp-rcal__day--empty" />;
@@ -710,7 +699,7 @@ export function RangeCalendar({
                         type="button"
                         className={cls}
                         role="gridcell"
-                        aria-label={`${MONTH_NAMES[panel.month]} ${day.day}, ${panel.year}`}
+                        aria-label={formatDayLabel(day.day, panel.month, panel.year)}
                         aria-selected={isStart || isEnd || undefined}
                         aria-current={isToday ? 'date' : undefined}
                         tabIndex={isFocused ? 0 : -1}
@@ -731,14 +720,14 @@ export function RangeCalendar({
       {showFooter && (
         <div className="sp-rcal__footer">
           <button type="button" className="sp-rcal__action" onClick={handleClear}>
-            Clear
+            {t('clear')}
           </button>
           <button
             type="button"
             className="sp-rcal__action sp-rcal__action--primary"
             onClick={handleApply}
           >
-            Apply
+            {t('apply')}
           </button>
         </div>
       )}

@@ -1,6 +1,6 @@
 const SIZES = [
   { token: '--sp-text-2xs', value: '10px' },
-  { token: '--sp-text-xs', value: '11px' },
+  { token: '--sp-text-xs', value: '12px' },
   { token: '--sp-text-sm', value: '13px' },
   { token: '--sp-text-base', value: '14px' },
   { token: '--sp-text-md', value: '16px' },
@@ -8,22 +8,34 @@ const SIZES = [
   { token: '--sp-text-xl', value: '20px' },
   { token: '--sp-text-2xl', value: '24px' },
   { token: '--sp-text-3xl', value: '30px' },
+  { token: '--sp-text-4xl', value: '36px' },
+  { token: '--sp-text-5xl', value: '48px' },
+  { token: '--sp-text-6xl', value: '60px' },
 ]
 
 const WEIGHTS = [
+  { token: '--sp-font-light', value: '300' },
   { token: '--sp-font-normal', value: '400' },
+  { token: '--sp-font-regular', value: '400' },
   { token: '--sp-font-medium', value: '500' },
   { token: '--sp-font-semibold', value: '600' },
   { token: '--sp-font-bold', value: '700' },
+  { token: '--sp-font-extrabold', value: '800' },
 ]
 
 const USAGE = [
   { token: '--sp-font-body', alias: '--sp-text-base', value: '14px', desc: 'Default body copy and control text' },
+  { token: '--sp-font-body-lg', alias: '--sp-text-md', value: '16px', desc: 'Large body copy and reading surfaces' },
+  { token: '--sp-font-heading-xs', alias: '--sp-text-md', value: '16px', desc: 'Small headings and dense section labels' },
   { token: '--sp-font-label', alias: '--sp-text-sm', value: '13px', desc: 'Form labels, table headers, dense UI' },
   { token: '--sp-font-caption', alias: '--sp-text-xs', value: '11px', desc: 'Captions, helper text, timestamps' },
   { token: '--sp-font-heading-sm', alias: '--sp-text-lg', value: '18px', desc: 'Card and section headings' },
   { token: '--sp-font-heading-md', alias: '--sp-text-xl', value: '20px', desc: 'Panel and dialog headings' },
   { token: '--sp-font-heading-lg', alias: '--sp-text-2xl', value: '24px', desc: 'Page titles' },
+  { token: '--sp-font-heading-xl', alias: '--sp-text-3xl', value: '30px', desc: 'Large page and product titles' },
+  { token: '--sp-font-display-sm', alias: '--sp-text-4xl', value: '36px', desc: 'Display heading, small' },
+  { token: '--sp-font-display-md', alias: '--sp-text-5xl', value: '48px', desc: 'Display heading, medium' },
+  { token: '--sp-font-display-lg', alias: '--sp-text-6xl', value: '60px', desc: 'Display heading, large' },
 ]
 
 const LEADING = [
@@ -35,10 +47,12 @@ const LEADING = [
 ]
 
 const TRACKING = [
+  { token: '--sp-tracking-tighter', value: '-0.035em' },
   { token: '--sp-tracking-tight', value: '-0.02em' },
   { token: '--sp-tracking-normal', value: '0' },
   { token: '--sp-tracking-wide', value: '0.04em' },
   { token: '--sp-tracking-wider', value: '0.07em' },
+  { token: '--sp-tracking-widest', value: '0.1em' },
 ]
 
 export function TypographyPage() {
@@ -48,11 +62,10 @@ export function TypographyPage() {
         <p className="page-tag">Foundation</p>
         <h1>Typography</h1>
         <p className="page-lead">
-          Spruce sets UI text in <strong>Geist</strong>, a geometric-humanist
-          sans built for dense interfaces — neutral, crisp, and highly legible
-          at 11&ndash;14px. Code and numeric data use its monospace companion,{' '}
-          <strong>Geist Mono</strong>. Both are self-hosted variable fonts
-          (weights 100&ndash;900), with League Spartan retained as a fallback.
+          Spruce sets UI text in <strong>Noto Sans</strong>, a neutral sans
+          built for dense interfaces. Code and numeric data use{' '}
+          <strong>Noto Sans Mono</strong>. Both families are exposed through
+          semantic CSS aliases so applications can override them consistently.
           The full scale is exposed as CSS custom properties.
         </p>
       </div>
@@ -60,7 +73,7 @@ export function TypographyPage() {
       <section className="doc-section">
         <h2>Font Families</h2>
         <div style={{ marginBottom: 'var(--sp-space-4, 16px)' }}>
-          <p><code>--sp-font-sans</code> &mdash; Geist</p>
+          <p><code>--sp-font-sans</code> &mdash; Noto Sans</p>
           <p
             style={{
               fontFamily: 'var(--sp-font-sans)',
@@ -72,7 +85,7 @@ export function TypographyPage() {
           </p>
         </div>
         <div>
-          <p><code>--sp-font-mono</code> &mdash; Geist Mono</p>
+          <p><code>--sp-font-mono</code> &mdash; Noto Sans Mono</p>
           <p
             style={{
               fontFamily: 'var(--sp-font-mono)',

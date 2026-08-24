@@ -7,6 +7,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Icon } from '../../icons/Icon';
+import { useI18n } from '../../i18n/i18n-context.js';
 import './Tree.css';
 
 // ---------------------------------------------------------------------------
@@ -208,6 +209,7 @@ function TreeNodeRow({
   onDrop,
   onRowKeydown,
 }: TreeNodeRowProps) {
+  const { t } = useI18n();
   const nodeHasChildren = hasChildren(node);
   const expanded = expandedIds.has(node.id);
   const checked = checkedIds.has(node.id);
@@ -284,7 +286,7 @@ function TreeNodeRow({
           }}
           type="button"
           tabIndex={-1}
-          aria-label={expanded ? `Collapse ${node.label}` : `Expand ${node.label}`}
+          aria-label={expanded ? `${t('collapse')} ${node.label}` : `${t('expand')} ${node.label}`}
         >
           <Icon name="chevron-right" size={12} />
         </button>
@@ -358,6 +360,7 @@ export function Tree({
   onNodeDrop,
   onNodeToggle,
 }: TreeProps) {
+  const { t } = useI18n();
   const [expandedIds, setExpandedIds] = useState<Set<string>>(() => {
     if (expandAll) {
       const ids = new Set<string>();
@@ -578,7 +581,7 @@ export function Tree({
   // ── Render ─────────────────────────────────────────────────────────────
 
   return (
-    <div className="sp-tree" role="tree" aria-label="Tree view" ref={treeRef}>
+    <div className="sp-tree" role="tree" aria-label={t('treeView')} ref={treeRef}>
       {internalNodes.map(node => (
         <TreeNodeRow
           key={node.id}

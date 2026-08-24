@@ -6,6 +6,8 @@ const PRIMARY_SWATCHES = [
   { label: 'Active', token: '--sp-primary-active' },
   { label: 'Subtle', token: '--sp-primary-subtle' },
   { label: 'On Primary', token: '--sp-primary-text' },
+  { label: 'Secondary', token: '--sp-secondary' },
+  { label: 'Tertiary', token: '--sp-tertiary' },
 ]
 
 const SEMANTIC_SWATCHES = [
@@ -17,6 +19,10 @@ const SEMANTIC_SWATCHES = [
   { label: 'Danger Subtle', token: '--sp-danger-subtle' },
   { label: 'Info', token: '--sp-info' },
   { label: 'Info Subtle', token: '--sp-info-subtle' },
+  { label: 'Success Tint', token: '--sp-success-tint' },
+  { label: 'Warning Tint', token: '--sp-warning-tint' },
+  { label: 'Danger Tint', token: '--sp-danger-tint' },
+  { label: 'Info Tint', token: '--sp-info-tint' },
 ]
 
 const TEXT_SWATCHES = [
@@ -54,8 +60,8 @@ export function ColorsPage() {
         <p className="page-tag">Foundation</p>
         <h1>Colors</h1>
         <p className="page-lead">
-          Spruce uses cool, slate-tinted neutrals with an evergreen-teal brand
-          accent. The surface scale runs from 0 (lightest) to 950 (darkest) and
+          Spruce uses quiet zinc neutrals with an evergreen brand accent. The
+          surface scale runs from 0 (lightest) to 950 (darkest) and
           automatically inverts in dark mode. All colors are defined as CSS
           custom properties with the <code>--sp-</code> prefix — style with
           tokens, never hard-coded values, and both themes come for free.
@@ -124,6 +130,29 @@ export function ColorsPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="doc-section">
+        <h2>Status tints and on-tint roles</h2>
+        <p className="section-desc">
+          The <code>-tint</code>, <code>-tint-border</code>, and{' '}
+          <code>-on-tint</code> roles use a shared perceptual tone scale. Use
+          them for status surfaces when a stable lightness matters more than an
+          alpha blend over the page background.
+        </p>
+        <table className="token-table" aria-label="Status tone tokens">
+          <thead><tr><th>Family</th><th>Tint</th><th>Border</th><th>On tint</th></tr></thead>
+          <tbody>
+            {['primary', 'success', 'warning', 'danger', 'info'].map(name => (
+              <tr key={name}>
+                <td>{name}</td>
+                <td><code>--sp-{name}-tint</code></td>
+                <td><code>--sp-{name}-tint-border</code></td>
+                <td><code>--sp-{name}-on-tint</code></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </section>
 
       <section className="doc-section">

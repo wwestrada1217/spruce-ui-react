@@ -7,6 +7,7 @@
 
 import { useState, type ReactNode } from 'react';
 import { Icon } from '../../icons/Icon.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 import './MessageBar.css';
 
 export type MessageBarVariant = 'info' | 'success' | 'warning' | 'danger' | 'neutral';
@@ -43,6 +44,7 @@ export function MessageBar({
   onClose,
   children,
 }: MessageBarProps) {
+  const { t } = useI18n();
   const [dismissed, setDismissed] = useState(false);
 
   if (dismissed) return null;
@@ -76,7 +78,7 @@ export function MessageBar({
         <span className="sp-message-bar__message">{children}</span>
       </div>
       {actions.length > 0 && (
-        <div className="sp-message-bar__actions" role="group" aria-label="Message bar actions">
+        <div className="sp-message-bar__actions" role="group" aria-label={t('messageBarActions')}>
           {actions.map((a) => (
             <button
               key={a.label}
@@ -93,7 +95,7 @@ export function MessageBar({
         <button
           type="button"
           className="sp-message-bar__dismiss"
-          aria-label="Dismiss"
+          aria-label={t('dismiss')}
           onClick={handleDismiss}
         >
           <Icon name="x" size={14} />

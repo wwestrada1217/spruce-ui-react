@@ -15,6 +15,7 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 /* ── Z-index management ──────────────────────────────────────────────── */
 
@@ -74,6 +75,7 @@ export function Window({
   footer,
   className = '',
 }: WindowProps) {
+  const { t } = useI18n();
   const preset = SIZE_PRESETS[size];
 
   const [dim, setDim] = useState({ width: preset.width, height: preset.height });
@@ -270,7 +272,7 @@ export function Window({
                 type="button"
                 className="sp-window__btn"
                 onClick={toggleMaximize}
-                aria-label={maximized ? 'Restore window' : 'Maximize window'}
+                aria-label={maximized ? t('restore') : t('maximize')}
               >
                 <Icon name={maximized ? 'minimize' : 'maximize'} size={14} />
               </button>
@@ -279,7 +281,7 @@ export function Window({
               type="button"
               className="sp-window__btn sp-window__btn--close"
               onClick={onClose}
-              aria-label="Close window"
+              aria-label={t('close')}
             >
               <Icon name="x" size={14} />
             </button>

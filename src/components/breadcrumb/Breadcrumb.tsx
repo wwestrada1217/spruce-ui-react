@@ -7,6 +7,7 @@
 
 import './Breadcrumb.css';
 import { createContext, useContext, type ReactNode, type HTMLAttributes } from 'react';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 /* ── Context ─────────────────────────────────────────────────────────────── */
 
@@ -42,9 +43,10 @@ export function Breadcrumbs({
   className = '',
   ...props
 }: BreadcrumbsProps) {
+  const { t } = useI18n();
   return (
     <BreadcrumbContext.Provider value={{ separator }}>
-      <nav aria-label="Breadcrumb" className={className || undefined} {...props}>
+      <nav aria-label={t('breadcrumb')} className={className || undefined} {...props}>
         <ol className="sp-breadcrumbs">{children}</ol>
       </nav>
     </BreadcrumbContext.Provider>

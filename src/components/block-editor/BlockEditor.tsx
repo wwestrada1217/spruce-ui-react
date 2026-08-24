@@ -18,6 +18,7 @@ import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
 import { Select, type SelectOption } from '../select/Select.js';
 import { computePosition } from '../../utils/positioning.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 export type BlockType =
   | 'paragraph'
@@ -184,6 +185,7 @@ export function BlockEditor({
   className,
   style,
 }: BlockEditorProps) {
+  const { t } = useI18n();
   const [internalBlocks, setInternalBlocks] = useState<BlockItem[]>(
     propBlocks ?? NOTION_DEFAULT_BLOCKS,
   );
@@ -580,7 +582,7 @@ export function BlockEditor({
       <div className="sp-block-editor__canvas">
         {currentBlocks.length === 0 ? (
           <div className="sp-block-editor__empty-hint" onClick={() => handleAddBlock('paragraph')}>
-            Click to start typing or enter '/' for commands...
+            {t('enterText')} / {t('addBlock')}
           </div>
         ) : (
           currentBlocks.map((block, index) => {
@@ -609,8 +611,8 @@ export function BlockEditor({
                       type="button"
                       className="sp-block-editor__handle-btn"
                       onClick={() => handleAddBlock('paragraph', index)}
-                      title="Add Block Below"
-                      aria-label="Add Block Below"
+                      title={t('addBlockBelow')}
+                      aria-label={t('addBlockBelow')}
                     >
                       <Icon name="plus" size={14} />
                     </button>
@@ -623,8 +625,8 @@ export function BlockEditor({
                           activeContextMenuBlockId === block.id ? null : block.id,
                         )
                       }
-                      title="Block Options"
-                      aria-label="Block Options"
+                      title={t('options')}
+                      aria-label={t('options')}
                     >
                       <Icon name="grip-vertical" size={14} />
                     </button>
@@ -678,7 +680,7 @@ export function BlockEditor({
                           handleInputChange(block.id, e.target.value)
                         }
                         onKeyDown={(e) => handleKeyDown(e, block, index)}
-                        placeholder="Quote text..."
+                        placeholder={t('blockquote')}
                         disabled={!isInteractive}
                       />
                     </div>
@@ -701,7 +703,7 @@ export function BlockEditor({
                               handleInputChange(block.id, e.target.value)
                             }
                             onKeyDown={(e) => handleKeyDown(e, block, index)}
-                            placeholder="Callout note..."
+                            placeholder={t('annotationText')}
                             disabled={!isInteractive}
                           />
                         </div>
@@ -746,7 +748,7 @@ export function BlockEditor({
                           onClick={() => handleCopyCode(block.id, block.content)}
                         >
                           <Icon name={copiedCodeId === block.id ? 'check' : 'copy'} size={12} />
-                          {copiedCodeId === block.id ? 'Copied' : 'Copy'}
+                          {copiedCodeId === block.id ? t('done') : t('copy')}
                         </button>
                       </div>
                       <div className="sp-block-editor__code-body">
@@ -763,7 +765,7 @@ export function BlockEditor({
                             handleInputChange(block.id, e.target.value);
                           }}
                           onKeyDown={(e) => handleKeyDown(e, block, index)}
-                          placeholder="// Type code here..."
+                          placeholder={t('enterText')}
                           disabled={!isInteractive}
                         />
                       </div>
@@ -792,12 +794,12 @@ export function BlockEditor({
                           handleInputChange(block.id, e.target.value)
                         }
                         onKeyDown={(e) => handleKeyDown(e, block, index)}
-                        placeholder="Enter image URL (e.g. https://images.unsplash.com/...)"
+                        placeholder={t('enterUrl')}
                         disabled={!isInteractive}
                       />
                       {isInteractive && block.content && (
                         <div className="sp-block-editor__image-toolbar">
-                          <span style={{ fontSize: 11, color: 'var(--sp-text-subtle)' }}>Width:</span>
+                          <span style={{ fontSize: 11, color: 'var(--sp-text-subtle)' }}>{t('width')}:</span>
                           {[25, 50, 75, 100].map((w) => (
                             <button
                               key={w}
@@ -877,28 +879,28 @@ export function BlockEditor({
                             className="sp-block-editor__table-btn"
                             onClick={() => handleTableAddRow(block.id)}
                           >
-                            <Icon name="plus" size={12} /> Row
+                            <Icon name="plus" size={12} /> {t('row')}
                           </button>
                           <button
                             type="button"
                             className="sp-block-editor__table-btn"
                             onClick={() => handleTableRemoveRow(block.id)}
                           >
-                            <Icon name="minus" size={12} /> Row
+                            <Icon name="minus" size={12} /> {t('row')}
                           </button>
                           <button
                             type="button"
                             className="sp-block-editor__table-btn"
                             onClick={() => handleTableAddCol(block.id)}
                           >
-                            <Icon name="plus" size={12} /> Column
+                            <Icon name="plus" size={12} /> {t('column')}
                           </button>
                           <button
                             type="button"
                             className="sp-block-editor__table-btn"
                             onClick={() => handleTableRemoveCol(block.id)}
                           >
-                            <Icon name="minus" size={12} /> Column
+                            <Icon name="minus" size={12} /> {t('column')}
                           </button>
                         </div>
                       )}
@@ -932,7 +934,7 @@ export function BlockEditor({
             className="sp-block-editor__slash-menu"
             style={{ top: `${slashPos.top}px`, left: `${slashPos.left}px` }}
           >
-            <div className="sp-block-editor__slash-title">Basic Blocks</div>
+            <div className="sp-block-editor__slash-title">{t('addBlock')}</div>
             {filteredSlashCommands.map((cmd, cmdIdx) => (
               <button
                 key={cmd.type}
@@ -971,7 +973,7 @@ export function BlockEditor({
                 if (idx !== -1) handleMoveBlock(idx, -1);
               }}
             >
-              <Icon name="arrow-up" size={14} /> Move Up
+              <Icon name="arrow-up" size={14} /> {t('moveUp')}
             </button>
             <button
               type="button"
@@ -981,21 +983,21 @@ export function BlockEditor({
                 if (idx !== -1) handleMoveBlock(idx, 1);
               }}
             >
-              <Icon name="arrow-down" size={14} /> Move Down
+              <Icon name="arrow-down" size={14} /> {t('moveDown')}
             </button>
             <button
               type="button"
               className="sp-block-editor__menu-btn"
               onClick={() => handleDuplicateBlock(activeContextMenuBlockId)}
             >
-              <Icon name="copy" size={14} /> Duplicate
+              <Icon name="copy" size={14} /> {t('duplicate')}
             </button>
             <button
               type="button"
               className="sp-block-editor__menu-btn sp-block-editor__menu-btn--danger"
               onClick={() => handleDeleteBlock(activeContextMenuBlockId)}
             >
-              <Icon name="trash" size={14} /> Delete
+              <Icon name="trash" size={14} /> {t('delete')}
             </button>
           </div>,
           document.body,

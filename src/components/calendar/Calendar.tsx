@@ -8,6 +8,7 @@
 import { Fragment, useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import './Calendar.css';
 import { Icon } from '../../icons/Icon.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 /* ── Types ── */
 
@@ -30,18 +31,6 @@ export interface CalendarProps {
 /* ── Constants ── */
 
 type ViewMode = 'days' | 'months' | 'years';
-
-const WEEKDAY_LABELS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-
-const MONTH_ABBR = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-];
-
-const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
-];
 
 /* ── Helpers ── */
 
@@ -92,6 +81,7 @@ export function Calendar({
   showFooter = true,
   className,
 }: CalendarProps) {
+  const { monthNames, monthLabels, dayLabels, t, formatDayLabel, leadingBlankDays } = useI18n();
   /* ── State ── */
 
   const today = useMemo(() => todayIso(), []);
@@ -146,7 +136,7 @@ export function Calendar({
 
   const calendarRows = useMemo(() => {
     const totalDays = daysInMonth(viewYear, viewMonth);
-    const firstDow = new Date(viewYear, viewMonth, 1).getDay(); // 0=Sun
+    const firstDow = leadingBlankDays(viewYear, viewMonth);
 
     const rows: { weekNumber: number; days: (number | null)[] }[] = [];
     let currentDay = 1;
@@ -175,7 +165,7 @@ export function Calendar({
     }
 
     return rows;
-  }, [viewYear, viewMonth]);
+  }, [leadingBlankDays, viewYear, viewMonth]);
 
   /* ── Navigation helpers ── */
 
@@ -444,7 +434,7 @@ export function Calendar({
           <button
             type="button"
             className="sp-cal__nav"
-            aria-label="Previous month"
+            aria-label={t('previousMonth')}
             onClick={goToPrevMonth}
           >
             <Icon name="chevron-left" size={14} />
@@ -452,15 +442,15 @@ export function Calendar({
           <button
             type="button"
             className="sp-cal__header-label"
-            aria-label="Switch to months view"
+            aria-label={t('selectMonthAndYear')}
             onClick={() => setViewMode('months')}
           >
-            {MONTH_NAMES[viewMonth]} {viewYear}
+            {monthNames[viewMonth]} {viewYear}
           </button>
           <button
             type="button"
             className="sp-cal__nav"
-            aria-label="Next month"
+            aria-label={t('nextMonth')}
             onClick={goToNextMonth}
           >
             <Icon name="chevron-right" size={14} />
@@ -475,7 +465,7 @@ export function Calendar({
           <button
             type="button"
             className="sp-cal__nav"
-            aria-label="Previous year"
+            aria-label={t('previousYear')}
             onClick={goToPrevYear}
           >
             <Icon name="chevron-left" size={14} />
@@ -483,7 +473,7 @@ export function Calendar({
           <button
             type="button"
             className="sp-cal__header-label"
-            aria-label="Switch to years view"
+            aria-label={t('selectYear')}
             onClick={() => setViewMode('years')}
           >
             {viewYear}
@@ -491,7 +481,7 @@ export function Calendar({
           <button
             type="button"
             className="sp-cal__nav"
-            aria-label="Next year"
+            aria-label={t('nextYear')}
             onClick={goToNextYear}
           >
             <Icon name="chevron-right" size={14} />
@@ -507,7 +497,7 @@ export function Calendar({
         <button
           type="button"
           className="sp-cal__nav"
-          aria-label="Previous 12 years"
+          aria-label={t('previousYears')}
           onClick={goToPrevYearRange}
         >
           <Icon name="chevron-left" size={14} />
@@ -518,7 +508,7 @@ export function Calendar({
         <button
           type="button"
           className="sp-cal__nav"
-          aria-label="Next 12 years"
+          aria-label={t('nextYears')}
           onClick={goToNextYearRange}
         >
           <Icon name="chevron-right" size={14} />
@@ -543,7 +533,7 @@ export function Calendar({
           }
         >
           {showWeekNumbers && <span className="sp-cal__weekday" />}
-          {WEEKDAY_LABELS.map((label) => (
+          {dayLabels.map((label) => (
             <span key={label} className="sp-cal__weekday">
               {label}
             </span>
@@ -559,7 +549,7 @@ export function Calendar({
               : 'sp-cal__grid'
           }
           role="grid"
-          aria-label={`${MONTH_NAMES[viewMonth]} ${viewYear}`}
+          aria-label={`${monthNames[viewMonth]} ${viewYear}`}
           tabIndex={0}
           onKeyDown={handleDaysKeyDown}
           onFocus={() => {
@@ -624,7 +614,7 @@ export function Calendar({
                     className={dayCls}
                     data-day={day}
                     tabIndex={-1}
-                    aria-label={`${MONTH_NAMES[viewMonth]} ${day}, ${viewYear}`}
+                    aria-label={formatDayLabel(day, viewMonth, viewYear)}
                     aria-selected={isSelected}
                     aria-disabled={isDisabled}
                     disabled={isDisabled}
@@ -649,8 +639,8 @@ export function Calendar({
     const selectedDate = value ? parseIso(value) : null;
 
     return (
-      <div className="sp-cal__cell-grid" role="grid" aria-label="Months">
-        {MONTH_ABBR.map((abbr, idx) => {
+      <div className="sp-cal__cell-grid" role="grid" aria-label={t('months')}>
+        {monthLabels.map((abbr, idx) => {
           const isCurrent = idx === currentMonth && viewYear === currentYear;
           const isSelected =
             selectedDate !== null &&
@@ -673,7 +663,7 @@ export function Calendar({
               type="button"
               className={cls}
               disabled={isDisabled}
-              aria-label={MONTH_NAMES[idx]}
+              aria-label={monthNames[idx]}
               onClick={() => selectMonth(idx)}
             >
               {abbr}
@@ -695,7 +685,7 @@ export function Calendar({
     }
 
     return (
-      <div className="sp-cal__cell-grid" role="grid" aria-label="Years">
+      <div className="sp-cal__cell-grid" role="grid" aria-label={t('years')}>
         {years.map((year) => {
           const isCurrent = year === currentYear;
           const isSelected = selectedDate !== null && year === selectedDate.getFullYear();
@@ -739,14 +729,14 @@ export function Calendar({
           className="sp-cal__today-btn"
           onClick={handleTodayClick}
         >
-          Today
+          {t('today')}
         </button>
         <button
           type="button"
           className="sp-cal__clear-btn"
           onClick={handleClearClick}
         >
-          Clear
+          {t('clear')}
         </button>
       </div>
     );

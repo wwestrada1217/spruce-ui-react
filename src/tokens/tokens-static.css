@@ -1,0 +1,868 @@
+/* ============================================================================
+   Spruce Design Tokens — Static / Server-Rendered Bundle
+   ============================================================================
+   Light-only, framework-agnostic token bundle. It intentionally excludes the
+   runtime dark theme and provider mechanics while retaining the shared token
+   contract, density aliases, motion safety, focus treatment, and utilities.
+   ============================================================================ */
+
+:root {
+  color-scheme: light;
+}
+
+/* ============================================================================
+   Spruce Design Tokens — Master CSS
+   ============================================================================
+   Import this file in your application to activate all design tokens.
+   (Bundled into `spruce-react/style.css`; also importable standalone.)
+
+   Ported from the Angular design system's `@spruce-ui/tokens` styles —
+   keep the two in sync when the brand palette changes.
+   ============================================================================ */
+
+/* ── Web Fonts ───────────────────────────────────────────────────────────────
+   Self-hosted Geist (variable, weight 100–900). SIL Open Font License 1.1,
+   cleared for commercial use. Geometric-humanist sans built for dense UI —
+   neutral, crisp, and highly legible at small (11–14px) sizes. */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('./fonts/geist-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('./fonts/geist-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* Self-hosted Geist Mono (variable, weight 100–900). SIL Open Font License 1.1.
+   The monospace companion to Geist — same design language, for code previews,
+   token names, IDs, and numeric-heavy tabular data. */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('./fonts/geist-mono-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('./fonts/geist-mono-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* Self-hosted League Spartan (variable, weight 100–900) — kept as fallback.
+   METRIC-PATCHED build (rebalanced vertical metrics so centered UI text sits
+   true). Do NOT replace with a vanilla download — regenerate via the metric
+   patch script in the Angular repo or the bug returns. */
+@font-face {
+  font-family: 'League Spartan';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('./fonts/league-spartan-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0100-02BA, U+02BD-02C5, U+02C7-02CC,
+    U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F,
+    U+1EF2-1EFF, U+2000-206F, U+20A0-20C0, U+2113, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+2C60-2C7F, U+A720-A7FF, U+FEFF, U+FFFD;
+}
+
+/* ============================================================================*/
+/* Spruce Design Tokens — Colors*/
+/* ============================================================================*/
+/**/
+/* Neutral surface scale (0 = lightest, 950 = darkest in light mode).*/
+/* Primary brand colors, semantic status colors.*/
+/* All values defined for light theme; dark overrides live in _theme-dark.scss.*/
+
+:root {
+  /* ── Neutral surface scale (Spruce — quiet zinc workspace) ───────────────*/
+  --sp-surface-0: #fafafa;
+  --sp-surface-25: #f8f8f9;
+  --sp-surface-50: #f4f4f5;
+  --sp-surface-100: #ececee;
+  --sp-surface-200: #e4e4e7;
+  --sp-surface-300: #d4d4d8;
+  --sp-surface-400: #a1a1aa;
+  --sp-surface-500: #71717a;
+  --sp-surface-600: #52525b;
+  --sp-surface-700: #3f3f46;
+  --sp-surface-800: #27272a;
+  --sp-surface-900: #18181b;
+  --sp-surface-950: #09090b;
+
+  /* ── Surface aliases ─────────────────────────────────────────────────────*/
+  --sp-surface: var(--sp-surface-0);
+  --sp-bg: var(--sp-surface-0);
+  --sp-background: var(--sp-surface-0);
+  --sp-surface-raised: var(--sp-surface-50);
+  --sp-surface-sunken: var(--sp-surface-100);
+  --sp-surface-hover: var(--sp-content-hover-bg);
+
+  /* ── Primary brand (Spruce — evergreen accent) ───────────────────────────*/
+  --sp-primary: #166534;
+  --sp-primary-hover: #14532d;
+  --sp-primary-active: #052e16;
+  --sp-primary-subtle: rgba(22, 101, 52, 0.09);
+  --sp-primary-text: #fafafa;
+  --sp-primary-fg: var(--sp-primary-text);
+  --sp-primary-border: rgba(22, 101, 52, 0.25);
+
+  /* ── Semantic status ─────────────────────────────────────────────────────*/
+  --sp-success: #059669;
+  --sp-success-hover: #047857;
+  --sp-success-active: #065f46;
+  --sp-success-subtle: rgba(5, 150, 105, 0.09);
+  --sp-success-bg: #ecfdf5;
+  --sp-success-border: rgba(5, 150, 105, 0.25);
+  --sp-success-text: #065f46;
+
+  --sp-warning: #b45309;
+  --sp-warning-hover: #92400e;
+  --sp-warning-active: #78350f;
+  --sp-warning-subtle: rgba(180, 83, 9, 0.09);
+  --sp-warning-bg: #fffbeb;
+  --sp-warning-border: rgba(180, 83, 9, 0.25);
+  --sp-warning-text: #92400e;
+
+  --sp-danger: #dc2626;
+  --sp-danger-hover: #b91c1c;
+  --sp-danger-active: #991b1b;
+  --sp-danger-subtle: rgba(220, 38, 38, 0.09);
+  --sp-danger-bg: #fef2f2;
+  --sp-danger-border: rgba(220, 38, 38, 0.25);
+  --sp-danger-text: #b91c1c;
+
+  --sp-info: #0e7490;
+  --sp-info-hover: #0369a1;
+  --sp-info-active: #075985;
+  --sp-info-subtle: rgba(14, 116, 144, 0.09);
+  --sp-info-bg: #f0f9ff;
+  --sp-info-border: rgba(14, 116, 144, 0.25);
+  --sp-info-text: #075985;
+
+  /* ── Text ───────────────────────────────────────────────────────────────*/
+  --sp-text: #18181b;
+  --sp-text-color: #18181b;
+  --sp-text-muted: #3f3f46;
+  --sp-text-subtle: #71717a;
+  --sp-text-disabled: #a1a1aa;
+  --sp-text-inverse: #fafafa;
+
+  /* ── Borders ────────────────────────────────────────────────────────────*/
+  --sp-border: rgba(24, 24, 27, 0.055);
+  --sp-border-strong: rgba(24, 24, 27, 0.1);
+  --sp-border-focus: #166534;
+
+  /* Edge of a floating surface — popover, dropdown panel, menu, picker.*/
+  /* Floating panels overlap other content, so their outline needs far more*/
+  /* presence than an in-page divider; derived from the theme's text color so*/
+  /* every theme preset gets a matching edge without redefining it.*/
+  --sp-overlay-border: color-mix(in srgb, var(--sp-text-color, #18181b) 17%, transparent);
+  --sp-overlay-border-width: var(--sp-border-width-hairline, 1px);
+
+  /* ── Status tone scale (OKLCH) ──────────────────────────────────────────*/
+  /* The `*-subtle` tokens above are alpha tints, which makes their brightness*/
+  /* a property of whatever sits behind them: the same danger tint measures*/
+  /* L 0.30 on surface-0 and L 0.37 on surface-200, and every theme's dark*/
+  /* surface lands somewhere different again. That is why a tinted component*/
+  /* like sp-alert is hard to tune in dark mode — there is no knob for*/
+  /* "how bright is a tint", only "how much of the hue shows through".*/
+  /**/
+  /* The tone scale replaces that with absolute targets: a tint is a color at a*/
+  /* FIXED OKLCH lightness and chroma, carrying only the family's hue. Brightness*/
+  /* becomes one number per mode (--sp-tone-tint-l), and because lightness is*/
+  /* perceptual, every hue lands at the same visual weight — no per-family*/
+  /* tuning, and no dependence on the surface underneath.*/
+  /**/
+  /* The pairs are chosen so contrast holds for every hue on the wheel:*/
+  /*   light  tint 0.96 / on-tint 0.47 → 5.78:1 worst case across 36 hues*/
+  /*   dark   tint 0.30 / on-tint 0.85 → 8.45:1*/
+  /* Keep them in step with SPRUCE_TONE_SCALE in tokens.ts, which the docs read*/
+  /* and the spec asserts against.*/
+  --sp-tone-tint-l: 0.96;
+  --sp-tone-tint-c: 0.035;
+  --sp-tone-border-l: 0.82;
+  --sp-tone-border-c: 0.1;
+  --sp-tone-on-tint-l: 0.47;
+  --sp-tone-on-tint-c: 0.13;
+
+  /* Alpha-tint fallbacks. Engines without relative color syntax keep today's*/
+  /* behavior; the @supports block below upgrades everyone else.*/
+  --sp-primary-tint: var(--sp-primary-subtle);
+  --sp-primary-tint-border: var(--sp-primary-border);
+  --sp-primary-on-tint: var(--sp-primary);
+  --sp-success-tint: var(--sp-success-subtle);
+  --sp-success-tint-border: var(--sp-success-border);
+  --sp-success-on-tint: var(--sp-success);
+  --sp-warning-tint: var(--sp-warning-subtle);
+  --sp-warning-tint-border: var(--sp-warning-border);
+  --sp-warning-on-tint: var(--sp-warning);
+  --sp-danger-tint: var(--sp-danger-subtle);
+  --sp-danger-tint-border: var(--sp-danger-border);
+  --sp-danger-on-tint: var(--sp-danger);
+  --sp-info-tint: var(--sp-info-subtle);
+  --sp-info-tint-border: var(--sp-info-border);
+  --sp-info-on-tint: var(--sp-info);
+
+  /* ── Companion accent roles ─────────────────────────────────────────────*/
+  /* Non-semantic hues for UI that needs a second or third accent without*/
+  /* borrowing meaning from success / warning / danger: secondary CTAs, badge*/
+  /* and tag variants, categorical series. They alias primary by default, so a*/
+  /* theme that never sets them looks exactly as it does today; a color-harmony*/
+  /* accent (see accent-harmony.ts) or a theme preset overrides them with*/
+  /* derived hues.*/
+  --sp-secondary: var(--sp-primary);
+  --sp-secondary-hover: var(--sp-primary-hover);
+  --sp-secondary-active: var(--sp-primary-active);
+  --sp-secondary-subtle: var(--sp-primary-subtle);
+  --sp-secondary-text: var(--sp-primary-text);
+
+  --sp-tertiary: var(--sp-primary);
+  --sp-tertiary-hover: var(--sp-primary-hover);
+  --sp-tertiary-active: var(--sp-primary-active);
+  --sp-tertiary-subtle: var(--sp-primary-subtle);
+  --sp-tertiary-text: var(--sp-primary-text);
+
+  /* ── Backgrounds (interactive) ──────────────────────────────────────────*/
+  --sp-content-hover-bg: rgba(24, 24, 27, 0.035);
+  --sp-content-active-bg: rgba(24, 24, 27, 0.065);
+
+  /* ── Overlay ────────────────────────────────────────────────────────────*/
+  --sp-overlay-bg: rgba(24, 24, 27, 0.45);
+
+  /* ── Scrollbar ──────────────────────────────────────────────────────────*/
+  --sp-scrollbar-track: rgba(24, 24, 27, 0.028);
+  --sp-scrollbar-thumb: #d4d4d8;
+  --sp-scrollbar-hover: #a1a1aa;
+
+  /* ── Backdrop effects ───────────────────────────────────────────────────*/
+  --sp-backdrop-filter: none;
+  --sp-backdrop-filter-strong: none;
+
+  /* ── Frosted surface (reusable translucent glass panel) ──────────────────*/
+  /* Unlike --sp-backdrop-filter (off by default), the frosted tokens always*/
+  /* carry a real blur so the `.sp-frosted` utility reads as glass in every*/
+  /* theme. Themes may override these for a stronger or tinted effect.*/
+  --sp-frosted-bg: rgba(255, 255, 255, 0.55);
+  --sp-frosted-border: rgba(255, 255, 255, 0.6);
+  --sp-frosted-blur: blur(16px) saturate(160%);
+  --sp-frosted-blur-strong: blur(28px) saturate(180%);
+  --sp-frosted-shadow:
+    0 8px 32px -12px rgba(24, 24, 27, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+
+  /* ── Icons (duotone) ───────────────────────────────────────────────────*/
+  --sp-icon-secondary-color: currentColor;
+  --sp-icon-secondary-opacity: 0.2;
+
+  /* ── Component surfacing ────────────────────────────────────────────────*/
+  --sp-card-bg: #fafafa;
+  --sp-card-bg-filled: #f4f4f5;
+  --sp-card-border: rgba(24, 24, 27, 0.06);
+  --sp-card-radius: 8px;
+
+  --sp-input-bg: #ffffff;
+  --sp-input-border: rgba(24, 24, 27, 0.09);
+  --sp-input-border-focus: #166534;
+  --sp-input-radius: 3px;
+  --sp-input-text: #18181b;
+
+  --sp-modal-bg: #fafafa;
+  --sp-modal-radius: 8px;
+  --sp-modal-border: rgba(24, 24, 27, 0.08);
+
+  --sp-btn-radius: 3px;
+  --sp-alert-radius: 4px;
+  --sp-select-bg: #ffffff;
+  --sp-select-border: rgba(24, 24, 27, 0.09);
+  --sp-select-border-focus: #166534;
+  --sp-select-radius: 3px;
+  --sp-checkbox-border: rgba(24, 24, 27, 0.14);
+  --sp-checkbox-radius: 2px;
+
+  /* ── Focus ring ("Precision Glow") ──────────────────────────────────────*/
+  --sp-focus-ring-color: rgba(22, 101, 52, 0.35);
+  --sp-focus-ring-width: 2px;
+  --sp-focus-ring-offset: 2px;
+  --sp-focus-glow-color: rgba(22, 101, 52, 0.12);
+  --sp-focus-glow-spread: 3px;
+
+  /* ── Charts ────────────────────────────────────────────────────────────*/
+  --sp-chart-title-color: #18181b;
+  --sp-chart-subtitle-color: #71717a;
+  --sp-chart-axis-text: #71717a;
+  --sp-chart-axis-line: #e4e4e7;
+  --sp-chart-grid-line: #ececee;
+  --sp-chart-value-label: #3f3f46;
+  --sp-chart-axis-label: #71717a;
+  --sp-chart-legend-text: #71717a;
+  --sp-chart-dot-stroke: #fafafa;
+  --sp-chart-tooltip-bg: #27272a;
+  --sp-chart-tooltip-text: #fafafa;
+  --sp-chart-track-bg: #f4f4f5;
+}
+
+/* ── Tone scale, derived ──────────────────────────────────────────────────────*/
+/* Relative color syntax pulls the hue off each family color and rebuilds it at*/
+/* the tone scale's lightness and chroma. `from` keeps the theme in charge of*/
+/* hue while the scale takes charge of brightness — swap a family color and its*/
+/* tint follows; retune --sp-tone-tint-l and every tint moves together.*/
+@supports (color: oklch(from white l c h)) {
+  :root {
+    --sp-primary-tint: oklch(
+      from var(--sp-primary) var(--sp-tone-tint-l) var(--sp-tone-tint-c) h / 1
+    );
+    --sp-primary-tint-border: oklch(
+      from var(--sp-primary) var(--sp-tone-border-l) var(--sp-tone-border-c) h / 1
+    );
+    --sp-primary-on-tint: oklch(
+      from var(--sp-primary) var(--sp-tone-on-tint-l) var(--sp-tone-on-tint-c) h / 1
+    );
+
+    --sp-success-tint: oklch(
+      from var(--sp-success) var(--sp-tone-tint-l) var(--sp-tone-tint-c) h / 1
+    );
+    --sp-success-tint-border: oklch(
+      from var(--sp-success) var(--sp-tone-border-l) var(--sp-tone-border-c) h / 1
+    );
+    --sp-success-on-tint: oklch(
+      from var(--sp-success) var(--sp-tone-on-tint-l) var(--sp-tone-on-tint-c) h / 1
+    );
+
+    --sp-warning-tint: oklch(
+      from var(--sp-warning) var(--sp-tone-tint-l) var(--sp-tone-tint-c) h / 1
+    );
+    --sp-warning-tint-border: oklch(
+      from var(--sp-warning) var(--sp-tone-border-l) var(--sp-tone-border-c) h / 1
+    );
+    --sp-warning-on-tint: oklch(
+      from var(--sp-warning) var(--sp-tone-on-tint-l) var(--sp-tone-on-tint-c) h / 1
+    );
+
+    --sp-danger-tint: oklch(
+      from var(--sp-danger) var(--sp-tone-tint-l) var(--sp-tone-tint-c) h / 1
+    );
+    --sp-danger-tint-border: oklch(
+      from var(--sp-danger) var(--sp-tone-border-l) var(--sp-tone-border-c) h / 1
+    );
+    --sp-danger-on-tint: oklch(
+      from var(--sp-danger) var(--sp-tone-on-tint-l) var(--sp-tone-on-tint-c) h / 1
+    );
+
+    --sp-info-tint: oklch(from var(--sp-info) var(--sp-tone-tint-l) var(--sp-tone-tint-c) h / 1);
+    --sp-info-tint-border: oklch(
+      from var(--sp-info) var(--sp-tone-border-l) var(--sp-tone-border-c) h / 1
+    );
+    --sp-info-on-tint: oklch(
+      from var(--sp-info) var(--sp-tone-on-tint-l) var(--sp-tone-on-tint-c) h / 1
+    );
+  }
+}
+
+/* ── Control chrome and component token defaults ──────────────────────────── */
+/*
+   Global chrome tokens are intentionally no-op by default. Component tokens
+   alias them so a theme can opt into a coherent edge/shadow treatment without
+   every component needing a theme-specific implementation.
+*/
+:root {
+  --sp-control-border-color: transparent;
+  --sp-control-shadow: none;
+  --sp-control-shadow-hover: var(--sp-control-shadow);
+  --sp-control-shadow-active: var(--sp-control-shadow);
+  --sp-control-press-transform: scale(0.97);
+  --sp-control-font-weight: var(--sp-font-medium, 500);
+  --sp-surface-shadow: none;
+
+  --sp-btn-primary-bg: var(--sp-primary);
+  --sp-btn-primary-text: var(--sp-primary-text);
+  --sp-btn-primary-bg-hover: var(--sp-primary-hover);
+  --sp-btn-primary-bg-active: var(--sp-primary-active);
+  --sp-btn-danger-bg: var(--sp-danger);
+  --sp-btn-success-bg: var(--sp-success);
+  --sp-btn-radius: var(--sp-radius-md);
+  --sp-btn-height-sm: 28px;
+  --sp-btn-height-md: var(--sp-density-control-height);
+  --sp-btn-height-lg: 40px;
+  --sp-btn-border-color: var(--sp-control-border-color);
+  --sp-btn-shadow: var(--sp-control-shadow);
+  --sp-btn-shadow-hover: var(--sp-control-shadow-hover);
+  --sp-btn-shadow-active: var(--sp-control-shadow-active);
+  --sp-btn-press-transform: var(--sp-control-press-transform);
+  --sp-btn-font-weight: var(--sp-control-font-weight);
+
+  --sp-badge-radius: var(--sp-radius-full);
+  --sp-badge-default-bg: var(--sp-surface-100);
+  --sp-badge-default-text: var(--sp-text-color);
+  --sp-badge-default-border: var(--sp-border);
+  --sp-message-bar-info-fg: var(--sp-info-on-tint);
+  --sp-message-bar-success-fg: var(--sp-success-on-tint);
+  --sp-message-bar-warning-fg: var(--sp-warning-on-tint);
+  --sp-message-bar-danger-fg: var(--sp-danger-on-tint);
+  --sp-badge-primary-bg: var(--sp-primary-tint);
+  --sp-badge-primary-text: var(--sp-primary-on-tint);
+  --sp-badge-secondary-bg: var(--sp-secondary-subtle);
+  --sp-badge-secondary-text: var(--sp-secondary-text);
+  --sp-badge-tertiary-bg: var(--sp-tertiary-subtle);
+  --sp-badge-tertiary-text: var(--sp-tertiary-text);
+  --sp-badge-success-bg: var(--sp-success-tint);
+  --sp-badge-success-text: var(--sp-success-on-tint);
+  --sp-badge-warning-bg: var(--sp-warning-tint);
+  --sp-badge-warning-text: var(--sp-warning-on-tint);
+  --sp-badge-danger-bg: var(--sp-danger-tint);
+  --sp-badge-danger-text: var(--sp-danger-on-tint);
+  --sp-badge-info-bg: var(--sp-info-tint);
+  --sp-badge-info-text: var(--sp-info-on-tint);
+
+  --sp-card-bg: var(--sp-surface);
+  --sp-card-bg-filled: var(--sp-surface-raised);
+  --sp-card-border: var(--sp-border);
+  --sp-card-radius: var(--sp-radius-lg);
+  --sp-card-shadow: var(--sp-surface-shadow);
+
+  --sp-input-bg: var(--sp-surface-0);
+  --sp-input-border: var(--sp-border-strong);
+  --sp-input-border-focus: var(--sp-border-focus);
+  --sp-input-radius: var(--sp-radius-md);
+  --sp-input-text: var(--sp-text);
+  --sp-input-shadow: var(--sp-control-shadow);
+
+  --sp-alert-radius: var(--sp-radius-lg);
+  --sp-alert-info-bg: var(--sp-info-tint);
+  --sp-alert-success-bg: var(--sp-success-tint);
+  --sp-alert-warning-bg: var(--sp-warning-tint);
+  --sp-alert-danger-bg: var(--sp-danger-tint);
+
+  --sp-modal-bg: var(--sp-surface-raised);
+  --sp-modal-radius: var(--sp-radius-lg);
+  --sp-modal-border: var(--sp-border-strong);
+  --sp-modal-shadow: var(--sp-shadow-xl);
+
+  --sp-switch-checked-bg: var(--sp-primary);
+  --sp-switch-unchecked-bg: var(--sp-surface-300);
+  --sp-switch-border-color: var(--sp-border-strong);
+  --sp-switch-border-width: var(--sp-border-width-hairline);
+
+  --sp-checkbox-checked-bg: var(--sp-primary);
+  --sp-checkbox-border: var(--sp-border-strong);
+  --sp-checkbox-radius: var(--sp-radius-sm);
+
+  --sp-select-bg: var(--sp-surface-0);
+  --sp-select-border: var(--sp-border-strong);
+  --sp-select-border-focus: var(--sp-border-focus);
+  --sp-select-radius: var(--sp-radius-md);
+  --sp-select-shadow: var(--sp-control-shadow);
+
+  --sp-radio-border: var(--sp-border-strong);
+  --sp-radio-checked-color: var(--sp-primary);
+
+  --sp-tabs-active-color: var(--sp-primary);
+  --sp-tabs-active-border: var(--sp-primary);
+  --sp-tabs-indicator-color: var(--sp-primary);
+
+  /* Default eight-colour chart ramp; harmony providers may overwrite it. */
+  --sp-chart-series-1: #6366f1;
+  --sp-chart-series-2: #f59e0b;
+  --sp-chart-series-3: #10b981;
+  --sp-chart-series-4: #ef4444;
+  --sp-chart-series-5: #3b82f6;
+  --sp-chart-series-6: #8b5cf6;
+  --sp-chart-series-7: #ec4899;
+  --sp-chart-series-8: #14b8a6;
+}
+
+/* ============================================================================*/
+/* Spruce Design Tokens — Typography*/
+/* ============================================================================*/
+
+:root {
+  /* ── Font families ──────────────────────────────────────────────────────*/
+  --sp-font-sans:
+    'Noto Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+  --sp-font-mono:
+    'Noto Sans Mono', ui-monospace, 'SFMono-Regular', 'SF Mono', Menlo, Consolas, 'Liberation Mono',
+    monospace;
+  --sp-font-family: var(--sp-font-sans);
+  --sp-font-family-sans: var(--sp-font-sans);
+  --sp-font-family-mono: var(--sp-font-mono);
+
+  /* ── Font sizes ─────────────────────────────────────────────────────────*/
+  --sp-text-2xs: 0.625rem; /* 10px — exceptional use only*/
+  --sp-text-xs: 0.75rem; /* 12px*/
+  --sp-text-sm: 0.8125rem; /* 13px*/
+  --sp-text-base: 0.875rem; /* 14px*/
+  --sp-text-md: 1rem; /* 16px*/
+  --sp-text-lg: 1.125rem; /* 18px*/
+  --sp-text-xl: 1.25rem; /* 20px*/
+  --sp-text-2xl: 1.5rem; /* 24px*/
+  --sp-text-3xl: 1.875rem; /* 30px*/
+  --sp-text-4xl: 2.25rem; /* 36px*/
+  --sp-text-5xl: 3rem; /* 48px*/
+  --sp-text-6xl: 3.75rem; /* 60px*/
+
+  /* ── Font size aliases (--sp-font-size-*) ────────────────────────────────*/
+  --sp-font-size-2xs: var(--sp-text-2xs);
+  --sp-font-size-xs: var(--sp-text-xs);
+  --sp-font-size-sm: var(--sp-text-sm);
+  --sp-font-size-base: var(--sp-text-base);
+  --sp-font-size-md: var(--sp-text-md);
+  --sp-font-size-lg: var(--sp-text-lg);
+  --sp-font-size-xl: var(--sp-text-xl);
+  --sp-font-size-2xl: var(--sp-text-2xl);
+  --sp-font-size-3xl: var(--sp-text-3xl);
+  --sp-font-size-4xl: var(--sp-text-4xl);
+  --sp-font-size-5xl: var(--sp-text-5xl);
+  --sp-font-size-6xl: var(--sp-text-6xl);
+
+  /* ── Font weights ───────────────────────────────────────────────────────*/
+  --sp-font-light: 300;
+  --sp-font-normal: 400;
+  --sp-font-regular: var(--sp-font-normal);
+  --sp-font-medium: 500;
+  --sp-font-semibold: 600;
+  --sp-font-bold: 700;
+  --sp-font-extrabold: 800;
+
+  /* ── Font weight aliases (--sp-font-weight-*) ────────────────────────────*/
+  --sp-font-weight-light: var(--sp-font-light);
+  --sp-font-weight-normal: var(--sp-font-normal);
+  --sp-font-weight-regular: var(--sp-font-normal);
+  --sp-font-weight-medium: var(--sp-font-medium);
+  --sp-font-weight-semibold: var(--sp-font-semibold);
+  --sp-font-weight-bold: var(--sp-font-bold);
+  --sp-font-weight-extrabold: var(--sp-font-extrabold);
+
+  /* ── Semantic typography ────────────────────────────────────────────────*/
+
+  /* General UI*/
+  --sp-font-body: var(--sp-text-base); /* 14px*/
+  --sp-font-body-lg: var(--sp-text-md); /* 16px*/
+  --sp-font-label: var(--sp-text-sm); /* 13px*/
+  --sp-font-caption: var(--sp-text-xs); /* 12px*/
+
+  /* Headings*/
+  --sp-font-heading-xs: var(--sp-text-md); /* 16px*/
+  --sp-font-heading-sm: var(--sp-text-lg); /* 18px*/
+  --sp-font-heading-md: var(--sp-text-xl); /* 20px*/
+  --sp-font-heading-lg: var(--sp-text-2xl); /* 24px*/
+  --sp-font-heading-xl: var(--sp-text-3xl); /* 30px*/
+
+  /* Display*/
+  --sp-font-display-sm: var(--sp-text-4xl); /* 36px*/
+  --sp-font-display-md: var(--sp-text-5xl); /* 48px*/
+  --sp-font-display-lg: var(--sp-text-6xl); /* 60px*/
+
+  /* ── Line heights / leading scale ────────────────────────────────────────*/
+  --sp-leading-none: 1;
+  --sp-leading-tight: 1.25;
+  --sp-leading-snug: 1.375;
+  --sp-leading-normal: 1.5;
+  --sp-leading-relaxed: 1.625;
+
+  /* ── Line height scale aliases (--sp-line-height-*) ───────────────────────*/
+  --sp-line-height-none: var(--sp-leading-none);
+  --sp-line-height-tight: var(--sp-leading-tight);
+  --sp-line-height-snug: var(--sp-leading-snug);
+  --sp-line-height-normal: var(--sp-leading-normal);
+  --sp-line-height-relaxed: var(--sp-leading-relaxed);
+
+  /* Body*/
+  --sp-line-height-body: var(--sp-leading-normal); /* 1.5*/
+  --sp-line-height-body-lg: var(--sp-leading-normal);
+
+  /* Labels / compact UI*/
+  --sp-line-height-label: var(--sp-leading-snug); /* 1.375*/
+  --sp-line-height-caption: var(--sp-leading-snug);
+
+  /* Headings*/
+  --sp-line-height-heading-xs: var(--sp-leading-snug);
+  --sp-line-height-heading-sm: var(--sp-leading-snug);
+  --sp-line-height-heading-md: var(--sp-leading-tight);
+  --sp-line-height-heading-lg: var(--sp-leading-tight);
+  --sp-line-height-heading-xl: var(--sp-leading-tight);
+
+  /* Display*/
+  --sp-line-height-display-sm: var(--sp-leading-tight);
+  --sp-line-height-display-md: var(--sp-leading-tight);
+  --sp-line-height-display-lg: var(--sp-leading-none);
+
+  /* ── Letter spacing / tracking scale ─────────────────────────────────────*/
+  --sp-tracking-tighter: -0.035em;
+  --sp-tracking-tight: -0.02em;
+  --sp-tracking-normal: 0;
+  --sp-tracking-wide: 0.04em;
+  --sp-tracking-wider: 0.07em;
+  --sp-tracking-widest: 0.1em;
+
+  /* ── Letter spacing scale aliases (--sp-letter-spacing-*) ────────────────*/
+  --sp-letter-spacing-tighter: var(--sp-tracking-tighter);
+  --sp-letter-spacing-tight: var(--sp-tracking-tight);
+  --sp-letter-spacing-normal: var(--sp-tracking-normal);
+  --sp-letter-spacing-wide: var(--sp-tracking-wide);
+  --sp-letter-spacing-wider: var(--sp-tracking-wider);
+  --sp-letter-spacing-widest: var(--sp-tracking-widest);
+
+  /* ── Font feature settings ──────────────────────────────────────────────*/
+  --sp-font-feature-tabular: 'tnum', 'lnum';
+  --sp-font-feature-default: 'cv02', 'cv03', 'cv04', 'cv11';
+}
+
+/* ── Spacing ─────────────────────────────────────────────────────────────── */
+:root {
+  --sp-space-0: 0px;
+  --sp-space-px: 1px;
+  --sp-space-0_5: 2px;
+  --sp-space-1: 4px;
+  --sp-space-1_5: 6px;
+  --sp-space-2: 8px;
+  --sp-space-2_5: 10px;
+  --sp-space-3: 12px;
+  --sp-space-3_5: 14px;
+  --sp-space-4: 16px;
+  --sp-space-5: 20px;
+  --sp-space-6: 24px;
+  --sp-space-7: 28px;
+  --sp-space-8: 32px;
+  --sp-space-9: 36px;
+  --sp-space-10: 40px;
+  --sp-space-12: 48px;
+  --sp-space-14: 56px;
+  --sp-space-16: 64px;
+  --sp-space-20: 80px;
+  --sp-space-24: 96px;
+}
+
+/* ============================================================================*/
+/* Spruce Design Tokens — Border Radius*/
+/* ============================================================================*/
+
+:root {
+  --sp-radius-none: 0;
+  --sp-radius-sm: 2px;
+  --sp-radius-md: 3px;
+  --sp-radius-lg: 4px;
+  --sp-radius-xl: 6px;
+  --sp-radius-2xl: 8px;
+  --sp-radius-full: 9999px;
+}
+
+/* ── Border Widths ───────────────────────────────────────────────────────── */
+/* Works with the border color tokens (`--sp-border`, `--sp-border-strong`).
+   Example: border: var(--sp-border-width-hairline) solid var(--sp-border);
+   Dark mode does not change hairline width; only border colors are themed. */
+:root {
+  --sp-border-width-none: 0;
+  /* Default divider / control outline (data grids, tables, splitters) */
+  --sp-border-width-hairline: 1px;
+  /* Section breaks, emphasis separators, aggregate rows */
+  --sp-border-width-medium: 2px;
+}
+
+/* ============================================================================*/
+/* Spruce Design Tokens — Shadows*/
+/* ============================================================================*/
+
+:root {
+  --sp-shadow-xs: 0 1px 2px rgba(24, 24, 27, 0.03);
+  --sp-shadow-sm: 0 1px 2px rgba(24, 24, 27, 0.04), 0 1px 3px rgba(24, 24, 27, 0.03);
+  --sp-shadow-md: 0 4px 12px -2px rgba(24, 24, 27, 0.06), 0 2px 4px -2px rgba(24, 24, 27, 0.04);
+  --sp-shadow-lg: 0 12px 28px -8px rgba(24, 24, 27, 0.08);
+  --sp-shadow-xl: 0 20px 44px -16px rgba(24, 24, 27, 0.11);
+  --sp-shadow-inner: inset 0 2px 4px rgba(24, 24, 27, 0.05);
+  --sp-shadow-none: none;
+}
+
+/* ── Z-Index Scale ───────────────────────────────────────────────────────── */
+:root {
+  --sp-z-base: 0;
+  --sp-z-dropdown: 100;
+  --sp-z-sticky: 200;
+  --sp-z-overlay: 300;
+  --sp-z-modal: 400;
+  --sp-z-popover: 500;
+  --sp-z-toast: 600;
+  --sp-z-tooltip: 700;
+}
+
+/* ── Density ─────────────────────────────────────────────────────────────── */
+/* Density presets define semantic sizing tokens for controls, lists, panels,
+   and data-dense surfaces. Components can either consume the semantic aliases
+   (for inherited density) or the preset-specific tokens (for local overrides).
+   Switch density with [data-density='dense' | 'default' | 'comfortable']. */
+:root {
+  --sp-density-dense-control-height: 28px;
+  --sp-density-dense-control-padding-x: 8px;
+  --sp-density-dense-control-padding-y: 4px;
+  --sp-density-dense-inline-gap: 8px;
+  --sp-density-dense-stack-gap: 12px;
+  --sp-density-dense-icon-size: 14px;
+  --sp-density-dense-list-item-min-height: 28px;
+  --sp-density-dense-panel-padding: 12px;
+  --sp-density-dense-datagrid-row-height: 26px;
+  --sp-density-dense-datagrid-header-height: 24px;
+  --sp-density-dense-datagrid-filter-height: 28px;
+  --sp-density-dense-datagrid-aggregate-height: 28px;
+  --sp-density-dense-datagrid-toolbar-height: 32px;
+  --sp-density-dense-datagrid-footer-height: 24px;
+  --sp-density-dense-datagrid-pagination-height: 30px;
+  --sp-density-dense-datagrid-group-header-height: 18px;
+  --sp-density-dense-datagrid-leaf-header-height: 26px;
+  --sp-density-dense-datagrid-cell-padding-x: 8px;
+  --sp-density-dense-datagrid-auto-cell-padding-y: 4px;
+
+  --sp-density-default-control-height: 32px;
+  --sp-density-default-control-padding-x: 10px;
+  --sp-density-default-control-padding-y: 6px;
+  --sp-density-default-inline-gap: 10px;
+  --sp-density-default-stack-gap: 16px;
+  --sp-density-default-icon-size: 16px;
+  --sp-density-default-list-item-min-height: 32px;
+  --sp-density-default-panel-padding: 16px;
+  --sp-density-default-datagrid-row-height: 32px;
+  --sp-density-default-datagrid-header-height: 32px;
+  --sp-density-default-datagrid-filter-height: 32px;
+  --sp-density-default-datagrid-aggregate-height: 32px;
+  --sp-density-default-datagrid-toolbar-height: 36px;
+  --sp-density-default-datagrid-footer-height: 28px;
+  --sp-density-default-datagrid-pagination-height: 34px;
+  --sp-density-default-datagrid-group-header-height: 22px;
+  --sp-density-default-datagrid-leaf-header-height: 30px;
+  --sp-density-default-datagrid-cell-padding-x: 10px;
+  --sp-density-default-datagrid-auto-cell-padding-y: 6px;
+
+  --sp-density-comfortable-control-height: 36px;
+  --sp-density-comfortable-control-padding-x: 12px;
+  --sp-density-comfortable-control-padding-y: 8px;
+  --sp-density-comfortable-inline-gap: 12px;
+  --sp-density-comfortable-stack-gap: 20px;
+  --sp-density-comfortable-icon-size: 18px;
+  --sp-density-comfortable-list-item-min-height: 40px;
+  --sp-density-comfortable-panel-padding: 20px;
+  --sp-density-comfortable-datagrid-row-height: 38px;
+  --sp-density-comfortable-datagrid-header-height: 32px;
+  --sp-density-comfortable-datagrid-filter-height: 34px;
+  --sp-density-comfortable-datagrid-aggregate-height: 34px;
+  --sp-density-comfortable-datagrid-toolbar-height: 40px;
+  --sp-density-comfortable-datagrid-footer-height: 30px;
+  --sp-density-comfortable-datagrid-pagination-height: 38px;
+  --sp-density-comfortable-datagrid-group-header-height: 24px;
+  --sp-density-comfortable-datagrid-leaf-header-height: 34px;
+  --sp-density-comfortable-datagrid-cell-padding-x: 12px;
+  --sp-density-comfortable-datagrid-auto-cell-padding-y: 8px;
+}
+
+:root,
+[data-density='default'] {
+  --sp-density-control-height: var(--sp-density-default-control-height);
+  --sp-density-control-padding-x: var(--sp-density-default-control-padding-x);
+  --sp-density-control-padding-y: var(--sp-density-default-control-padding-y);
+  --sp-density-inline-gap: var(--sp-density-default-inline-gap);
+  --sp-density-stack-gap: var(--sp-density-default-stack-gap);
+  --sp-density-icon-size: var(--sp-density-default-icon-size);
+  --sp-density-list-item-min-height: var(--sp-density-default-list-item-min-height);
+  --sp-density-panel-padding: var(--sp-density-default-panel-padding);
+  --sp-density-datagrid-row-height: var(--sp-density-default-datagrid-row-height);
+  --sp-density-datagrid-header-height: var(--sp-density-default-datagrid-header-height);
+  --sp-density-datagrid-filter-height: var(--sp-density-default-datagrid-filter-height);
+  --sp-density-datagrid-aggregate-height: var(--sp-density-default-datagrid-aggregate-height);
+  --sp-density-datagrid-toolbar-height: var(--sp-density-default-datagrid-toolbar-height);
+  --sp-density-datagrid-footer-height: var(--sp-density-default-datagrid-footer-height);
+  --sp-density-datagrid-pagination-height: var(--sp-density-default-datagrid-pagination-height);
+  --sp-density-datagrid-group-header-height: var(--sp-density-default-datagrid-group-header-height);
+  --sp-density-datagrid-leaf-header-height: var(--sp-density-default-datagrid-leaf-header-height);
+  --sp-density-datagrid-cell-padding-x: var(--sp-density-default-datagrid-cell-padding-x);
+  --sp-density-datagrid-auto-cell-padding-y: var(--sp-density-default-datagrid-auto-cell-padding-y);
+}
+
+[data-density='dense'] {
+  --sp-density-control-height: var(--sp-density-dense-control-height);
+  --sp-density-control-padding-x: var(--sp-density-dense-control-padding-x);
+  --sp-density-control-padding-y: var(--sp-density-dense-control-padding-y);
+  --sp-density-inline-gap: var(--sp-density-dense-inline-gap);
+  --sp-density-stack-gap: var(--sp-density-dense-stack-gap);
+  --sp-density-icon-size: var(--sp-density-dense-icon-size);
+  --sp-density-list-item-min-height: var(--sp-density-dense-list-item-min-height);
+  --sp-density-panel-padding: var(--sp-density-dense-panel-padding);
+  --sp-density-datagrid-row-height: var(--sp-density-dense-datagrid-row-height);
+  --sp-density-datagrid-header-height: var(--sp-density-dense-datagrid-header-height);
+  --sp-density-datagrid-filter-height: var(--sp-density-dense-datagrid-filter-height);
+  --sp-density-datagrid-aggregate-height: var(--sp-density-dense-datagrid-aggregate-height);
+  --sp-density-datagrid-toolbar-height: var(--sp-density-dense-datagrid-toolbar-height);
+  --sp-density-datagrid-footer-height: var(--sp-density-dense-datagrid-footer-height);
+  --sp-density-datagrid-pagination-height: var(--sp-density-dense-datagrid-pagination-height);
+  --sp-density-datagrid-group-header-height: var(--sp-density-dense-datagrid-group-header-height);
+  --sp-density-datagrid-leaf-header-height: var(--sp-density-dense-datagrid-leaf-header-height);
+  --sp-density-datagrid-cell-padding-x: var(--sp-density-dense-datagrid-cell-padding-x);
+  --sp-density-datagrid-auto-cell-padding-y: var(--sp-density-dense-datagrid-auto-cell-padding-y);
+}
+
+[data-density='comfortable'] {
+  --sp-density-control-height: var(--sp-density-comfortable-control-height);
+  --sp-density-control-padding-x: var(--sp-density-comfortable-control-padding-x);
+  --sp-density-control-padding-y: var(--sp-density-comfortable-control-padding-y);
+  --sp-density-inline-gap: var(--sp-density-comfortable-inline-gap);
+  --sp-density-stack-gap: var(--sp-density-comfortable-stack-gap);
+  --sp-density-icon-size: var(--sp-density-comfortable-icon-size);
+  --sp-density-list-item-min-height: var(--sp-density-comfortable-list-item-min-height);
+  --sp-density-panel-padding: var(--sp-density-comfortable-panel-padding);
+  --sp-density-datagrid-row-height: var(--sp-density-comfortable-datagrid-row-height);
+  --sp-density-datagrid-header-height: var(--sp-density-comfortable-datagrid-header-height);
+  --sp-density-datagrid-filter-height: var(--sp-density-comfortable-datagrid-filter-height);
+  --sp-density-datagrid-aggregate-height: var(--sp-density-comfortable-datagrid-aggregate-height);
+  --sp-density-datagrid-toolbar-height: var(--sp-density-comfortable-datagrid-toolbar-height);
+  --sp-density-datagrid-footer-height: var(--sp-density-comfortable-datagrid-footer-height);
+  --sp-density-datagrid-pagination-height: var(--sp-density-comfortable-datagrid-pagination-height);
+  --sp-density-datagrid-group-header-height: var(--sp-density-comfortable-datagrid-group-header-height);
+  --sp-density-datagrid-leaf-header-height: var(--sp-density-comfortable-datagrid-leaf-header-height);
+  --sp-density-datagrid-cell-padding-x: var(--sp-density-comfortable-datagrid-cell-padding-x);
+  --sp-density-datagrid-auto-cell-padding-y: var(--sp-density-comfortable-datagrid-auto-cell-padding-y);
+}
+
+/* ── Motion ──────────────────────────────────────────────────────────────── */
+:root {
+  --sp-duration-instant: 50ms;
+  --sp-duration-fast: 100ms;
+  --sp-duration-normal: 200ms;
+  --sp-duration-slow: 300ms;
+  --sp-duration-slower: 500ms;
+
+  --sp-ease-default: cubic-bezier(0.2, 0, 0, 1);
+  --sp-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --sp-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --sp-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --sp-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --sp-ease-bounce: cubic-bezier(0.34, 1.8, 0.64, 1);
+  --sp-ease-linear: linear;
+
+  --sp-motion-distance-sm: 4px;
+  --sp-motion-distance-md: 8px;
+  --sp-motion-distance-lg: 16px;
+  --sp-motion-distance-xl: 24px;
+
+  --sp-motion-scale-in: 0.95;
+  --sp-motion-scale-out: 1.05;
+}
+
+/* ============================================================================*/
+

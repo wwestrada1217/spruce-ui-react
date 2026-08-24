@@ -6,6 +6,7 @@
  */
 
 import { useMemo } from 'react';
+import { useI18n } from '../../i18n/i18n-context.js';
 import './CreditCard.css';
 
 export type CardColor = 'dark' | 'blue' | 'purple' | 'green' | 'gold' | 'red';
@@ -48,6 +49,7 @@ export function CreditCard({
   className = '',
   style,
 }: CreditCardProps) {
+  const { t } = useI18n();
   const gradient = COLOR_GRADIENTS[color] ?? COLOR_GRADIENTS['dark'];
 
   const numberGroups = useMemo(() => {
@@ -106,11 +108,11 @@ export function CreditCard({
       {/* Bottom row */}
       <div className="sp-credit-card__bottom">
         <div className="sp-credit-card__info">
-          <span className="sp-credit-card__label">Card Holder</span>
+          <span className="sp-credit-card__label">{t('cardHolder')}</span>
           <span className="sp-credit-card__value">{holderName}</span>
         </div>
         <div className="sp-credit-card__info sp-credit-card__info--right">
-          <span className="sp-credit-card__label">Expires</span>
+          <span className="sp-credit-card__label">{t('expires')}</span>
           <span className="sp-credit-card__value">{expiry}</span>
         </div>
         {network && (

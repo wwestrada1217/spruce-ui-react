@@ -15,6 +15,7 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 /* ── Types ────────────────────────────────────────────────────────────── */
 
@@ -109,6 +110,9 @@ export function CommandPalette({
   fuzzySearch = true,
   className = '',
 }: CommandPaletteProps) {
+  const { t } = useI18n();
+  const resolvedPlaceholder = placeholder === 'Type a command...' ? t('commandPalette') : placeholder;
+  const resolvedEmptyMessage = emptyMessage === 'No results found.' ? t('noResults') : emptyMessage;
   const [query, setQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -255,7 +259,7 @@ export function CommandPalette({
       <div
         className={dialogClass}
         role="dialog"
-        aria-label="Command palette"
+        aria-label={t('commandPalette')}
         onKeyDown={handleKeyDown}
       >
         {/* Search bar */}
@@ -267,13 +271,13 @@ export function CommandPalette({
             ref={inputRef}
             type="text"
             className="sp-cp-search__input"
-            placeholder={placeholder}
+            placeholder={resolvedPlaceholder}
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
               setActiveIndex(0);
             }}
-            aria-label="Search commands"
+            aria-label={t('search')}
             autoComplete="off"
             spellCheck={false}
           />
@@ -283,7 +287,7 @@ export function CommandPalette({
         {/* Results */}
         <div className="sp-cp-results" ref={listRef} role="listbox">
           {flatItems.length === 0 && (
-            <div className="sp-cp-empty">{emptyMessage}</div>
+            <div className="sp-cp-empty">{resolvedEmptyMessage}</div>
           )}
           {Array.from(groups.entries()).map(([category, groupItems]) => (
             <div key={category} role="group" aria-label={category}>

@@ -7,6 +7,7 @@
 
 import React from 'react';
 import { Icon } from '../../icons/Icon.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 import './PasswordInput.css';
 
 export type PasswordInputSize = 'sm' | 'md' | 'lg';
@@ -40,6 +41,7 @@ export function PasswordInput({
   id,
   name,
 }: PasswordInputProps) {
+  const { t } = useI18n();
   const [internalValue, setInternalValue] = React.useState(defaultValue);
   const [focused, setFocused] = React.useState(false);
   const [visible, setVisible] = React.useState(false);
@@ -87,7 +89,7 @@ export function PasswordInput({
           className="sp-pw__toggle"
           type="button"
           tabIndex={-1}
-          aria-label={visible ? 'Hide password' : 'Show password'}
+          aria-label={visible ? t('enterPassword') : t('enterPassword')}
           onClick={() => setVisible(v => !v)}
           disabled={disabled}
         >

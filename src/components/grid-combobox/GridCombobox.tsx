@@ -14,6 +14,7 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 import {
   computePosition,
   getScrollParents,
@@ -103,6 +104,7 @@ export function GridCombobox({
   disabled = false,
   className,
 }: GridComboboxProps) {
+  const { t } = useI18n();
   const [instanceId] = useState(() => instanceCounter++);
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
@@ -344,7 +346,7 @@ export function GridCombobox({
               className="sp-gc__clear"
               type="button"
               tabIndex={-1}
-              aria-label="Clear"
+              aria-label={t('clear')}
               onMouseDown={handleClear}
             >
               <Icon name="x" size={12} />

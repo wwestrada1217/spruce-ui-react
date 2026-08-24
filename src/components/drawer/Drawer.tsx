@@ -9,6 +9,7 @@ import './Drawer.css';
 import { useEffect, useCallback, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 export type DrawerPosition = 'left' | 'right' | 'bottom';
 export type DrawerSize = 'sm' | 'md' | 'lg' | 'full';
@@ -56,6 +57,7 @@ export function Drawer({
   footer,
   className,
 }: DrawerProps) {
+  const { t } = useI18n();
   // Close on Escape key
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -103,7 +105,7 @@ export function Drawer({
           <button
             className="sp-drawer__close"
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t('close')}
           >
             <Icon name="x" size={16} />
           </button>

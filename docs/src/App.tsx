@@ -7,8 +7,14 @@ import { SpacingPage } from './pages/foundation/Spacing'
 import { ShadowsPage } from './pages/foundation/Shadows'
 import { IconographyPage } from './pages/foundation/Iconography'
 import { ThemingPage } from './pages/foundation/Theming'
+import { ColorHarmonyPage } from './pages/foundation/ColorHarmony'
 import { MotionPage } from './pages/foundation/Motion'
 import { VoiceAndTonePage } from './pages/foundation/VoiceAndTone'
+import { BordersPage } from './pages/foundation/Borders'
+import { DensityPage } from './pages/foundation/Density'
+import { MotifsPage } from './pages/foundation/Motifs'
+import { AccessibilityPage } from './pages/foundation/Accessibility'
+import { InternationalizationPage } from './pages/foundation/Internationalization'
 import { ButtonPage } from './pages/components/ButtonPage'
 import { BadgePage } from './pages/components/BadgePage'
 import { CheckboxPage } from './pages/components/CheckboxPage'
@@ -172,8 +178,14 @@ function renderPage(hash: string): React.ReactElement {
     case '#/foundation/shadows':        return <ShadowsPage />
     case '#/foundation/iconography':    return <IconographyPage />
     case '#/foundation/theming':        return <ThemingPage />
+    case '#/foundation/color-harmony':  return <ColorHarmonyPage />
     case '#/foundation/motion':         return <MotionPage />
     case '#/foundation/voice-and-tone': return <VoiceAndTonePage />
+    case '#/foundation/borders':        return <BordersPage />
+    case '#/foundation/density':        return <DensityPage />
+    case '#/foundation/motifs':         return <MotifsPage />
+    case '#/foundation/accessibility':  return <AccessibilityPage />
+    case '#/foundation/internationalization': return <InternationalizationPage />
     case '#/components/button':         return <ButtonPage />
     case '#/components/badge':          return <BadgePage />
     case '#/components/checkbox':       return <CheckboxPage />

@@ -36,7 +36,8 @@
       "import": "./dist/spruce-react.es.js",
       "require": "./dist/spruce-react.umd.js"
     },
-    "./style.css": "./dist/spruce-react.css"
+    "./style.css": "./dist/spruce-react.css",
+    "./tokens-static.css": "./dist/tokens-static.css"
   },
   "sideEffects": [
     "**/*.css"
@@ -47,7 +48,9 @@
     "prepublishOnly": "npm run build",
     "lint": "eslint .",
     "docs:build": "npm run build --workspace spruce-react-docs",
-    "docs:preview": "npm run preview --workspace spruce-react-docs"
+    "docs:preview": "npm run preview --workspace spruce-react-docs",
+    "test:type": "tsc -p tests/tsconfig.json --noEmit",
+    "test": "npm run build && npm run test:type && node --experimental-strip-types --test tests/tokens.test.mjs tests/theme.test.mjs tests/i18n.test.mjs"
   },
   "peerDependencies": {
     "react": "^19.0.0",

@@ -5,60 +5,323 @@
 
 export const SPRUCE_COLORS = {
   surface: {
-    0: '#ffffff', 25: '#fcfcfd', 50: '#f8f9fb', 100: '#f1f3f6',
-    200: '#e4e7ec', 300: '#cdd3dc', 400: '#9ca5b4', 500: '#6b7685',
-    600: '#4a5567', 700: '#374151', 800: '#1f2937', 900: '#151b2b', 950: '#0f1117',
+    0: '#fafafa',
+    25: '#f8f8f9',
+    50: '#f4f4f5',
+    100: '#ececee',
+    200: '#e4e4e7',
+    300: '#d4d4d8',
+    400: '#a1a1aa',
+    500: '#71717a',
+    600: '#52525b',
+    700: '#3f3f46',
+    800: '#27272a',
+    900: '#18181b',
+    950: '#09090b',
   },
-  primary: { base: '#2563eb', hover: '#1d4ed8', active: '#1e40af' },
-  success: '#16a34a',
-  warning: '#d97706',
-  danger: '#dc2626',
-  info: '#0891b2',
+  primary: {
+    base: '#166534',
+    hover: '#14532d',
+    active: '#052e16',
+    subtle: 'rgba(22, 101, 52, 0.09)',
+    text: '#fafafa',
+    border: 'rgba(22, 101, 52, 0.25)',
+  },
+  success: {
+    base: '#059669',
+    hover: '#047857',
+    active: '#065f46',
+    subtle: 'rgba(5, 150, 105, 0.09)',
+    bg: '#ecfdf5',
+    border: 'rgba(5, 150, 105, 0.25)',
+    text: '#065f46',
+  },
+  warning: {
+    base: '#b45309',
+    hover: '#92400e',
+    active: '#78350f',
+    subtle: 'rgba(180, 83, 9, 0.09)',
+    bg: '#fffbeb',
+    border: 'rgba(180, 83, 9, 0.25)',
+    text: '#92400e',
+  },
+  danger: {
+    base: '#dc2626',
+    hover: '#b91c1c',
+    active: '#991b1b',
+    subtle: 'rgba(220, 38, 38, 0.09)',
+    bg: '#fef2f2',
+    border: 'rgba(220, 38, 38, 0.25)',
+    text: '#b91c1c',
+  },
+  info: {
+    base: '#0e7490',
+    hover: '#0369a1',
+    active: '#075985',
+    subtle: 'rgba(14, 116, 144, 0.09)',
+    bg: '#f0f9ff',
+    border: 'rgba(14, 116, 144, 0.25)',
+    text: '#075985',
+  },
+  text: {
+    default: '#18181b',
+    muted: '#3f3f46',
+    subtle: '#71717a',
+    disabled: '#a1a1aa',
+    inverse: '#fafafa',
+  },
+  border: {
+    default: 'rgba(24, 24, 27, 0.055)',
+    strong: 'rgba(24, 24, 27, 0.10)',
+    focus: '#166534',
+  },
 } as const;
 
 export const SPRUCE_SPACING = {
-  0: '0px', px: '1px', 0.5: '2px', 1: '4px', 1.5: '6px',
-  2: '8px', 2.5: '10px', 3: '12px', 3.5: '14px', 4: '16px',
-  5: '20px', 6: '24px', 7: '28px', 8: '32px', 9: '36px',
-  10: '40px', 12: '48px', 14: '56px', 16: '64px', 20: '80px', 24: '96px',
+  0: '0px',
+  px: '1px',
+  0.5: '2px',
+  1: '4px',
+  1.5: '6px',
+  2: '8px',
+  2.5: '10px',
+  3: '12px',
+  3.5: '14px',
+  4: '16px',
+  5: '20px',
+  6: '24px',
+  7: '28px',
+  8: '32px',
+  9: '36px',
+  10: '40px',
+  12: '48px',
+  14: '56px',
+  16: '64px',
+  20: '80px',
+  24: '96px',
+} as const;
+
+export const SPRUCE_DENSITY = {
+  dense: {
+    controlHeight: '28px',
+    controlPaddingX: '8px',
+    controlPaddingY: '4px',
+    inlineGap: '8px',
+    stackGap: '12px',
+    iconSize: '14px',
+    listItemMinHeight: '28px',
+    panelPadding: '12px',
+    datagrid: {
+      rowHeight: '26px',
+      headerHeight: '24px',
+      filterHeight: '28px',
+      aggregateHeight: '28px',
+      toolbarHeight: '32px',
+      footerHeight: '24px',
+      paginationHeight: '30px',
+      groupHeaderHeight: '18px',
+      leafHeaderHeight: '26px',
+      cellPaddingX: '8px',
+      autoCellPaddingY: '4px',
+    },
+  },
+  default: {
+    controlHeight: '32px',
+    controlPaddingX: '10px',
+    controlPaddingY: '6px',
+    inlineGap: '10px',
+    stackGap: '16px',
+    iconSize: '16px',
+    listItemMinHeight: '32px',
+    panelPadding: '16px',
+    datagrid: {
+      rowHeight: '32px',
+      headerHeight: '32px',
+      filterHeight: '32px',
+      aggregateHeight: '32px',
+      toolbarHeight: '36px',
+      footerHeight: '28px',
+      paginationHeight: '34px',
+      groupHeaderHeight: '22px',
+      leafHeaderHeight: '30px',
+      cellPaddingX: '10px',
+      autoCellPaddingY: '6px',
+    },
+  },
+  comfortable: {
+    controlHeight: '36px',
+    controlPaddingX: '12px',
+    controlPaddingY: '8px',
+    inlineGap: '12px',
+    stackGap: '20px',
+    iconSize: '18px',
+    listItemMinHeight: '40px',
+    panelPadding: '20px',
+    datagrid: {
+      rowHeight: '38px',
+      headerHeight: '32px',
+      filterHeight: '34px',
+      aggregateHeight: '34px',
+      toolbarHeight: '40px',
+      footerHeight: '30px',
+      paginationHeight: '38px',
+      groupHeaderHeight: '24px',
+      leafHeaderHeight: '34px',
+      cellPaddingX: '12px',
+      autoCellPaddingY: '8px',
+    },
+  },
 } as const;
 
 export const SPRUCE_TYPOGRAPHY = {
   fontSans:
-    "'League Spartan', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+    "'Noto Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'",
   fontMono:
-    "ui-monospace, 'SFMono-Regular', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace",
+    "'Noto Sans Mono', ui-monospace, 'SFMono-Regular', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace",
   sizes: {
-    '2xs': '0.625rem', xs: '0.6875rem', sm: '0.8125rem',
-    base: '0.875rem', md: '1rem', lg: '1.125rem',
-    xl: '1.25rem', '2xl': '1.5rem', '3xl': '1.875rem',
+    '2xs': '0.625rem',
+    xs: '0.75rem',
+    sm: '0.8125rem',
+    base: '0.875rem',
+    md: '1rem',
+    lg: '1.125rem',
+    xl: '1.25rem',
+    '2xl': '1.5rem',
+    '3xl': '1.875rem',
+    '4xl': '2.25rem',
+    '5xl': '3rem',
+    '6xl': '3.75rem',
   },
-  weights: { normal: 400, medium: 500, semibold: 600, bold: 700 },
+  fontSizes: {
+    '2xs': 'var(--sp-font-size-2xs)',
+    xs: 'var(--sp-font-size-xs)',
+    sm: 'var(--sp-font-size-sm)',
+    base: 'var(--sp-font-size-base)',
+    md: 'var(--sp-font-size-md)',
+    lg: 'var(--sp-font-size-lg)',
+    xl: 'var(--sp-font-size-xl)',
+    '2xl': 'var(--sp-font-size-2xl)',
+    '3xl': 'var(--sp-font-size-3xl)',
+    '4xl': 'var(--sp-font-size-4xl)',
+    '5xl': 'var(--sp-font-size-5xl)',
+    '6xl': 'var(--sp-font-size-6xl)',
+  },
+  fontFamilies: {
+    sans: 'var(--sp-font-sans)',
+    mono: 'var(--sp-font-mono)',
+  },
+  weights: {
+    light: 300,
+    normal: 400,
+    regular: 400,
+    medium: 500,
+    semibold: 600,
+    bold: 700,
+    extrabold: 800,
+  },
+  fontWeights: {
+    light: 'var(--sp-font-weight-light)',
+    normal: 'var(--sp-font-weight-normal)',
+    regular: 'var(--sp-font-weight-regular)',
+    medium: 'var(--sp-font-weight-medium)',
+    semibold: 'var(--sp-font-weight-semibold)',
+    bold: 'var(--sp-font-weight-bold)',
+    extrabold: 'var(--sp-font-weight-extrabold)',
+  },
+  lineHeights: {
+    none: 1,
+    tight: 1.25,
+    snug: 1.375,
+    normal: 1.5,
+    relaxed: 1.625,
+  },
+  letterSpacings: {
+    tighter: '-0.035em',
+    tight: '-0.02em',
+    normal: '0',
+    wide: '0.04em',
+    wider: '0.07em',
+    widest: '0.1em',
+  },
+  roles: {
+    body: 'var(--sp-text-base)',
+    bodyLg: 'var(--sp-text-md)',
+    label: 'var(--sp-text-sm)',
+    caption: 'var(--sp-text-xs)',
+    headingXs: 'var(--sp-text-md)',
+    headingSm: 'var(--sp-text-lg)',
+    headingMd: 'var(--sp-text-xl)',
+    headingLg: 'var(--sp-text-2xl)',
+    headingXl: 'var(--sp-text-3xl)',
+    displaySm: 'var(--sp-text-4xl)',
+    displayMd: 'var(--sp-text-5xl)',
+    displayLg: 'var(--sp-text-6xl)',
+  },
+  fontFeatures: {
+    tabular: "'tnum', 'lnum'",
+    default: "'cv02', 'cv03', 'cv04', 'cv11'",
+  },
+} as const;
+
+/**
+ * Status tone scale — the OKLCH targets every tinted status surface is built
+ * from. Mirrors the `--sp-tone-*` custom properties in `_colors.scss` (light)
+ * and `_theme-dark.scss` (dark); the two must move together, and
+ * `color-tone.spec.ts` asserts the contrast guarantees these numbers make.
+ *
+ * A tint is a color at fixed lightness and chroma carrying only the family's
+ * hue, so "how bright is a tinted surface" is one number per mode instead of
+ * an alpha whose result depends on the surface behind it.
+ */
+export const SPRUCE_TONE_SCALE = {
+  light: {
+    tint: { l: 0.96, c: 0.035 },
+    border: { l: 0.82, c: 0.1 },
+    onTint: { l: 0.47, c: 0.13 },
+  },
+  dark: {
+    tint: { l: 0.3, c: 0.05 },
+    border: { l: 0.5, c: 0.09 },
+    onTint: { l: 0.85, c: 0.11 },
+  },
+} as const;
+
+export const SPRUCE_BORDERS = {
+  width: {
+    none: '0',
+    hairline: '1px',
+    medium: '2px',
+  },
 } as const;
 
 export const SPRUCE_RADIUS = {
-  none: '0', sm: '4px', md: '6px', lg: '8px', xl: '12px', '2xl': '16px', full: '9999px',
-} as const;
-
-export const SPRUCE_SHADOWS = {
-  xs: '0 1px 2px rgba(0,0,0,0.05)',
-  sm: '0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06)',
-  md: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)',
-  lg: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
-  xl: '0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
-  inner: 'inset 0 2px 4px rgba(0,0,0,0.06)',
-  none: 'none',
+  none: '0',
+  sm: '2px',
+  md: '3px',
+  lg: '4px',
+  xl: '6px',
+  '2xl': '8px',
+  full: '9999px',
 } as const;
 
 export const SPRUCE_Z_INDEX = {
-  base: 0, dropdown: 100, sticky: 200, overlay: 300,
-  modal: 400, popover: 500, toast: 600, tooltip: 700,
+  base: 0,
+  dropdown: 100,
+  sticky: 200,
+  overlay: 300,
+  modal: 400,
+  popover: 500,
+  toast: 600,
+  tooltip: 700,
 } as const;
 
 export const SPRUCE_MOTION = {
   duration: {
-    instant: '50ms', fast: '100ms', normal: '200ms',
-    slow: '300ms', slower: '500ms',
+    instant: '50ms',
+    fast: '100ms',
+    normal: '200ms',
+    slow: '300ms',
+    slower: '500ms',
   },
   easing: {
     default: 'cubic-bezier(0.2, 0, 0, 1)',
@@ -81,54 +344,30 @@ export const SPRUCE_FOCUS = {
   glowSpread: '6px',
 } as const;
 
-/** All CSS custom property keys defined by the Spruce design system. */
-export type SpruceTokenKey =
-  | '--sp-surface-0' | '--sp-surface-25' | '--sp-surface-50' | '--sp-surface-100'
-  | '--sp-surface-200' | '--sp-surface-300' | '--sp-surface-400' | '--sp-surface-500'
-  | '--sp-surface-600' | '--sp-surface-700' | '--sp-surface-800' | '--sp-surface-900'
-  | '--sp-surface-950'
-  | '--sp-primary' | '--sp-primary-hover' | '--sp-primary-active'
-  | '--sp-primary-subtle' | '--sp-primary-text'
-  | '--sp-success' | '--sp-success-subtle'
-  | '--sp-warning' | '--sp-warning-subtle'
-  | '--sp-danger'  | '--sp-danger-subtle'
-  | '--sp-info'    | '--sp-info-subtle'
-  | '--sp-text-color' | '--sp-text-muted' | '--sp-text-subtle'
-  | '--sp-text-disabled' | '--sp-text-inverse'
-  | '--sp-border' | '--sp-border-strong' | '--sp-border-focus'
-  | '--sp-content-hover-bg' | '--sp-content-active-bg'
-  | '--sp-overlay-bg'
-  | '--sp-scrollbar-track' | '--sp-scrollbar-thumb' | '--sp-scrollbar-hover'
-  | '--sp-focus-ring-color' | '--sp-focus-ring-width'
-  | '--sp-focus-ring-offset' | '--sp-focus-glow-color' | '--sp-focus-glow-spread'
-  | '--sp-font-sans' | '--sp-font-mono'
-  | '--sp-text-2xs' | '--sp-text-xs' | '--sp-text-sm' | '--sp-text-base'
-  | '--sp-text-md' | '--sp-text-lg' | '--sp-text-xl' | '--sp-text-2xl' | '--sp-text-3xl'
-  | '--sp-font-normal' | '--sp-font-medium' | '--sp-font-semibold' | '--sp-font-bold'
-  | '--sp-leading-none' | '--sp-leading-tight' | '--sp-leading-snug'
-  | '--sp-leading-normal' | '--sp-leading-relaxed'
-  | '--sp-tracking-tight' | '--sp-tracking-normal' | '--sp-tracking-wide' | '--sp-tracking-wider'
-  | '--sp-space-0'   | '--sp-space-px'  | '--sp-space-0_5' | '--sp-space-1'
-  | '--sp-space-1_5' | '--sp-space-2'   | '--sp-space-2_5' | '--sp-space-3'
-  | '--sp-space-3_5' | '--sp-space-4'   | '--sp-space-5'   | '--sp-space-6'
-  | '--sp-space-7'   | '--sp-space-8'   | '--sp-space-9'   | '--sp-space-10'
-  | '--sp-space-12'  | '--sp-space-14'  | '--sp-space-16'  | '--sp-space-20' | '--sp-space-24'
-  | '--sp-radius-none' | '--sp-radius-sm' | '--sp-radius-md' | '--sp-radius-lg'
-  | '--sp-radius-xl' | '--sp-radius-2xl' | '--sp-radius-full'
-  | '--sp-shadow-xs' | '--sp-shadow-sm' | '--sp-shadow-md'
-  | '--sp-shadow-lg' | '--sp-shadow-xl' | '--sp-shadow-inner' | '--sp-shadow-none'
-  | '--sp-z-base' | '--sp-z-dropdown' | '--sp-z-sticky' | '--sp-z-overlay'
-  | '--sp-z-modal' | '--sp-z-popover' | '--sp-z-toast' | '--sp-z-tooltip'
-  | '--sp-duration-instant' | '--sp-duration-fast' | '--sp-duration-normal'
-  | '--sp-duration-slow' | '--sp-duration-slower'
-  | '--sp-ease-default' | '--sp-ease-in' | '--sp-ease-out' | '--sp-ease-in-out'
-  | '--sp-ease-spring' | '--sp-ease-bounce' | '--sp-ease-linear'
-  | '--sp-motion-distance-sm' | '--sp-motion-distance-md'
-  | '--sp-motion-distance-lg' | '--sp-motion-distance-xl'
-  | '--sp-motion-scale-in' | '--sp-motion-scale-out'
-  | '--sp-chart-title-color' | '--sp-chart-subtitle-color' | '--sp-chart-axis-text'
-  | '--sp-chart-axis-line' | '--sp-chart-grid-line' | '--sp-chart-value-label'
-  | '--sp-chart-axis-label' | '--sp-chart-legend-text' | '--sp-chart-dot-stroke'
-  | '--sp-chart-tooltip-bg' | '--sp-chart-tooltip-text' | '--sp-chart-track-bg'
-  | '--sp-icon-secondary-color' | '--sp-icon-secondary-opacity'
-  | (string & {});
+/** Programmatic counterpart to the shadow CSS tokens. */
+export const SPRUCE_SHADOWS = {
+  xs: '0 1px 2px rgba(24, 24, 27, 0.03)',
+  sm: '0 1px 2px rgba(24, 24, 27, 0.04), 0 1px 3px rgba(24, 24, 27, 0.03)',
+  md: '0 4px 12px -2px rgba(24, 24, 27, 0.06), 0 2px 4px -2px rgba(24, 24, 27, 0.04)',
+  lg: '0 12px 28px -8px rgba(24, 24, 27, 0.08)',
+  xl: '0 20px 44px -16px rgba(24, 24, 27, 0.11)',
+  inner: 'inset 0 2px 4px rgba(24, 24, 27, 0.05)',
+  none: 'none',
+} as const;
+
+export type {
+  SpruceGlobalTokenKey,
+  SpruceComponentTokenKey,
+  SpruceTokenKey,
+  SpruceCustomTokenKey,
+} from './types.js';
+export {
+  SPRUCE_GLOBAL_TOKEN_KEYS,
+  SPRUCE_COMPONENT_TOKEN_KEYS,
+  SPRUCE_TOKEN_KEYS,
+} from './types.js';
+
+
+
+
+

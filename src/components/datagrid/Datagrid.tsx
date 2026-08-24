@@ -19,6 +19,7 @@ import { Popover } from '../popover/Popover';
 import { CellEditor } from './CellEditor';
 import { ColumnPanel } from './ColumnPanel';
 import { GridColumnFilter } from './GridColumnFilter';
+import { useI18n } from '../../i18n/i18n-context.js';
 import {
   type ColumnDef,
   type ColumnFilter,
@@ -94,6 +95,7 @@ export function Datagrid<T = unknown>({
   className,
   ...rest
 }: DatagridProps<T>) {
+  const { t } = useI18n();
   const opts = options;
   const density: GridDensity = opts.density ?? DEFAULT_DENSITY;
   const metrics = DENSITY_METRICS[density];
@@ -1601,7 +1603,7 @@ export function Datagrid<T = unknown>({
                 {col.headerName ?? col.field}
               </span>
               {col.editable && opts.editMode && (
-                <span className="sp-grid-header-cell__edit-hint" title="Editable">
+                <span className="sp-grid-header-cell__edit-hint" title={t('editable')}>
                   <Icon name="edit" size={12} />
                 </span>
               )}
@@ -1631,7 +1633,7 @@ export function Datagrid<T = unknown>({
                     <span
                       className={`sp-grid-header-cell__filter-btn${hasFilter(col.field) ? ' active' : ''}`}
                       onClick={(e) => e.stopPropagation()}
-                      title="Filter"
+                      title={t('filter')}
                     >
                       <Icon name="filter" size={12} />
                     </span>
@@ -1775,7 +1777,7 @@ export function Datagrid<T = unknown>({
               <button
                 className={`sp-grid-expand-btn${expanded ? ' expanded' : ''}`}
                 onClick={() => toggleTreeRow(treeId)}
-                title="Toggle children"
+                title={t('toggleChildren')}
               >
                 <Icon name="chevron-down" size={14} />
               </button>
@@ -1784,7 +1786,7 @@ export function Datagrid<T = unknown>({
               <button
                 className={`sp-grid-expand-btn${isDetailOpen(row) ? ' expanded' : ''}`}
                 onClick={() => toggleDetail(row)}
-                title="Toggle detail"
+                title={t('toggleDetails')}
               >
                 <Icon name="chevron-down" size={14} />
               </button>
@@ -1799,7 +1801,7 @@ export function Datagrid<T = unknown>({
             style={{ width: 36, minWidth: 36, flexShrink: 0, ...(ctrlColLeftDrag != null ? { left: ctrlColLeftDrag } : {}) }}
             onMouseDown={(e) => onRowMouseDown(e, absIdx)}
             onClick={(e) => e.stopPropagation()}
-            title="Drag to reorder"
+            title={t('dragToReorder')}
           >
             <Icon name="grip-vertical" size={14} />
           </div>
@@ -1819,7 +1821,7 @@ export function Datagrid<T = unknown>({
                     e.stopPropagation();
                     commitRowEdit(row);
                   }}
-                  title="Save"
+                  title={t('save')}
                 >
                   <Icon name="check" size={12} />
                 </button>
@@ -1829,7 +1831,7 @@ export function Datagrid<T = unknown>({
                     e.stopPropagation();
                     cancelRowEdit(row);
                   }}
-                  title="Cancel"
+                  title={t('cancel')}
                 >
                   <Icon name="x" size={12} />
                 </button>
@@ -1841,7 +1843,7 @@ export function Datagrid<T = unknown>({
                   e.stopPropagation();
                   onRowDblClick(e as unknown as React.MouseEvent, row, absIdx);
                 }}
-                title="Edit"
+                title={t('edit')}
               >
                 <Icon name="edit" size={12} />
               </button>
@@ -1940,7 +1942,7 @@ export function Datagrid<T = unknown>({
           minHeight: rowHeight,
         }}
         role="row"
-        aria-label="Add new row"
+        aria-label={t('addNewRow')}
       >
         {hasExpandColumn && (
           <div className="sp-grid-cell" style={{ width: 36, minWidth: 36, flexShrink: 0 }} />
@@ -1955,14 +1957,14 @@ export function Datagrid<T = unknown>({
                 <button
                   className="sp-grid-edit-btn sp-grid-edit-btn--save"
                   onClick={commitNewRow}
-                  title="Add row"
+                  title={t('addRow')}
                 >
                   <Icon name="check" size={12} />
                 </button>
                 <button
                   className="sp-grid-edit-btn sp-grid-edit-btn--cancel"
                   onClick={cancelNewRow}
-                  title="Discard"
+                  title={t('discard')}
                 >
                   <Icon name="x" size={12} />
                 </button>
@@ -2112,17 +2114,17 @@ export function Datagrid<T = unknown>({
             {opts.groupByField && (
               <span className="sp-grid-toolbar__group-badge">
                 <Icon name="network" size={14} />
-                Grouped by <strong>{opts.groupByField}</strong>
+                {t('group')} <strong>{opts.groupByField}</strong>
               </span>
             )}
             {opts.treeChildrenField && (
               <span className="sp-grid-toolbar__tree-badge">
                 <Icon name="git-fork" size={14} />
-                Tree view
-                <button className="sp-grid-toolbar__tree-btn" onClick={expandAll} title="Expand all">
+                {t('treeView')}
+                <button className="sp-grid-toolbar__tree-btn" onClick={expandAll} title={t('expandAll')}>
                   <Icon name="plus" size={12} />
                 </button>
-                <button className="sp-grid-toolbar__tree-btn" onClick={collapseAll} title="Collapse all">
+                <button className="sp-grid-toolbar__tree-btn" onClick={collapseAll} title={t('collapseAll')}>
                   <Icon name="minus" size={12} />
                 </button>
               </span>
@@ -2136,10 +2138,10 @@ export function Datagrid<T = unknown>({
               trigger={
                 <button
                   className={`sp-grid-toolbar__btn${columnPanelOpen ? ' active' : ''}`}
-                  title="Columns"
+                  title={t('columns')}
                 >
                   <Icon name="columns" size={14} />
-                  Columns
+                  {t('columns')}
                 </button>
               }
             >
@@ -2216,7 +2218,7 @@ export function Datagrid<T = unknown>({
                       <input
                         className="sp-grid-filter-inline"
                         type="text"
-                        placeholder="Filter\u2026"
+                        placeholder={t('filterValue')}
                         defaultValue={String(getFilter(col.field)?.value ?? '')}
                         onChange={(e) => onInlineFilterInput(col.field, e.target.value)}
                         onClick={(e) => e.stopPropagation()}
@@ -2289,7 +2291,7 @@ export function Datagrid<T = unknown>({
                     {displayRows.length === 0 && !loading && (
                       <div className="sp-grid-empty">
                         <Icon name="table" size={24} />
-                        <span>{opts.emptyMessage ?? 'No data to display'}</span>
+                        <span>{opts.emptyMessage ?? t('noData')}</span>
                       </div>
                     )}
                   </div>
@@ -2306,7 +2308,7 @@ export function Datagrid<T = unknown>({
                       <div className="sp-grid-spinner__ring" />
                       <div className="sp-grid-spinner__ring sp-grid-spinner__ring--delay" />
                     </div>
-                    <span>Loading more\u2026</span>
+                    <span>{t('loadingMore')}</span>
                   </div>
                 )}
                 {infiniteExhausted && (
@@ -2374,7 +2376,7 @@ export function Datagrid<T = unknown>({
               className="sp-grid-pagination__btn"
               disabled={currentPage === 1}
               onClick={() => goToPage(1)}
-              aria-label="First page"
+              aria-label={t('firstPage')}
             >
               <Icon name="chevrons-left" size={14} />
             </button>
@@ -2382,7 +2384,7 @@ export function Datagrid<T = unknown>({
               className="sp-grid-pagination__btn"
               disabled={currentPage === 1}
               onClick={() => goToPage(currentPage - 1)}
-              aria-label="Previous page"
+              aria-label={t('previousPage')}
             >
               <Icon name="chevron-left" size={14} />
             </button>
@@ -2405,7 +2407,7 @@ export function Datagrid<T = unknown>({
               className="sp-grid-pagination__btn"
               disabled={currentPage === totalPages}
               onClick={() => goToPage(currentPage + 1)}
-              aria-label="Next page"
+              aria-label={t('nextPage')}
             >
               <Icon name="chevron-right" size={14} />
             </button>
@@ -2413,13 +2415,13 @@ export function Datagrid<T = unknown>({
               className="sp-grid-pagination__btn"
               disabled={currentPage === totalPages}
               onClick={() => goToPage(totalPages)}
-              aria-label="Last page"
+              aria-label={t('lastPage')}
             >
               <Icon name="chevrons-right" size={14} />
             </button>
           </div>
           <div className="sp-grid-pagination__size">
-            <span className="sp-grid-pagination__size-label">Rows:</span>
+            <span className="sp-grid-pagination__size-label">{t('rows')}:</span>
             {(opts.pageSizeOptions ?? [10, 25, 50, 100]).map((s) => (
               <button
                 key={s}

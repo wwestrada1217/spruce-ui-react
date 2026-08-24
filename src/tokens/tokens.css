@@ -75,155 +75,545 @@
     U+2212, U+2215, U+2C60-2C7F, U+A720-A7FF, U+FEFF, U+FFFD;
 }
 
-/* ── Colors ──────────────────────────────────────────────────────────────── */
+/* ============================================================================*/
+/* Spruce Design Tokens — Colors*/
+/* ============================================================================*/
+/**/
+/* Neutral surface scale (0 = lightest, 950 = darkest in light mode).*/
+/* Primary brand colors, semantic status colors.*/
+/* All values defined for light theme; dark overrides live in _theme-dark.scss.*/
+
 :root {
-  /* Tells the browser the page is light so native UI (scrollbars, form
-     controls, overscroll) matches; the dark override flips it. */
-  color-scheme: light;
+  /* ── Neutral surface scale (Spruce — quiet zinc workspace) ───────────────*/
+  --sp-surface-0: #fafafa;
+  --sp-surface-25: #f8f8f9;
+  --sp-surface-50: #f4f4f5;
+  --sp-surface-100: #ececee;
+  --sp-surface-200: #e4e4e7;
+  --sp-surface-300: #d4d4d8;
+  --sp-surface-400: #a1a1aa;
+  --sp-surface-500: #71717a;
+  --sp-surface-600: #52525b;
+  --sp-surface-700: #3f3f46;
+  --sp-surface-800: #27272a;
+  --sp-surface-900: #18181b;
+  --sp-surface-950: #09090b;
 
-  /* Neutral surface scale (Spruce — cool, slate-tinted grays;
-     0 = lightest, 950 = darkest in light mode) */
-  --sp-surface-0: #f8fafc;
-  --sp-surface-25: #f4f7fb;
-  --sp-surface-50: #f1f5f9;
-  --sp-surface-100: #e9eef5;
-  --sp-surface-200: #e2e8f0;
-  --sp-surface-300: #cbd5e1;
-  --sp-surface-400: #94a3b8;
-  --sp-surface-500: #64748b;
-  --sp-surface-600: #475569;
-  --sp-surface-700: #334155;
-  --sp-surface-800: #1e293b;
-  --sp-surface-900: #0f172a;
-  --sp-surface-950: #020617;
+  /* ── Surface aliases ─────────────────────────────────────────────────────*/
+  --sp-surface: var(--sp-surface-0);
+  --sp-bg: var(--sp-surface-0);
+  --sp-background: var(--sp-surface-0);
+  --sp-surface-raised: var(--sp-surface-50);
+  --sp-surface-sunken: var(--sp-surface-100);
+  --sp-surface-hover: var(--sp-content-hover-bg);
 
-  /* Primary brand (Spruce — evergreen-teal accent) */
-  --sp-primary: #0f766e;
-  --sp-primary-hover: #115e59;
-  --sp-primary-active: #134e4a;
-  --sp-primary-subtle: rgba(15, 118, 110, 0.08);
-  --sp-primary-text: #f8fafc;
+  /* ── Primary brand (Spruce — evergreen accent) ───────────────────────────*/
+  --sp-primary: #166534;
+  --sp-primary-hover: #14532d;
+  --sp-primary-active: #052e16;
+  --sp-primary-subtle: rgba(22, 101, 52, 0.09);
+  --sp-primary-text: #fafafa;
+  --sp-primary-fg: var(--sp-primary-text);
+  --sp-primary-border: rgba(22, 101, 52, 0.25);
 
-  /* Semantic status */
-  --sp-success: #16a34a;
-  --sp-success-subtle: rgba(22, 163, 74, 0.09);
+  /* ── Semantic status ─────────────────────────────────────────────────────*/
+  --sp-success: #059669;
+  --sp-success-hover: #047857;
+  --sp-success-active: #065f46;
+  --sp-success-subtle: rgba(5, 150, 105, 0.09);
+  --sp-success-bg: #ecfdf5;
+  --sp-success-border: rgba(5, 150, 105, 0.25);
+  --sp-success-text: #065f46;
+
   --sp-warning: #b45309;
+  --sp-warning-hover: #92400e;
+  --sp-warning-active: #78350f;
   --sp-warning-subtle: rgba(180, 83, 9, 0.09);
+  --sp-warning-bg: #fffbeb;
+  --sp-warning-border: rgba(180, 83, 9, 0.25);
+  --sp-warning-text: #92400e;
+
   --sp-danger: #dc2626;
+  --sp-danger-hover: #b91c1c;
+  --sp-danger-active: #991b1b;
   --sp-danger-subtle: rgba(220, 38, 38, 0.09);
+  --sp-danger-bg: #fef2f2;
+  --sp-danger-border: rgba(220, 38, 38, 0.25);
+  --sp-danger-text: #b91c1c;
+
   --sp-info: #0e7490;
+  --sp-info-hover: #0369a1;
+  --sp-info-active: #075985;
   --sp-info-subtle: rgba(14, 116, 144, 0.09);
+  --sp-info-bg: #f0f9ff;
+  --sp-info-border: rgba(14, 116, 144, 0.25);
+  --sp-info-text: #075985;
 
-  /* Text */
-  --sp-text-color: #0f172a;
-  --sp-text-muted: #334155;
-  --sp-text-subtle: #64748b;
-  --sp-text-disabled: #94a3b8;
-  --sp-text-inverse: #f8fafc;
+  /* ── Text ───────────────────────────────────────────────────────────────*/
+  --sp-text: #18181b;
+  --sp-text-color: #18181b;
+  --sp-text-muted: #3f3f46;
+  --sp-text-subtle: #71717a;
+  --sp-text-disabled: #a1a1aa;
+  --sp-text-inverse: #fafafa;
 
-  /* Borders */
-  --sp-border: rgba(15, 23, 42, 0.08);
-  --sp-border-strong: rgba(15, 23, 42, 0.14);
-  --sp-border-focus: #0f766e;
+  /* ── Borders ────────────────────────────────────────────────────────────*/
+  --sp-border: rgba(24, 24, 27, 0.055);
+  --sp-border-strong: rgba(24, 24, 27, 0.1);
+  --sp-border-focus: #166534;
 
-  /* Interactive backgrounds */
-  --sp-content-hover-bg: rgba(15, 23, 42, 0.04);
-  --sp-content-active-bg: rgba(15, 23, 42, 0.07);
+  /* Edge of a floating surface — popover, dropdown panel, menu, picker.*/
+  /* Floating panels overlap other content, so their outline needs far more*/
+  /* presence than an in-page divider; derived from the theme's text color so*/
+  /* every theme preset gets a matching edge without redefining it.*/
+  --sp-overlay-border: color-mix(in srgb, var(--sp-text-color, #18181b) 17%, transparent);
+  --sp-overlay-border-width: var(--sp-border-width-hairline, 1px);
 
-  /* Overlay */
-  --sp-overlay-bg: rgba(15, 23, 42, 0.45);
+  /* ── Status tone scale (OKLCH) ──────────────────────────────────────────*/
+  /* The `*-subtle` tokens above are alpha tints, which makes their brightness*/
+  /* a property of whatever sits behind them: the same danger tint measures*/
+  /* L 0.30 on surface-0 and L 0.37 on surface-200, and every theme's dark*/
+  /* surface lands somewhere different again. That is why a tinted component*/
+  /* like sp-alert is hard to tune in dark mode — there is no knob for*/
+  /* "how bright is a tint", only "how much of the hue shows through".*/
+  /**/
+  /* The tone scale replaces that with absolute targets: a tint is a color at a*/
+  /* FIXED OKLCH lightness and chroma, carrying only the family's hue. Brightness*/
+  /* becomes one number per mode (--sp-tone-tint-l), and because lightness is*/
+  /* perceptual, every hue lands at the same visual weight — no per-family*/
+  /* tuning, and no dependence on the surface underneath.*/
+  /**/
+  /* The pairs are chosen so contrast holds for every hue on the wheel:*/
+  /*   light  tint 0.96 / on-tint 0.47 → 5.78:1 worst case across 36 hues*/
+  /*   dark   tint 0.30 / on-tint 0.85 → 8.45:1*/
+  /* Keep them in step with SPRUCE_TONE_SCALE in tokens.ts, which the docs read*/
+  /* and the spec asserts against.*/
+  --sp-tone-tint-l: 0.96;
+  --sp-tone-tint-c: 0.035;
+  --sp-tone-border-l: 0.82;
+  --sp-tone-border-c: 0.1;
+  --sp-tone-on-tint-l: 0.47;
+  --sp-tone-on-tint-c: 0.13;
 
-  /* Scrollbar */
-  --sp-scrollbar-track: rgba(15, 23, 42, 0.03);
-  --sp-scrollbar-thumb: #cbd5e1;
-  --sp-scrollbar-hover: #94a3b8;
+  /* Alpha-tint fallbacks. Engines without relative color syntax keep today's*/
+  /* behavior; the @supports block below upgrades everyone else.*/
+  --sp-primary-tint: var(--sp-primary-subtle);
+  --sp-primary-tint-border: var(--sp-primary-border);
+  --sp-primary-on-tint: var(--sp-primary);
+  --sp-success-tint: var(--sp-success-subtle);
+  --sp-success-tint-border: var(--sp-success-border);
+  --sp-success-on-tint: var(--sp-success);
+  --sp-warning-tint: var(--sp-warning-subtle);
+  --sp-warning-tint-border: var(--sp-warning-border);
+  --sp-warning-on-tint: var(--sp-warning);
+  --sp-danger-tint: var(--sp-danger-subtle);
+  --sp-danger-tint-border: var(--sp-danger-border);
+  --sp-danger-on-tint: var(--sp-danger);
+  --sp-info-tint: var(--sp-info-subtle);
+  --sp-info-tint-border: var(--sp-info-border);
+  --sp-info-on-tint: var(--sp-info);
 
-  /* Backdrop effects */
+  /* ── Companion accent roles ─────────────────────────────────────────────*/
+  /* Non-semantic hues for UI that needs a second or third accent without*/
+  /* borrowing meaning from success / warning / danger: secondary CTAs, badge*/
+  /* and tag variants, categorical series. They alias primary by default, so a*/
+  /* theme that never sets them looks exactly as it does today; a color-harmony*/
+  /* accent (see accent-harmony.ts) or a theme preset overrides them with*/
+  /* derived hues.*/
+  --sp-secondary: var(--sp-primary);
+  --sp-secondary-hover: var(--sp-primary-hover);
+  --sp-secondary-active: var(--sp-primary-active);
+  --sp-secondary-subtle: var(--sp-primary-subtle);
+  --sp-secondary-text: var(--sp-primary-text);
+
+  --sp-tertiary: var(--sp-primary);
+  --sp-tertiary-hover: var(--sp-primary-hover);
+  --sp-tertiary-active: var(--sp-primary-active);
+  --sp-tertiary-subtle: var(--sp-primary-subtle);
+  --sp-tertiary-text: var(--sp-primary-text);
+
+  /* ── Backgrounds (interactive) ──────────────────────────────────────────*/
+  --sp-content-hover-bg: rgba(24, 24, 27, 0.035);
+  --sp-content-active-bg: rgba(24, 24, 27, 0.065);
+
+  /* ── Overlay ────────────────────────────────────────────────────────────*/
+  --sp-overlay-bg: rgba(24, 24, 27, 0.45);
+
+  /* ── Scrollbar ──────────────────────────────────────────────────────────*/
+  --sp-scrollbar-track: rgba(24, 24, 27, 0.028);
+  --sp-scrollbar-thumb: #d4d4d8;
+  --sp-scrollbar-hover: #a1a1aa;
+
+  /* ── Backdrop effects ───────────────────────────────────────────────────*/
   --sp-backdrop-filter: none;
   --sp-backdrop-filter-strong: none;
 
-  /* Frosted surface (reusable translucent glass panel).
-     Unlike --sp-backdrop-filter (off by default), the frosted tokens always
-     carry a real blur so a frosted panel reads as glass in every theme.
-     Themes may override these for a stronger or tinted effect. */
+  /* ── Frosted surface (reusable translucent glass panel) ──────────────────*/
+  /* Unlike --sp-backdrop-filter (off by default), the frosted tokens always*/
+  /* carry a real blur so the `.sp-frosted` utility reads as glass in every*/
+  /* theme. Themes may override these for a stronger or tinted effect.*/
   --sp-frosted-bg: rgba(255, 255, 255, 0.55);
   --sp-frosted-border: rgba(255, 255, 255, 0.6);
   --sp-frosted-blur: blur(16px) saturate(160%);
   --sp-frosted-blur-strong: blur(28px) saturate(180%);
-  --sp-frosted-shadow: 0 8px 32px -12px rgba(15, 23, 42, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  --sp-frosted-shadow:
+    0 8px 32px -12px rgba(24, 24, 27, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.75);
 
-  /* Icons (duotone) */
+  /* ── Icons (duotone) ───────────────────────────────────────────────────*/
   --sp-icon-secondary-color: currentColor;
   --sp-icon-secondary-opacity: 0.2;
 
-  /* Focus ring ("Precision Glow") */
-  --sp-focus-ring-color: rgba(15, 118, 110, 0.35);
+  /* ── Component surfacing ────────────────────────────────────────────────*/
+  --sp-card-bg: #fafafa;
+  --sp-card-bg-filled: #f4f4f5;
+  --sp-card-border: rgba(24, 24, 27, 0.06);
+  --sp-card-radius: 8px;
+
+  --sp-input-bg: #ffffff;
+  --sp-input-border: rgba(24, 24, 27, 0.09);
+  --sp-input-border-focus: #166534;
+  --sp-input-radius: 3px;
+  --sp-input-text: #18181b;
+
+  --sp-modal-bg: #fafafa;
+  --sp-modal-radius: 8px;
+  --sp-modal-border: rgba(24, 24, 27, 0.08);
+
+  --sp-btn-radius: 3px;
+  --sp-alert-radius: 4px;
+  --sp-select-bg: #ffffff;
+  --sp-select-border: rgba(24, 24, 27, 0.09);
+  --sp-select-border-focus: #166534;
+  --sp-select-radius: 3px;
+  --sp-checkbox-border: rgba(24, 24, 27, 0.14);
+  --sp-checkbox-radius: 2px;
+
+  /* ── Focus ring ("Precision Glow") ──────────────────────────────────────*/
+  --sp-focus-ring-color: rgba(22, 101, 52, 0.35);
   --sp-focus-ring-width: 2px;
   --sp-focus-ring-offset: 2px;
-  --sp-focus-glow-color: rgba(15, 118, 110, 0.12);
-  --sp-focus-glow-spread: 5px;
+  --sp-focus-glow-color: rgba(22, 101, 52, 0.12);
+  --sp-focus-glow-spread: 3px;
 
-  /* Charts */
-  --sp-chart-title-color: #0f172a;
-  --sp-chart-subtitle-color: #64748b;
-  --sp-chart-axis-text: #64748b;
-  --sp-chart-axis-line: #e2e8f0;
-  --sp-chart-grid-line: #eef2f7;
-  --sp-chart-value-label: #334155;
-  --sp-chart-axis-label: #94a3b8;
-  --sp-chart-legend-text: #64748b;
-  --sp-chart-dot-stroke: #f8fafc;
-  --sp-chart-tooltip-bg: #1e293b;
-  --sp-chart-tooltip-text: #f8fafc;
-  --sp-chart-track-bg: #f1f5f9;
+  /* ── Charts ────────────────────────────────────────────────────────────*/
+  --sp-chart-title-color: #18181b;
+  --sp-chart-subtitle-color: #71717a;
+  --sp-chart-axis-text: #71717a;
+  --sp-chart-axis-line: #e4e4e7;
+  --sp-chart-grid-line: #ececee;
+  --sp-chart-value-label: #3f3f46;
+  --sp-chart-axis-label: #71717a;
+  --sp-chart-legend-text: #71717a;
+  --sp-chart-dot-stroke: #fafafa;
+  --sp-chart-tooltip-bg: #27272a;
+  --sp-chart-tooltip-text: #fafafa;
+  --sp-chart-track-bg: #f4f4f5;
 }
 
-/* ── Typography ──────────────────────────────────────────────────────────── */
+/* ── Tone scale, derived ──────────────────────────────────────────────────────*/
+/* Relative color syntax pulls the hue off each family color and rebuilds it at*/
+/* the tone scale's lightness and chroma. `from` keeps the theme in charge of*/
+/* hue while the scale takes charge of brightness — swap a family color and its*/
+/* tint follows; retune --sp-tone-tint-l and every tint moves together.*/
+@supports (color: oklch(from white l c h)) {
+  :root {
+    --sp-primary-tint: oklch(
+      from var(--sp-primary) var(--sp-tone-tint-l) var(--sp-tone-tint-c) h / 1
+    );
+    --sp-primary-tint-border: oklch(
+      from var(--sp-primary) var(--sp-tone-border-l) var(--sp-tone-border-c) h / 1
+    );
+    --sp-primary-on-tint: oklch(
+      from var(--sp-primary) var(--sp-tone-on-tint-l) var(--sp-tone-on-tint-c) h / 1
+    );
+
+    --sp-success-tint: oklch(
+      from var(--sp-success) var(--sp-tone-tint-l) var(--sp-tone-tint-c) h / 1
+    );
+    --sp-success-tint-border: oklch(
+      from var(--sp-success) var(--sp-tone-border-l) var(--sp-tone-border-c) h / 1
+    );
+    --sp-success-on-tint: oklch(
+      from var(--sp-success) var(--sp-tone-on-tint-l) var(--sp-tone-on-tint-c) h / 1
+    );
+
+    --sp-warning-tint: oklch(
+      from var(--sp-warning) var(--sp-tone-tint-l) var(--sp-tone-tint-c) h / 1
+    );
+    --sp-warning-tint-border: oklch(
+      from var(--sp-warning) var(--sp-tone-border-l) var(--sp-tone-border-c) h / 1
+    );
+    --sp-warning-on-tint: oklch(
+      from var(--sp-warning) var(--sp-tone-on-tint-l) var(--sp-tone-on-tint-c) h / 1
+    );
+
+    --sp-danger-tint: oklch(
+      from var(--sp-danger) var(--sp-tone-tint-l) var(--sp-tone-tint-c) h / 1
+    );
+    --sp-danger-tint-border: oklch(
+      from var(--sp-danger) var(--sp-tone-border-l) var(--sp-tone-border-c) h / 1
+    );
+    --sp-danger-on-tint: oklch(
+      from var(--sp-danger) var(--sp-tone-on-tint-l) var(--sp-tone-on-tint-c) h / 1
+    );
+
+    --sp-info-tint: oklch(from var(--sp-info) var(--sp-tone-tint-l) var(--sp-tone-tint-c) h / 1);
+    --sp-info-tint-border: oklch(
+      from var(--sp-info) var(--sp-tone-border-l) var(--sp-tone-border-c) h / 1
+    );
+    --sp-info-on-tint: oklch(
+      from var(--sp-info) var(--sp-tone-on-tint-l) var(--sp-tone-on-tint-c) h / 1
+    );
+  }
+}
+
+/* ── Control chrome and component token defaults ──────────────────────────── */
+/*
+   Global chrome tokens are intentionally no-op by default. Component tokens
+   alias them so a theme can opt into a coherent edge/shadow treatment without
+   every component needing a theme-specific implementation.
+*/
 :root {
-  --sp-font-sans: 'Geist', 'League Spartan', system-ui, -apple-system,
-    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif,
-    'Apple Color Emoji', 'Segoe UI Emoji';
-  --sp-font-mono: 'Geist Mono', ui-monospace, 'SFMono-Regular', 'SF Mono',
-    Menlo, Consolas, 'Liberation Mono', monospace;
+  --sp-control-border-color: transparent;
+  --sp-control-shadow: none;
+  --sp-control-shadow-hover: var(--sp-control-shadow);
+  --sp-control-shadow-active: var(--sp-control-shadow);
+  --sp-control-press-transform: scale(0.97);
+  --sp-control-font-weight: var(--sp-font-medium, 500);
+  --sp-surface-shadow: none;
 
-  /* Font sizes */
-  --sp-text-2xs: 0.625rem;   /* 10px */
-  --sp-text-xs: 0.6875rem;   /* 11px */
-  --sp-text-sm: 0.8125rem;   /* 13px */
-  --sp-text-base: 0.875rem;  /* 14px */
-  --sp-text-md: 1rem;        /* 16px */
-  --sp-text-lg: 1.125rem;    /* 18px */
-  --sp-text-xl: 1.25rem;     /* 20px */
-  --sp-text-2xl: 1.5rem;     /* 24px */
-  --sp-text-3xl: 1.875rem;   /* 30px */
+  --sp-btn-primary-bg: var(--sp-primary);
+  --sp-btn-primary-text: var(--sp-primary-text);
+  --sp-btn-primary-bg-hover: var(--sp-primary-hover);
+  --sp-btn-primary-bg-active: var(--sp-primary-active);
+  --sp-btn-danger-bg: var(--sp-danger);
+  --sp-btn-success-bg: var(--sp-success);
+  --sp-btn-radius: var(--sp-radius-md);
+  --sp-btn-height-sm: 28px;
+  --sp-btn-height-md: var(--sp-density-control-height);
+  --sp-btn-height-lg: 40px;
+  --sp-btn-border-color: var(--sp-control-border-color);
+  --sp-btn-shadow: var(--sp-control-shadow);
+  --sp-btn-shadow-hover: var(--sp-control-shadow-hover);
+  --sp-btn-shadow-active: var(--sp-control-shadow-active);
+  --sp-btn-press-transform: var(--sp-control-press-transform);
+  --sp-btn-font-weight: var(--sp-control-font-weight);
 
-  /* Font weights */
+  --sp-badge-radius: var(--sp-radius-full);
+  --sp-badge-default-bg: var(--sp-surface-100);
+  --sp-badge-default-text: var(--sp-text-color);
+  --sp-badge-default-border: var(--sp-border);
+  --sp-message-bar-info-fg: var(--sp-info-on-tint);
+  --sp-message-bar-success-fg: var(--sp-success-on-tint);
+  --sp-message-bar-warning-fg: var(--sp-warning-on-tint);
+  --sp-message-bar-danger-fg: var(--sp-danger-on-tint);
+  --sp-badge-primary-bg: var(--sp-primary-tint);
+  --sp-badge-primary-text: var(--sp-primary-on-tint);
+  --sp-badge-secondary-bg: var(--sp-secondary-subtle);
+  --sp-badge-secondary-text: var(--sp-secondary-text);
+  --sp-badge-tertiary-bg: var(--sp-tertiary-subtle);
+  --sp-badge-tertiary-text: var(--sp-tertiary-text);
+  --sp-badge-success-bg: var(--sp-success-tint);
+  --sp-badge-success-text: var(--sp-success-on-tint);
+  --sp-badge-warning-bg: var(--sp-warning-tint);
+  --sp-badge-warning-text: var(--sp-warning-on-tint);
+  --sp-badge-danger-bg: var(--sp-danger-tint);
+  --sp-badge-danger-text: var(--sp-danger-on-tint);
+  --sp-badge-info-bg: var(--sp-info-tint);
+  --sp-badge-info-text: var(--sp-info-on-tint);
+
+  --sp-card-bg: var(--sp-surface);
+  --sp-card-bg-filled: var(--sp-surface-raised);
+  --sp-card-border: var(--sp-border);
+  --sp-card-radius: var(--sp-radius-lg);
+  --sp-card-shadow: var(--sp-surface-shadow);
+
+  --sp-input-bg: var(--sp-surface-0);
+  --sp-input-border: var(--sp-border-strong);
+  --sp-input-border-focus: var(--sp-border-focus);
+  --sp-input-radius: var(--sp-radius-md);
+  --sp-input-text: var(--sp-text);
+  --sp-input-shadow: var(--sp-control-shadow);
+
+  --sp-alert-radius: var(--sp-radius-lg);
+  --sp-alert-info-bg: var(--sp-info-tint);
+  --sp-alert-success-bg: var(--sp-success-tint);
+  --sp-alert-warning-bg: var(--sp-warning-tint);
+  --sp-alert-danger-bg: var(--sp-danger-tint);
+
+  --sp-modal-bg: var(--sp-surface-raised);
+  --sp-modal-radius: var(--sp-radius-lg);
+  --sp-modal-border: var(--sp-border-strong);
+  --sp-modal-shadow: var(--sp-shadow-xl);
+
+  --sp-switch-checked-bg: var(--sp-primary);
+  --sp-switch-unchecked-bg: var(--sp-surface-300);
+  --sp-switch-border-color: var(--sp-border-strong);
+  --sp-switch-border-width: var(--sp-border-width-hairline);
+
+  --sp-checkbox-checked-bg: var(--sp-primary);
+  --sp-checkbox-border: var(--sp-border-strong);
+  --sp-checkbox-radius: var(--sp-radius-sm);
+
+  --sp-select-bg: var(--sp-surface-0);
+  --sp-select-border: var(--sp-border-strong);
+  --sp-select-border-focus: var(--sp-border-focus);
+  --sp-select-radius: var(--sp-radius-md);
+  --sp-select-shadow: var(--sp-control-shadow);
+
+  --sp-radio-border: var(--sp-border-strong);
+  --sp-radio-checked-color: var(--sp-primary);
+
+  --sp-tabs-active-color: var(--sp-primary);
+  --sp-tabs-active-border: var(--sp-primary);
+  --sp-tabs-indicator-color: var(--sp-primary);
+
+  /* Default eight-colour chart ramp; harmony providers may overwrite it. */
+  --sp-chart-series-1: #6366f1;
+  --sp-chart-series-2: #f59e0b;
+  --sp-chart-series-3: #10b981;
+  --sp-chart-series-4: #ef4444;
+  --sp-chart-series-5: #3b82f6;
+  --sp-chart-series-6: #8b5cf6;
+  --sp-chart-series-7: #ec4899;
+  --sp-chart-series-8: #14b8a6;
+}
+
+/* ============================================================================*/
+/* Spruce Design Tokens — Typography*/
+/* ============================================================================*/
+
+:root {
+  /* ── Font families ──────────────────────────────────────────────────────*/
+  --sp-font-sans:
+    'Noto Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+  --sp-font-mono:
+    'Noto Sans Mono', ui-monospace, 'SFMono-Regular', 'SF Mono', Menlo, Consolas, 'Liberation Mono',
+    monospace;
+  --sp-font-family: var(--sp-font-sans);
+  --sp-font-family-sans: var(--sp-font-sans);
+  --sp-font-family-mono: var(--sp-font-mono);
+
+  /* ── Font sizes ─────────────────────────────────────────────────────────*/
+  --sp-text-2xs: 0.625rem; /* 10px — exceptional use only*/
+  --sp-text-xs: 0.75rem; /* 12px*/
+  --sp-text-sm: 0.8125rem; /* 13px*/
+  --sp-text-base: 0.875rem; /* 14px*/
+  --sp-text-md: 1rem; /* 16px*/
+  --sp-text-lg: 1.125rem; /* 18px*/
+  --sp-text-xl: 1.25rem; /* 20px*/
+  --sp-text-2xl: 1.5rem; /* 24px*/
+  --sp-text-3xl: 1.875rem; /* 30px*/
+  --sp-text-4xl: 2.25rem; /* 36px*/
+  --sp-text-5xl: 3rem; /* 48px*/
+  --sp-text-6xl: 3.75rem; /* 60px*/
+
+  /* ── Font size aliases (--sp-font-size-*) ────────────────────────────────*/
+  --sp-font-size-2xs: var(--sp-text-2xs);
+  --sp-font-size-xs: var(--sp-text-xs);
+  --sp-font-size-sm: var(--sp-text-sm);
+  --sp-font-size-base: var(--sp-text-base);
+  --sp-font-size-md: var(--sp-text-md);
+  --sp-font-size-lg: var(--sp-text-lg);
+  --sp-font-size-xl: var(--sp-text-xl);
+  --sp-font-size-2xl: var(--sp-text-2xl);
+  --sp-font-size-3xl: var(--sp-text-3xl);
+  --sp-font-size-4xl: var(--sp-text-4xl);
+  --sp-font-size-5xl: var(--sp-text-5xl);
+  --sp-font-size-6xl: var(--sp-text-6xl);
+
+  /* ── Font weights ───────────────────────────────────────────────────────*/
+  --sp-font-light: 300;
   --sp-font-normal: 400;
+  --sp-font-regular: var(--sp-font-normal);
   --sp-font-medium: 500;
   --sp-font-semibold: 600;
   --sp-font-bold: 700;
+  --sp-font-extrabold: 800;
 
-  /* Font usage (semantic aliases) */
-  --sp-font-body: var(--sp-text-base);      /* 14px */
-  --sp-font-label: var(--sp-text-sm);       /* 13px */
-  --sp-font-caption: var(--sp-text-xs);     /* 11px */
-  --sp-font-heading-sm: var(--sp-text-lg);  /* 18px */
-  --sp-font-heading-md: var(--sp-text-xl);  /* 20px */
-  --sp-font-heading-lg: var(--sp-text-2xl); /* 24px */
+  /* ── Font weight aliases (--sp-font-weight-*) ────────────────────────────*/
+  --sp-font-weight-light: var(--sp-font-light);
+  --sp-font-weight-normal: var(--sp-font-normal);
+  --sp-font-weight-regular: var(--sp-font-normal);
+  --sp-font-weight-medium: var(--sp-font-medium);
+  --sp-font-weight-semibold: var(--sp-font-semibold);
+  --sp-font-weight-bold: var(--sp-font-bold);
+  --sp-font-weight-extrabold: var(--sp-font-extrabold);
 
-  /* Line heights */
+  /* ── Semantic typography ────────────────────────────────────────────────*/
+
+  /* General UI*/
+  --sp-font-body: var(--sp-text-base); /* 14px*/
+  --sp-font-body-lg: var(--sp-text-md); /* 16px*/
+  --sp-font-label: var(--sp-text-sm); /* 13px*/
+  --sp-font-caption: var(--sp-text-xs); /* 12px*/
+
+  /* Headings*/
+  --sp-font-heading-xs: var(--sp-text-md); /* 16px*/
+  --sp-font-heading-sm: var(--sp-text-lg); /* 18px*/
+  --sp-font-heading-md: var(--sp-text-xl); /* 20px*/
+  --sp-font-heading-lg: var(--sp-text-2xl); /* 24px*/
+  --sp-font-heading-xl: var(--sp-text-3xl); /* 30px*/
+
+  /* Display*/
+  --sp-font-display-sm: var(--sp-text-4xl); /* 36px*/
+  --sp-font-display-md: var(--sp-text-5xl); /* 48px*/
+  --sp-font-display-lg: var(--sp-text-6xl); /* 60px*/
+
+  /* ── Line heights / leading scale ────────────────────────────────────────*/
   --sp-leading-none: 1;
   --sp-leading-tight: 1.25;
   --sp-leading-snug: 1.375;
   --sp-leading-normal: 1.5;
   --sp-leading-relaxed: 1.625;
 
-  /* Letter spacing */
+  /* ── Line height scale aliases (--sp-line-height-*) ───────────────────────*/
+  --sp-line-height-none: var(--sp-leading-none);
+  --sp-line-height-tight: var(--sp-leading-tight);
+  --sp-line-height-snug: var(--sp-leading-snug);
+  --sp-line-height-normal: var(--sp-leading-normal);
+  --sp-line-height-relaxed: var(--sp-leading-relaxed);
+
+  /* Body*/
+  --sp-line-height-body: var(--sp-leading-normal); /* 1.5*/
+  --sp-line-height-body-lg: var(--sp-leading-normal);
+
+  /* Labels / compact UI*/
+  --sp-line-height-label: var(--sp-leading-snug); /* 1.375*/
+  --sp-line-height-caption: var(--sp-leading-snug);
+
+  /* Headings*/
+  --sp-line-height-heading-xs: var(--sp-leading-snug);
+  --sp-line-height-heading-sm: var(--sp-leading-snug);
+  --sp-line-height-heading-md: var(--sp-leading-tight);
+  --sp-line-height-heading-lg: var(--sp-leading-tight);
+  --sp-line-height-heading-xl: var(--sp-leading-tight);
+
+  /* Display*/
+  --sp-line-height-display-sm: var(--sp-leading-tight);
+  --sp-line-height-display-md: var(--sp-leading-tight);
+  --sp-line-height-display-lg: var(--sp-leading-none);
+
+  /* ── Letter spacing / tracking scale ─────────────────────────────────────*/
+  --sp-tracking-tighter: -0.035em;
   --sp-tracking-tight: -0.02em;
   --sp-tracking-normal: 0;
   --sp-tracking-wide: 0.04em;
   --sp-tracking-wider: 0.07em;
+  --sp-tracking-widest: 0.1em;
+
+  /* ── Letter spacing scale aliases (--sp-letter-spacing-*) ────────────────*/
+  --sp-letter-spacing-tighter: var(--sp-tracking-tighter);
+  --sp-letter-spacing-tight: var(--sp-tracking-tight);
+  --sp-letter-spacing-normal: var(--sp-tracking-normal);
+  --sp-letter-spacing-wide: var(--sp-tracking-wide);
+  --sp-letter-spacing-wider: var(--sp-tracking-wider);
+  --sp-letter-spacing-widest: var(--sp-tracking-widest);
+
+  /* ── Font feature settings ──────────────────────────────────────────────*/
+  --sp-font-feature-tabular: 'tnum', 'lnum';
+  --sp-font-feature-default: 'cv02', 'cv03', 'cv04', 'cv11';
 }
 
 /* ── Spacing ─────────────────────────────────────────────────────────────── */
@@ -251,14 +641,17 @@
   --sp-space-24: 96px;
 }
 
-/* ── Border Radius ───────────────────────────────────────────────────────── */
+/* ============================================================================*/
+/* Spruce Design Tokens — Border Radius*/
+/* ============================================================================*/
+
 :root {
   --sp-radius-none: 0;
-  --sp-radius-sm: 4px;
-  --sp-radius-md: 6px;
-  --sp-radius-lg: 8px;
-  --sp-radius-xl: 12px;
-  --sp-radius-2xl: 16px;
+  --sp-radius-sm: 2px;
+  --sp-radius-md: 3px;
+  --sp-radius-lg: 4px;
+  --sp-radius-xl: 6px;
+  --sp-radius-2xl: 8px;
   --sp-radius-full: 9999px;
 }
 
@@ -274,14 +667,17 @@
   --sp-border-width-medium: 2px;
 }
 
-/* ── Shadows ─────────────────────────────────────────────────────────────── */
+/* ============================================================================*/
+/* Spruce Design Tokens — Shadows*/
+/* ============================================================================*/
+
 :root {
-  --sp-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --sp-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-  --sp-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-  --sp-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-  --sp-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-  --sp-shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+  --sp-shadow-xs: 0 1px 2px rgba(24, 24, 27, 0.03);
+  --sp-shadow-sm: 0 1px 2px rgba(24, 24, 27, 0.04), 0 1px 3px rgba(24, 24, 27, 0.03);
+  --sp-shadow-md: 0 4px 12px -2px rgba(24, 24, 27, 0.06), 0 2px 4px -2px rgba(24, 24, 27, 0.04);
+  --sp-shadow-lg: 0 12px 28px -8px rgba(24, 24, 27, 0.08);
+  --sp-shadow-xl: 0 20px 44px -16px rgba(24, 24, 27, 0.11);
+  --sp-shadow-inner: inset 0 2px 4px rgba(24, 24, 27, 0.05);
   --sp-shadow-none: none;
 }
 
@@ -456,102 +852,178 @@
   --sp-motion-scale-out: 1.05;
 }
 
-/* ── Dark Theme Overrides ────────────────────────────────────────────────── */
+/* ============================================================================*/
+/* Spruce Design Tokens — Dark Theme Overrides*/
+/* ============================================================================*/
+/* Applied via [data-theme="dark"] attribute or .dark class on any ancestor.*/
+
 [data-theme='dark'],
 .dark {
-  color-scheme: dark;
+  /* ── Neutral surface scale (Spruce — Visual Studio Dark neutral charcoal) ─*/
+  --sp-surface-0: #1e1e1e;
+  --sp-surface-25: #222222;
+  --sp-surface-50: #252526;
+  --sp-surface-100: #2d2d30;
+  --sp-surface-200: #333333;
+  --sp-surface-300: #3c3c3c;
+  --sp-surface-400: #4a4a4a;
+  --sp-surface-500: #6a6a6a;
+  --sp-surface-600: #858585;
+  --sp-surface-700: #a6a6a6;
+  --sp-surface-800: #cccccc;
+  --sp-surface-900: #e5e5e5;
+  --sp-surface-950: #ffffff;
 
-  /* Neutral surface scale (Spruce — cool slate, inverted) */
-  --sp-surface-0: #0f172a;
-  --sp-surface-25: #131c30;
-  --sp-surface-50: #182236;
-  --sp-surface-100: #1e293b;
-  --sp-surface-200: #273449;
-  --sp-surface-300: #334155;
-  --sp-surface-400: #475569;
-  --sp-surface-500: #64748b;
-  --sp-surface-600: #94a3b8;
-  --sp-surface-700: #cbd5e1;
-  --sp-surface-800: #e2e8f0;
-  --sp-surface-900: #f1f5f9;
-  --sp-surface-950: #f8fafc;
+  /* ── Surface aliases ─────────────────────────────────────────────────────*/
+  --sp-surface: var(--sp-surface-0);
+  --sp-bg: var(--sp-surface-0);
+  --sp-background: var(--sp-surface-0);
+  --sp-surface-raised: var(--sp-surface-100);
+  --sp-surface-sunken: var(--sp-surface-25);
+  --sp-surface-hover: var(--sp-content-hover-bg);
 
-  /* Primary brand (Spruce — bright evergreen-teal accent) */
-  --sp-primary: #2dd4bf;
-  --sp-primary-hover: #5eead4;
-  --sp-primary-active: #14b8a6;
-  --sp-primary-subtle: rgba(45, 212, 191, 0.14);
-  --sp-primary-text: #042f2a;
+  /* ── Primary brand (Spruce — evergreen green accent) ──────────────────────*/
+  --sp-primary: #22c55e;
+  --sp-primary-hover: #4ade80;
+  --sp-primary-active: #16a34a;
+  --sp-primary-subtle: rgba(34, 197, 94, 0.15);
+  --sp-primary-text: #052e16;
+  --sp-primary-fg: var(--sp-primary-text);
+  --sp-primary-border: rgba(34, 197, 94, 0.3);
 
-  /* Semantic status */
+  /* ── Semantic status ─────────────────────────────────────────────────────*/
   --sp-success: #34d399;
+  --sp-success-hover: #6ee7b7;
+  --sp-success-active: #059669;
   --sp-success-subtle: rgba(52, 211, 153, 0.13);
+  --sp-success-bg: rgba(52, 211, 153, 0.12);
+  --sp-success-border: rgba(52, 211, 153, 0.25);
+  --sp-success-text: #6ee7b7;
+
   --sp-warning: #fbbf24;
+  --sp-warning-hover: #fcd34d;
+  --sp-warning-active: #d97706;
   --sp-warning-subtle: rgba(251, 191, 36, 0.13);
+  --sp-warning-bg: rgba(251, 191, 36, 0.12);
+  --sp-warning-border: rgba(251, 191, 36, 0.25);
+  --sp-warning-text: #fde68a;
+
   --sp-danger: #f87171;
+  --sp-danger-hover: #fca5a5;
+  --sp-danger-active: #dc2626;
   --sp-danger-subtle: rgba(248, 113, 113, 0.13);
+  --sp-danger-bg: rgba(248, 113, 113, 0.12);
+  --sp-danger-border: rgba(248, 113, 113, 0.25);
+  --sp-danger-text: #fca5a5;
+
   --sp-info: #38bdf8;
+  --sp-info-hover: #7dd3fc;
+  --sp-info-active: #0284c7;
   --sp-info-subtle: rgba(56, 189, 248, 0.13);
+  --sp-info-bg: rgba(56, 189, 248, 0.12);
+  --sp-info-border: rgba(56, 189, 248, 0.25);
+  --sp-info-text: #7dd3fc;
 
-  /* Text */
-  --sp-text-color: #e2e8f0;
-  --sp-text-muted: #cbd5e1;
-  --sp-text-subtle: #94a3b8;
-  --sp-text-disabled: #64748b;
-  --sp-text-inverse: #0f172a;
+  /* ── Text ───────────────────────────────────────────────────────────────*/
+  --sp-text: #cccccc;
+  --sp-text-color: #cccccc;
+  --sp-text-muted: #b7b7b7;
+  --sp-text-subtle: #858585;
+  --sp-text-disabled: #5f5f5f;
+  --sp-text-inverse: #1e1e1e;
 
-  /* Borders */
-  --sp-border: rgba(226, 232, 240, 0.08);
-  --sp-border-strong: rgba(226, 232, 240, 0.14);
-  --sp-border-focus: #2dd4bf;
+  /* ── Status tone scale ─────────────────────────────────────────────────*/
+  /* The whole reason for the tone scale: dark-mode tint brightness is these*/
+  /* two numbers, not an alpha guess per family. Raise --sp-tone-tint-l to*/
+  /* lift every tinted surface (alerts, badges, message bars) at once.*/
+  --sp-tone-tint-l: 0.3;
+  --sp-tone-tint-c: 0.05;
+  --sp-tone-border-l: 0.5;
+  --sp-tone-border-c: 0.09;
+  --sp-tone-on-tint-l: 0.85;
+  --sp-tone-on-tint-c: 0.11;
 
-  /* Interactive backgrounds */
-  --sp-content-hover-bg: rgba(226, 232, 240, 0.05);
-  --sp-content-active-bg: rgba(226, 232, 240, 0.09);
+  /* ── Borders ───────────────────────────────────────────────────────────*/
+  --sp-border: rgba(255, 255, 255, 0.08);
+  --sp-border-strong: rgba(255, 255, 255, 0.14);
+  --sp-border-focus: #22c55e;
 
-  /* Overlay */
-  --sp-overlay-bg: rgba(2, 6, 23, 0.62);
+  /* A light edge reads weaker on a dark surface than a dark edge does on a*/
+  /* light one, so floating panels carry a little more of it here.*/
+  --sp-overlay-border: color-mix(in srgb, var(--sp-text-color, #cccccc) 24%, transparent);
 
-  /* Frosted surface */
-  --sp-frosted-bg: rgba(24, 29, 39, 0.55);
+  /* ── Backgrounds (interactive) ─────────────────────────────────────────*/
+  --sp-content-hover-bg: rgba(255, 255, 255, 0.05);
+  --sp-content-active-bg: rgba(255, 255, 255, 0.09);
+
+  /* ── Overlay ───────────────────────────────────────────────────────────*/
+  --sp-overlay-bg: rgba(0, 0, 0, 0.7);
+
+  /* ── Frosted surface ─────────────────────────────────────────────────────*/
+  --sp-frosted-bg: rgba(30, 30, 30, 0.65);
   --sp-frosted-border: rgba(255, 255, 255, 0.12);
   --sp-frosted-blur: blur(18px) saturate(170%);
   --sp-frosted-blur-strong: blur(30px) saturate(190%);
-  --sp-frosted-shadow: 0 10px 32px -14px rgba(0, 0, 0, 0.6),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  --sp-frosted-shadow:
+    0 10px 32px -14px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.14);
 
-  /* Scrollbar */
-  --sp-scrollbar-track: rgba(226, 232, 240, 0.04);
-  --sp-scrollbar-thumb: #334155;
-  --sp-scrollbar-hover: #475569;
+  /* ── Scrollbar ─────────────────────────────────────────────────────────*/
+  --sp-scrollbar-track: rgba(255, 255, 255, 0.03);
+  --sp-scrollbar-thumb: #424242;
+  --sp-scrollbar-hover: #5f5f5f;
 
-  /* Icons (duotone) */
+  /* ── Icons (duotone) ───────────────────────────────────────────────────*/
   --sp-icon-secondary-opacity: 0.25;
 
-  /* Focus ring */
-  --sp-focus-ring-color: rgba(45, 212, 191, 0.34);
-  --sp-focus-glow-color: rgba(45, 212, 191, 0.16);
+  /* ── Focus ring ────────────────────────────────────────────────────────*/
+  --sp-focus-ring-color: var(--sp-border-focus, var(--sp-primary));
+  --sp-focus-glow-color: var(--sp-primary-subtle);
 
-  /* Shadows (darker in dark mode) */
-  --sp-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.35);
-  --sp-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.42), 0 1px 2px rgba(0, 0, 0, 0.32);
-  --sp-shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.48), 0 2px 5px -2px rgba(0, 0, 0, 0.38);
-  --sp-shadow-lg: 0 12px 18px -3px rgba(0, 0, 0, 0.52), 0 5px 8px -4px rgba(0, 0, 0, 0.42);
-  --sp-shadow-xl: 0 22px 28px -6px rgba(0, 0, 0, 0.58), 0 9px 12px -7px rgba(0, 0, 0, 0.48);
+  /* ── Shadows (darker in dark mode) ─────────────────────────────────────*/
+  --sp-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.45);
+  --sp-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.52), 0 1px 2px rgba(0, 0, 0, 0.4);
+  --sp-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.58), 0 2px 4px -2px rgba(0, 0, 0, 0.46);
+  --sp-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.64), 0 4px 6px -4px rgba(0, 0, 0, 0.52);
+  --sp-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.7), 0 8px 10px -6px rgba(0, 0, 0, 0.58);
 
-  /* Charts */
-  --sp-chart-title-color: #e2e8f0;
-  --sp-chart-subtitle-color: #94a3b8;
-  --sp-chart-axis-text: #94a3b8;
-  --sp-chart-axis-line: #334155;
-  --sp-chart-grid-line: #1e293b;
-  --sp-chart-value-label: #cbd5e1;
-  --sp-chart-axis-label: #64748b;
-  --sp-chart-legend-text: #94a3b8;
-  --sp-chart-dot-stroke: #0f172a;
-  --sp-chart-tooltip-bg: #273449;
-  --sp-chart-tooltip-text: #f8fafc;
-  --sp-chart-track-bg: #1e293b;
+  /* ── Component Surfacing Overrides ─────────────────────────────────────*/
+  --sp-card-bg: #252526;
+  --sp-card-bg-filled: #2d2d30;
+  --sp-card-border: rgba(255, 255, 255, 0.08);
+  --sp-card-radius: 8px;
+
+  --sp-input-bg: #252526;
+  --sp-input-border: rgba(255, 255, 255, 0.12);
+  --sp-input-border-focus: var(--sp-border-focus, var(--sp-primary));
+  --sp-input-radius: 3px;
+  --sp-input-text: #cccccc;
+
+  --sp-modal-bg: #252526;
+  --sp-modal-radius: 8px;
+  --sp-modal-border: rgba(255, 255, 255, 0.1);
+
+  --sp-btn-radius: 3px;
+  --sp-alert-radius: 4px;
+  --sp-select-bg: #252526;
+  --sp-select-border: rgba(255, 255, 255, 0.12);
+  --sp-select-border-focus: var(--sp-border-focus, var(--sp-primary));
+  --sp-select-radius: 3px;
+  --sp-checkbox-border: rgba(255, 255, 255, 0.18);
+  --sp-checkbox-radius: 2px;
+
+  /* ── Charts ────────────────────────────────────────────────────────────*/
+  --sp-chart-title-color: #cccccc;
+  --sp-chart-subtitle-color: #858585;
+  --sp-chart-axis-text: #858585;
+  --sp-chart-axis-line: #383838;
+  --sp-chart-grid-line: #2d2d30;
+  --sp-chart-value-label: #cccccc;
+  --sp-chart-axis-label: #6a6a6a;
+  --sp-chart-legend-text: #858585;
+  --sp-chart-dot-stroke: #1e1e1e;
+  --sp-chart-tooltip-bg: #252526;
+  --sp-chart-tooltip-text: #ffffff;
+  --sp-chart-track-bg: #2d2d30;
 }
 
 /* ── Accessibility: prefers-reduced-motion ───────────────────────────────── */
@@ -647,3 +1119,9 @@
     background: var(--sp-surface-0, #fff);
   }
 }
+
+
+
+
+
+

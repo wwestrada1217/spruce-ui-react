@@ -14,6 +14,7 @@ import {
   onClickOutside,
 } from '../../utils/positioning.js';
 import { Icon } from '../../icons/Icon.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 export interface SplitButtonItem {
   /** Display label. */
@@ -101,6 +102,7 @@ export function SplitButton({
   onItemSelect,
   className = '',
 }: SplitButtonProps) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
   const [menuMinWidth, setMenuMinWidth] = useState(0);
@@ -215,7 +217,7 @@ export function SplitButton({
           onClick={handleToggle}
           aria-haspopup="true"
           aria-expanded={open}
-          aria-label="More options"
+          aria-label={t('moreActions')}
         >
           <Icon name="chevron-down" size={iconSize} />
         </button>

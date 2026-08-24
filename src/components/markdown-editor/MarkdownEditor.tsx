@@ -14,6 +14,7 @@ import {
   type MouseEvent,
 } from 'react';
 import { Icon } from '../../icons/Icon.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 export type MarkdownEditorMode = 'write' | 'preview' | 'split';
 export type MarkdownEditorSize = 'sm' | 'md' | 'lg';
@@ -150,6 +151,7 @@ export function MarkdownEditor({
   className,
   style,
 }: MarkdownEditorProps) {
+  const { t } = useI18n();
   const [internalText, setInternalText] = useState<string>(value ?? '');
   const [internalMode, setInternalMode] = useState<MarkdownEditorMode>('write');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -249,7 +251,7 @@ export function MarkdownEditor({
         {/* Header & Mode Switcher */}
         <div className="sp-markdown-editor__header">
           {/* Formatting Toolbar */}
-          <div className="sp-markdown-editor__toolbar" role="toolbar" aria-label="Markdown formatting">
+          <div className="sp-markdown-editor__toolbar" role="toolbar" aria-label={t('markdownFormatting')}>
             {/* Headers */}
             <div className="sp-markdown-editor__toolbar-group">
               <button
@@ -261,7 +263,7 @@ export function MarkdownEditor({
                 }}
                 disabled={!isInteractive || currentMode === 'preview'}
                 title="Heading 1"
-                aria-label="Heading 1"
+                aria-label={t('heading1')}
               >
                 H1
               </button>
@@ -274,7 +276,7 @@ export function MarkdownEditor({
                 }}
                 disabled={!isInteractive || currentMode === 'preview'}
                 title="Heading 2"
-                aria-label="Heading 2"
+                aria-label={t('heading2')}
               >
                 H2
               </button>
@@ -287,7 +289,7 @@ export function MarkdownEditor({
                 }}
                 disabled={!isInteractive || currentMode === 'preview'}
                 title="Heading 3"
-                aria-label="Heading 3"
+                aria-label={t('heading3')}
               >
                 H3
               </button>
@@ -306,7 +308,7 @@ export function MarkdownEditor({
                 }}
                 disabled={!isInteractive || currentMode === 'preview'}
                 title="Bold"
-                aria-label="Bold"
+                aria-label={t('bold')}
               >
                 <Icon name="bold" size={16} />
               </button>
@@ -319,7 +321,7 @@ export function MarkdownEditor({
                 }}
                 disabled={!isInteractive || currentMode === 'preview'}
                 title="Italic"
-                aria-label="Italic"
+                aria-label={t('italic')}
               >
                 <Icon name="italic" size={16} />
               </button>
@@ -332,7 +334,7 @@ export function MarkdownEditor({
                 }}
                 disabled={!isInteractive || currentMode === 'preview'}
                 title="Strikethrough"
-                aria-label="Strikethrough"
+                aria-label={t('strikethrough')}
               >
                 <Icon name="strikethrough" size={16} />
               </button>
@@ -345,7 +347,7 @@ export function MarkdownEditor({
                 }}
                 disabled={!isInteractive || currentMode === 'preview'}
                 title="Inline Code"
-                aria-label="Inline Code"
+                aria-label={t('inlineCode')}
               >
                 <Icon name="code" size={16} />
               </button>
@@ -364,7 +366,7 @@ export function MarkdownEditor({
                 }}
                 disabled={!isInteractive || currentMode === 'preview'}
                 title="Bullet List"
-                aria-label="Bullet List"
+                aria-label={t('bulletList')}
               >
                 <Icon name="list" size={16} />
               </button>
@@ -377,7 +379,7 @@ export function MarkdownEditor({
                 }}
                 disabled={!isInteractive || currentMode === 'preview'}
                 title="Numbered List"
-                aria-label="Numbered List"
+                aria-label={t('numberedList')}
               >
                 <Icon name="list-ordered" size={16} />
               </button>
@@ -390,7 +392,7 @@ export function MarkdownEditor({
                 }}
                 disabled={!isInteractive || currentMode === 'preview'}
                 title="Blockquote"
-                aria-label="Blockquote"
+                aria-label={t('blockquote')}
               >
                 <Icon name="quote" size={16} />
               </button>
@@ -409,7 +411,7 @@ export function MarkdownEditor({
                 }}
                 disabled={!isInteractive || currentMode === 'preview'}
                 title="Code Block"
-                aria-label="Code Block"
+                aria-label={t('codeBlock')}
               >
                 <Icon name="code" size={16} />
               </button>
@@ -422,7 +424,7 @@ export function MarkdownEditor({
                 }}
                 disabled={!isInteractive || currentMode === 'preview'}
                 title="Table"
-                aria-label="Insert Table"
+                aria-label={t('table')}
               >
                 <Icon name="table" size={16} />
               </button>
@@ -435,7 +437,7 @@ export function MarkdownEditor({
                 }}
                 disabled={!isInteractive || currentMode === 'preview'}
                 title="Link"
-                aria-label="Insert Link"
+                aria-label={t('insertLink')}
               >
                 <Icon name="link" size={16} />
               </button>
@@ -448,7 +450,7 @@ export function MarkdownEditor({
                 }}
                 disabled={!isInteractive || currentMode === 'preview'}
                 title="Image"
-                aria-label="Insert Image"
+                aria-label={t('insertImage')}
               >
                 <Icon name="image" size={16} />
               </button>
@@ -461,7 +463,7 @@ export function MarkdownEditor({
                 }}
                 disabled={!isInteractive || currentMode === 'preview'}
                 title="Horizontal Rule"
-                aria-label="Horizontal Rule"
+                aria-label={t('horizontalRule')}
               >
                 <Icon name="minus" size={16} />
               </button>
@@ -469,7 +471,7 @@ export function MarkdownEditor({
           </div>
 
           {/* Mode Toggles */}
-          <div className="sp-markdown-editor__modes" role="tablist" aria-label="View mode">
+          <div className="sp-markdown-editor__modes" role="tablist" aria-label={t('previewMode')}>
             <button
               type="button"
               className={`sp-markdown-editor__mode-btn${
@@ -527,7 +529,7 @@ export function MarkdownEditor({
                 placeholder={placeholder}
                 disabled={disabled}
                 readOnly={readOnly}
-                aria-label="Markdown text editor"
+            aria-label={t('editorContent')}
               />
             </div>
           )}
@@ -539,7 +541,7 @@ export function MarkdownEditor({
                 className="sp-markdown-editor__preview"
                 style={paneStyle}
                 dangerouslySetInnerHTML={{ __html: renderedHtml }}
-                aria-label="Markdown HTML preview"
+            aria-label={t('markdownPreview')}
               />
             </div>
           )}

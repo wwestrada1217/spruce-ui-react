@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { SPRUCE_THEME_PRESETS } from 'spruce-react'
 
 interface PresetDef {
   name: string
@@ -8,25 +9,16 @@ interface PresetDef {
   importName: string
 }
 
-const LIGHT_PRESETS: PresetDef[] = [
-  { name: 'ocean',      displayName: 'Ocean',      base: 'light', color: '#0e7490', importName: 'oceanTheme' },
-  { name: 'forest',     displayName: 'Forest',     base: 'light', color: '#166534', importName: 'forestTheme' },
-  { name: 'rose',       displayName: 'Rose',       base: 'light', color: '#be185d', importName: 'roseTheme' },
-  { name: 'corporate',  displayName: 'Corporate',  base: 'light', color: '#1d3557', importName: 'corporateTheme' },
-  { name: 'retro',      displayName: 'Retro',      base: 'light', color: '#d97706', importName: 'retroTheme' },
-  { name: 'shadcn',     displayName: 'shadcn',     base: 'light', color: '#18181b', importName: 'shadcnTheme' },
-]
+const ALL_PRESETS: PresetDef[] = SPRUCE_THEME_PRESETS.map(theme => ({
+  name: theme.name,
+  displayName: theme.displayName,
+  base: theme.base,
+  color: theme.tokens['--sp-primary'] ?? (theme.base === 'dark' ? '#94a3b8' : '#166534'),
+  importName: `${theme.name.replace(/-([a-z])/g, (_, letter: string) => letter.toUpperCase())}Theme`,
+}))
 
-const DARK_PRESETS: PresetDef[] = [
-  { name: 'night',          displayName: 'Night',          base: 'dark', color: '#38bdf8', importName: 'nightTheme' },
-  { name: 'dracula',        displayName: 'Dracula',        base: 'dark', color: '#bd93f9', importName: 'draculaTheme' },
-  { name: 'dim',            displayName: 'Dim',            base: 'dark', color: '#818cf8', importName: 'dimTheme' },
-  { name: 'nord',           displayName: 'Nord',           base: 'dark', color: '#88C0D0', importName: 'nordTheme' },
-  { name: 'corporate-dark', displayName: 'Corporate Dark', base: 'dark', color: '#4a8cc4', importName: 'corporateDarkTheme' },
-  { name: 'shadcn-dark',    displayName: 'shadcn Dark',    base: 'dark', color: '#ffffff', importName: 'shadcnDarkTheme' },
-]
-
-const ALL_PRESETS = [...LIGHT_PRESETS, ...DARK_PRESETS]
+const LIGHT_PRESETS = ALL_PRESETS.filter(preset => preset.base === 'light')
+const DARK_PRESETS = ALL_PRESETS.filter(preset => preset.base === 'dark')
 
 function PresetCard({ preset, active, onClick }: { preset: PresetDef; active: boolean; onClick: () => void }) {
   const isDark = preset.base === 'dark'
@@ -174,7 +166,9 @@ function ThemeSwitcher() {
         <p className="section-desc">
           A theme object requires a unique <code>name</code>, a human-readable{' '}
           <code>displayName</code>, a <code>base</code> mode, and a partial map
-          of token overrides.
+          of token overrides. Built-in token names are checked by TypeScript;
+          application-owned <code>--sp-*</code> properties belong in the
+          separate <code>customTokens</code> map.
         </p>
         <div className="code-block">
           <pre><code>{`import type { SpruceTheme } from 'spruce-react'
@@ -188,6 +182,9 @@ const myTheme: SpruceTheme = {
     '--sp-primary-hover': '#6d28d9',
     '--sp-primary-active': '#5b21b6',
     '--sp-primary-text': '#ffffff',
+  },
+  customTokens: {
+    '--sp-brand-mark': 'url(/brand-mark.svg)',
   },
 }`}</code></pre>
         </div>
@@ -243,7 +240,12 @@ function Settings() {
             <tr>
               <td>tokens</td>
               <td>{'Partial<Record<SpruceTokenKey, string>>'}</td>
-              <td>CSS custom property overrides</td>
+              <td>Strict built-in CSS token overrides</td>
+            </tr>
+            <tr>
+              <td>customTokens</td>
+              <td>{'Partial<Record<`--sp-${string}`, string>>'}</td>
+              <td>Application-owned custom properties</td>
             </tr>
           </tbody>
         </table>
@@ -358,6 +360,54 @@ function ThemePicker() {
       </section>
 
       <section className="doc-section">
+        <h2>Accents and color harmony</h2>
+        <p className="section-desc">
+          The provider owns an independent accent layer. Choose a shipped accent,
+          supply a custom hex value, or derive secondary, tertiary, and chart
+          colors from a harmony scheme. These choices persist with the theme
+          preference and update without remounting components.
+        </p>
+        <div className="code-block">
+          <pre><code>{`import { useTheme } from 'spruce-react'
+
+function BrandControls() {
+  const {
+    setAccent,
+    setCustomAccentColor,
+    setAccentHarmony,
+    setAccentHarmonyCustom,
+    harmonyPalette,
+    accentRevision,
+  } = useTheme()
+
+  return (
+    <>
+      <button onClick={() => setAccent('indigo')}>Indigo</button>
+      <button onClick={() => setCustomAccentColor('#7c3aed')}>Custom</button>
+      <button onClick={() => setAccentHarmony('triadic')}>Triadic</button>
+      <button onClick={() => setAccentHarmonyCustom({ secondary: 72, tertiary: 216 })}>
+        Custom offsets
+      </button>
+      <output>Palette revision: {accentRevision}</output>
+      <output>{harmonyPalette?.light.series.join(', ')}</output>
+    </>
+  )
+}`}</code></pre>
+        </div>
+        <p className="section-desc">
+          The document exposes <code>data-theme</code>,{' '}
+          <code>data-theme-preset</code>, <code>data-accent</code>, and{' '}
+          <code>data-accent-harmony</code>. Charts or canvas integrations that
+          read computed CSS values can subscribe to <code>accentRevision</code>{' '}
+          before sampling the chart-series tokens.
+        </p>
+        <p className="section-desc">
+          See <a href="#/foundation/color-harmony">Color Harmony</a> for the
+          palette generator, contrast guarantees, and custom-offset editor.
+        </p>
+      </section>
+
+      <section className="doc-section">
         <h2>Token reference</h2>
         <p className="section-desc">
           The most commonly overridden tokens when building custom themes.
@@ -370,10 +420,10 @@ function ThemePicker() {
             <tr><th>Token</th><th>Default</th><th>Description</th></tr>
           </thead>
           <tbody>
-            <tr><td>--sp-primary</td><td>#0f766e</td><td>Primary brand color (evergreen teal)</td></tr>
-            <tr><td>--sp-primary-hover</td><td>#115e59</td><td>Hover state</td></tr>
-            <tr><td>--sp-primary-active</td><td>#134e4a</td><td>Active/pressed state</td></tr>
-            <tr><td>--sp-primary-text</td><td>#f8fafc</td><td>Text on primary surfaces</td></tr>
+            <tr><td>--sp-primary</td><td>#166534</td><td>Primary brand color</td></tr>
+            <tr><td>--sp-primary-hover</td><td>#14532d</td><td>Hover state</td></tr>
+            <tr><td>--sp-primary-active</td><td>#052e16</td><td>Active/pressed state</td></tr>
+            <tr><td>--sp-primary-text</td><td>#fafafa</td><td>Text on primary surfaces</td></tr>
           </tbody>
         </table>
 
@@ -396,11 +446,11 @@ function ThemePicker() {
             <tr><th>Token</th><th>Default</th><th>Description</th></tr>
           </thead>
           <tbody>
-            <tr><td>--sp-surface-0</td><td>#f8fafc</td><td>Page background</td></tr>
-            <tr><td>--sp-surface-50</td><td>#f1f5f9</td><td>Subtle background</td></tr>
-            <tr><td>--sp-surface-100</td><td>#e9eef5</td><td>Muted background</td></tr>
-            <tr><td>--sp-text-color</td><td>#0f172a</td><td>Primary text</td></tr>
-            <tr><td>--sp-text-muted</td><td>#334155</td><td>Muted text</td></tr>
+            <tr><td>--sp-surface-0</td><td>#fafafa</td><td>Page background</td></tr>
+            <tr><td>--sp-surface-50</td><td>#f4f4f5</td><td>Subtle background</td></tr>
+            <tr><td>--sp-surface-100</td><td>#ececee</td><td>Muted background</td></tr>
+            <tr><td>--sp-text</td><td>#18181b</td><td>Primary text</td></tr>
+            <tr><td>--sp-text-muted</td><td>#3f3f46</td><td>Muted text</td></tr>
           </tbody>
         </table>
 
@@ -410,10 +460,10 @@ function ThemePicker() {
             <tr><th>Token</th><th>Default</th><th>Description</th></tr>
           </thead>
           <tbody>
-            <tr><td>--sp-radius-sm</td><td>4px</td><td>Small radius</td></tr>
-            <tr><td>--sp-radius-md</td><td>6px</td><td>Medium radius</td></tr>
-            <tr><td>--sp-radius-lg</td><td>8px</td><td>Large radius</td></tr>
-            <tr><td>--sp-radius-xl</td><td>12px</td><td>Extra large radius</td></tr>
+            <tr><td>--sp-radius-sm</td><td>2px</td><td>Small radius</td></tr>
+            <tr><td>--sp-radius-md</td><td>3px</td><td>Medium radius</td></tr>
+            <tr><td>--sp-radius-lg</td><td>4px</td><td>Large radius</td></tr>
+            <tr><td>--sp-radius-xl</td><td>6px</td><td>Extra large radius</td></tr>
             <tr><td>--sp-radius-full</td><td>9999px</td><td>Fully rounded</td></tr>
           </tbody>
         </table>

@@ -7,6 +7,7 @@
 
 import './Terminal.css';
 import { useRef, useEffect, useCallback, useState } from 'react';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 /* ── Public types ──────────────────────────────────────────────────────── */
 
@@ -126,6 +127,8 @@ export function Terminal({
   ariaLabel = 'Terminal output',
   onClear,
 }: TerminalProps) {
+  const { t } = useI18n();
+  const resolvedAriaLabel = ariaLabel === 'Terminal output' ? t('terminalOutput') : ariaLabel;
   const bodyRef = useRef<HTMLDivElement>(null);
 
   /* Resolve entries with max cap */
@@ -157,7 +160,7 @@ export function Terminal({
     <div
       className={shellCls}
       role="log"
-      aria-label={ariaLabel}
+      aria-label={resolvedAriaLabel}
       aria-live="polite"
       style={maxHeight ? { height: maxHeight } : undefined}
     >
@@ -174,9 +177,9 @@ export function Terminal({
             className="sp-terminal__clear-btn"
             type="button"
             onClick={handleClear}
-            aria-label="Clear terminal"
+            aria-label={t('clearTerminal')}
           >
-            clear
+            {t('clear')}
           </button>
         )}
       </div>
@@ -205,7 +208,7 @@ export function Terminal({
           </div>
         ))}
         {resolvedEntries.length === 0 && (
-          <div className="sp-terminal__empty">No output yet.</div>
+          <div className="sp-terminal__empty">{t('noOutputYet')}</div>
         )}
         <div className="sp-terminal__cursor" aria-hidden="true" />
       </div>

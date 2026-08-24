@@ -7,6 +7,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import type { ColumnDef, ColumnState } from './grid-types';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 export interface ColumnPanelProps<T = unknown> {
   columns: ColumnDef<T>[];
@@ -35,6 +36,7 @@ export function ColumnPanel<T = unknown>({
   onVisibilityChange,
   onReorderChange,
 }: ColumnPanelProps<T>) {
+  const { t } = useI18n();
   const [drag, setDrag] = useState<DragState>(INITIAL_DRAG);
   const listRef = useRef<HTMLUListElement>(null);
 
@@ -159,10 +161,10 @@ export function ColumnPanel<T = unknown>({
     <div
       className="sp-grid-column-panel"
       role="dialog"
-      aria-label="Column visibility and order"
+      aria-label={t('columnVisibility')}
     >
       <div className="sp-grid-column-panel__header">
-        <span className="sp-grid-column-panel__title">Columns</span>
+        <span className="sp-grid-column-panel__title">{t('columns')}</span>
         <div className="sp-grid-column-panel__actions">
           <button
             type="button"
@@ -170,7 +172,7 @@ export function ColumnPanel<T = unknown>({
             onClick={handleShowAll}
             disabled={allVisible}
           >
-            Show All
+            {t('showAll')}
           </button>
           <button
             type="button"
@@ -178,7 +180,7 @@ export function ColumnPanel<T = unknown>({
             onClick={handleHideAll}
             disabled={noneVisible}
           >
-            Hide All
+            {t('hideAll')}
           </button>
         </div>
       </div>
@@ -187,7 +189,7 @@ export function ColumnPanel<T = unknown>({
         ref={listRef}
         className="sp-grid-column-panel__list"
         role="list"
-        aria-label="Column list"
+        aria-label={t('columns')}
       >
         {orderedItems.map((item) => {
           const isDragging = drag.dragField === item.field;

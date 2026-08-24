@@ -13,6 +13,7 @@ import {
   onClickOutside,
 } from '../../utils/positioning.js';
 import { Icon } from '../../icons/Icon.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 import './DateRangePicker.css';
 
 /* ── Types (re-exported from RangeCalendar conventions) ── */
@@ -42,18 +43,6 @@ export interface DateRangePickerProps {
 
 type ViewMode = 'days' | 'months' | 'years';
 
-const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
-];
-
-const SHORT_MONTHS = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-];
-
-const DAY_LABELS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-
 /* ── Helpers ── */
 
 function toISO(y: number, m: number, d: number): string {
@@ -76,8 +65,7 @@ interface DayEntry {
   empty: boolean;
 }
 
-function buildDays(year: number, month: number): DayEntry[] {
-  const firstDay = new Date(year, month, 1).getDay();
+function buildDays(year: number, month: number, firstDay: number): DayEntry[] {
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const days: DayEntry[] = [];
 
@@ -109,17 +97,6 @@ function addMonths(iso: string, n: number): string {
     return toISO(d.getFullYear(), d.getMonth(), Math.min(day, maxDay));
   }
   return toISO(d.getFullYear(), d.getMonth(), d.getDate());
-}
-
-/** Format ISO date to "Jan 15" display string. */
-function formatShort(iso: string): string {
-  const { year, month, day } = parseISO(iso);
-  // Include year if not current year
-  const now = new Date();
-  if (year !== now.getFullYear()) {
-    return `${SHORT_MONTHS[month]} ${day}, ${year}`;
-  }
-  return `${SHORT_MONTHS[month]} ${day}`;
 }
 
 /** Format ISO date to MM/DD/YYYY for input fields. */
@@ -163,6 +140,8 @@ export function DateRangePicker({
   presets,
   className = '',
 }: DateRangePickerProps) {
+  const { monthNames, monthLabels, dayLabels, t, formatDate, formatDayLabel, leadingBlankDays } = useI18n();
+  const resolvedPlaceholder = placeholder === 'Select date range' ? t('selectRange') : placeholder;
   const today = useMemo(() => todayISO(), []);
   const todayParsed = useMemo(() => parseISO(today), [today]);
 
@@ -174,7 +153,6 @@ export function DateRangePicker({
 
   const anchorRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
   const rafId = useRef(0);
 
   /* ── Calendar State ── */
@@ -238,9 +216,9 @@ export function DateRangePicker({
       const total = baseYear * 12 + baseMonth + i;
       const month = total % 12;
       const year = Math.floor(total / 12);
-      return { index: i, month, year, days: buildDays(year, month) };
+      return { index: i, month, year, days: buildDays(year, month, leadingBlankDays(year, month)) };
     });
-  }, [baseMonth, baseYear, monthCount]);
+  }, [baseMonth, baseYear, leadingBlankDays, monthCount]);
 
   /* ── Positioning ── */
 
@@ -576,13 +554,13 @@ export function DateRangePicker({
 
   const displayValue = useMemo(() => {
     if (value?.start && value?.end) {
-      return `${formatShort(value.start)} \u2013 ${formatShort(value.end)}`;
+      return `${formatDate(value.start, { month: 'short', day: 'numeric' })} \u2013 ${formatDate(value.end, { month: 'short', day: 'numeric' })}`;
     }
     if (value?.start) {
-      return `${formatShort(value.start)} \u2013 ...`;
+      return `${formatDate(value.start, { month: 'short', day: 'numeric' })} \u2013 ...`;
     }
     return '';
-  }, [value]);
+  }, [formatDate, value]);
 
   /* ── Root Classes ── */
 
@@ -606,10 +584,10 @@ export function DateRangePicker({
           <input
             type="text"
             className="sp-drp__input"
-            placeholder="MM/DD/YYYY"
+            placeholder={t('dateInput')}
             value={startInputText}
             disabled={disabled}
-            aria-label="Start date"
+            aria-label={t('startDate')}
             onChange={(e) => setStartInputText(e.target.value)}
             onBlur={handleStartInputBlur}
             onFocus={() => { if (!open) openDropdown(); }}
@@ -618,10 +596,10 @@ export function DateRangePicker({
           <input
             type="text"
             className="sp-drp__input"
-            placeholder="MM/DD/YYYY"
+            placeholder={t('dateInput')}
             value={endInputText}
             disabled={disabled}
-            aria-label="End date"
+            aria-label={t('endDate')}
             onChange={(e) => setEndInputText(e.target.value)}
             onBlur={handleEndInputBlur}
             onFocus={() => { if (!open) openDropdown(); }}
@@ -629,7 +607,7 @@ export function DateRangePicker({
           <button
             type="button"
             className="sp-drp__input-toggle"
-            aria-label="Toggle calendar"
+            aria-label={open ? t('hideCalendar') : t('showCalendar')}
             disabled={disabled}
             onClick={toggleDropdown}
           >
@@ -651,7 +629,7 @@ export function DateRangePicker({
       >
         <Icon name="filter" size={14} />
         <span className={`sp-drp__value${!displayValue ? ' sp-drp__value--placeholder' : ''}`}>
-          {displayValue || placeholder}
+          {displayValue || resolvedPlaceholder}
         </span>
         <Icon name="chevron-down" size={14} />
       </button>
@@ -671,7 +649,7 @@ export function DateRangePicker({
                 <button
                   type="button"
                   className="sp-drp__nav"
-                  aria-label="Previous month"
+                  aria-label={t('previousMonth')}
                   onClick={goToPrevMonth}
                 >
                   <Icon name="chevron-left" size={14} />
@@ -682,16 +660,16 @@ export function DateRangePicker({
               <button
                 type="button"
                 className="sp-drp__header-label"
-                aria-label={`${MONTH_NAMES[panel.month]} ${panel.year}, click to pick month`}
+                  aria-label={`${monthNames[panel.month]} ${panel.year}`}
                 onClick={() => handleHeaderLabelClick(panel.index, panel.year)}
               >
-                {MONTH_NAMES[panel.month]} {panel.year}
+                {monthNames[panel.month]} {panel.year}
               </button>
               {panel.index === monthCount - 1 ? (
                 <button
                   type="button"
                   className="sp-drp__nav"
-                  aria-label="Next month"
+                  aria-label={t('nextMonth')}
                   onClick={goToNextMonth}
                 >
                   <Icon name="chevron-right" size={14} />
@@ -703,7 +681,7 @@ export function DateRangePicker({
 
             {/* Weekday headers */}
             <div className="sp-drp__weekdays" role="row">
-              {DAY_LABELS.map((label) => (
+              {dayLabels.map((label) => (
                 <span key={label} className="sp-drp__weekday" role="columnheader" aria-label={label}>
                   {label}
                 </span>
@@ -711,7 +689,7 @@ export function DateRangePicker({
             </div>
 
             {/* Day grid */}
-            <div className="sp-drp__grid" role="grid" aria-label={`${MONTH_NAMES[panel.month]} ${panel.year}`}>
+            <div className="sp-drp__grid" role="grid" aria-label={`${monthNames[panel.month]} ${panel.year}`}>
               {panel.days.map((day, i) => {
                 if (day.empty) {
                   return <span key={`empty-${i}`} className="sp-drp__day sp-drp__day--empty" />;
@@ -743,7 +721,7 @@ export function DateRangePicker({
                     type="button"
                     className={cls}
                     role="gridcell"
-                    aria-label={`${MONTH_NAMES[panel.month]} ${day.day}, ${panel.year}`}
+                    aria-label={formatDayLabel(day.day, panel.month, panel.year)}
                     aria-selected={isStart || isEnd || undefined}
                     aria-current={isToday ? 'date' : undefined}
                     tabIndex={isFocused ? 0 : -1}
@@ -772,7 +750,7 @@ export function DateRangePicker({
           <button
             type="button"
             className="sp-drp__nav"
-            aria-label="Previous year"
+            aria-label={t('previousYear')}
             onClick={() => setEditYear((y) => y - 1)}
           >
             <Icon name="chevron-left" size={14} />
@@ -790,14 +768,14 @@ export function DateRangePicker({
           <button
             type="button"
             className="sp-drp__nav"
-            aria-label="Next year"
+            aria-label={t('nextYear')}
             onClick={() => setEditYear((y) => y + 1)}
           >
             <Icon name="chevron-right" size={14} />
           </button>
         </div>
-        <div className="sp-drp__cell-grid" role="grid" aria-label="Month picker">
-          {SHORT_MONTHS.map((label, i) => {
+        <div className="sp-drp__cell-grid" role="grid" aria-label={t('month')}>
+          {monthLabels.map((label, i) => {
             const isCurrent = i === nowMonth && editYear === nowYear;
             const panelTotal = baseYear * 12 + baseMonth + editingPanel;
             const isSelected = editYear * 12 + i === panelTotal;
@@ -815,7 +793,7 @@ export function DateRangePicker({
                 type="button"
                 className={cls}
                 role="gridcell"
-                aria-label={MONTH_NAMES[i]}
+                aria-label={monthNames[i]}
                 onClick={() => handleMonthSelect(i)}
               >
                 {label}
@@ -839,7 +817,7 @@ export function DateRangePicker({
           <button
             type="button"
             className="sp-drp__nav"
-            aria-label="Previous 12 years"
+            aria-label={t('previousYears')}
             onClick={() => setYearRangeStart((s) => s - 12)}
           >
             <Icon name="chevron-left" size={14} />
@@ -850,13 +828,13 @@ export function DateRangePicker({
           <button
             type="button"
             className="sp-drp__nav"
-            aria-label="Next 12 years"
+            aria-label={t('nextYears')}
             onClick={() => setYearRangeStart((s) => s + 12)}
           >
             <Icon name="chevron-right" size={14} />
           </button>
         </div>
-        <div className="sp-drp__cell-grid" role="grid" aria-label="Year picker">
+        <div className="sp-drp__cell-grid" role="grid" aria-label={t('year')}>
           {years.map((yr) => {
             const isCurrent = yr === nowYear;
             const isSelected = yr === editYear;
@@ -892,7 +870,7 @@ export function DateRangePicker({
     if (!presets || presets.length === 0) return null;
 
     return (
-      <div className="sp-drp__presets" role="listbox" aria-label="Date range presets">
+      <div className="sp-drp__presets" role="listbox" aria-label={t('dateRangePresets')}>
         {presets.map((preset) => (
           <button
             key={preset.label}
@@ -915,14 +893,14 @@ export function DateRangePicker({
     return (
       <div className="sp-drp__footer">
         <button type="button" className="sp-drp__action" onClick={handleClear}>
-          Clear
+          {t('clear')}
         </button>
         <button
           type="button"
           className="sp-drp__action sp-drp__action--primary"
           onClick={handleApply}
         >
-          Apply
+          {t('apply')}
         </button>
       </div>
     );
@@ -955,7 +933,7 @@ export function DateRangePicker({
             ref={dropdownRef}
             className="sp-drp__dropdown"
             role="dialog"
-            aria-label="Date range picker"
+            aria-label={t('dateRangeCalendar')}
             tabIndex={0}
             onKeyDown={handleKeyDown}
             style={{

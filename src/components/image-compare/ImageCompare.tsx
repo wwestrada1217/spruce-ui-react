@@ -7,6 +7,7 @@
 
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { Icon } from '../../icons/Icon';
+import { useI18n } from '../../i18n/i18n-context.js';
 import './ImageCompare.css';
 
 export type ImageCompareOrientation = 'horizontal' | 'vertical';
@@ -37,15 +38,19 @@ export interface ImageCompareProps {
 export function ImageCompare({
   beforeSrc,
   afterSrc,
-  beforeLabel = 'Before',
-  afterLabel = 'After',
+  beforeLabel,
+  afterLabel,
   showLabels = true,
   orientation = 'horizontal',
   initialPosition = 50,
-  ariaLabel = 'Image comparison',
+  ariaLabel,
   className = '',
   style,
 }: ImageCompareProps) {
+  const { t } = useI18n();
+  const resolvedBeforeLabel = beforeLabel ?? t('before');
+  const resolvedAfterLabel = afterLabel ?? t('after');
+  const resolvedAriaLabel = ariaLabel ?? t('imageComparisonSlider');
   const [position, setPosition] = useState(initialPosition);
   const containerRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
@@ -137,30 +142,30 @@ export function ImageCompare({
       ref={containerRef}
       className={rootClasses}
       role="img"
-      aria-label={ariaLabel}
+      aria-label={resolvedAriaLabel}
       style={style}
     >
       {/* After (bottom layer -- full) */}
       <img
         className="sp-image-compare__after"
         src={afterSrc}
-        alt={afterLabel}
+        alt={resolvedAfterLabel}
         draggable={false}
       />
 
       {/* Before (top layer -- clipped) */}
       <div className="sp-image-compare__before" style={{ clipPath }}>
-        <img src={beforeSrc} alt={beforeLabel} draggable={false} />
+        <img src={beforeSrc} alt={resolvedBeforeLabel} draggable={false} />
       </div>
 
       {/* Labels */}
       {showLabels && (
         <>
           <span className="sp-image-compare__label sp-image-compare__label--before">
-            {beforeLabel}
+            {resolvedBeforeLabel}
           </span>
           <span className="sp-image-compare__label sp-image-compare__label--after">
-            {afterLabel}
+            {resolvedAfterLabel}
           </span>
         </>
       )}
@@ -175,7 +180,7 @@ export function ImageCompare({
         }
         onPointerDown={onPointerDown}
         role="slider"
-        aria-label="Image comparison slider"
+        aria-label={t('imageComparisonSlider')}
         aria-valuenow={position}
         aria-valuemin={0}
         aria-valuemax={100}

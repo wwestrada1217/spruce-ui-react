@@ -7,6 +7,7 @@
 
 import React from 'react';
 import { Icon } from '../../icons/Icon.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 import './Input.css';
 
 export type InputType = 'text' | 'password' | 'email' | 'number' | 'search' | 'tel' | 'url';
@@ -59,6 +60,7 @@ export function Input({
   name,
   autoComplete,
 }: InputProps) {
+  const { t } = useI18n();
   const [internalValue, setInternalValue] = React.useState(defaultValue);
   const [focused, setFocused] = React.useState(false);
   const isControlled = value !== undefined;
@@ -120,7 +122,7 @@ export function Input({
             type="button"
             tabIndex={-1}
             onClick={handleClear}
-            aria-label="Clear"
+            aria-label={t('clear')}
           >
             <Icon name="x" size={12} />
           </button>

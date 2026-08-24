@@ -13,6 +13,7 @@ import {
   type ReactNode,
 } from 'react';
 import { SidebarProvider, useSidebar } from './SidebarContext.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 import './Sidebar.css';
 
 export interface SidebarProps {
@@ -41,6 +42,7 @@ function SidebarInner({
   onCollapsedChange,
   children,
 }: Omit<SidebarProps, 'allowCollapsible' | 'allowResponsive'>) {
+  const { t } = useI18n();
   const { collapsed, isMobileOpen, allowCollapsible, allowResponsive, toggle, setMobileOpen, setCollapsed } = useSidebar();
   const [isSmallScreen, setIsSmallScreen] = useState(
     typeof window !== 'undefined' ? window.matchMedia(`(max-width: ${breakpoint}px)`).matches : false,
@@ -93,7 +95,7 @@ function SidebarInner({
           type="button"
           className="sp-sidebar-backdrop"
           onClick={() => setMobileOpen(false)}
-          aria-label="Close sidebar"
+          aria-label={t('closeSidebar')}
         />
       )}
       <aside className={asideClass} aria-label={label}>
@@ -104,7 +106,7 @@ function SidebarInner({
             className="sp-sidebar__rail"
             style={{ cursor: collapsedEffective ? 'e-resize' : 'w-resize' }}
             aria-expanded={!collapsedEffective}
-            aria-label={collapsedEffective ? 'Expand sidebar' : 'Collapse sidebar'}
+            aria-label={collapsedEffective ? t('expand') : t('collapse')}
             onClick={toggle}
           >
             <span className="sp-sidebar__rail-indicator" />

@@ -8,6 +8,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import type { ColumnFilter, FilterOperator } from './grid-types';
 import { FILTER_OPERATORS } from './grid-utils';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 export interface GridColumnFilterProps {
   field: string;
@@ -28,6 +29,7 @@ export function GridColumnFilter({
   onClear,
   onClose,
 }: GridColumnFilterProps) {
+  const { t } = useI18n();
   const [operator, setOperator] = useState<FilterOperator>(
     current?.operator ?? 'contains',
   );
@@ -91,7 +93,7 @@ export function GridColumnFilter({
     <div
       className="sp-grid-column-filter"
       role="dialog"
-      aria-label={`Filter ${headerName}`}
+      aria-label={`${t('filter')} ${headerName}`}
       onKeyDown={handleKeyDown}
     >
       <div className="sp-grid-column-filter__header">
@@ -135,7 +137,7 @@ export function GridColumnFilter({
               type="text"
               value={value}
               onChange={(e) => setValue(e.target.value)}
-              placeholder="Filter value..."
+              placeholder={t('filterValue')}
             />
           </>
         )}
@@ -154,7 +156,7 @@ export function GridColumnFilter({
               type="text"
               value={value2}
               onChange={(e) => setValue2(e.target.value)}
-              placeholder="Second value..."
+              placeholder={t('filterValue')}
             />
           </>
         )}
@@ -166,14 +168,14 @@ export function GridColumnFilter({
           type="button"
           onClick={handleClear}
         >
-          Clear
+          {t('clear')}
         </button>
         <button
           className="sp-grid-column-filter__btn sp-grid-column-filter__btn--apply"
           type="button"
           onClick={handleApply}
         >
-          Apply
+          {t('apply')}
         </button>
       </div>
     </div>

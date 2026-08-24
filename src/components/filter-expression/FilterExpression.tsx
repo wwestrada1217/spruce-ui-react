@@ -5,8 +5,11 @@
  * The full license information can be found in LICENSE in the root directory of this project.
  */
 
+/* eslint-disable react-refresh/only-export-components */
+
 import { useMemo, useCallback } from 'react';
 import { Icon } from '../../icons/Icon';
+import { useI18n } from '../../i18n/i18n-context.js';
 import './FilterExpression.css';
 
 // -- Types ------------------------------------------------------------------
@@ -129,6 +132,7 @@ interface FilterRuleRowProps {
 }
 
 function FilterRuleRow({ fields, rule, onChanged, onRemoved }: FilterRuleRowProps) {
+  const { t } = useI18n();
   const fieldType = useMemo<FieldType>(() => {
     const f = fields.find((f) => f.value === rule.field);
     return f?.type ?? 'text';
@@ -192,7 +196,7 @@ function FilterRuleRow({ fields, rule, onChanged, onRemoved }: FilterRuleRowProp
   const inputType = fieldType === 'number' ? 'number' : fieldType === 'date' ? 'date' : fieldType === 'datetime' ? 'datetime-local' : fieldType === 'time' ? 'time' : 'text';
 
   return (
-    <div className="sp-filter-expr__rule" role="group" aria-label="Filter condition">
+    <div className="sp-filter-expr__rule" role="group" aria-label={t('filterCondition')}>
       <select
         className="sp-filter-expr__field"
         value={rule.field}
@@ -224,7 +228,7 @@ function FilterRuleRow({ fields, rule, onChanged, onRemoved }: FilterRuleRowProp
             value={rule.value}
             onChange={(e) => onValueChange(e.target.value)}
           >
-            <option value="">Value</option>
+            <option value="">{t('value')}</option>
             <option value="true">True</option>
             <option value="false">False</option>
           </select>
@@ -234,7 +238,7 @@ function FilterRuleRow({ fields, rule, onChanged, onRemoved }: FilterRuleRowProp
             type={inputType}
             value={rule.value}
             onChange={(e) => onValueChange(e.target.value)}
-            placeholder="Value"
+            placeholder={t('value')}
           />
         )
       )}
@@ -245,7 +249,7 @@ function FilterRuleRow({ fields, rule, onChanged, onRemoved }: FilterRuleRowProp
           type={inputType}
           value={rule.value2 ?? ''}
           onChange={(e) => onValue2Change(e.target.value)}
-          placeholder="To"
+          placeholder={t('to')}
         />
       )}
 
@@ -253,7 +257,7 @@ function FilterRuleRow({ fields, rule, onChanged, onRemoved }: FilterRuleRowProp
         type="button"
         className="sp-filter-expr__rm"
         onClick={onRemoved}
-        aria-label="Remove condition"
+        aria-label={t('remove')}
       >
         <Icon name="x" size={14} />
       </button>
@@ -282,6 +286,7 @@ function FilterGroupBlock({
   onChanged,
   onRemoved,
 }: FilterGroupBlockProps) {
+  const { t } = useI18n();
   const setLogic = useCallback(
     (logic: FilterLogic) => {
       onChanged({ ...group, logic });
@@ -338,10 +343,10 @@ function FilterGroupBlock({
     <div
       className={groupClasses}
       role="group"
-      aria-label={group.logic === 'and' ? 'AND filter group' : 'OR filter group'}
+      aria-label={`${group.logic === 'and' ? 'AND' : 'OR'} ${t('filterLogic')}`}
     >
       <div className="sp-filter-expr__bar">
-        <div className="sp-filter-expr__logic" role="radiogroup" aria-label="Filter logic">
+        <div className="sp-filter-expr__logic" role="radiogroup" aria-label={t('filterLogic')}>
           <button
             type="button"
             className={`sp-filter-expr__logic-btn${group.logic === 'and' ? ' active' : ''}`}
@@ -362,12 +367,12 @@ function FilterGroupBlock({
         <div className="sp-filter-expr__actions">
           <button type="button" className="sp-filter-expr__action-btn" onClick={addRule}>
             <Icon name="plus" size={14} />
-            <span>Rule</span>
+            <span>{t('rule')}</span>
           </button>
           {depth < maxDepth && (
             <button type="button" className="sp-filter-expr__action-btn" onClick={addGroup}>
               <Icon name="layers" size={14} />
-              <span>Group</span>
+              <span>{t('group')}</span>
             </button>
           )}
           {removable && (
@@ -375,7 +380,7 @@ function FilterGroupBlock({
               type="button"
               className="sp-filter-expr__action-btn sp-filter-expr__action-btn--icon"
               onClick={onRemoved}
-              aria-label="Remove group"
+              aria-label={t('remove')}
             >
               <Icon name="trash" size={14} />
             </button>
@@ -407,7 +412,7 @@ function FilterGroupBlock({
         )}
         {group.children.length === 0 && (
           <p className="sp-filter-expr__empty">
-            No conditions. Click <strong>+ Rule</strong> to add one.
+            {t('noConditions')}. <strong>+ {t('rule')}</strong>
           </p>
         )}
       </div>

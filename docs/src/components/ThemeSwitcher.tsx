@@ -3,26 +3,14 @@ import {
   useTheme,
   Icon,
   Popover,
-  oceanTheme,
-  forestTheme,
-  roseTheme,
-  corporateTheme,
-  corporateDarkTheme,
-  nightTheme,
-  draculaTheme,
-  dimTheme,
-  retroTheme,
-  nordTheme,
-  shadcnTheme,
-  shadcnDarkTheme,
+  ACCENT_OPTIONS,
+  HARMONY_PRESETS,
+  HARMONY_SCHEMES,
+  SPRUCE_THEME_PRESETS,
 } from 'spruce-react';
+import type { AccentId, HarmonySchemeId } from 'spruce-react';
 
 // ── Theme registry ────────────────────────────────────────────────────────────
-
-const CUSTOM_THEMES = [
-  oceanTheme, forestTheme, roseTheme, corporateTheme, retroTheme, shadcnTheme,
-  nightTheme, draculaTheme, dimTheme, nordTheme, shadcnDarkTheme, corporateDarkTheme,
-];
 
 type ThemeMode = 'light' | 'dark';
 type ThemeView = 'grid' | 'list';
@@ -37,27 +25,19 @@ interface ThemeOption {
   mode: ThemeMode;
 }
 
-const LIGHT_OPTIONS: ThemeOption[] = [
-  { id: 'light',      label: 'Spruce',    color: '#0f766e', mode: 'light' },
-  { id: 'ocean',      label: 'Ocean',     color: '#0e7490', mode: 'light' },
-  { id: 'forest',     label: 'Forest',    color: '#166534', mode: 'light' },
-  { id: 'rose',       label: 'Rose',      color: '#be185d', mode: 'light' },
-  { id: 'corporate',  label: 'Corporate', color: '#1d3557', mode: 'light' },
-  { id: 'retro',      label: 'Retro',     color: '#d97706', mode: 'light' },
-  { id: 'shadcn',     label: 'Shadcn',    color: '#18181b', mode: 'light' },
+const BASE_OPTIONS: ThemeOption[] = [
+  { id: 'light', label: 'Spruce', color: '#166534', mode: 'light' },
+  { id: 'dark', label: 'Spruce Dark', color: '#22c55e', mode: 'dark' },
 ];
 
-const DARK_OPTIONS: ThemeOption[] = [
-  { id: 'dark',           label: 'Spruce Dark',    color: '#2dd4bf', mode: 'dark' },
-  { id: 'night',          label: 'Night',          color: '#38bdf8', mode: 'dark' },
-  { id: 'dracula',        label: 'Dracula',        color: '#bd93f9', mode: 'dark' },
-  { id: 'dim',            label: 'Dim',            color: '#818cf8', mode: 'dark' },
-  { id: 'nord',           label: 'Nord',           color: '#88c0d0', mode: 'dark' },
-  { id: 'shadcn-dark',    label: 'Shadcn Dark',    color: '#fafafa', mode: 'dark' },
-  { id: 'corporate-dark', label: 'Corporate Dark', color: '#4a8cc4', mode: 'dark' },
-];
+const PRESET_OPTIONS: ThemeOption[] = SPRUCE_THEME_PRESETS.map(theme => ({
+  id: theme.name,
+  label: theme.displayName,
+  color: theme.tokens['--sp-primary'] ?? (theme.base === 'dark' ? '#94a3b8' : '#166534'),
+  mode: theme.base,
+}));
 
-const ALL_OPTIONS = [...LIGHT_OPTIONS, ...DARK_OPTIONS];
+const ALL_OPTIONS = [...BASE_OPTIONS, ...PRESET_OPTIONS];
 
 /** Swatch shown for the "System" preference (splits light / dark). */
 const SYSTEM_SWATCH = 'conic-gradient(#111827 0deg 180deg, #f8fafc 180deg 360deg)';
@@ -81,7 +61,7 @@ const MODE_FILTERS: { id: ModeFilter; label: string }[] = [
   { id: 'dark', label: 'Dark' },
 ];
 
-const THEME_KEY   = 'spruce-docs-theme-preference';
+const THEME_KEY   = 'spruce-theme-preference';
 const MOTION_KEY  = 'spruce-docs-reduce-motion';
 const DENSITY_KEY = 'spruce-docs-density-preference';
 
@@ -142,7 +122,21 @@ function ThemeThumb({ opt }: { opt?: ThemeOption }) {
 // ── Component ─────────────────────────────────────────────────────────────────
 
 export function ThemeSwitcher() {
-  const { preference, setTheme, registerTheme } = useTheme();
+  const {
+    preference,
+    setTheme,
+    registerTheme,
+    accentPreference,
+    accentCustomColor,
+    accentHarmony,
+    accentHarmonyCustom,
+    setAccent,
+    setCustomAccentColor,
+    setAccentHarmony,
+    setAccentHarmonyCustom,
+    setHarmonyPreset,
+    resetAccent,
+  } = useTheme();
 
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<ThemeView>('grid');
@@ -156,16 +150,15 @@ export function ThemeSwitcher() {
   );
   const triggerRef = useRef<HTMLButtonElement>(null);
 
-  // Register presets once, then restore persisted preferences
+  // Built-in presets are already registered by the provider. Registering the
+  // same objects here keeps this switcher compatible with older providers.
   useEffect(() => {
-    for (const theme of CUSTOM_THEMES) {
+    for (const theme of SPRUCE_THEME_PRESETS) {
       registerTheme(theme);
     }
-    setTheme(readStorage(THEME_KEY, 'system') as Parameters<typeof setTheme>[0]);
     applyReduceMotion(readStorage(MOTION_KEY, 'false') === 'true');
     applyDensity(readStorage(DENSITY_KEY, 'default') as Density);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [registerTheme]);
 
   // Close on Escape (outside-click dismissal is handled by the Popover)
   useEffect(() => {
@@ -193,6 +186,21 @@ export function ThemeSwitcher() {
     writeStorage(THEME_KEY, id);
   }
 
+  function activateAccent(id: AccentId) {
+    setAccent(id);
+  }
+
+  function activateHarmony(id: HarmonySchemeId | 'none') {
+    setAccentHarmony(id);
+  }
+
+  function updateCustomHarmony(role: 'secondary' | 'tertiary', value: string) {
+    const current = accentHarmonyCustom ?? { secondary: 120, tertiary: 240 };
+    const degrees = Number(value);
+    if (!Number.isFinite(degrees)) return;
+    setAccentHarmonyCustom({ ...current, [role]: degrees });
+  }
+
   function changeDensity(next: Density) {
     setDensity(next);
     applyDensity(next);
@@ -206,6 +214,7 @@ export function ThemeSwitcher() {
 
   function resetToDefault() {
     activate('system');
+    resetAccent();
     changeDensity('default');
     setReduceMotion(false);
     applyReduceMotion(false);
@@ -423,6 +432,101 @@ export function ThemeSwitcher() {
                 )}
               </div>
             )}
+
+            {/* ── Accent and color harmony ─────────────────────── */}
+            <div className="tsw__section">
+              <span className="tsw__section-label">Accent</span>
+              <div className="tsw__accent-grid" role="radiogroup" aria-label="Accent preset">
+                {ACCENT_OPTIONS.map(option => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    className={`tsw-accent${accentPreference === option.id ? ' tsw-accent--active' : ''}`}
+                    role="radio"
+                    aria-checked={accentPreference === option.id}
+                    onClick={() => activateAccent(option.id)}
+                  >
+                    <span className="tsw-accent__swatch" style={{ background: option.swatch }} aria-hidden="true" />
+                    <span>{option.label}</span>
+                  </button>
+                ))}
+                <label className={`tsw-accent tsw-accent--custom${accentPreference === 'custom' ? ' tsw-accent--active' : ''}`}>
+                  <input
+                    type="color"
+                    value={accentCustomColor}
+                    aria-label="Custom accent color"
+                    onChange={event => setCustomAccentColor(event.target.value)}
+                  />
+                  <span className="tsw-accent__swatch" style={{ background: accentCustomColor }} aria-hidden="true" />
+                  <span>Custom</span>
+                </label>
+              </div>
+            </div>
+
+            <div className="tsw__section">
+              <span className="tsw__section-label">Color harmony</span>
+              <div className="tsw__harmony-grid" role="radiogroup" aria-label="Color harmony scheme">
+                <button
+                  type="button"
+                  className={`tsw-harmony${accentHarmony === 'none' ? ' tsw-harmony--active' : ''}`}
+                  role="radio"
+                  aria-checked={accentHarmony === 'none'}
+                  onClick={() => activateHarmony('none')}
+                >
+                  Single hue
+                </button>
+                {HARMONY_SCHEMES.map(scheme => (
+                  <button
+                    key={scheme.id}
+                    type="button"
+                    className={`tsw-harmony${accentHarmony === scheme.id ? ' tsw-harmony--active' : ''}`}
+                    role="radio"
+                    aria-checked={accentHarmony === scheme.id}
+                    onClick={() => activateHarmony(scheme.id)}
+                    title={scheme.description}
+                  >
+                    {scheme.label}
+                  </button>
+                ))}
+              </div>
+              {accentHarmony === 'custom' && (
+                <div className="tsw__harmony-custom">
+                  <label>
+                    Secondary offset
+                    <input
+                      type="number"
+                      value={accentHarmonyCustom?.secondary ?? 120}
+                      min={-360}
+                      max={360}
+                      onChange={event => updateCustomHarmony('secondary', event.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Tertiary offset
+                    <input
+                      type="number"
+                      value={accentHarmonyCustom?.tertiary ?? 240}
+                      min={-360}
+                      max={360}
+                      onChange={event => updateCustomHarmony('tertiary', event.target.value)}
+                    />
+                  </label>
+                </div>
+              )}
+              <div className="tsw__harmony-presets" aria-label="Harmony presets">
+                {HARMONY_PRESETS.map(preset => (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    className="tsw-harmony-preset"
+                    onClick={() => setHarmonyPreset(preset.id)}
+                  >
+                    <span aria-hidden="true" style={{ background: preset.base }} />
+                    {preset.displayName}
+                  </button>
+                ))}
+              </div>
+            </div>
 
             {/* ── Interface density ───────────────────────────── */}
             <div className="tsw__section">

@@ -2498,6 +2498,229 @@ code {
   background: var(--sp-primary-hover);
 }
 
+/* Accent and harmony controls */
+.tsw__accent-grid,
+.tsw__harmony-grid,
+.tsw__harmony-presets {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.tsw-accent,
+.tsw-harmony,
+.tsw-harmony-preset {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 4px 7px;
+  border: 1px solid var(--sp-border);
+  border-radius: var(--sp-radius-sm);
+  background: var(--sp-surface-0);
+  color: var(--sp-text-muted);
+  font: inherit;
+  font-size: 11px;
+  text-align: start;
+  cursor: pointer;
+}
+
+.tsw-accent:hover,
+.tsw-harmony:hover,
+.tsw-harmony-preset:hover,
+.tsw-accent--active,
+.tsw-harmony--active {
+  border-color: var(--sp-primary);
+  color: var(--sp-text-color);
+}
+
+.tsw-accent--active,
+.tsw-harmony--active {
+  box-shadow: 0 0 0 1px var(--sp-primary);
+}
+
+.tsw-accent__swatch,
+.tsw-harmony-preset span {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  border: 1px solid var(--sp-border-strong);
+  border-radius: var(--sp-radius-full);
+}
+
+.tsw-accent--custom input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tsw__harmony-custom {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.tsw__harmony-custom label {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--sp-text-subtle);
+  font-size: 10px;
+}
+
+.tsw__harmony-custom input {
+  min-width: 0;
+  height: 28px;
+  padding-inline: 6px;
+  border: 1px solid var(--sp-border);
+  border-radius: var(--sp-radius-sm);
+  background: var(--sp-surface-0);
+  color: var(--sp-text-color);
+  font: inherit;
+  font-size: 11px;
+}
+
+.tsw__harmony-presets {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 8px;
+}
+
+.tsw-harmony-preset span {
+  border-radius: var(--sp-radius-sm);
+}
+
+/* Color Harmony foundation page */
+.harmony-page__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--sp-space-4);
+  padding: var(--sp-space-4);
+  border: 1px solid var(--sp-border);
+  border-radius: var(--sp-radius-lg);
+  background: var(--sp-surface-25);
+}
+
+.harmony-page__controls label,
+.harmony-page__label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-space-2);
+  color: var(--sp-text-muted);
+  font-size: var(--sp-text-sm);
+  font-weight: var(--sp-font-semibold);
+}
+
+.harmony-page__color-input {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-space-2);
+}
+
+.harmony-page__color-input input {
+  inline-size: 42px;
+  block-size: 32px;
+  padding: 2px;
+  border: 1px solid var(--sp-border-strong);
+  border-radius: var(--sp-radius-sm);
+  background: none;
+}
+
+.harmony-page__schemes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-space-1);
+}
+
+.harmony-page__schemes button,
+.harmony-page__apply,
+.harmony-page__presets button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-space-2);
+  min-block-size: 32px;
+  padding: 0 var(--sp-space-3);
+  border: 1px solid var(--sp-border);
+  border-radius: var(--sp-radius-sm);
+  background: var(--sp-surface-0);
+  color: var(--sp-text-muted);
+  font: inherit;
+  font-size: var(--sp-text-sm);
+  cursor: pointer;
+}
+
+.harmony-page__schemes button:hover,
+.harmony-page__schemes .harmony-page__active,
+.harmony-page__presets button:hover {
+  border-color: var(--sp-primary);
+  color: var(--sp-text-color);
+}
+
+.harmony-page__apply {
+  border-color: var(--sp-primary);
+  background: var(--sp-primary);
+  color: var(--sp-primary-text);
+}
+
+.harmony-page__roles,
+.harmony-page__series,
+.harmony-page__presets {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--sp-space-3);
+}
+
+.harmony-page__role {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-space-2);
+  min-block-size: 56px;
+  padding: var(--sp-space-3);
+  border: 1px solid var(--sp-border);
+  border-radius: var(--sp-radius-md);
+  background: var(--sp-surface-0);
+}
+
+.harmony-page__role > span,
+.harmony-page__series > span,
+.harmony-page__presets button > span:first-child {
+  display: inline-block;
+  inline-size: 28px;
+  block-size: 28px;
+  flex: 0 0 auto;
+  border: 1px solid var(--sp-border-strong);
+  border-radius: var(--sp-radius-sm);
+}
+
+.harmony-page__role code {
+  margin-inline-start: auto;
+  color: var(--sp-text-subtle);
+  font-size: var(--sp-text-xs);
+}
+
+.harmony-page__series {
+  grid-template-columns: repeat(8, minmax(24px, 1fr));
+  margin-block: var(--sp-space-4);
+}
+
+.harmony-page__series > span {
+  inline-size: 100%;
+  block-size: 32px;
+}
+
+.harmony-page__presets button {
+  justify-content: start;
+}
+
+.harmony-page__presets button code {
+  margin-inline-start: auto;
+  color: var(--sp-text-subtle);
+  font-size: var(--sp-text-2xs);
+}
+
 /* ── Swatch Items (Colors page - CSS variable based) ────────────────────────── */
 .swatch-item {
   display: flex;
@@ -2785,4 +3008,3 @@ code {
 
 /* Reduce motion is handled by the token system via
    :root[data-reduce-motion='true'] in src/tokens/tokens.css. */
-

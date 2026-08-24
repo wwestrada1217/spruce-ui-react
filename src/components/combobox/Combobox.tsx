@@ -17,6 +17,7 @@ import {
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
 import { computePosition, getScrollParents } from '../../utils/positioning.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 export interface ComboboxOption {
   label: string;
@@ -68,6 +69,8 @@ export function Combobox({
   disabled = false,
   className = '',
 }: ComboboxProps) {
+  const { t } = useI18n();
+  const resolvedPlaceholder = placeholder === 'Search…' ? t('search') : placeholder;
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
@@ -359,7 +362,7 @@ export function Combobox({
           className="sp-combo__input"
           type="text"
           value={query}
-          placeholder={selectedValues.length > 0 && multiple ? '' : placeholder}
+          placeholder={selectedValues.length > 0 && multiple ? '' : resolvedPlaceholder}
           disabled={disabled}
           aria-autocomplete="list"
           onChange={handleInputChange}
@@ -373,7 +376,7 @@ export function Combobox({
             type="button"
             className="sp-combo__clear"
             tabIndex={-1}
-            aria-label="Clear selection"
+                aria-label={t('clear')}
             onClick={handleClear}
           >
             <Icon name="x" size={10} />
@@ -399,7 +402,7 @@ export function Combobox({
             }}
           >
             {filteredOptions.length === 0 && (
-              <div className="sp-combo__empty">No results found</div>
+              <div className="sp-combo__empty">{t('noResults')}</div>
             )}
 
             {filteredOptions.map((opt, idx) => {

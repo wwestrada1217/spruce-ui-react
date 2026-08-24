@@ -10,6 +10,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { Icon } from '../../icons/Icon.js';
 import { Dropdown } from '../dropdown/Dropdown.js';
 import type { DropdownItem } from '../dropdown/Dropdown.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 /* ── Types ──────────────────────────────────────────────────────────────── */
 
@@ -51,6 +52,7 @@ export function Toolbar({
   dividerAfter = [],
   className = '',
 }: ToolbarProps) {
+  const { t } = useI18n();
   const containerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<Map<number, HTMLElement>>(new Map());
   const dividerRefs = useRef<Map<number, HTMLElement>>(new Map());
@@ -199,7 +201,7 @@ export function Toolbar({
               <button
                 type="button"
                 className="sp-toolbar__menu-trigger"
-                aria-label="More actions"
+                aria-label={t('moreActions')}
               >
                 <Icon name="more-horizontal" size={iconSize} />
               </button>

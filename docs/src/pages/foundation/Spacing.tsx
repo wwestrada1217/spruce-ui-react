@@ -24,11 +24,11 @@ const SPACINGS = [
 
 const RADII = [
   { token: '--sp-radius-none', value: '0' },
-  { token: '--sp-radius-sm', value: '4px' },
-  { token: '--sp-radius-md', value: '6px' },
-  { token: '--sp-radius-lg', value: '8px' },
-  { token: '--sp-radius-xl', value: '12px' },
-  { token: '--sp-radius-2xl', value: '16px' },
+  { token: '--sp-radius-sm', value: '2px' },
+  { token: '--sp-radius-md', value: '3px' },
+  { token: '--sp-radius-lg', value: '4px' },
+  { token: '--sp-radius-xl', value: '6px' },
+  { token: '--sp-radius-2xl', value: '8px' },
   { token: '--sp-radius-full', value: '9999px' },
 ]
 

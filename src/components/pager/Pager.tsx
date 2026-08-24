@@ -8,6 +8,7 @@
 import './Pager.css';
 import { useMemo, useCallback } from 'react';
 import { Icon } from '../../icons/Icon.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 export type PagerSize = 'sm' | 'md' | 'lg';
 export type PagerVariant = 'default' | 'outline' | 'ghost';
@@ -93,6 +94,8 @@ export function Pager({
   onStateChange,
   onPageChange,
 }: PagerProps) {
+  const { t, rangeInfo } = useI18n();
+  const resolvedAriaLabel = ariaLabel === 'Pagination' ? t('pagination') : ariaLabel;
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
   const currentPage = Math.min(Math.max(1, page), totalPages);
   const iconSize = ICON_SIZES[size];
@@ -135,10 +138,10 @@ export function Pager({
     .join(' ');
 
   return (
-    <nav className={classes} aria-label={ariaLabel}>
+    <nav className={classes} aria-label={resolvedAriaLabel}>
       {showTotal && (
         <span className="sp-pager__total">
-          {rangeStart}&ndash;{rangeEnd} of {totalItems}
+          {rangeInfo(rangeStart, rangeEnd, totalItems)}
         </span>
       )}
 
@@ -148,7 +151,7 @@ export function Pager({
             className="sp-pager__btn sp-pager__btn--nav"
             type="button"
             disabled={disabled || currentPage <= 1}
-            aria-label="First page"
+            aria-label={t('firstPage')}
             onClick={() => goTo(1)}
           >
             <Icon name="chevrons-left" size={iconSize} />
@@ -159,7 +162,7 @@ export function Pager({
           className="sp-pager__btn sp-pager__btn--nav"
           type="button"
           disabled={disabled || currentPage <= 1}
-          aria-label="Previous page"
+          aria-label={t('previousPage')}
           onClick={() => goTo(currentPage - 1)}
         >
           <Icon name="chevron-left" size={iconSize} />
@@ -187,7 +190,7 @@ export function Pager({
                   .join(' ')}
                 type="button"
                 disabled={disabled}
-                aria-label={`Page ${item}`}
+                aria-label={`${t('page')} ${item}`}
                 aria-current={item === currentPage ? 'page' : undefined}
                 onClick={() => goTo(item)}
               >
@@ -200,7 +203,7 @@ export function Pager({
           className="sp-pager__btn sp-pager__btn--nav"
           type="button"
           disabled={disabled || currentPage >= totalPages}
-          aria-label="Next page"
+          aria-label={t('nextPage')}
           onClick={() => goTo(currentPage + 1)}
         >
           <Icon name="chevron-right" size={iconSize} />
@@ -211,7 +214,7 @@ export function Pager({
             className="sp-pager__btn sp-pager__btn--nav"
             type="button"
             disabled={disabled || currentPage >= totalPages}
-            aria-label="Last page"
+            aria-label={t('lastPage')}
             onClick={() => goTo(totalPages)}
           >
             <Icon name="chevrons-right" size={iconSize} />

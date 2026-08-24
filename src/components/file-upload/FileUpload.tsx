@@ -17,6 +17,7 @@ import {
   type KeyboardEvent,
 } from 'react';
 import { Icon } from '../../icons/Icon.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 export type FileUploadSize = 'sm' | 'md' | 'lg';
 
@@ -169,6 +170,7 @@ export function FileUpload({
   className,
   style,
 }: FileUploadProps) {
+  const { t } = useI18n();
   const [internalFiles, setInternalFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -343,7 +345,7 @@ export function FileUpload({
         tabIndex={disabled ? -1 : 0}
         role="button"
         aria-disabled={disabled}
-        aria-label={label || dropText || 'File upload'}
+        aria-label={label || dropText || t('upload')}
       >
         <input
           ref={inputRef}
@@ -366,7 +368,7 @@ export function FileUpload({
 
       {/* Selected File Cards */}
       {currentFiles.length > 0 && (
-        <div className="sp-file-upload__file-list" role="list" aria-label="Uploaded files">
+        <div className="sp-file-upload__file-list" role="list" aria-label={t('upload')}>
           {currentFiles.map((item, index) => {
             const isNativeFile = item instanceof File;
             const key = isNativeFile ? `${item.name}-${index}` : (item as UploadedFileItem).id || index;

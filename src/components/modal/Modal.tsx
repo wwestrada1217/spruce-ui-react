@@ -9,6 +9,7 @@ import './Modal.css';
 import { useEffect, useCallback, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
 
@@ -51,6 +52,7 @@ export function Modal({
   footer,
   className,
 }: ModalProps) {
+  const { t } = useI18n();
   // Close on Escape key
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -97,7 +99,7 @@ export function Modal({
           <button
             className="sp-modal__close"
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t('close')}
           >
             <Icon name="x" size={16} />
           </button>

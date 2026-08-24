@@ -8,6 +8,7 @@
 import { useState, useCallback, useRef } from 'react';
 import type { ReactNode, DragEvent, KeyboardEvent } from 'react';
 import './Kanban.css';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 /* ── Public types ──────────────────────────────────────────────────────── */
 
@@ -57,13 +58,15 @@ export interface KanbanProps {
 export function Kanban({
   columns,
   columnDraggable = true,
-  ariaLabel = 'Kanban board',
+  ariaLabel,
   cardRenderer,
   columnHeaderRenderer,
   onCardMoved,
   onColumnMoved,
   onCardClicked,
 }: KanbanProps) {
+  const { t } = useI18n();
+  const resolvedAriaLabel = ariaLabel ?? 'Kanban board';
   /* ── Internal drag state ──────────────────────────────────────────────── */
 
   const [dragType, setDragType] = useState<'card' | 'column' | null>(null);
@@ -374,7 +377,7 @@ export function Kanban({
   /* ── Render ──────────────────────────────────────────────────────────── */
 
   return (
-    <div className="sp-kanban" role="region" aria-label={ariaLabel}>
+    <div className="sp-kanban" role="region" aria-label={resolvedAriaLabel}>
       {columns.map((col, colIdx) => {
         const columnClasses = [
           'sp-kanban__column',
@@ -464,7 +467,7 @@ export function Kanban({
 
               {/* Empty column drop zone */}
               {col.cards.length === 0 && (
-                <div className="sp-kanban__empty-zone">Drop cards here</div>
+                <div className="sp-kanban__empty-zone">{t('dropCardsHere')}</div>
               )}
             </div>
           </div>

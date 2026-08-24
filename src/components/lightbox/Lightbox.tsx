@@ -9,6 +9,7 @@ import './Lightbox.css';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 export interface LightboxImage {
   src: string;
@@ -53,6 +54,7 @@ export function Lightbox({
   onIndexChange,
   className = '',
 }: LightboxProps) {
+  const { t } = useI18n();
   const [activeIndex, setActiveIndex] = useState(startIndex);
   const [zoom, setZoom] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -165,7 +167,7 @@ export function Lightbox({
       className={rootClasses}
       role="dialog"
       aria-roledescription="lightbox"
-      aria-label={currentImage?.alt || 'Image viewer'}
+      aria-label={currentImage?.alt || t('imageEditor')}
       tabIndex={-1}
       onKeyDown={onKeydown}
       ref={(el) => el?.focus()}
@@ -181,21 +183,21 @@ export function Lightbox({
               <button
                 className="sp-lightbox__btn"
                 onClick={zoomIn}
-                aria-label="Zoom in"
+                aria-label={t('zoomIn')}
               >
                 <Icon name="zoom-in" size={18} />
               </button>
               <button
                 className="sp-lightbox__btn"
                 onClick={zoomOut}
-                aria-label="Zoom out"
+                aria-label={t('zoomOut')}
               >
                 <Icon name="zoom-out" size={18} />
               </button>
               <button
                 className="sp-lightbox__btn"
                 onClick={resetZoom}
-                aria-label="Reset zoom"
+                aria-label={t('resetZoom')}
               >
                 <Icon name="maximize" size={18} />
               </button>
@@ -204,7 +206,7 @@ export function Lightbox({
           <button
             className="sp-lightbox__btn"
             onClick={close}
-            aria-label="Close lightbox"
+                aria-label={t('closeLightbox')}
           >
             <Icon name="x" size={18} />
           </button>
@@ -220,7 +222,7 @@ export function Lightbox({
               prev();
               e.stopPropagation();
             }}
-            aria-label="Previous image"
+                aria-label={t('previousImage')}
           >
             <Icon name="chevron-left" size={24} />
           </button>
@@ -255,7 +257,7 @@ export function Lightbox({
               next();
               e.stopPropagation();
             }}
-            aria-label="Next image"
+                aria-label={t('nextImage')}
           >
             <Icon name="chevron-right" size={24} />
           </button>
@@ -272,7 +274,7 @@ export function Lightbox({
         <div
           className="sp-lightbox__thumbnails"
           role="tablist"
-          aria-label="Image thumbnails"
+          aria-label={t('imageThumbnails')}
         >
           {images.map((img, i) => (
             <button

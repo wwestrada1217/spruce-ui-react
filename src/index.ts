@@ -1,6 +1,7 @@
 // ─── Design Tokens ───────────────────────────────────────────────────────────
 import './tokens/tokens.css';
 import './tokens/motion-patterns.css';
+export * from './tokens/index.js';
 
 // ─── Root Provider ────────────────────────────────────────────────────────────
 export { SpruceProvider } from './SpruceProvider.js';
@@ -24,6 +25,40 @@ export type { AlertProps, AlertVariant } from './components/alert/Alert.js';
 export { Card, CardHeader, CardMedia, CardFooter } from './components/card/Card.js';
 export type { CardProps, CardVariant, CardPadding, CardHeaderProps, CardMediaProps, CardFooterProps } from './components/card/Card.js';
 export type { SpruceProviderProps } from './SpruceProvider.js';
+
+// ─── Internationalization ───────────────────────────────────────────────────
+export { SpruceI18nProvider, useI18n, useSpruceI18n, applyI18nToDocument } from './i18n/i18n-context.js';
+export type {
+  SpDirection,
+  SpI18nConfig,
+  SpI18nConfigInput,
+  SpI18nLabelKey,
+  SpI18nLabelParams,
+  SpI18nLabels,
+  SpI18nLocale,
+  SpruceI18nContextValue,
+  SpruceI18nProviderProps,
+} from './i18n/index.js';
+export {
+  SP_I18N_DEFAULT_CONFIG,
+  SP_I18N_DEFAULT_LABELS,
+  SP_I18N_LOCALES,
+  findSpruceLocale,
+  SP_I18N_LABELS_AR,
+  SP_I18N_LABELS_DE_DE,
+  SP_I18N_LABELS_EN_GB,
+  SP_I18N_LABELS_ES_ES,
+  SP_I18N_LABELS_FIL_PH,
+  SP_I18N_LABELS_FR_FR,
+  SP_I18N_LABELS_HI_IN,
+  SP_I18N_LABELS_IT_IT,
+  SP_I18N_LABELS_JA_JP,
+  SP_I18N_LABELS_KO_KR,
+  SP_I18N_LABELS_NL_NL,
+  SP_I18N_LABELS_PT_BR,
+  SP_I18N_LABELS_ZH_CN,
+  SP_I18N_LABELS_ZH_TW,
+} from './i18n/index.js';
 
 // ─── Tooltip ─────────────────────────────────────────────────────────────────
 export { Tooltip } from './components/tooltip/Tooltip.js';
@@ -82,7 +117,8 @@ export type { AppShellProps, AppShellHamburgerProps } from './components/app-she
 
 // ─── Theme ────────────────────────────────────────────────────────────────────
 export { ThemeProvider, useTheme } from './theme/theme-context.js';
-export type { ThemeContextValue, ThemeProviderProps } from './theme/theme-context.js';
+export type { AccentHarmony, ThemeContextValue, ThemeProviderProps } from './theme/theme-context.js';
+export { applyThemeToDocument } from './theme/theme-dom.js';
 // Re-export theme types and presets from existing theme module
 export type { SpruceTheme, ThemePreference } from './theme/types.js';
 export * from './theme/index.js';

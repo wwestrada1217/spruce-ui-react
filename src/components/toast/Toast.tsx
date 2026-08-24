@@ -17,6 +17,7 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -124,6 +125,7 @@ export interface ToastProviderProps {
  * ```
  */
 export function ToastProvider({ children, position = 'top-right' }: ToastProviderProps) {
+  const { t } = useI18n();
   const [toasts, setToasts] = useState<ToastInstance[]>([]);
   const nextIdRef = useRef(0);
   const timersRef = useRef(new Map<number, ReturnType<typeof setTimeout>>());
@@ -270,7 +272,7 @@ export function ToastProvider({ children, position = 'top-right' }: ToastProvide
             {toast.dismissible && (
               <button
                 className="sp-toast__close"
-                aria-label="Dismiss notification"
+                aria-label={t('dismissNotification')}
                 onClick={() => dismiss(toast.id)}
               >
                 <Icon name="x" size={14} />

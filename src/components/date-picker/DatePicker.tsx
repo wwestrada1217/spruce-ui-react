@@ -9,6 +9,7 @@ import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
 import { computePosition, getScrollParents, onClickOutside } from '../../utils/positioning.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 import './DatePicker.css';
 
 /* ── Public Types ────────────────────────────────────────────────────────── */
@@ -51,16 +52,6 @@ type View = 'days' | 'months' | 'years';
 
 /* ── Constants ───────────────────────────────────────────────────────────── */
 
-const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
-];
-const MONTH_ABBR = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-];
-const WEEKDAY_ABBR = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-
 /* ── Date Helpers ────────────────────────────────────────────────────────── */
 
 function todayIso(): string {
@@ -83,11 +74,6 @@ function daysInMonth(year: number, month: number): number {
   return new Date(year, month, 0).getDate();
 }
 
-function firstDayOfWeek(year: number, month: number): number {
-  // 0 = Sunday
-  return new Date(year, month - 1, 1).getDay();
-}
-
 /** ISO 8601 week number */
 function isoWeekNumber(year: number, month: number, day: number): number {
   const date = new Date(year, month - 1, day);
@@ -95,12 +81,6 @@ function isoWeekNumber(year: number, month: number, day: number): number {
   date.setDate(date.getDate() + 4 - dayOfWeek);
   const yearStart = new Date(date.getFullYear(), 0, 1);
   return Math.ceil(((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
-}
-
-function formatDisplay(iso: string | null | undefined): string {
-  const parsed = parseIso(iso);
-  if (!parsed) return '';
-  return `${MONTH_ABBR[parsed.month - 1]} ${parsed.day}, ${parsed.year}`;
 }
 
 function formatInputValue(iso: string | null | undefined): string {
@@ -153,6 +133,8 @@ export function DatePicker({
   dateFilter,
   className,
 }: DatePickerProps) {
+  const { monthNames, monthLabels, dayLabels, t, formatDate, formatDayLabel, leadingBlankDays } = useI18n();
+  const resolvedPlaceholder = placeholder === 'Select date' ? t('selectDate') : placeholder;
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<View>('days');
   const [viewYear, setViewYear] = useState(() => {
@@ -234,7 +216,7 @@ export function DatePicker({
   /* ── Calendar grid computation ───────────────────────────────────────── */
 
   const calendarDays = useMemo(() => {
-    const offset = firstDayOfWeek(viewYear, viewMonth);
+    const offset = leadingBlankDays(viewYear, viewMonth - 1);
     const total = daysInMonth(viewYear, viewMonth);
     const cells: (number | null)[] = [];
 
@@ -244,7 +226,7 @@ export function DatePicker({
     for (let d = 1; d <= total; d++) cells.push(d);
 
     return cells;
-  }, [viewYear, viewMonth]);
+  }, [leadingBlankDays, viewMonth, viewYear]);
 
   /** Group calendar cells into rows of 7 for week number computation */
   const calendarRows = useMemo(() => {
@@ -605,7 +587,7 @@ export function DatePicker({
           className={`sp-dp__weekdays${wk ? ' sp-dp__weekdays--with-weeks' : ''}`}
         >
           {wk && <div className="sp-dp__weekday" />}
-          {WEEKDAY_ABBR.map((wd) => (
+          {dayLabels.map((wd) => (
             <div key={wd} className="sp-dp__weekday">{wd}</div>
           ))}
         </div>
@@ -614,7 +596,7 @@ export function DatePicker({
         <div
           className={`sp-dp__grid${wk ? ' sp-dp__grid--with-weeks' : ''}`}
           role="grid"
-          aria-label={`${MONTH_NAMES[viewMonth - 1]} ${viewYear}`}
+          aria-label={`${monthNames[viewMonth - 1]} ${viewYear}`}
         >
           {calendarRows.map((row, ri) => {
             // Calculate week number from the first real day in this row
@@ -673,7 +655,7 @@ export function DatePicker({
                     className={cls}
                     tabIndex={isFocused ? 0 : -1}
                     disabled={isDayDisabled}
-                    aria-label={`${MONTH_NAMES[viewMonth - 1]} ${day}, ${viewYear}`}
+                    aria-label={formatDayLabel(day, viewMonth - 1, viewYear)}
                     aria-selected={isSelected}
                     aria-current={isToday ? 'date' : undefined}
                     onClick={() => selectDay(day)}
@@ -700,8 +682,8 @@ export function DatePicker({
     const selectedParsed = parseIso(value);
 
     return (
-      <div className="sp-dp__cell-grid" role="grid" aria-label="Month selection">
-        {MONTH_ABBR.map((label, i) => {
+      <div className="sp-dp__cell-grid" role="grid" aria-label={t('month')}>
+        {monthLabels.map((label, i) => {
           const month = i + 1;
           const isCurrent = month === currentMonth && viewYear === currentYear;
           const isSelected =
@@ -724,7 +706,7 @@ export function DatePicker({
               className={cls}
               disabled={isDis}
               onClick={() => selectMonth(month)}
-              aria-label={MONTH_NAMES[i]}
+              aria-label={monthNames[i]}
             >
               {label}
             </button>
@@ -744,7 +726,7 @@ export function DatePicker({
     for (let i = 0; i < 12; i++) years.push(yearRangeStart + i);
 
     return (
-      <div className="sp-dp__cell-grid" role="grid" aria-label="Year selection">
+      <div className="sp-dp__cell-grid" role="grid" aria-label={t('year')}>
         {years.map((year) => {
           const isCurrent = year === currentYear;
           const isSelected = selectedParsed != null && year === selectedParsed.year;
@@ -787,24 +769,24 @@ export function DatePicker({
     let nextLabel: string;
 
     if (view === 'days') {
-      labelText = `${MONTH_NAMES[viewMonth - 1]} ${viewYear}`;
+      labelText = `${monthNames[viewMonth - 1]} ${viewYear}`;
       onPrev = prevMonth;
       onNext = nextMonth;
-      prevLabel = 'Previous month';
-      nextLabel = 'Next month';
+      prevLabel = t('previousMonth');
+      nextLabel = t('nextMonth');
     } else if (view === 'months') {
       labelText = String(viewYear);
       onPrev = prevYear;
       onNext = nextYear;
-      prevLabel = 'Previous year';
-      nextLabel = 'Next year';
+      prevLabel = t('previousYear');
+      nextLabel = t('nextYear');
     } else {
       labelText = `${yearRangeStart} – ${yearRangeStart + 11}`;
       labelStatic = true;
       onPrev = prevYearRange;
       onNext = nextYearRange;
-      prevLabel = 'Previous 12 years';
-      nextLabel = 'Next 12 years';
+      prevLabel = t('previousYears');
+      nextLabel = t('nextYears');
     }
 
     return (
@@ -822,7 +804,7 @@ export function DatePicker({
           type="button"
           className={`sp-dp__header-label${labelStatic ? ' sp-dp__header-label--static' : ''}`}
           onClick={!labelStatic ? headerLabelClick : undefined}
-          aria-label={view === 'days' ? 'Switch to month view' : view === 'months' ? 'Switch to year view' : undefined}
+          aria-label={view === 'days' ? t('month') : view === 'months' ? t('year') : undefined}
           tabIndex={labelStatic ? -1 : 0}
         >
           {labelText}
@@ -856,7 +838,7 @@ export function DatePicker({
           }}
           role="dialog"
           aria-modal="true"
-          aria-label="Date picker"
+            aria-label={t('dateInput')}
           onKeyDown={handlePanelKeyDown}
         >
           {renderHeader()}
@@ -872,14 +854,14 @@ export function DatePicker({
               className="sp-dp__today-btn"
               onClick={handleToday}
             >
-              Today
+              {t('today')}
             </button>
             <button
               type="button"
               className="sp-dp__clear-btn"
               onClick={handleClear}
             >
-              Clear
+              {t('clear')}
             </button>
           </div>
         </div>,
@@ -913,20 +895,20 @@ export function DatePicker({
             ref={inputRef}
             className="sp-dp__input"
             type="text"
-            placeholder={placeholder}
+            placeholder={resolvedPlaceholder}
             value={inputText}
             disabled={disabled}
             onChange={handleInputChange}
             onBlur={handleInputBlur}
             onKeyDown={handleInputKeyDown}
-            aria-label="Date"
+            aria-label={t('dateInput')}
           />
           <button
             type="button"
             className="sp-dp__input-toggle"
             onClick={togglePanel}
             disabled={disabled}
-            aria-label="Toggle date picker"
+            aria-label={open ? t('hideCalendar') : t('showCalendar')}
             aria-expanded={open}
           >
             <Icon name="calendar" size={iconSize} />
@@ -956,7 +938,7 @@ export function DatePicker({
       >
         <Icon name="filter" size={iconSize} />
         <span className="sp-dp__value">
-          {value ? formatDisplay(value) : placeholder}
+          {value ? formatDate(value) : resolvedPlaceholder}
         </span>
         <Icon name="chevron-down" size={12} />
       </button>

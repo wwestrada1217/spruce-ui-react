@@ -6,6 +6,7 @@
  */
 
 import './Spinner.css'
+import { useI18n } from '../../i18n/i18n-context.js'
 
 export type SpinnerSize = 'sm' | 'md' | 'lg' | 'xl'
 
@@ -16,6 +17,7 @@ export interface SpinnerProps {
 }
 
 export function Spinner({ size = 'md', label = '', className = '' }: SpinnerProps) {
+  const { t } = useI18n()
   const classes = [
     'sp-spinner',
     `sp-spinner--${size}`,
@@ -23,7 +25,7 @@ export function Spinner({ size = 'md', label = '', className = '' }: SpinnerProp
   ].filter(Boolean).join(' ')
 
   return (
-    <span className={classes} role="status" aria-label={label || 'Loading'}>
+    <span className={classes} role="status" aria-label={label || t('loading')}>
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle className="sp-spinner__track" cx="12" cy="12" r="10" strokeWidth="3" />
         <path className="sp-spinner__arc" d="M12 2a10 10 0 0 1 10 10" strokeWidth="3" strokeLinecap="round" />

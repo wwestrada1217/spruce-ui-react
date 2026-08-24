@@ -7,6 +7,7 @@
 
 import './AvatarGroup.css';
 import { Avatar, type AvatarSize } from '../avatar/Avatar.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 export interface AvatarGroupItem {
   name?: string;
@@ -52,6 +53,7 @@ export function AvatarGroup({
   borderColor = '',
   className = '',
 }: AvatarGroupProps) {
+  const { t } = useI18n();
   const visibleItems = items.slice(0, max);
   const overflowCount = Math.max(0, items.length - max);
 
@@ -82,7 +84,7 @@ export function AvatarGroup({
             `sp-avatar-group__overflow--${size}`,
           ].join(' ')}
           style={{ zIndex: visibleItems.length + 1 }}
-          aria-label={`${overflowCount} more`}
+          aria-label={`${overflowCount} ${t('more')}`}
         >
           +{overflowCount}
         </span>

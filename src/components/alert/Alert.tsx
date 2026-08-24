@@ -8,6 +8,7 @@
 import './Alert.css';
 import { useState, type ReactNode } from 'react';
 import { Icon } from '../../icons/Icon.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 export type AlertVariant = 'info' | 'success' | 'warning' | 'danger';
 
@@ -38,6 +39,7 @@ export function Alert({
   children,
 }: AlertProps) {
   const [dismissed, setDismissed] = useState(false);
+  const { t } = useI18n();
 
   if (dismissed) return null;
 
@@ -58,7 +60,7 @@ export function Alert({
         <div className="sp-alert__message">{children}</div>
       </div>
       {dismissible && (
-        <button className="sp-alert__close" aria-label="Dismiss" onClick={handleDismiss}>
+        <button className="sp-alert__close" aria-label={t('dismiss')} onClick={handleDismiss}>
           <Icon name="x" size={14} />
         </button>
       )}

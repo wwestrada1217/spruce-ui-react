@@ -9,6 +9,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
 import { computePosition, getScrollParents, onClickOutside } from '../../utils/positioning.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 import './TimePicker.css';
 
 export type TimePickerSize = 'sm' | 'md' | 'lg';
@@ -111,6 +112,8 @@ export function TimePicker({
   disabled = false,
   className,
 }: TimePickerProps) {
+  const { t } = useI18n();
+  const resolvedPlaceholder = placeholder === 'Select time' ? t('selectTime') : placeholder;
   const [open, setOpen] = useState(false);
   const [hour, setHour] = useState(0);
   const [minute, setMinute] = useState(0);
@@ -345,7 +348,7 @@ export function TimePicker({
             opacity: panelReady ? 1 : 0,
           }}
           role="dialog"
-          aria-label="Time picker"
+          aria-label={t('time')}
         >
           {/* Columns */}
           <div className="sp-tp__columns">
@@ -354,18 +357,18 @@ export function TimePicker({
               <button
                 type="button"
                 className="sp-tp__step"
-                aria-label="Increase hour"
+                aria-label={t('increaseHours')}
                 {...hourUp}
               >
                 <Icon name="chevron-up" size={14} />
               </button>
-              <div className="sp-tp__digit" aria-label={`Hour: ${displayHour}`}>
+              <div className="sp-tp__digit" aria-label={`${t('hour')}: ${displayHour}`}>
                 {displayHour}
               </div>
               <button
                 type="button"
                 className="sp-tp__step"
-                aria-label="Decrease hour"
+                aria-label={t('decreaseHours')}
                 {...hourDown}
               >
                 <Icon name="chevron-down" size={14} />
@@ -379,18 +382,18 @@ export function TimePicker({
               <button
                 type="button"
                 className="sp-tp__step"
-                aria-label="Increase minute"
+                aria-label={t('increaseMinutes')}
                 {...minuteUp}
               >
                 <Icon name="chevron-up" size={14} />
               </button>
-              <div className="sp-tp__digit" aria-label={`Minute: ${pad(minute)}`}>
+              <div className="sp-tp__digit" aria-label={`${t('minutes')}: ${pad(minute)}`}>
                 {pad(minute)}
               </div>
               <button
                 type="button"
                 className="sp-tp__step"
-                aria-label="Decrease minute"
+                aria-label={t('decreaseMinutes')}
                 {...minuteDown}
               >
                 <Icon name="chevron-down" size={14} />
@@ -405,18 +408,18 @@ export function TimePicker({
                   <button
                     type="button"
                     className="sp-tp__step"
-                    aria-label="Increase second"
+                    aria-label={t('increaseSeconds')}
                     {...secondUp}
                   >
                     <Icon name="chevron-up" size={14} />
                   </button>
-                  <div className="sp-tp__digit" aria-label={`Second: ${pad(second)}`}>
+                  <div className="sp-tp__digit" aria-label={`${t('seconds')}: ${pad(second)}`}>
                     {pad(second)}
                   </div>
                   <button
                     type="button"
                     className="sp-tp__step"
-                    aria-label="Decrease second"
+                    aria-label={t('decreaseSeconds')}
                     {...secondDown}
                   >
                     <Icon name="chevron-down" size={14} />
@@ -492,18 +495,18 @@ export function TimePicker({
           <input
             className="sp-tp__input"
             type="text"
-            placeholder={placeholder}
+            placeholder={resolvedPlaceholder}
             value={displayValue}
             disabled={disabled}
             onChange={handleInputChange}
-            aria-label="Time"
+            aria-label={t('time')}
           />
           <button
             type="button"
             className="sp-tp__input-toggle"
             onClick={toggleOpen}
             disabled={disabled}
-            aria-label="Toggle time picker"
+            aria-label={open ? t('close') : t('selectTime')}
             aria-expanded={open}
           >
             <Icon name="chevron-down" size={12} />

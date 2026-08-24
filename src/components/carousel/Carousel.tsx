@@ -8,6 +8,7 @@
 import './Carousel.css';
 import { useState, useRef, useCallback, useEffect, type ReactNode } from 'react';
 import { Icon } from '../../icons/Icon.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 export type CarouselIndicator = 'dots' | 'bars' | 'none';
 
@@ -43,6 +44,8 @@ export function Carousel({
   onSlideChange,
   className = '',
 }: CarouselProps) {
+  const { t } = useI18n();
+  const resolvedAriaLabel = ariaLabel === 'Carousel' ? t('carousel') : ariaLabel;
   const slides = Array.isArray(children) ? children : children ? [children] : [];
   const slideCount = slides.length;
 
@@ -178,7 +181,7 @@ export function Carousel({
       className={rootClasses}
       role="region"
       aria-roledescription="carousel"
-      aria-label={ariaLabel}
+      aria-label={resolvedAriaLabel}
       onKeyDown={onKeydown}
       onMouseEnter={pauseAutoplay}
       onMouseLeave={resumeAutoplay}
@@ -215,7 +218,7 @@ export function Carousel({
           <button
             className="sp-carousel__arrow sp-carousel__arrow--prev"
             onClick={prev}
-            aria-label="Previous slide"
+            aria-label={t('previousSlide')}
             disabled={!loop && currentIndex === 0}
           >
             <Icon name="chevron-left" size={20} />
@@ -223,7 +226,7 @@ export function Carousel({
           <button
             className="sp-carousel__arrow sp-carousel__arrow--next"
             onClick={next}
-            aria-label="Next slide"
+            aria-label={t('nextSlide')}
             disabled={!loop && currentIndex === slideCount - 1}
           >
             <Icon name="chevron-right" size={20} />
@@ -235,7 +238,7 @@ export function Carousel({
         <div
           className="sp-carousel__indicators"
           role="tablist"
-          aria-label="Slide controls"
+          aria-label={t('slideControls')}
         >
           {slideIndices.map((i) => (
             <button

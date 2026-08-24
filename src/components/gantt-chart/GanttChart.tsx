@@ -7,6 +7,7 @@
 
 import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import { Icon } from '../../icons/Icon';
+import { useI18n } from '../../i18n/i18n-context.js';
 import type {
   GanttTask,
   GanttMilestone,
@@ -391,6 +392,7 @@ function DependencyOverlay({
   rowHeight,
   containerWidth,
 }: DependencyOverlayProps) {
+  const { t } = useI18n();
   const totalHeight = rows.length * rowHeight;
 
   const taskRowIndex = useMemo(() => {
@@ -445,7 +447,7 @@ function DependencyOverlay({
         width="100%"
         height={totalHeight}
         className="sp-gantt__dep-svg"
-        aria-label="Task dependencies"
+        aria-label={t('task')}
       >
         <defs>
           <marker
@@ -529,6 +531,7 @@ export function GanttChart({
   onSlotClick,
   className = '',
 }: GanttChartProps) {
+  const { t } = useI18n();
   // ── Merged config ────────────────────────────────────────
   const cfg = useMemo<GanttConfig>(
     () => ({ ...DEFAULT_CONFIG, ...config }),
@@ -718,7 +721,7 @@ export function GanttChart({
   return (
     <div className={rootClasses}>
       {/* ── Toolbar ─────────────────────────────────────── */}
-      <div className="sp-gantt__toolbar" role="toolbar" aria-label="Gantt chart controls">
+      <div className="sp-gantt__toolbar" role="toolbar" aria-label={t('ganttChartControls')}>
         <div className="sp-gantt__toolbar-group">
           {SCALE_ORDER.map((scale) => (
             <button
@@ -733,14 +736,14 @@ export function GanttChart({
         </div>
 
         <div className="sp-gantt__toolbar-group">
-          <button className="sp-gantt__toolbar-btn" onClick={zoomIn} aria-label="Zoom in">
+          <button className="sp-gantt__toolbar-btn" onClick={zoomIn} aria-label={t('zoomIn')}>
             <Icon name="plus" size={14} />
           </button>
-          <button className="sp-gantt__toolbar-btn" onClick={zoomOut} aria-label="Zoom out">
+          <button className="sp-gantt__toolbar-btn" onClick={zoomOut} aria-label={t('zoomOut')}>
             <Icon name="minus" size={14} />
           </button>
-          <button className="sp-gantt__toolbar-btn" onClick={scrollToToday} aria-label="Scroll to today">
-            Today
+          <button className="sp-gantt__toolbar-btn" onClick={scrollToToday} aria-label={t('scrollToToday')}>
+            {t('today')}
           </button>
         </div>
       </div>
@@ -756,7 +759,7 @@ export function GanttChart({
           <div
             className="sp-gantt__task-list"
             role="treegrid"
-            aria-label="Task list"
+            aria-label={t('taskList')}
           >
             {/* Task list header */}
             <div
@@ -765,7 +768,7 @@ export function GanttChart({
               role="row"
             >
               <div className="sp-gantt__task-list-header-cell sp-gantt__task-list-header-cell--name" role="columnheader">
-                Task
+                {t('task')}
               </div>
               {cfg.showProgress && (
                 <div className="sp-gantt__task-list-header-cell sp-gantt__task-list-header-cell--progress" role="columnheader">
@@ -774,7 +777,7 @@ export function GanttChart({
               )}
               {cfg.showResources && (
                 <div className="sp-gantt__task-list-header-cell sp-gantt__task-list-header-cell--resource" role="columnheader">
-                  Owner
+                  {t('owner')}
                 </div>
               )}
             </div>
@@ -822,7 +825,7 @@ export function GanttChart({
                       {row.hasChildren ? (
                         <button
                           className="sp-gantt__task-list-toggle"
-                          aria-label={row.expanded ? `Collapse ${row.task.title}` : `Expand ${row.task.title}`}
+                          aria-label={row.expanded ? `${t('collapse')} ${row.task.title}` : `${t('expand')} ${row.task.title}`}
                           onClick={(e) => {
                             e.stopPropagation();
                             toggleExpand(row.task.id);
@@ -881,7 +884,7 @@ export function GanttChart({
               })}
 
               {flatRows.length === 0 && (
-                <div className="sp-gantt__empty">No tasks to display</div>
+                <div className="sp-gantt__empty">{t('noData')}</div>
               )}
             </div>
           </div>
@@ -892,7 +895,7 @@ export function GanttChart({
           className="sp-gantt__gutter"
           role="separator"
           tabIndex={0}
-          aria-label="Resize task list"
+          aria-label={t('resizeTaskList')}
           aria-valuenow={taskListWidthPx}
           onMouseDown={handleGutterDragStart}
           onKeyDown={handleGutterKeyDown}

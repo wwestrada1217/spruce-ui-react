@@ -8,6 +8,7 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import './Scheduler.css';
 import { Icon } from '../../icons/Icon.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 import type {
   SchedulerView,
   SchedulerEvent,
@@ -100,6 +101,7 @@ export function Scheduler({
   onViewChange,
   onDateChange,
 }: SchedulerProps) {
+  const { t } = useI18n();
   const [activeView, setActiveView] = useState<SchedulerView>(view);
   const [currentDate, setCurrentDate] = useState<Date>(currentDateProp ?? new Date());
 
@@ -196,19 +198,19 @@ export function Scheduler({
   return (
     <div className={`sp-sch sp-sch--${activeView}`}>
       {/* Toolbar */}
-      <div className="sp-sch__toolbar" role="toolbar" aria-label="Scheduler toolbar">
+      <div className="sp-sch__toolbar" role="toolbar" aria-label={t('schedulerToolbar')}>
         <div className="sp-sch__toolbar-nav">
-          <button className="sp-sch__btn" onClick={handleToday} aria-label="Go to today">Today</button>
-          <button className="sp-sch__btn sp-sch__btn--icon" onClick={handlePrev} aria-label="Previous">
+          <button className="sp-sch__btn" onClick={handleToday} aria-label={t('goToToday')}>{t('today')}</button>
+          <button className="sp-sch__btn sp-sch__btn--icon" onClick={handlePrev} aria-label={t('previous')}>
             <Icon name="chevron-left" size={16} />
           </button>
-          <button className="sp-sch__btn sp-sch__btn--icon" onClick={handleNext} aria-label="Next">
+          <button className="sp-sch__btn sp-sch__btn--icon" onClick={handleNext} aria-label={t('next')}>
             <Icon name="chevron-right" size={16} />
           </button>
           <span className="sp-sch__title">{title}</span>
         </div>
 
-        <div className="sp-sch__toolbar-views" role="tablist" aria-label="Calendar views">
+        <div className="sp-sch__toolbar-views" role="tablist" aria-label={t('calendarViews')}>
           {viewOptions.map(v => (
             <button
               key={v.value}
@@ -310,6 +312,7 @@ function DayView({
   onEventMove,
   onEventResize,
 }: DayViewProps) {
+  const { t } = useI18n();
   const scrollBodyRef = useRef<HTMLDivElement>(null);
   const [now, setNow] = useState(new Date());
   const [dragState, setDragState] = useState<{
@@ -580,7 +583,7 @@ function DayView({
   );
 
   return (
-    <div className="sp-sch-dayview" role="grid" aria-label="Schedule day view">
+    <div className="sp-sch-dayview" role="grid" aria-label={t('scheduleDayView')}>
       <div className="sp-sch-dayview__body" ref={scrollBodyRef}>
         {/* Column headers */}
         <div className="sp-sch-dayview__header" role="row">
@@ -602,7 +605,7 @@ function DayView({
         {/* All-day row */}
         {hasAllDay && (
           <div className="sp-sch-dayview__allday-row" role="row">
-            <div className="sp-sch-dayview__allday-label">all-day</div>
+            <div className="sp-sch-dayview__allday-label">{t('allDay')}</div>
             {days.map(day => (
               <div
                 key={day.toISOString()}
@@ -846,6 +849,7 @@ interface AgendaDay {
 }
 
 function AgendaView({ currentDate, events, daysToShow, onEventClick }: AgendaViewProps) {
+  const { t } = useI18n();
   const agendaDays = useMemo<AgendaDay[]>(() => {
     const start = startOfDay(currentDate);
     const end = addDays(start, daysToShow);
@@ -872,9 +876,9 @@ function AgendaView({ currentDate, events, daysToShow, onEventClick }: AgendaVie
   );
 
   return (
-    <div className="sp-sch-agenda" role="list" aria-label="Agenda view">
+    <div className="sp-sch-agenda" role="list" aria-label={t('agendaView')}>
       {agendaDays.length === 0 && (
-        <div className="sp-sch-agenda__empty">No events in this period.</div>
+        <div className="sp-sch-agenda__empty">{t('noEventsInPeriod')}</div>
       )}
       {agendaDays.map(day => (
         <div key={day.date.toISOString()} className="sp-sch-agenda__day" role="listitem">
@@ -1057,6 +1061,7 @@ function TimelineView({
   onEventMove,
   onEventResize,
 }: TimelineViewProps) {
+  const { t } = useI18n();
   const timeHeaderRef = useRef<HTMLDivElement>(null);
 
   const days = useMemo(() => {
@@ -1248,10 +1253,10 @@ function TimelineView({
   );
 
   return (
-    <div className="sp-sch-timeline" role="grid" aria-label="Timeline view">
+    <div className="sp-sch-timeline" role="grid" aria-label={t('timelineView')}>
       {/* Header */}
       <div className="sp-sch-timeline__header">
-        <div className="sp-sch-timeline__res-hd">Resource</div>
+        <div className="sp-sch-timeline__res-hd">{t('resource')}</div>
         <div className="sp-sch-timeline__time-hd-wrap" ref={timeHeaderRef}>
           {days.map(day => (
             <div key={day.toISOString()} className="sp-sch-timeline__day-group">

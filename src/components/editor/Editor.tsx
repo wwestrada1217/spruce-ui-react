@@ -14,6 +14,7 @@ import {
 } from 'react';
 import { Icon } from '../../icons/Icon.js';
 import { Select, type SelectOption } from '../select/Select.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 export type EditorSize = 'sm' | 'md' | 'lg';
 
@@ -76,6 +77,7 @@ export function Editor({
   className,
   style,
 }: EditorProps) {
+  const { t } = useI18n();
   const [internalHtml, setInternalHtml] = useState<string>(value ?? '');
   const [isSourceView, setIsSourceView] = useState(false);
   const [blockFormat, setBlockFormat] = useState<string>('p');
@@ -208,7 +210,7 @@ export function Editor({
       <div className="sp-editor__container">
         {/* Toolbar */}
         {!hideToolbar && (
-          <div className="sp-editor__toolbar" role="toolbar" aria-label="Formatting options">
+          <div className="sp-editor__toolbar" role="toolbar" aria-label={t('formattingOptions')}>
             {/* Spruce Select Heading / Block selector */}
             <div style={{ width: 130 }}>
               <Select
@@ -233,7 +235,7 @@ export function Editor({
                 }}
                 disabled={!isInteractive || isSourceView}
                 title="Bold"
-                aria-label="Bold"
+                aria-label={t('bold')}
               >
                 <Icon name="bold" size={16} />
               </button>
@@ -246,7 +248,7 @@ export function Editor({
                 }}
                 disabled={!isInteractive || isSourceView}
                 title="Italic"
-                aria-label="Italic"
+                aria-label={t('italic')}
               >
                 <Icon name="italic" size={16} />
               </button>
@@ -259,7 +261,7 @@ export function Editor({
                 }}
                 disabled={!isInteractive || isSourceView}
                 title="Underline"
-                aria-label="Underline"
+                aria-label={t('underline')}
               >
                 <Icon name="underline" size={16} />
               </button>
@@ -272,7 +274,7 @@ export function Editor({
                 }}
                 disabled={!isInteractive || isSourceView}
                 title="Strikethrough"
-                aria-label="Strikethrough"
+                aria-label={t('strikethrough')}
               >
                 <Icon name="strikethrough" size={16} />
               </button>
@@ -285,7 +287,7 @@ export function Editor({
                 }}
                 disabled={!isInteractive || isSourceView}
                 title="Subscript"
-                aria-label="Subscript"
+                aria-label={t('subscript')}
               >
                 <Icon name="subscript" size={16} />
               </button>
@@ -298,7 +300,7 @@ export function Editor({
                 }}
                 disabled={!isInteractive || isSourceView}
                 title="Superscript"
-                aria-label="Superscript"
+                aria-label={t('superscript')}
               >
                 <Icon name="superscript" size={16} />
               </button>
@@ -323,7 +325,7 @@ export function Editor({
                   className="sp-editor__color-input"
                   disabled={!isInteractive || isSourceView}
                   onChange={(e) => execCmd('foreColor', e.target.value)}
-                  aria-label="Text Color"
+                  aria-label={t('textColor')}
                 />
               </label>
               <label className="sp-editor__color-wrap" title="Highlight Color">
@@ -341,7 +343,7 @@ export function Editor({
                   className="sp-editor__color-input"
                   disabled={!isInteractive || isSourceView}
                   onChange={(e) => execCmd('hiliteColor', e.target.value)}
-                  aria-label="Highlight Color"
+                  aria-label={t('highlightColor')}
                 />
               </label>
             </div>
@@ -359,7 +361,7 @@ export function Editor({
                 }}
                 disabled={!isInteractive || isSourceView}
                 title="Bullet List"
-                aria-label="Bullet List"
+                aria-label={t('bulletList')}
               >
                 <Icon name="list" size={16} />
               </button>
@@ -372,7 +374,7 @@ export function Editor({
                 }}
                 disabled={!isInteractive || isSourceView}
                 title="Numbered List"
-                aria-label="Numbered List"
+                aria-label={t('numberedList')}
               >
                 <Icon name="list-ordered" size={16} />
               </button>
@@ -391,7 +393,7 @@ export function Editor({
                 }}
                 disabled={!isInteractive || isSourceView}
                 title="Blockquote"
-                aria-label="Blockquote"
+                aria-label={t('blockquote')}
               >
                 <Icon name="quote" size={16} />
               </button>
@@ -404,7 +406,7 @@ export function Editor({
                 }}
                 disabled={!isInteractive || isSourceView}
                 title="Code Block"
-                aria-label="Code Block"
+                aria-label={t('codeBlock')}
               >
                 <Icon name="code" size={16} />
               </button>
@@ -417,7 +419,7 @@ export function Editor({
                 }}
                 disabled={!isInteractive || isSourceView}
                 title="Horizontal Line"
-                aria-label="Horizontal Line"
+                aria-label={t('horizontalRule')}
               >
                 <Icon name="minus" size={16} />
               </button>
@@ -436,7 +438,7 @@ export function Editor({
                 }}
                 disabled={!isInteractive || isSourceView}
                 title="Align Left"
-                aria-label="Align Left"
+                aria-label={t('alignLeft')}
               >
                 <Icon name="align-left" size={16} />
               </button>
@@ -449,7 +451,7 @@ export function Editor({
                 }}
                 disabled={!isInteractive || isSourceView}
                 title="Align Center"
-                aria-label="Align Center"
+                aria-label={t('alignCenter')}
               >
                 <Icon name="align-center" size={16} />
               </button>
@@ -462,7 +464,7 @@ export function Editor({
                 }}
                 disabled={!isInteractive || isSourceView}
                 title="Align Right"
-                aria-label="Align Right"
+                aria-label={t('alignRight')}
               >
                 <Icon name="align-right" size={16} />
               </button>
@@ -481,7 +483,7 @@ export function Editor({
                 }}
                 disabled={!isInteractive || isSourceView}
                 title="Insert Link"
-                aria-label="Insert Link"
+                aria-label={t('insertLink')}
               >
                 <Icon name="link" size={16} />
               </button>
@@ -494,7 +496,7 @@ export function Editor({
                 }}
                 disabled={!isInteractive || isSourceView}
                 title="Insert Image"
-                aria-label="Insert Image"
+                aria-label={t('insertImage')}
               >
                 <Icon name="image" size={16} />
               </button>
@@ -507,7 +509,7 @@ export function Editor({
                 }}
                 disabled={!isInteractive || isSourceView}
                 title="Clear Formatting"
-                aria-label="Clear Formatting"
+                aria-label={t('formattingOptions')}
               >
                 <Icon name="x" size={16} />
               </button>
@@ -520,7 +522,7 @@ export function Editor({
                 }}
                 disabled={disabled}
                 title={isSourceView ? 'Visual Editor' : 'HTML Source'}
-                aria-label="Toggle HTML Source View"
+                aria-label={t('htmlSource')}
               >
                 <Icon name="code" size={16} />
               </button>
@@ -537,7 +539,7 @@ export function Editor({
             onChange={(e) => handleSourceChange(e.target.value)}
             disabled={disabled}
             readOnly={readOnly}
-            aria-label="HTML Source Code"
+            aria-label={t('htmlSource')}
           />
         ) : (
           <div
@@ -554,7 +556,7 @@ export function Editor({
             aria-multiline="true"
             aria-readonly={readOnly}
             aria-disabled={disabled}
-            aria-label={label || 'Rich text editor'}
+            aria-label={label || t('editorContent')}
           />
         )}
       </div>

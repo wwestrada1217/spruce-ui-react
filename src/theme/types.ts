@@ -1,4 +1,4 @@
-import type { SpruceTokenKey } from '../tokens/index.js';
+import type { SpruceCustomTokenKey, SpruceTokenKey } from '../tokens/index.js';
 
 /**
  * A Spruce theme preset. Defines a named set of CSS custom property overrides
@@ -11,8 +11,10 @@ export interface SpruceTheme {
   displayName: string;
   /** The base color scheme this theme builds on. Used to toggle `.dark` class. */
   base: 'light' | 'dark';
-  /** Token overrides applied as inline CSS variables on `:root`. */
+  /** Exact Spruce token overrides applied as inline CSS variables on `:root`. */
   tokens: Partial<Record<SpruceTokenKey, string>>;
+  /** Application-owned `--sp-*` properties kept separate from the strict token map. */
+  customTokens?: Partial<Record<SpruceCustomTokenKey, string>>;
 }
 
 /** Built-in theme names plus an escape hatch for custom theme names. */
