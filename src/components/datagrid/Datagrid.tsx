@@ -79,12 +79,18 @@ export interface DatagridProps<T = unknown> extends Omit<HTMLAttributes<HTMLDivE
   columns: ColumnDef<T>[];
   rowData?: T[];
   options?: GridOptions<T>;
+  /** Automatically adjust row height to fit cell content without clipping. */
+  autoRowHeight?: boolean;
+  /** Alias for autoRowHeight. Automatically adjust row height to fit cell content. */
+  autoHeightRow?: boolean;
 }
 
 export function Datagrid<T = unknown>({
   columns,
   rowData = [],
   options = {},
+  autoRowHeight,
+  autoHeightRow,
   className,
   ...rest
 }: DatagridProps<T>) {
@@ -262,7 +268,7 @@ export function Datagrid<T = unknown>({
   // ── Computed: metrics ─────────────────────────────────────────────────────
   const rowHeight = opts.rowHeight ?? metrics.rowHeight;
   const headerHeight = opts.headerHeight ?? metrics.headerHeight;
-  const isAutoRowHeight = !!opts.autoRowHeight;
+  const isAutoRowHeight = !!(opts.autoRowHeight || opts.autoHeightRow || autoRowHeight || autoHeightRow);
   const fixedRowHeight = isAutoRowHeight ? null : rowHeight;
   const showToolbar = opts.showToolbar ?? false;
   const hasExpandColumn = !!(opts.treeChildrenField || opts.detailRenderer);

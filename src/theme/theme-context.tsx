@@ -35,19 +35,25 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 export interface ThemeProviderProps {
   /** Initial theme preference. Defaults to 'system'. */
   defaultTheme?: Theme;
+  /** Custom theme preset object to register and apply. */
+  theme?: SpruceTheme;
   children: ReactNode;
 }
 
-export function ThemeProvider({ defaultTheme = 'system', children }: ThemeProviderProps) {
+export function ThemeProvider({ defaultTheme = 'system', theme, children }: ThemeProviderProps) {
   const registeredThemesRef = useRef(new Map<string, SpruceTheme>());
   const styleOverrideRef = useRef<HTMLStyleElement | null>(null);
+
+  if (theme && !registeredThemesRef.current.has(theme.name)) {
+    registeredThemesRef.current.set(theme.name, theme);
+  }
 
   const getSystemResolved = useCallback((): 'light' | 'dark' => {
     if (typeof window === 'undefined') return 'light';
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }, []);
 
-  const [preference, setPreference] = useState<Theme>(defaultTheme);
+  const [preference, setPreference] = useState<Theme>(() => (theme ? theme.name : defaultTheme));
   const [resolved, setResolved] = useState<'light' | 'dark'>(() => {
     if (defaultTheme === 'system') return getSystemResolved();
     if (defaultTheme === 'dark') return 'dark';
@@ -107,10 +113,15 @@ export function ThemeProvider({ defaultTheme = 'system', children }: ThemeProvid
     [getSystemResolved, injectTokenOverrides, clearTokenOverrides],
   );
 
-  // Apply theme on preference change
+  // Apply theme on preference change or theme prop change
   useEffect(() => {
-    applyResolvedTheme(preference);
-  }, [preference, applyResolvedTheme]);
+    if (theme) {
+      registeredThemesRef.current.set(theme.name, theme);
+      applyResolvedTheme(theme.name);
+    } else {
+      applyResolvedTheme(preference);
+    }
+  }, [theme, preference, applyResolvedTheme]);
 
   // Listen for system color scheme changes when preference is 'system'
   useEffect(() => {

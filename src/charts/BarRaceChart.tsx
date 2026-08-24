@@ -92,7 +92,7 @@ export function BarRaceChart({
         <svg
           className="sp-chart-svg"
           viewBox={`0 0 ${svgWidth} ${svgHeight}`}
-          preserveAspectRatio="none"
+          preserveAspectRatio="xMidYMid meet"
           onMouseLeave={() => setTooltip(null)}
         >
           {sortedBars.map((bar, idx) => {
