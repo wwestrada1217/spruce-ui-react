@@ -12,9 +12,9 @@ test('renders accessible grid semantics and labeled keyboard controls', () => {
   const source = readFileSync(new URL('../src/components/datagridex/Datagridex.tsx', import.meta.url), 'utf8')
   assert.match(source, /role="grid"/)
   assert.match(source, /aria-label=\{ariaLabel\}/)
-  assert.match(source, /aria-label=\{`Sort by \$\{column\.header\}/)
-  assert.match(source, /aria-label=\{`Filter \$\{column\.header\}/)
-  assert.match(source, /aria-label="Select all visible rows"/)
+  assert.match(source, /aria-label=\{`\$\{t\('sortAscending'\)\} \$\{column\.header\}/)
+  assert.match(source, /aria-label=\{`\$\{t\('filter'\)\} \$\{column\.header\}/)
+  assert.match(source, /aria-label=\{`\$\{t\('selectAllRowsOnPage'\)\}/)
 })
 
 test('adapts structural DataContext state and write-through operations', () => {

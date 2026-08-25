@@ -3,7 +3,9 @@ import { Datagridex, type DatagridexColumn } from '../../src/index.js';
 import {
   expectFocused,
   expectNoA11yViolations,
+  expectDocumentTheme,
   renderWithSpruce,
+  renderWithTheme,
   waitFor,
 } from '../utils/test-utils.js';
 
@@ -70,5 +72,75 @@ describe('Datagridex', () => {
       key: 'name',
       errors: [{ rule: 'required', message: 'Name is required.' }],
     }));
+  });
+
+  it('uses provider labels and logical pinned offsets in RTL', () => {
+    const { getByRole, container } = renderWithSpruce(
+      <Datagridex<Person>
+        rows={rows}
+        columns={columns}
+        columnPins={{ name: 'right' }}
+      />,
+      { providerProps: { locale: 'ar', direction: 'rtl', labels: { dataGrid: 'شبكة الأشخاص' } } },
+    );
+
+    expect(getByRole('grid', { name: 'شبكة الأشخاص' })).toBeInTheDocument();
+    expect(container.querySelector('.sp-datagridex__header-cell--pinned-right')).toBeInTheDocument();
+    expect(document.documentElement).toHaveAttribute('dir', 'rtl');
+  });
+
+  it('renders row spans with accessible span metadata and omits covered cells', () => {
+    const spanColumns: readonly DatagridexColumn<Person>[] = [
+      { key: 'name', header: 'Name', resizable: false, sortable: false, rowSpan: 2 },
+      { key: 'age', header: 'Age', resizable: false, sortable: false },
+    ];
+    const { container } = renderWithSpruce(<Datagridex<Person> rows={rows} columns={spanColumns} />);
+    const dataRows = container.querySelectorAll('.sp-datagridex__row');
+    const nameCells = [...dataRows].flatMap((row) => [...row.querySelectorAll('[role="gridcell"]')]).filter((cell) => cell.textContent?.includes('Ada') || cell.textContent?.includes('Grace'));
+
+    expect(dataRows).toHaveLength(2);
+    expect(container.querySelector('[aria-rowspan="2"]')).toBeInTheDocument();
+    expect(nameCells.filter((cell) => cell.textContent?.includes('Grace'))).toHaveLength(0);
+  });
+
+  it('requests virtual pages through the controlled paging callback', async () => {
+    const onVirtualPageRequest = vi.fn();
+    const onPageSizeChange = vi.fn();
+    const { getByRole, user } = renderWithSpruce(
+      <Datagridex<Person>
+        rows={rows}
+        columns={columns}
+        virtualPaging
+        virtualPage={1}
+        virtualTotalRows={100}
+        virtualHasNextPage
+        onVirtualPageRequest={onVirtualPageRequest}
+        pageSizeOptions={[25, 50]}
+        onPageSizeChange={onPageSizeChange}
+      />,
+    );
+
+    await user.click(getByRole('button', { name: 'Next page' }));
+    expect(onVirtualPageRequest).toHaveBeenCalledWith(expect.objectContaining({ page: 2, pageSize: 25, direction: 'next', trigger: 'button' }));
+    await user.selectOptions(getByRole('combobox'), '50');
+    expect(onPageSizeChange).toHaveBeenCalledWith(50);
+  });
+
+  it('disables row reorder controls when the visible order is transformed', () => {
+    const { getByRole } = renderWithSpruce(
+      <Datagridex<Person> rows={rows} columns={columns} rowReorder pagination />,
+    );
+
+    expect(getByRole('button', { name: /Drag handle: Row 1/i })).toBeDisabled();
+  });
+
+  it.each(['light', 'dark'] as const)('uses design tokens in the %s theme', (theme) => {
+    const { getByRole } = renderWithTheme(
+      <Datagridex<Person> rows={rows} columns={columns} ariaLabel={`${theme} people`} />,
+      theme,
+    );
+
+    expect(getByRole('grid', { name: `${theme} people` })).toBeInTheDocument();
+    expectDocumentTheme(theme);
   });
 });

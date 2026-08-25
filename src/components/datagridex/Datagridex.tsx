@@ -23,6 +23,7 @@ import {
   type UIEvent,
 } from 'react';
 import { Icon } from '../../icons/Icon.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 import {
   createDatagridexDataContextAdapter,
   type DatagridexDataContextAdapter,
@@ -35,6 +36,7 @@ import type {
   DatagridexCellEditCommit,
   DatagridexCellTemplate as DatagridexCellTemplateRenderer,
   DatagridexCellTemplateContext,
+  DatagridexChoiceOption,
   DatagridexColumn,
   DatagridexColumnFilter,
   DatagridexColumnGroup,
@@ -53,6 +55,7 @@ import type {
   DatagridexEditMode,
   DatagridexEditorType,
   DatagridexFilterChange,
+  DatagridexFilterDataType,
   DatagridexFilterMode,
   DatagridexGroupBy,
   DatagridexGroupSort,
@@ -173,6 +176,15 @@ function normalizeStyle(value: CSSProperties | string | null | undefined): CSSPr
   return typeof value === 'string' ? undefined : value ?? undefined;
 }
 
+function columnPinFor<T extends object>(
+  column: DatagridexColumn<T>,
+  overrides: Readonly<Record<string, DatagridexColumnPin | null | undefined>>,
+): DatagridexColumnPin | null {
+  return Object.prototype.hasOwnProperty.call(overrides, column.key)
+    ? overrides[column.key] ?? null
+    : column.pinned ?? null;
+}
+
 function sameRows<T>(left: readonly T[], right: readonly T[]): boolean {
   return left.length === right.length && left.every((row, index) => row === right[index]);
 }
@@ -184,10 +196,18 @@ function filterValueKey(value: unknown): string {
   return `${typeof value}:${String(value)}`;
 }
 
-function evaluateCondition(value: unknown, condition: DatagridexDynamicFilterCondition): boolean {
-  const text = String(value ?? '').toLocaleLowerCase();
-  const conditionText = String(condition.value ?? '').toLocaleLowerCase();
-  const compare = compareValues(value, condition.value);
+function evaluateCondition(
+  value: unknown,
+  condition: DatagridexDynamicFilterCondition,
+  dataType: DatagridexFilterDataType = 'text',
+  locale?: string,
+): boolean {
+  const normalizedValue = normalizeFilterValue(value, dataType);
+  const normalizedCondition = normalizeFilterValue(condition.value, dataType);
+  const normalizedTo = normalizeFilterValue(condition.valueTo, dataType);
+  const text = String(normalizedValue ?? '').toLocaleLowerCase(locale);
+  const conditionText = String(normalizedCondition ?? '').toLocaleLowerCase(locale);
+  const compare = compareValues(normalizedValue, normalizedCondition, locale);
   switch (condition.operator) {
     case 'contains': return text.includes(conditionText);
     case 'notContains': return !text.includes(conditionText);
@@ -199,10 +219,42 @@ function evaluateCondition(value: unknown, condition: DatagridexDynamicFilterCon
     case 'greaterThanOrEqual': return compare >= 0;
     case 'lessThan': return compare < 0;
     case 'lessThanOrEqual': return compare <= 0;
-    case 'between': return compare >= 0 && compareValues(value, condition.valueTo) <= 0;
-    case 'isEmpty': return value === null || value === undefined || text.length === 0;
-    case 'isNotEmpty': return value !== null && value !== undefined && text.length > 0;
+    case 'between': return compare >= 0 && compareValues(normalizedValue, normalizedTo, locale) <= 0;
+    case 'isEmpty': return normalizedValue === null || normalizedValue === undefined || text.length === 0;
+    case 'isNotEmpty': return normalizedValue !== null && normalizedValue !== undefined && text.length > 0;
   }
+}
+
+function normalizeFilterValue(value: unknown, dataType: DatagridexFilterDataType): unknown {
+  if (dataType === 'number') {
+    const number = Number(value);
+    return Number.isNaN(number) ? value : number;
+  }
+  if (dataType === 'date') {
+    const date = value instanceof Date ? value : new Date(String(value));
+    return Number.isNaN(date.getTime()) ? value : date;
+  }
+  if (dataType === 'boolean') {
+    if (value === true || value === 'true') return true;
+    if (value === false || value === 'false') return false;
+  }
+  return value;
+}
+
+function editorOptions<T extends object>(column: DatagridexColumn<T>): readonly DatagridexChoiceOption[] {
+  const options = column.editorOptions?.options;
+  if (!Array.isArray(options)) return [];
+  const displayField = column.editorOptions?.displayField;
+  const valueField = column.editorOptions?.valueField;
+  return options.map((option) => {
+    if (option !== null && typeof option === 'object') {
+      const record = option as Record<string, unknown>;
+      const value = valueField ? record[valueField] : record.value ?? option;
+      const label = displayField ? record[displayField] : record.label ?? value;
+      return { value, label: String(label ?? ''), disabled: record.disabled === true };
+    }
+    return { value: option, label: String(option ?? '') };
+  });
 }
 
 function validationMessage<T extends object>(column: DatagridexColumn<T>, rule: string, fallback: string): string {
@@ -524,9 +576,9 @@ function getSlotMap<T extends object, P extends { columnKey: string }>(slots: Da
   return map;
 }
 
-function sortGroups<T extends object>(groups: readonly GroupBucket<T>[], sorts: readonly DatagridexGroupSort[], columnByKey: ReadonlyMap<string, DatagridexColumn<T>>): GroupBucket<T>[] {
+function sortGroups<T extends object>(groups: readonly GroupBucket<T>[], key: string, sorts: readonly DatagridexGroupSort[], columnByKey: ReadonlyMap<string, DatagridexColumn<T>>): GroupBucket<T>[] {
   return [...groups].sort((left, right) => {
-    const sort = sorts.find((entry) => entry.key === columnByKey.get(entry.key)?.key);
+    const sort = sorts.find((entry) => entry.key === key);
     if (!sort) return 0;
     const column = columnByKey.get(sort.key);
     if (!column) return 0;
@@ -545,6 +597,7 @@ function buildGroupItems<T extends object>(
   groupSorts: readonly DatagridexGroupSort[],
   groupExpanded: ReadonlySet<string>,
   groupsExpandedByDefault: boolean,
+  emptyGroupLabel: string,
 ): readonly GridItem<T>[] {
   const key = groupBy[depth];
   if (!key) return entries.map((display) => ({ kind: 'row', display }));
@@ -555,13 +608,13 @@ function buildGroupItems<T extends object>(
     const raw = valueFor(display.row, column);
     const groupKey = filterValueKey(raw);
     const existing = groups.get(groupKey);
-    groups.set(groupKey, existing ? { ...existing, rows: [...existing.rows, display.row] } : { key: groupKey, label: toText(raw) || 'Empty', rows: [display.row] });
+    groups.set(groupKey, existing ? { ...existing, rows: [...existing.rows, display.row] } : { key: groupKey, label: toText(raw) || emptyGroupLabel, rows: [display.row] });
   });
-  const ordered = groupSorting ? sortGroups([...groups.values()], groupSorts, columnByKey) : [...groups.values()];
+  const ordered = groupSorting ? sortGroups([...groups.values()], key, groupSorts, columnByKey) : [...groups.values()];
   return ordered.flatMap((bucket) => {
     const groupKey = `${path}/${key}:${bucket.key}`;
     const childEntries = entries.filter((entry) => filterValueKey(valueFor(entry.row, column)) === bucket.key);
-    const children = buildGroupItems(childEntries, depth + 1, groupKey, groupBy, columnByKey, groupSorting, groupSorts, groupExpanded, groupsExpandedByDefault);
+    const children = buildGroupItems(childEntries, depth + 1, groupKey, groupBy, columnByKey, groupSorting, groupSorts, groupExpanded, groupsExpandedByDefault, emptyGroupLabel);
     const item: GroupItem<T> = { kind: 'group', key: groupKey, label: bucket.label, level: depth, rows: bucket.rows, children };
     return groupExpanded.has(groupKey) || (groupExpanded.size === 0 && groupsExpandedByDefault) ? [item, ...children] : [item];
   });
@@ -583,34 +636,34 @@ function aggregateValue<T extends object>(aggregate: DatagridexAggregate<T>, row
 function DatagridexInner<T extends object>(props: DatagridexProps<T>, ref: ForwardedRef<DatagridexHandle<T>>): ReactElement {
   const {
     rows = [], dataContext = null, dataContextOptions, columns, columnGroups = [],
-    ariaLabel = 'Data grid', loading = false, loadingMessage = 'Loading data…',
-    emptyMessage = 'No rows to display', filterEmptyMessage = 'No matching rows',
-    emptyStateDescription, filterEmptyStateDescription = 'Try changing or clearing the active filters.',
+    ariaLabel: ariaLabelProp, loading = false, loadingMessage: loadingMessageProp,
+    emptyMessage: emptyMessageProp, filterEmptyMessage: filterEmptyMessageProp,
+    emptyStateDescription, filterEmptyStateDescription: filterEmptyStateDescriptionProp,
     autoHeight = true, autoColumnWidth = true, fitColumnsToWidth = false, reorderable = true,
     showVerticalLines = false, defaultColumnWidth = 160, sortMode = 'client',
     sortIndicatorVisibility = 'hover', multiSort = false, filterIndicatorVisibility = 'hover',
-    filterMode = 'client', locale, trackBy = defaultTrackBy, editMode = 'none', editOnClick = false,
+    filterMode = 'client', locale: localeProp, trackBy = defaultTrackBy, editMode = 'none', editOnClick = false,
     editOnType = false, editLabels = {}, rowLabel = defaultRowLabel, rowDetails = false,
     expandedRows: expandedRowsProp, onExpandedRowsChange, rowDetailExpandable = defaultRowDetailExpandable,
-    rowDetailHeight = 96, enableNewRow = false, newRowFactory = defaultNewRowFactory,
-    newRowLabel = 'New row', pagination = false, paginationType = 'compact', pageSize = 25,
-    pageSizeOptions = [10, 25, 50, 100], virtualScroll = false, virtualScrollHeight = 360,
-    virtualRowHeight = 32, virtualOverscan = 5, columnVirtualization = false,
-    columnVirtualizationOverscan = 160, virtualPaging = false, virtualPage: virtualPageProp,
+    rowDetailHeight = 112, enableNewRow = false, newRowFactory = defaultNewRowFactory,
+    newRowLabel: newRowLabelProp, pagination = false, paginationType = 'compact', pageSize: pageSizeProp,
+    pageSizeOptions = [10, 25, 50, 100], virtualScroll = false, virtualScrollHeight = 400,
+    virtualRowHeight = 32, virtualOverscan = 6, columnVirtualization = false,
+    columnVirtualizationOverscan = 320, virtualPaging = false, virtualPage: virtualPageProp,
     onVirtualPageChange, virtualTotalRows = null, virtualHasPreviousPage = null,
     virtualHasNextPage = null, virtualPagingLoading = false, selectionMode = 'none',
     groupSelection = false, selectedRows: selectedRowsProp, onSelectedRowsChange, stripedRows = false,
-    footer = false, footerLabel = 'Summary', statusbar = false, statusbarAriaLabel = 'Data grid status',
+    footer = false, footerLabel: footerLabelProp, statusbar = false, statusbarAriaLabel: statusbarAriaLabelProp,
     statusbarShowRowCount = true, statusbarShowSelectedRowCount = true, statusbarMergePagination = false,
-    toolbar = false, toolbarAriaLabel = 'Data grid tools', toolbarShowColumnSelector = true,
+    toolbar = false, toolbarAriaLabel: toolbarAriaLabelProp, toolbarShowColumnSelector = true,
     toolbarShowGroupedColumns = true, searchable = false, searchTerm: searchTermProp,
-    onSearchTermChange, columnSelector = false, columnSelectorLabel = 'Columns',
+    onSearchTermChange, columnSelector = false, columnSelectorLabel: columnSelectorLabelProp,
     hiddenColumnKeys: hiddenColumnKeysProp, onHiddenColumnKeysChange, groupBy: groupByProp,
     onGroupByChange, stickyGroupHeaders = false, groupsExpandedByDefault = true, indentGroupedRows = true,
     rowReorder = false, rowNumbers = false, groupSorting = false, groupSorts: groupSortsProp,
-    onGroupSortsChange, columnMenu = false, columnPins = {}, onColumnPinsChange, detailPane = false,
-    detailPaneWidth = 320, detailPaneTitle = 'Details', detailPaneRow: detailPaneRowProp,
-    onDetailPaneRowChange, leadingRowActionsWidth = 48, preventInvalidCommit = true,
+    onGroupSortsChange, columnMenu = false, columnPins: columnPinsProp, onColumnPinsChange, detailPane = false,
+    detailPaneWidth = 320, detailPaneTitle: detailPaneTitleProp, detailPaneRow: detailPaneRowProp,
+    onDetailPaneRowChange, leadingRowActionsWidth = 40, preventInvalidCommit = true,
     validateOnInput = true, rowClass, rowStyle, cellTemplates = {}, cellEditors = {}, rowDetail,
     detailPaneRenderer, leadingRowActions, rowTemplate, toolbarStart, toolbarEnd, statusbarStart,
     statusbarEnd, onSortChange, onSortsChange, onFilterChange, onColumnResize, onColumnOrderChange,
@@ -619,6 +672,21 @@ function DatagridexInner<T extends object>(props: DatagridexProps<T>, ref: Forwa
     onSelectionChange, onRowOrderChange, onColumnGroupResize, onColumnGroupOrderChange,
     onDataContextSaveComplete, onDataContextSaveError, className, style, children, ...rest
   } = props;
+
+  const { t, locale: i18nLocale, isRtl } = useI18n();
+  const ariaLabel = ariaLabelProp ?? t('dataGrid');
+  const loadingMessage = loadingMessageProp ?? t('loadingData');
+  const emptyMessage = emptyMessageProp ?? t('noRowsToDisplay');
+  const filterEmptyMessage = filterEmptyMessageProp ?? t('noMatchingRows');
+  const filterEmptyStateDescription = filterEmptyStateDescriptionProp ?? t('clearFilters');
+  const newRowLabel = newRowLabelProp ?? t('newRow');
+  const footerLabel = footerLabelProp ?? t('summary');
+  const statusbarAriaLabel = statusbarAriaLabelProp ?? t('dataGridStatus');
+  const toolbarAriaLabel = toolbarAriaLabelProp ?? t('dataGridTools');
+  const columnSelectorLabel = columnSelectorLabelProp ?? t('columns');
+  const detailPaneTitle = detailPaneTitleProp ?? t('details');
+  const locale = localeProp ?? i18nLocale;
+  const getRowLabel = useCallback((row: T, index: number) => rowLabel === defaultRowLabel ? `${t('row')} ${index + 1}` : rowLabel(row, index), [rowLabel, t]);
 
   const instanceId = useId();
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -633,6 +701,7 @@ function DatagridexInner<T extends object>(props: DatagridexProps<T>, ref: Forwa
   const [columnSelectorOpen, setColumnSelectorOpen] = useState(false);
   const [groupExpanded, setGroupExpanded] = useState<ReadonlySet<string>>(new Set());
   const [draggedColumnKey, setDraggedColumnKey] = useState<string | null>(null);
+  const [draggedGroupKey, setDraggedGroupKey] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [virtualPageInternal, setVirtualPageInternal] = useState(1);
   const [viewportScrollTop, setViewportScrollTop] = useState(0);
@@ -646,6 +715,7 @@ function DatagridexInner<T extends object>(props: DatagridexProps<T>, ref: Forwa
 
   const [expandedRows, setExpandedRows] = useControllableState(expandedRowsProp, [] as readonly T[], onExpandedRowsChange);
   const [selectedRows, setSelectedRows] = useControllableState(selectedRowsProp, [] as readonly T[], onSelectedRowsChange);
+  const [pageSize, setPageSize] = useControllableState(pageSizeProp, 25, onPageSizeChange);
   const [hiddenColumnKeys, setHiddenColumnKeys] = useControllableState(hiddenColumnKeysProp, [] as readonly string[], onHiddenColumnKeysChange);
   const [groupBy, setGroupBy] = useControllableState(groupByProp, [] as readonly string[], onGroupByChange);
   const [groupSorts, setGroupSorts] = useControllableState(groupSortsProp, [] as readonly DatagridexGroupSort[], onGroupSortsChange);
@@ -658,6 +728,11 @@ function DatagridexInner<T extends object>(props: DatagridexProps<T>, ref: Forwa
     setOpenDetailPaneInternal(next);
     onDetailPaneRowChange?.(next);
   });
+  const [columnPins, setColumnPins] = useControllableState(
+    columnPinsProp,
+    {} as Readonly<Record<string, DatagridexColumnPin | null | undefined>>,
+    onColumnPinsChange,
+  );
 
   const contextSubscribe = useCallback((listener: () => void) => dataContext?.subscribe?.(listener) ?? (() => undefined), [dataContext]);
   const contextSnapshot = useCallback(() => dataContext?.getSnapshot?.() ?? 0, [dataContext]);
@@ -668,15 +743,20 @@ function DatagridexInner<T extends object>(props: DatagridexProps<T>, ref: Forwa
   );
   const resolvedRows = contextAdapter?.rows ?? rows;
   const resolvedLoading = loading || Boolean(contextAdapter?.loading);
+  const gridLoading = resolvedLoading || virtualPagingLoading;
   const allColumns = useMemo(() => {
     const byKey = new Map(columns.map((column) => [column.key, column]));
     const configured = columnOrder.filter((key) => byKey.has(key)).map((key) => byKey.get(key)!);
     return [...configured, ...columns.filter((column) => !columnOrder.includes(column.key))];
   }, [columns, columnOrder]);
-  const visibleColumns = useMemo(
-    () => allColumns.filter((column) => !hiddenColumnKeys.includes(column.key)),
-    [allColumns, hiddenColumnKeys],
-  );
+  const visibleColumns = useMemo(() => {
+    const visible = allColumns.filter((column) => !hiddenColumnKeys.includes(column.key));
+    return [
+      ...visible.filter((column) => columnPinFor(column, columnPins) === 'left'),
+      ...visible.filter((column) => columnPinFor(column, columnPins) === null),
+      ...visible.filter((column) => columnPinFor(column, columnPins) === 'right'),
+    ];
+  }, [allColumns, columnPins, hiddenColumnKeys]);
   const columnByKey = useMemo(() => new Map(allColumns.map((column) => [column.key, column])), [allColumns]);
   const leadingColumnCount = (rowDetails ? 1 : 0) + (detailPane ? 1 : 0) + (selectionMode !== 'none' ? 1 : 0) + (rowNumbers ? 1 : 0) + (rowReorder ? 1 : 0) + (editMode === 'row' ? 1 : 0) + (leadingRowActions ? 1 : 0);
 
@@ -711,11 +791,18 @@ function DatagridexInner<T extends object>(props: DatagridexProps<T>, ref: Forwa
       if (query && !visibleColumns.some((column) => format(row, rowIndex, column).toLocaleLowerCase(locale).includes(query))) return false;
       for (const column of allColumns) {
         const values = valueFilters.get(column.key);
-        if (values && !column.filterPredicate?.(valueFor(row, column), [...values], row)) {
-          if (!values.has(filterValueKey(valueFor(row, column)))) return false;
+        if (values) {
+          const selectedValues = resolvedRows
+            .map((candidate) => valueFor(candidate, column))
+            .filter((candidate, candidateIndex, source) =>
+              values.has(filterValueKey(candidate)) &&
+              source.findIndex((value) => filterValueKey(value) === filterValueKey(candidate)) === candidateIndex,
+            );
+          if (column.filterPredicate && !column.filterPredicate(valueFor(row, column), selectedValues, row)) return false;
+          if (!column.filterPredicate && !values.has(filterValueKey(valueFor(row, column)))) return false;
         }
         const condition = dynamicFilters.get(column.key);
-        if (condition && !evaluateCondition(valueFor(row, column), condition)) return false;
+        if (condition && !evaluateCondition(valueFor(row, column), condition, column.filterDataType, locale)) return false;
       }
       return true;
     });
@@ -745,24 +832,77 @@ function DatagridexInner<T extends object>(props: DatagridexProps<T>, ref: Forwa
     return result;
   }, [currentPage, editMode, enableNewRow, newRow, pageSize, pagedRows]);
   const visibleDataRows = displayRows.filter((entry) => !entry.isNewRow).map((entry) => entry.row);
+  const rowSpanPlan = useMemo(() => {
+    const plan = new Map<string, number>();
+    if (virtualScroll || virtualPaging || groupBy.length > 0 || expandedRows.length > 0) return plan;
+    const dataRows = displayRows.filter((entry) => !entry.isNewRow);
+    const sourceRows = dataRows.map((entry) => entry.row);
+    visibleColumns.forEach((column) => {
+      let coveredThrough = -1;
+      dataRows.forEach((display, index) => {
+        const key = `${display.rowIndex}:${column.key}`;
+        if (index <= coveredThrough) {
+          plan.set(key, 0);
+          return;
+        }
+        const configured = typeof column.rowSpan === 'function'
+          ? column.rowSpan({
+            value: valueFor(display.row, column),
+            row: display.row,
+            rowIndex: display.rowIndex,
+            column,
+            rows: sourceRows,
+          })
+          : column.rowSpan;
+        const span = typeof configured === 'number' && Number.isFinite(configured)
+          ? Math.max(1, Math.min(Math.floor(configured), dataRows.length - index))
+          : 1;
+        plan.set(key, span);
+        coveredThrough = index + span - 1;
+      });
+    });
+    return plan;
+  }, [displayRows, expandedRows.length, groupBy.length, virtualPaging, virtualScroll, visibleColumns]);
+  const isCellCoveredByRowSpan = useCallback((rowIndex: number, key: string) => rowSpanPlan.get(`${rowIndex}:${key}`) === 0, [rowSpanPlan]);
+  const cellRowSpan = useCallback((rowIndex: number, key: string) => rowSpanPlan.get(`${rowIndex}:${key}`) ?? 1, [rowSpanPlan]);
 
   const gridItems = useMemo(
-    () => buildGroupItems(displayRows, 0, '', groupBy, columnByKey, groupSorting, groupSorts, groupExpanded, groupsExpandedByDefault),
-    [columnByKey, displayRows, groupBy, groupExpanded, groupSorting, groupSorts, groupsExpandedByDefault],
+    () => buildGroupItems(displayRows, 0, '', groupBy, columnByKey, groupSorting, groupSorts, groupExpanded, groupsExpandedByDefault, t('none')),
+    [columnByKey, displayRows, groupBy, groupExpanded, groupSorting, groupSorts, groupsExpandedByDefault, t],
   );
 
   const activeItemCount = gridItems.length;
   const virtualStart = virtualScroll ? Math.max(0, Math.floor(viewportScrollTop / virtualRowHeight) - virtualOverscan) : 0;
   const virtualEnd = virtualScroll ? Math.min(activeItemCount, Math.ceil((viewportScrollTop + virtualViewportHeight) / virtualRowHeight) + virtualOverscan) : activeItemCount;
   const renderedItems = virtualScroll ? gridItems.slice(virtualStart, virtualEnd) : gridItems;
-  const estimatedWidth = (column: DatagridexColumn<T>): number => {
+  const estimatedWidth = useCallback((column: DatagridexColumn<T>): number => {
     const resized = resizedWidths.get(column.key);
     if (resized) return resized;
     if (typeof column.width === 'number') return column.width;
-    if (typeof column.width === 'string' && column.width.endsWith('%')) return Math.max(column.minWidth ?? 96, Number.parseFloat(column.width));
+    if (typeof column.width === 'string' && column.width.endsWith('%')) return Math.max(column.minWidth ?? 96, defaultColumnWidth);
     return column.minWidth ?? defaultColumnWidth;
-  };
+  }, [defaultColumnWidth, resizedWidths]);
   const totalGridWidth = visibleColumns.reduce((sum, column) => sum + estimatedWidth(column), 0);
+  const utilityColumnWidth = leadingColumnCount * 40;
+  const pinnedOffsets = useMemo(() => {
+    const left = new Map<string, number>();
+    const right = new Map<string, number>();
+    let leftOffset = utilityColumnWidth;
+    let rightOffset = 0;
+    visibleColumns.forEach((column) => {
+      if (columnPinFor(column, columnPins) === 'left') {
+        left.set(column.key, leftOffset);
+        leftOffset += estimatedWidth(column);
+      }
+    });
+    [...visibleColumns].reverse().forEach((column) => {
+      if (columnPinFor(column, columnPins) === 'right') {
+        right.set(column.key, rightOffset);
+        rightOffset += estimatedWidth(column);
+      }
+    });
+    return { left, right };
+  }, [columnPins, estimatedWidth, utilityColumnWidth, visibleColumns]);
   const leadingTemplate = leadingColumnCount > 0 ? `repeat(${leadingColumnCount}, auto) ` : '';
   const gridTemplateColumns = `${leadingTemplate}${visibleColumns.map((column) => {
     const width = column.width;
@@ -789,7 +929,8 @@ function DatagridexInner<T extends object>(props: DatagridexProps<T>, ref: Forwa
     const move = (event: globalThis.MouseEvent) => {
       const column = columnByKey.get(resizing.key);
       if (!column) return;
-      const width = Math.max(column.minWidth ?? 96, Math.min(column.maxWidth ?? 480, resizing.width + event.clientX - resizing.startX));
+      const delta = isRtl ? resizing.startX - event.clientX : event.clientX - resizing.startX;
+      const width = Math.max(column.minWidth ?? 96, Math.min(column.maxWidth ?? 480, resizing.width + delta));
       setResizedWidths((current) => {
         const next = new Map(current);
         next.set(resizing.key, width);
@@ -807,17 +948,24 @@ function DatagridexInner<T extends object>(props: DatagridexProps<T>, ref: Forwa
       window.removeEventListener('mousemove', move);
       window.removeEventListener('mouseup', up);
     };
-  }, [columnByKey, onColumnResize, resizing, resizedWidths]);
+  }, [columnByKey, isRtl, onColumnResize, resizing, resizedWidths]);
 
   const emitFilters = useCallback((nextValues: ReadonlyMap<string, ReadonlySet<string>>, nextDynamic: ReadonlyMap<string, DatagridexDynamicFilterCondition>) => {
     const filters: DatagridexColumnFilter<T>[] = [];
     allColumns.forEach((column) => {
       const values = nextValues.get(column.key);
       const condition = nextDynamic.get(column.key);
-      if (values || condition) filters.push({ key: column.key, column, values: values ? [...values].map((value) => value) : [], ...(condition ? { condition } : {}) });
+      if (values || condition) {
+        const selectedValues = values
+          ? filterOptions(column)
+            .filter((option) => values.has(filterValueKey(option.value)))
+            .map((option) => option.value)
+          : [];
+        filters.push({ key: column.key, column, values: selectedValues, ...(condition ? { condition } : {}) });
+      }
     });
     onFilterChange?.(filters);
-  }, [allColumns, onFilterChange]);
+  }, [allColumns, filterOptions, onFilterChange]);
 
   const setSort = useCallback((key: string, direction: DatagridexSortDirection) => {
     const column = columnByKey.get(key);
@@ -889,13 +1037,21 @@ function DatagridexInner<T extends object>(props: DatagridexProps<T>, ref: Forwa
 
   const initialEditorValue = useCallback((row: T, column: DatagridexColumn<T>): unknown => {
     const value = valueFor(row, column);
-    return column.editorValueFormatter ? column.editorValueFormatter(value, row) : editorType(row, column) === 'number' ? value === null || value === undefined ? '' : String(value) : value;
+    if (column.editorValueFormatter) return column.editorValueFormatter(value, row);
+    if ((editorType(row, column) === 'select' || editorType(row, column) === 'combobox' || editorType(row, column) === 'grid-combobox') && column.editorOptions?.useDisplayValue) {
+      return editorOptions(column).find((option) => Object.is(option.value, value))?.label ?? value;
+    }
+    return editorType(row, column) === 'number' ? value === null || value === undefined ? '' : String(value) : value;
   }, [editorType]);
 
   const parseEditorValue = useCallback((value: unknown, row: T, column: DatagridexColumn<T>): unknown => {
     let next = value;
     if (editorType(row, column) === 'number') next = value === '' ? null : Number(value);
     if (editorType(row, column) === 'checkbox') next = Boolean(value);
+    if (editorType(row, column) === 'select' || editorType(row, column) === 'combobox' || editorType(row, column) === 'grid-combobox') {
+      const option = editorOptions(column).find((candidate) => String(candidate.value) === String(value) || candidate.label === String(value));
+      if (option) next = column.editorOptions?.saveDisplayField ? option.label : option.value;
+    }
     return column.valueParser?.(next, row) ?? next;
   }, [editorType]);
 
@@ -1017,7 +1173,7 @@ function DatagridexInner<T extends object>(props: DatagridexProps<T>, ref: Forwa
 
   const renderEditor = (display: DisplayRow<T>, column: DatagridexColumn<T>, value: unknown, update: (value: unknown) => void, commit: () => void, cancel: () => void): ReactNode => {
     const errors = validateOnInput ? validateValue(parseEditorValue(value, display.row, column), display.row, column) : [];
-    const context: DatagridexCellEditorContext<T> = { value, originalValue: valueFor(display.row, column), row: display.row, rowIndex: display.rowIndex, column, invalid: errors.length > 0, errors, firstError: errors[0]?.message ?? null, update, commit, cancel };
+    const context: DatagridexCellEditorContext<T> = { $implicit: value, value, originalValue: valueFor(display.row, column), row: display.row, rowIndex: display.rowIndex, column, invalid: errors.length > 0, errors, firstError: errors[0]?.message ?? null, update, commit, cancel };
     const custom = resolvedCellEditors[column.key];
     if (custom || editorType(display.row, column) === 'custom') return custom ? custom(context) : null;
     const type = editorType(display.row, column);
@@ -1029,10 +1185,18 @@ function DatagridexInner<T extends object>(props: DatagridexProps<T>, ref: Forwa
     } };
     if (type === 'checkbox') return <input {...common} type="checkbox" checked={Boolean(value)} aria-label={`Edit ${column.header}`} onChange={(event) => { update(event.target.checked); if (editMode === 'cell') commit(); }} />;
     if (type === 'select') {
-      const options = Array.isArray(column.editorOptions?.options) ? column.editorOptions.options as readonly { label?: string; value?: unknown; disabled?: boolean }[] : [];
-      return <select {...common} value={String(value ?? '')} multiple={column.editorOptions?.multiple} onChange={(event) => update(column.editorOptions?.multiple ? [...event.currentTarget.selectedOptions].map((option) => option.value) : event.target.value)}>{!column.editorOptions?.multiple && <option value="">{column.editorOptions?.placeholder ?? 'Select…'}</option>}{options.map((option) => <option key={String(option.value)} value={String(option.value)} disabled={option.disabled}>{option.label ?? String(option.value)}</option>)}</select>;
+      const options = editorOptions(column);
+      return <select {...common} value={String(value ?? '')} multiple={column.editorOptions?.multiple} onChange={(event) => update(column.editorOptions?.multiple ? [...event.currentTarget.selectedOptions].map((option) => option.value) : event.target.value)}>{!column.editorOptions?.multiple && <option value="">{column.editorOptions?.placeholder ?? t('select')}</option>}{options.map((option) => <option key={String(option.value)} value={String(option.value)} disabled={option.disabled}>{option.label}</option>)}</select>;
     }
-    return <input {...common} type={type === 'number' ? 'number' : type === 'date' ? 'date' : 'text'} value={String(value ?? '')} placeholder={column.editorOptions?.placeholder} min={column.editorOptions?.minDate} max={column.editorOptions?.maxDate} onChange={(event) => update(event.target.value)} onBlur={() => commit()} />;
+    if (type === 'combobox' || type === 'grid-combobox') {
+      const options = editorOptions(column);
+      const listId = `${instanceId}-editor-options-${display.rowIndex}-${column.key}`;
+      return <><input {...common} type="text" role="combobox" aria-autocomplete="list" list={listId} value={String(value ?? '')} placeholder={column.editorOptions?.placeholder} onChange={(event) => update(event.target.value)} onBlur={() => commit()} /><datalist id={listId}>{options.map((option) => <option key={String(option.value)} value={String(option.value)} label={option.label} />)}</datalist></>;
+    }
+    const minDate = column.editorOptions?.minDate ?? (column.min instanceof Date ? column.min.toISOString().slice(0, 10) : typeof column.min === 'string' ? column.min : undefined);
+    const maxDate = column.editorOptions?.maxDate ?? (column.max instanceof Date ? column.max.toISOString().slice(0, 10) : typeof column.max === 'string' ? column.max : undefined);
+    const dateIsAllowed = (next: string) => type !== 'date' || (!column.editorOptions?.disabledDates?.includes(next) && (column.editorOptions?.dateFilter?.(next) ?? true));
+    return <input {...common} type={type === 'number' ? 'number' : type === 'date' ? 'date' : 'text'} value={String(value ?? '')} placeholder={column.editorOptions?.placeholder} min={type === 'date' ? minDate : undefined} max={type === 'date' ? maxDate : undefined} onChange={(event) => { const next = event.target.value; if (dateIsAllowed(next)) update(type === 'number' ? next : next); }} onBlur={() => commit()} />;
   };
 
   const toggleDetails = useCallback((row: T) => {
@@ -1058,6 +1222,17 @@ function DatagridexInner<T extends object>(props: DatagridexProps<T>, ref: Forwa
     onPageChange?.({ page: safe, pageSize, totalRows, totalPages });
   }, [currentPage, onPageChange, onVirtualPageRequest, pageSize, pagination, setVirtualPage, totalPages, totalRows, virtualPaging]);
 
+  const changePageSize = useCallback((nextSize: number) => {
+    const size = Math.max(1, Math.floor(nextSize));
+    if (size === pageSize) return;
+    setPageSize(size);
+    setPage(1);
+    if (!virtualPaging) {
+      const nextTotalPages = Math.max(1, Math.ceil(totalRows / size));
+      onPageChange?.({ page: 1, pageSize: size, totalRows, totalPages: nextTotalPages });
+    }
+  }, [onPageChange, pageSize, setPageSize, totalRows, virtualPaging]);
+
   const setColumnVisible = useCallback((key: string, visible: boolean) => {
     const nextHidden = visible ? hiddenColumnKeys.filter((candidate) => candidate !== key) : [...hiddenColumnKeys, key];
     if (!visible && visibleColumns.length <= 1) return;
@@ -1065,12 +1240,33 @@ function DatagridexInner<T extends object>(props: DatagridexProps<T>, ref: Forwa
     onColumnVisibilityChange?.({ visibleKeys: allColumns.map((column) => column.key).filter((candidate) => !nextHidden.includes(candidate)), hiddenKeys: allColumns.map((column) => column.key).filter((candidate) => nextHidden.includes(candidate)) });
   }, [allColumns, hiddenColumnKeys, onColumnVisibilityChange, setHiddenColumnKeys, visibleColumns.length]);
 
+  const setColumnPin = useCallback((key: string, pin: DatagridexColumnPin | null) => {
+    if (!allColumns.some((column) => column.key === key)) return;
+    setColumnPins({ ...columnPins, [key]: pin });
+  }, [allColumns, columnPins, setColumnPins]);
+
   const setGrouping = useCallback((keys: readonly string[]) => {
     const known = new Set(allColumns.map((column) => column.key));
     const next = keys.filter((key, index) => known.has(key) && keys.indexOf(key) === index);
     setGroupBy(next);
     setGroupSorts(groupSorts.filter((sort) => next.includes(sort.key)));
   }, [allColumns, groupSorts, setGroupBy, setGroupSorts]);
+
+  const toggleGroupSort = useCallback((key: string) => {
+    if (!groupSorting || !groupBy.includes(key)) return;
+    const current = groupSorts.find((sort) => sort.key === key)?.direction;
+    const next = groupSorts.filter((sort) => sort.key !== key);
+    setGroupSorts([...next, { key, direction: current === 'asc' ? 'desc' : 'asc' }]);
+  }, [groupBy, groupSorts, groupSorting, setGroupSorts]);
+
+  const moveGrouping = useCallback((sourceKey: string, targetKey: string, after = false) => {
+    if (!reorderable || sourceKey === targetKey) return;
+    const next = groupBy.filter((key) => key !== sourceKey);
+    const targetIndex = next.indexOf(targetKey);
+    if (targetIndex < 0) return;
+    next.splice(targetIndex + (after ? 1 : 0), 0, sourceKey);
+    setGrouping(next);
+  }, [groupBy, reorderable, setGrouping]);
 
   const addDataContextRow = useCallback(() => {
     if (!contextAdapter) return;
@@ -1089,7 +1285,7 @@ function DatagridexInner<T extends object>(props: DatagridexProps<T>, ref: Forwa
   }, [contextAdapter, onSelectionChange, selectedRows, setSelectedRows]);
 
   const saveDataContextChanges = useCallback(() => {
-    if (!contextAdapter || !contextAdapter.dirty || !contextAdapter.valid()) return;
+    if (!contextAdapter || !contextAdapter.dirty || (contextAdapter.blockInvalidSave && !contextAdapter.valid())) return;
     contextAdapter.context.save().then(() => onDataContextSaveComplete?.()).catch((error: unknown) => onDataContextSaveError?.(error));
   }, [contextAdapter, onDataContextSaveComplete, onDataContextSaveError]);
 
@@ -1147,16 +1343,17 @@ function DatagridexInner<T extends object>(props: DatagridexProps<T>, ref: Forwa
     if (virtualPaging && !virtualPagingLoading && viewport.scrollTop <= 1 && (virtualHasPreviousPage ?? false)) goToPage(currentPage - 1, 'scroll');
   };
 
-  const rootClassName = ['sp-datagridex', autoHeight ? 'sp-datagridex--auto-height' : '', showVerticalLines ? 'sp-datagridex--vertical-lines' : '', stripedRows ? 'sp-datagridex--striped' : '', virtualScroll ? 'sp-datagridex--virtual' : '', columnVirtualization ? 'sp-datagridex--column-virtual' : '', className ?? ''].filter(Boolean).join(' ');
+  const rootClassName = ['sp-datagridex', autoHeight ? 'sp-datagridex--auto-height' : '', showVerticalLines ? 'sp-datagridex--vertical-lines' : '', stripedRows ? 'sp-datagridex--striped' : '', virtualScroll || virtualPaging ? 'sp-datagridex--virtual' : '', Array.from(rowSpanPlan.values()).some((span) => span > 1) ? 'sp-datagridex--row-spanning' : '', columnVirtualization ? 'sp-datagridex--column-virtual' : '', className ?? ''].filter(Boolean).join(' ');
   const activeFilters = valueFilters.size + dynamicFilters.size;
   const selectableRows = visibleDataRows;
+  const rowReorderingEnabled = rowReorder && !pagination && !virtualPaging && !virtualScroll && groupBy.length === 0 && sorts.length === 0 && activeFilters === 0;
   const allSelected = selectableRows.length > 0 && selectableRows.every((row) => selectedRows.includes(row));
   const someSelected = selectableRows.some((row) => selectedRows.includes(row)) && !allSelected;
-  const resolvedEditLabels: DatagridexEditLabels = { actions: 'Actions', edit: 'Edit', save: 'Save', cancel: 'Cancel', ...editLabels };
-  const paneRenderer = detailPaneRow && resolvedDetailPane ? resolvedDetailPane({ row: detailPaneRow, rowIndex: resolvedRows.indexOf(detailPaneRow), close: () => setDetailRow(null) }) : null;
+  const resolvedEditLabels: DatagridexEditLabels = { actions: t('actions'), edit: t('edit'), save: t('save'), cancel: t('cancel'), ...editLabels };
+  const paneRenderer = detailPaneRow && resolvedDetailPane ? resolvedDetailPane({ $implicit: detailPaneRow, row: detailPaneRow, rowIndex: resolvedRows.indexOf(detailPaneRow), close: () => setDetailRow(null) }) : null;
 
   const onCellKeyDown = (event: KeyboardEvent<HTMLDivElement>, display: DisplayRow<T>, column: DatagridexColumn<T>) => {
-    if (event.altKey && rowReorder && (event.key === 'ArrowUp' || event.key === 'ArrowDown' || event.key === 'Home' || event.key === 'End')) {
+    if (event.altKey && rowReorderingEnabled && (event.key === 'ArrowUp' || event.key === 'ArrowDown' || event.key === 'Home' || event.key === 'End')) {
       event.preventDefault();
       const from = display.rowIndex;
       const to = event.key === 'Home' ? 0 : event.key === 'End' ? resolvedRows.length - 1 : from + (event.key === 'ArrowUp' ? -1 : 1);
@@ -1187,28 +1384,43 @@ function DatagridexInner<T extends object>(props: DatagridexProps<T>, ref: Forwa
     const isSelected = selectedRows.includes(display.row);
     const isPaneOpen = detailPaneRow === display.row;
     return <Fragment key={String(trackBy(display.row, display.rowIndex))}>
-      {rowDetails && <div role="gridcell" className="sp-datagridex__cell sp-datagridex__cell--utility" style={{ gridColumn: 1 }}><button type="button" className="sp-datagridex__icon-button" aria-label={`${expandedRows.includes(display.row) ? 'Collapse' : 'Expand'} ${rowLabel(display.row, rowIndex)}`} aria-expanded={expandedRows.includes(display.row)} onClick={() => toggleDetails(display.row)} disabled={!rowDetailExpandable(display.row, rowIndex)}><Icon name={expandedRows.includes(display.row) ? 'chevron-down' : 'chevron-right'} size={14} aria-hidden="true" /></button></div>}
-      {detailPane && <div role="gridcell" className="sp-datagridex__cell sp-datagridex__cell--utility" style={{ gridColumn: rowDetails ? 2 : 1 }}><button type="button" className={`sp-datagridex__icon-button${isPaneOpen ? ' sp-datagridex__icon-button--active' : ''}`} aria-label={`${isPaneOpen ? 'Close' : 'Open'} details for ${rowLabel(display.row, rowIndex)}`} aria-pressed={isPaneOpen} onClick={() => setDetailRow(isPaneOpen ? null : display.row)}><Icon name="info" size={14} aria-hidden="true" /></button></div>}
-      {selectionMode !== 'none' && <div role="gridcell" className="sp-datagridex__cell sp-datagridex__cell--utility" style={{ gridColumn: (rowDetails ? 1 : 0) + (detailPane ? 1 : 0) + 1 }}>{selectionMode === 'single' ? <input type="radio" aria-label={`Select ${rowLabel(display.row, rowIndex)}`} name={`${instanceId}-selection`} checked={isSelected} onChange={(event) => changeSelection(display.row, event.target.checked)} /> : <input type="checkbox" aria-label={`Select ${rowLabel(display.row, rowIndex)}`} checked={isSelected} onChange={(event) => changeSelection(display.row, event.target.checked)} />}</div>}
+      {rowDetails && <div role="gridcell" className="sp-datagridex__cell sp-datagridex__cell--utility" style={{ gridColumn: 1 }}><button type="button" className="sp-datagridex__icon-button" aria-label={`${expandedRows.includes(display.row) ? t('collapse') : t('expand')} ${getRowLabel(display.row, rowIndex)}`} aria-expanded={expandedRows.includes(display.row)} onClick={() => toggleDetails(display.row)} disabled={!rowDetailExpandable(display.row, rowIndex)}><Icon name={expandedRows.includes(display.row) ? 'chevron-down' : 'chevron-right'} size={14} aria-hidden="true" /></button></div>}
+      {detailPane && <div role="gridcell" className="sp-datagridex__cell sp-datagridex__cell--utility" style={{ gridColumn: rowDetails ? 2 : 1 }}><button type="button" className={`sp-datagridex__icon-button${isPaneOpen ? ' sp-datagridex__icon-button--active' : ''}`} aria-label={`${isPaneOpen ? t('close') : t('open')} ${t('details').toLocaleLowerCase()} ${getRowLabel(display.row, rowIndex)}`} aria-pressed={isPaneOpen} onClick={() => setDetailRow(isPaneOpen ? null : display.row)}><Icon name="info" size={14} aria-hidden="true" /></button></div>}
+      {selectionMode !== 'none' && <div role="gridcell" className="sp-datagridex__cell sp-datagridex__cell--utility" style={{ gridColumn: (rowDetails ? 1 : 0) + (detailPane ? 1 : 0) + 1 }}>{selectionMode === 'single' ? <input type="radio" aria-label={`${t('select')} ${getRowLabel(display.row, rowIndex)}`} name={`${instanceId}-selection`} checked={isSelected} onChange={(event) => changeSelection(display.row, event.target.checked)} /> : <input type="checkbox" aria-label={`${t('select')} ${getRowLabel(display.row, rowIndex)}`} checked={isSelected} onChange={(event) => changeSelection(display.row, event.target.checked)} />}</div>}
       {rowNumbers && <div role="gridcell" className="sp-datagridex__cell sp-datagridex__cell--utility sp-datagridex__cell--number" style={{ gridColumn: leadingColumnCount - (editMode === 'row' ? 1 : 0) }}>{rowIndex + 1}</div>}
-      {rowReorder && <div role="gridcell" className="sp-datagridex__cell sp-datagridex__cell--utility"><button type="button" className="sp-datagridex__icon-button" draggable aria-label={`Reorder ${rowLabel(display.row, rowIndex)}`} onDragStart={() => setRowDragIndex(rowIndex)} onDragOver={(event) => event.preventDefault()} onDrop={() => { if (rowDragIndex === null || rowDragIndex === rowIndex) return; const next = [...resolvedRows]; const [moved] = next.splice(rowDragIndex, 1); next.splice(rowIndex, 0, moved); onRowOrderChange?.({ row: moved, fromIndex: rowDragIndex, toIndex: rowIndex, rows: next }); setRowDragIndex(null); }}><Icon name="grip-vertical" size={14} aria-hidden="true" /></button></div>}
-      {resolvedLeadingActions && <div role="gridcell" className="sp-datagridex__cell sp-datagridex__cell--utility" style={{ minWidth: leadingRowActionsWidth }}>{resolvedLeadingActions({ row: display.row, rowIndex, detailPaneOpen: isPaneOpen, toggleDetailPane: () => setDetailRow(isPaneOpen ? null : display.row) })}</div>}
-      {editMode === 'row' && <div role="gridcell" className="sp-datagridex__cell sp-datagridex__cell--utility">{activeRowEdit?.row === display.row ? <span className="sp-datagridex__edit-actions"><button type="button" onClick={commitRowEdit}>{resolvedEditLabels.save}</button><button type="button" onClick={cancelEditing}>{resolvedEditLabels.cancel}</button></span> : <button type="button" className="sp-datagridex__icon-button" aria-label={`${resolvedEditLabels.edit} ${rowLabel(display.row, rowIndex)}`} onClick={() => startRowEdit(rowIndex)}><Icon name="edit" size={14} aria-hidden="true" /></button>}</div>}
+      {rowReorder && <div role="gridcell" className="sp-datagridex__cell sp-datagridex__cell--utility"><button type="button" className="sp-datagridex__icon-button" draggable={rowReorderingEnabled} disabled={!rowReorderingEnabled} aria-label={`${t('dragHandle')}: ${getRowLabel(display.row, rowIndex)}`} onDragStart={() => rowReorderingEnabled && setRowDragIndex(rowIndex)} onDragOver={(event) => { if (rowReorderingEnabled) event.preventDefault(); }} onDrop={() => { if (!rowReorderingEnabled || rowDragIndex === null || rowDragIndex === rowIndex) return; const next = [...resolvedRows]; const [moved] = next.splice(rowDragIndex, 1); next.splice(rowIndex, 0, moved); onRowOrderChange?.({ row: moved, fromIndex: rowDragIndex, toIndex: rowIndex, rows: next }); setRowDragIndex(null); }}><Icon name="grip-vertical" size={14} aria-hidden="true" /></button></div>}
+      {resolvedLeadingActions && <div role="gridcell" className="sp-datagridex__cell sp-datagridex__cell--utility" style={{ minWidth: leadingRowActionsWidth }}>{resolvedLeadingActions({ $implicit: display.row, row: display.row, rowIndex, detailPaneOpen: isPaneOpen, toggleDetailPane: () => setDetailRow(isPaneOpen ? null : display.row) })}</div>}
+      {editMode === 'row' && <div role="gridcell" className="sp-datagridex__cell sp-datagridex__cell--utility">{activeRowEdit?.row === display.row ? <span className="sp-datagridex__edit-actions"><button type="button" onClick={commitRowEdit}>{resolvedEditLabels.save}</button><button type="button" onClick={cancelEditing}>{resolvedEditLabels.cancel}</button></span> : <button type="button" className="sp-datagridex__icon-button" aria-label={`${resolvedEditLabels.edit} ${getRowLabel(display.row, rowIndex)}`} onClick={() => startRowEdit(rowIndex)}><Icon name="edit" size={14} aria-hidden="true" /></button>}</div>}
     </Fragment>;
   };
 
   const renderDataCell = (display: DisplayRow<T>, column: DatagridexColumn<T>, columnIndex: number) => {
+    if (isCellCoveredByRowSpan(display.rowIndex, column.key)) return null;
     const value = valueFor(display.row, column);
     const isActiveCell = activeCellEdit?.row === display.row && activeCellEdit.key === column.key;
     const rowEditValue = activeRowEdit?.row === display.row ? activeRowEdit.values.get(column.key) : undefined;
     const isEditing = isActiveCell || activeRowEdit?.row === display.row && rowEditValue !== undefined && isEditable(display.row, column);
     const readonly = column.readonly === true || typeof column.readonly === 'function' && column.readonly(display.row);
-    const recordState = contextAdapter?.cellState(display.row, column.key);
-    const invalid = contextAdapter?.cellInvalid(display.row, column.key) ?? false;
-    const content = isEditing ? renderEditor(display, column, isActiveCell ? activeCellEdit.value : rowEditValue, (next) => isActiveCell ? updateCellDraft(next) : updateRowDraft(column.key, next), isActiveCell ? () => commitCellEdit() : commitRowEdit, cancelEditing) : editorType(display.row, column) === 'checkbox' && isEditable(display.row, column) ? <input type="checkbox" tabIndex={-1} aria-label={`${column.header} for ${rowLabel(display.row, display.rowIndex)}`} checked={Boolean(value)} onChange={(event) => { const next = event.target.checked; if (contextAdapter) contextAdapter.patch(display.row, { [column.key]: next }); onCellEditCommit?.({ row: display.row, rowIndex: display.rowIndex, column, key: column.key, previousValue: value, value: next }); }} /> : resolvedCellTemplates[column.key]?.({ value, formattedValue: format(display.row, display.rowIndex, column), row: display.row, rowIndex: display.rowIndex, column } as DatagridexCellTemplateContext<T>) ?? format(display.row, display.rowIndex, column);
+    const showCellState = contextAdapter?.showCellState() ?? true;
+    const showCellValidation = contextAdapter?.showCellValidation() ?? true;
+    const recordState = showCellState ? contextAdapter?.cellState(display.row, column.key) : null;
+    const activeErrors = isEditing && validateOnInput
+      ? validateValue(parseEditorValue(isActiveCell ? activeCellEdit.value : rowEditValue, display.row, column), display.row, column)
+      : [];
+    const invalid = activeErrors.length > 0 || (showCellValidation && (contextAdapter?.cellInvalid(display.row, column.key) ?? false));
+    const span = cellRowSpan(display.rowIndex, column.key);
+    const pin = columnPinFor(column, columnPins);
+    const content = isEditing ? renderEditor(display, column, isActiveCell ? activeCellEdit.value : rowEditValue, (next) => isActiveCell ? updateCellDraft(next) : updateRowDraft(column.key, next), isActiveCell ? () => commitCellEdit() : commitRowEdit, cancelEditing) : editorType(display.row, column) === 'checkbox' && isEditable(display.row, column) ? <input type="checkbox" tabIndex={-1} aria-label={`${column.header} for ${getRowLabel(display.row, display.rowIndex)}`} checked={Boolean(value)} onChange={(event) => { const next = event.target.checked; if (contextAdapter) contextAdapter.patch(display.row, { [column.key]: next }); onCellEditCommit?.({ row: display.row, rowIndex: display.rowIndex, column, key: column.key, previousValue: value, value: next }); }} /> : resolvedCellTemplates[column.key]?.({ $implicit: value, value, formattedValue: format(display.row, display.rowIndex, column), row: display.row, rowIndex: display.rowIndex, column } as DatagridexCellTemplateContext<T>) ?? format(display.row, display.rowIndex, column);
     const displayContent = display.isNewRow && columnIndex === 0 && !isEditing ? <span className="sp-datagridex__new-row-prompt">{newRowLabel}</span> : content;
-    const classes = ['sp-datagridex__cell', column.pinned === 'left' ? 'sp-datagridex__cell--pinned-left' : '', column.pinned === 'right' ? 'sp-datagridex__cell--pinned-right' : '', column.align ? `sp-datagridex__cell--align-${column.align}` : '', column.wrap === false ? 'sp-datagridex__cell--nowrap' : '', readonly ? 'sp-datagridex__cell--readonly' : '', recordState ? `sp-datagridex__cell--state-${recordState}` : '', invalid ? 'sp-datagridex__cell--validation-error' : ''].filter(Boolean).join(' ');
-    return <div key={column.key} id={`${instanceId}-cell-${display.rowIndex}-${column.key}`} role="gridcell" tabIndex={isEditing ? -1 : 0} aria-colindex={leadingColumnCount + columnIndex + 1} aria-readonly={readonly || undefined} aria-invalid={invalid || undefined} className={classes} onClick={() => { if (editOnClick && isEditable(display.row, column) && !isActiveCell) startCellEdit(display.rowIndex, column.key); else contextAdapter?.navigateTo(display.row); }} onKeyDown={(event) => onCellKeyDown(event, display, column)} onDoubleClick={() => { if (isEditable(display.row, column)) startCellEdit(display.rowIndex, column.key); }}>{displayContent}{invalid && <span className="sp-datagridex__validation-message" role="alert">{contextAdapter?.validationMessage(display.row, column.key)}</span>}</div>;
+    const classes = ['sp-datagridex__cell', pin === 'left' ? 'sp-datagridex__cell--pinned-left' : '', pin === 'right' ? 'sp-datagridex__cell--pinned-right' : '', span > 1 ? 'sp-datagridex__cell--row-span' : '', column.align ? `sp-datagridex__cell--align-${column.align}` : '', column.wrap === false ? 'sp-datagridex__cell--nowrap' : '', readonly ? 'sp-datagridex__cell--readonly' : '', recordState ? `sp-datagridex__cell--state-${recordState}` : '', invalid ? 'sp-datagridex__cell--validation-error' : ''].filter(Boolean).join(' ');
+    const validationMessage = activeErrors[0]?.message ?? contextAdapter?.validationMessage(display.row, column.key);
+    const cellStyle: CSSProperties = {
+      gridColumn: leadingColumnCount + columnIndex + 1,
+      ...(span > 1 ? { gridRow: `span ${span}`, blockSize: `calc(${span} * var(--sp-density-datagrid-row-height))` } : {}),
+      ...(pin === 'left' ? { insetInlineStart: pinnedOffsets.left.get(column.key) } : {}),
+      ...(pin === 'right' ? { insetInlineEnd: pinnedOffsets.right.get(column.key) } : {}),
+    };
+    return <div key={column.key} id={`${instanceId}-cell-${display.rowIndex}-${column.key}`} role="gridcell" tabIndex={isEditing ? -1 : 0} aria-colindex={leadingColumnCount + columnIndex + 1} aria-rowspan={span > 1 ? span : undefined} aria-readonly={readonly || undefined} aria-invalid={invalid || undefined} aria-describedby={validationMessage ? `${instanceId}-error-${display.rowIndex}-${column.key}` : undefined} className={classes} style={cellStyle} onClick={() => { if (editOnClick && isEditable(display.row, column) && !isActiveCell) startCellEdit(display.rowIndex, column.key); else contextAdapter?.navigateTo(display.row); }} onKeyDown={(event) => onCellKeyDown(event, display, column)} onDoubleClick={() => { if (isEditable(display.row, column)) startCellEdit(display.rowIndex, column.key); }}>{displayContent}{validationMessage && invalid && <span id={`${instanceId}-error-${display.rowIndex}-${column.key}`} className="sp-datagridex__validation-message" role="alert">{validationMessage}</span>}</div>;
   };
 
   const renderRow = (display: DisplayRow<T>, itemIndex: number) => {
@@ -1216,56 +1428,60 @@ function DatagridexInner<T extends object>(props: DatagridexProps<T>, ref: Forwa
     const expanded = expandedRows.includes(display.row);
     const rowClassValue = typeof rowClass === 'function' ? rowClass(display.row, display.rowIndex) : rowClass;
     const rowStyleValue = typeof rowStyle === 'function' ? rowStyle(display.row, display.rowIndex) : rowStyle;
-    const recordState = contextAdapter?.recordState(display.row);
-    const customRow = resolvedRowTemplate?.({ row: display.row, rowIndex: display.rowIndex, columns: visibleColumns, isEditing: activeRowEdit?.row === display.row || activeCellEdit?.row === display.row, isSelected: selected, isExpanded: expanded });
+    const recordState = contextAdapter?.showRowState() ? contextAdapter.recordState(display.row) : null;
+    const rowInvalid = contextAdapter?.showRowValidation() ? contextAdapter.rowInvalid(display.row) : false;
+    const customRow = resolvedRowTemplate?.({ $implicit: display.row, row: display.row, rowIndex: display.rowIndex, columns: visibleColumns, isEditing: activeRowEdit?.row === display.row || activeCellEdit?.row === display.row, isSelected: selected, isExpanded: expanded });
     return <Fragment key={String(trackBy(display.row, display.rowIndex))}>
-      <div role="row" aria-rowindex={itemIndex + 2} aria-selected={selected || undefined} className={['sp-datagridex__row', selected ? 'sp-datagridex__row--selected' : '', expanded ? 'sp-datagridex__row--expanded' : '', display.isNewRow ? 'sp-datagridex__row--new' : '', recordState ? `sp-datagridex__row--state-${recordState}` : '', normalizeClassName(rowClassValue)].filter(Boolean).join(' ')} style={normalizeStyle(rowStyleValue)}>{customRow ?? <>{renderLeadingCell(display, display.rowIndex)}{visibleColumns.map((column, index) => renderDataCell(display, column, index))}</>}</div>
-      {expanded && resolvedRowDetail && <div className="sp-datagridex__detail-row" role="row" style={{ minHeight: rowDetailHeight }}><div role="gridcell" className="sp-datagridex__detail-cell" style={{ gridColumn: `1 / span ${leadingColumnCount + visibleColumns.length}` }}>{resolvedRowDetail({ row: display.row, rowIndex: display.rowIndex })}</div></div>}
+      <div role="row" aria-label={display.isNewRow ? newRowLabel : undefined} aria-rowindex={itemIndex + 2} aria-selected={selected || undefined} aria-invalid={rowInvalid || undefined} className={['sp-datagridex__row', selected ? 'sp-datagridex__row--selected' : '', expanded ? 'sp-datagridex__row--expanded' : '', display.isNewRow ? 'sp-datagridex__row--new' : '', recordState ? `sp-datagridex__row--state-${recordState}` : '', rowInvalid ? 'sp-datagridex__row--validation-error' : '', normalizeClassName(rowClassValue)].filter(Boolean).join(' ')} style={normalizeStyle(rowStyleValue)}>{customRow ?? <>{renderLeadingCell(display, display.rowIndex)}{visibleColumns.map((column, index) => renderDataCell(display, column, index))}</>}</div>
+      {expanded && resolvedRowDetail && <div className="sp-datagridex__detail-row" role="row" style={{ minHeight: rowDetailHeight }}><div role="gridcell" className="sp-datagridex__detail-cell" style={{ gridColumn: `1 / span ${leadingColumnCount + visibleColumns.length}` }}>{resolvedRowDetail({ $implicit: display.row, row: display.row, rowIndex: display.rowIndex })}</div></div>}
     </Fragment>;
   };
 
   const renderGroup = (item: GroupItem<T>) => {
     const expanded = groupExpanded.has(item.key) || (groupExpanded.size === 0 && groupsExpandedByDefault);
     const selectedCount = item.rows.filter((row) => selectedRows.includes(row)).length;
-    return <div role="row" aria-expanded={expanded} aria-level={item.level + 1} className={`sp-datagridex__group-row${stickyGroupHeaders ? ' sp-datagridex__group-row--sticky' : ''}`} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); setGroupExpanded((current) => { const next = new Set(current); if (next.has(item.key)) next.delete(item.key); else next.add(item.key); return next; }); } }} tabIndex={0}><div role="gridcell" className="sp-datagridex__group-cell" style={{ gridColumn: `1 / span ${leadingColumnCount + visibleColumns.length}`, paddingInlineStart: indentGroupedRows ? `calc(var(--sp-space-3) * ${item.level + 1})` : undefined }}><button type="button" className="sp-datagridex__icon-button" aria-label={`${expanded ? 'Collapse' : 'Expand'} ${item.label}`} aria-expanded={expanded} onClick={() => setGroupExpanded((current) => { const next = new Set(current); if (next.has(item.key)) next.delete(item.key); else next.add(item.key); return next; })}><Icon name={expanded ? 'chevron-down' : 'chevron-right'} size={14} aria-hidden="true" /></button>{groupSelection && selectionMode === 'multiple' && <input type="checkbox" aria-label={`Select group ${item.label}`} checked={selectedCount === item.rows.length && item.rows.length > 0} ref={(node) => { if (node) node.indeterminate = selectedCount > 0 && selectedCount < item.rows.length; }} onChange={(event) => setRowsSelected(item.rows, event.target.checked)} />}{item.label}<span className="sp-datagridex__group-count">{item.rows.length}</span></div></div>;
+    return <div role="row" aria-expanded={expanded} aria-level={item.level + 1} className={`sp-datagridex__group-row${stickyGroupHeaders ? ' sp-datagridex__group-row--sticky' : ''}`} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); setGroupExpanded((current) => { const next = new Set(current); if (next.has(item.key)) next.delete(item.key); else next.add(item.key); return next; }); } }} tabIndex={0}><div role="gridcell" className="sp-datagridex__group-cell" style={{ gridColumn: `1 / span ${leadingColumnCount + visibleColumns.length}`, paddingInlineStart: indentGroupedRows ? `calc(var(--sp-space-3) * ${item.level + 1})` : undefined }}><button type="button" className="sp-datagridex__icon-button" aria-label={`${expanded ? t('collapseGroupRows') : t('expandGroupRows')}: ${item.label}`} aria-expanded={expanded} onClick={() => setGroupExpanded((current) => { const next = new Set(current); if (next.has(item.key)) next.delete(item.key); else next.add(item.key); return next; })}><Icon name={expanded ? 'chevron-down' : 'chevron-right'} size={14} aria-hidden="true" /></button>{groupSelection && selectionMode === 'multiple' && <input type="checkbox" aria-label={`${t('selectAllRows')}: ${item.label}`} checked={selectedCount === item.rows.length && item.rows.length > 0} ref={(node) => { if (node) node.indeterminate = selectedCount > 0 && selectedCount < item.rows.length; }} onChange={(event) => setRowsSelected(item.rows, event.target.checked)} />}{item.label}<span className="sp-datagridex__group-count">{item.rows.length}</span>{visibleColumns.map((column) => { if (!column.aggregate) return null; const aggregate = aggregateValue(column.aggregate, item.rows, column, 'group'); const context: DatagridexAggregateValueContext<T> = { value: aggregate.value, values: item.rows.map((row) => valueFor(row, column)), rows: item.rows, column, scope: 'group' }; return <span key={`aggregate-${column.key}`} className="sp-datagridex__aggregate"><b>{column.header}</b> {aggregate.formatter?.(context) ?? toText(aggregate.value)}</span>; })}</div></div>;
   };
 
   const renderHeader = (column: DatagridexColumn<T>, index: number) => {
     const sort = sorts.find((entry) => entry.key === column.key);
     const filterActive = valueFilters.has(column.key) || dynamicFilters.has(column.key);
+    const pin = columnPinFor(column, columnPins);
     const width = resizedWidths.get(column.key) ?? (typeof column.width === 'number' ? column.width : undefined);
-    const headerClasses = ['sp-datagridex__header-cell', column.pinned === 'left' ? 'sp-datagridex__header-cell--pinned-left' : '', column.pinned === 'right' ? 'sp-datagridex__header-cell--pinned-right' : '', column.align ? `sp-datagridex__header-cell--align-${column.align}` : ''].filter(Boolean).join(' ');
-    return <div key={column.key} ref={(node) => { headerRefs.current[column.key] = node; }} role="columnheader" aria-colindex={leadingColumnCount + index + 1} draggable={reorderable && column.reorderable !== false} className={headerClasses} onDragStart={() => setDraggedColumnKey(column.key)} onDragOver={(event) => { if (draggedColumnKey && draggedColumnKey !== column.key) event.preventDefault(); }} onDrop={() => { if (draggedColumnKey) updateColumnOrder(draggedColumnKey, column.key); setDraggedColumnKey(null); }} onKeyDown={(event) => { if (event.altKey && (event.key === 'ArrowLeft' || event.key === 'ArrowRight' || event.key === 'Home' || event.key === 'End')) { event.preventDefault(); const keys = allColumns.map((candidate) => candidate.key); const currentIndex = keys.indexOf(column.key); const targetIndex = event.key === 'Home' ? 0 : event.key === 'End' ? keys.length - 1 : currentIndex + (event.key === 'ArrowLeft' ? -1 : 1); const target = keys[targetIndex]; if (target) updateColumnOrder(column.key, target, event.key === 'ArrowRight'); } if (event.key === 'Enter' && column.sortable !== false) cycleSort(column.key); }} style={{ width: width ? `${width}px` : undefined }}><span className="sp-datagridex__header-label">{column.readonly && editMode !== 'none' && <Icon name="lock" size={12} aria-hidden="true" />}{column.header}</span><span className="sp-datagridex__header-actions">{column.sortable !== false && <button type="button" className={`sp-datagridex__sort-button${sort ? ' sp-datagridex__sort-button--active' : ''}`} aria-label={`Sort by ${column.header}${sort ? `, ${sort.direction}` : ''}`} onClick={() => cycleSort(column.key)}><Icon name={sort?.direction === 'desc' ? 'chevron-down' : 'chevron-up'} size={12} aria-hidden="true" />{sort && multiSort && <span className="sp-datagridex__sort-order">{sorts.indexOf(sort) + 1}</span>}</button>}{column.filterable && <button type="button" className={`sp-datagridex__filter-button${filterActive ? ' sp-datagridex__filter-button--active' : ''}`} aria-label={`Filter ${column.header}`} onClick={() => setFilterPanelKey(filterPanelKey === column.key ? null : column.key)}><Icon name="filter" size={12} aria-hidden="true" /></button>}{columnMenu && <button type="button" className="sp-datagridex__menu-button" aria-label={`Column menu for ${column.header}`} aria-haspopup="menu" onClick={() => setColumnMenuKey(columnMenuKey === column.key ? null : column.key)}><Icon name="more-vertical" size={12} aria-hidden="true" /></button>}</span>{column.resizable !== false && <button type="button" className="sp-datagridex__resize-handle" aria-label={`Resize ${column.header}`} onMouseDown={(event) => { event.preventDefault(); setResizing({ key: column.key, startX: event.clientX, width: width ?? estimatedWidth(column) }); }} onDoubleClick={() => { setResizedWidths((current) => { const next = new Map(current); next.delete(column.key); return next; }); onColumnResize?.({ key: column.key, width: 'auto' }); }} onKeyDown={(event) => { const currentWidth = width ?? estimatedWidth(column); const amount = event.shiftKey ? 32 : 8; if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); const next = Math.max(column.minWidth ?? 96, Math.min(column.maxWidth ?? 480, currentWidth + (event.key === 'ArrowRight' ? amount : -amount))); setResizedWidths((current) => new Map(current).set(column.key, next)); onColumnResize?.({ key: column.key, width: next }); } if (event.key === 'Home' || event.key === 'End') { event.preventDefault(); const next = event.key === 'Home' ? column.minWidth ?? 96 : column.maxWidth ?? 480; setResizedWidths((current) => new Map(current).set(column.key, next)); onColumnResize?.({ key: column.key, width: next }); } }} />}{filterPanelKey === column.key && <div className="sp-datagridex__popover sp-datagridex__filter-popover" role="dialog" aria-label={`Filter ${column.header}`}><FilterPanel column={column} options={filterOptions(column)} selected={valueFilters.get(column.key) ?? new Set()} condition={dynamicFilters.get(column.key)} onApply={(values, nextCondition) => { const nextValues = new Map(valueFilters); const nextDynamic = new Map(dynamicFilters); if (values.size === 0) nextValues.delete(column.key); else nextValues.set(column.key, values); if (nextCondition) nextDynamic.set(column.key, nextCondition); else nextDynamic.delete(column.key); setValueFilters(nextValues); setDynamicFilters(nextDynamic); emitFilters(nextValues, nextDynamic); setFilterPanelKey(null); }} /></div>}{columnMenuKey === column.key && <ColumnMenu column={column} onClose={() => setColumnMenuKey(null)} onSort={() => cycleSort(column.key)} onHide={() => setColumnVisible(column.key, false)} onGroup={() => setGrouping([...groupBy, column.key])} onPin={(pin) => { const next = { ...columnPins, [column.key]: pin }; onColumnPinsChange?.(next); }} onAutoSize={() => { setResizedWidths((current) => { const next = new Map(current); next.delete(column.key); return next; }); onColumnResize?.({ key: column.key, width: 'auto' }); }} />}</div>;
+    const headerClasses = ['sp-datagridex__header-cell', pin === 'left' ? 'sp-datagridex__header-cell--pinned-left' : '', pin === 'right' ? 'sp-datagridex__header-cell--pinned-right' : '', column.align ? `sp-datagridex__header-cell--align-${column.align}` : ''].filter(Boolean).join(' ');
+    const headerStyle: CSSProperties = { width: width ? `${width}px` : undefined, ...(pin === 'left' ? { insetInlineStart: pinnedOffsets.left.get(column.key) } : {}), ...(pin === 'right' ? { insetInlineEnd: pinnedOffsets.right.get(column.key) } : {}) };
+    return <div key={column.key} ref={(node) => { headerRefs.current[column.key] = node; }} role="columnheader" aria-colindex={leadingColumnCount + index + 1} draggable={reorderable && column.reorderable !== false} className={headerClasses} onDragStart={() => setDraggedColumnKey(column.key)} onDragOver={(event) => { if (draggedColumnKey && draggedColumnKey !== column.key) event.preventDefault(); }} onDrop={() => { if (draggedColumnKey) updateColumnOrder(draggedColumnKey, column.key); setDraggedColumnKey(null); }} onKeyDown={(event) => { if (event.altKey && (event.key === 'ArrowLeft' || event.key === 'ArrowRight' || event.key === 'Home' || event.key === 'End')) { event.preventDefault(); const keys = allColumns.map((candidate) => candidate.key); const currentIndex = keys.indexOf(column.key); const visualDirection = isRtl ? (event.key === 'ArrowLeft' ? 1 : -1) : (event.key === 'ArrowLeft' ? -1 : 1); const targetIndex = event.key === 'Home' ? 0 : event.key === 'End' ? keys.length - 1 : currentIndex + visualDirection; const target = keys[targetIndex]; if (target) updateColumnOrder(column.key, target, !isRtl && event.key === 'ArrowRight' || isRtl && event.key === 'ArrowLeft'); } if (event.key === 'Enter' && column.sortable !== false) cycleSort(column.key); }} style={headerStyle}><span className="sp-datagridex__header-label">{column.readonly && editMode !== 'none' && <Icon name="lock" size={12} aria-hidden="true" />}{column.header}</span><span className="sp-datagridex__header-actions">{column.sortable !== false && <button type="button" className={`sp-datagridex__sort-button${sort ? ' sp-datagridex__sort-button--active' : ''}`} aria-label={`${t('sortAscending')} ${column.header}${sort ? `, ${sort.direction}` : ''}`} onClick={() => cycleSort(column.key)}><Icon name={sort?.direction === 'desc' ? 'chevron-down' : 'chevron-up'} size={12} aria-hidden="true" />{sort && multiSort && <span className="sp-datagridex__sort-order">{sorts.indexOf(sort) + 1}</span>}</button>}{column.filterable && <button type="button" className={`sp-datagridex__filter-button${filterActive ? ' sp-datagridex__filter-button--active' : ''}`} aria-label={`${t('filter')} ${column.header}`} onClick={() => setFilterPanelKey(filterPanelKey === column.key ? null : column.key)}><Icon name="filter" size={12} aria-hidden="true" /></button>}{columnMenu && <button type="button" className="sp-datagridex__menu-button" aria-label={t('openColumnMenu', { column: column.header })} aria-haspopup="menu" onClick={() => setColumnMenuKey(columnMenuKey === column.key ? null : column.key)}><Icon name="more-vertical" size={12} aria-hidden="true" /></button>}</span>{column.resizable !== false && <button type="button" className="sp-datagridex__resize-handle" aria-label={t('resizeColumn', { column: column.header })} onMouseDown={(event) => { event.preventDefault(); setResizing({ key: column.key, startX: event.clientX, width: width ?? estimatedWidth(column) }); }} onDoubleClick={() => { setResizedWidths((current) => { const next = new Map(current); next.delete(column.key); return next; }); onColumnResize?.({ key: column.key, width: 'auto' }); }} onKeyDown={(event) => { const currentWidth = width ?? estimatedWidth(column); const amount = event.shiftKey ? 32 : 8; if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); const delta = event.key === 'ArrowRight' ? (isRtl ? -amount : amount) : (isRtl ? amount : -amount); const next = Math.max(column.minWidth ?? 96, Math.min(column.maxWidth ?? 480, currentWidth + delta)); setResizedWidths((current) => new Map(current).set(column.key, next)); onColumnResize?.({ key: column.key, width: next }); } if (event.key === 'Home' || event.key === 'End') { event.preventDefault(); const next = event.key === 'Home' ? column.minWidth ?? 96 : column.maxWidth ?? 480; setResizedWidths((current) => new Map(current).set(column.key, next)); onColumnResize?.({ key: column.key, width: next }); } }} />}{filterPanelKey === column.key && <div className="sp-datagridex__popover sp-datagridex__filter-popover" role="dialog" aria-label={`${t('filter')} ${column.header}`}><FilterPanel column={column} options={filterOptions(column)} selected={valueFilters.get(column.key) ?? new Set()} condition={dynamicFilters.get(column.key)} onApply={(values, nextCondition) => { const nextValues = new Map(valueFilters); const nextDynamic = new Map(dynamicFilters); if (values.size === 0) nextValues.delete(column.key); else nextValues.set(column.key, values); if (nextCondition) nextDynamic.set(column.key, nextCondition); else nextDynamic.delete(column.key); setValueFilters(nextValues); setDynamicFilters(nextDynamic); setFilterPanelKey(null); emitFilters(nextValues, nextDynamic); }} /></div>}{columnMenuKey === column.key && <ColumnMenu column={column} onClose={() => setColumnMenuKey(null)} onSort={() => cycleSort(column.key)} onHide={() => setColumnVisible(column.key, false)} onGroup={() => setGrouping([...groupBy, column.key])} onPin={(nextPin) => setColumnPin(column.key, nextPin)} onAutoSize={() => { setResizedWidths((current) => { const next = new Map(current); next.delete(column.key); return next; }); onColumnResize?.({ key: column.key, width: 'auto' }); }} />}</div>;
   };
 
   const groupHeaderKeys = columnGroups.length > 0 ? [...columnGroups].sort((left, right) => Math.min(...left.columnKeys.map((key) => allColumns.findIndex((column) => column.key === key))) - Math.min(...right.columnKeys.map((key) => allColumns.findIndex((column) => column.key === key)))) : [];
   const rootStyle: CSSProperties = { ...style, '--sp-datagridex-grid-template-columns': gridTemplateColumns, '--sp-datagridex-min-width': `${Math.max(totalGridWidth, 0)}px` } as CSSProperties;
 
-  return <div {...rest} className={rootClassName} style={rootStyle} data-sort-indicator-visibility={sortIndicatorVisibility} data-filter-indicator-visibility={filterIndicatorVisibility} data-column-virtualization={columnVirtualization ? 'true' : undefined} data-column-virtualization-overscan={columnVirtualizationOverscan}>
-    {toolbar && <div className="sp-datagridex__toolbar" role="toolbar" aria-label={toolbarAriaLabel}>{toolbarStart}<div className="sp-datagridex__toolbar-spacer" />{dataContext && dataContextOptions?.toolbarActions !== false && <><button type="button" onClick={addDataContextRow} aria-label="Add row">+</button><button type="button" onClick={deleteDataContextSelection} aria-label="Delete selected rows">−</button><button type="button" onClick={saveDataContextChanges} disabled={!contextAdapter?.dirty || (contextAdapter?.blockInvalidSave && !contextAdapter.valid())} aria-label="Save changes">{resolvedEditLabels.save}</button><button type="button" onClick={discardDataContextChanges} disabled={!contextAdapter?.dirty} aria-label="Discard changes">{resolvedEditLabels.cancel}</button></>}{searchable && <input className="sp-datagridex__search" type="search" value={searchTerm} placeholder="Search" aria-label="Search grid" onChange={(event) => setSearchTerm(event.target.value)} />}{toolbarShowColumnSelector && columnSelector && <button type="button" onClick={() => setColumnSelectorOpen((open) => !open)} aria-expanded={columnSelectorOpen}>{columnSelectorLabel}</button>}{toolbarEnd}</div>}
-    {toolbar && toolbarShowGroupedColumns && groupBy.length > 0 && <div className="sp-datagridex__grouping-toolbar" aria-label="Grouped columns">{groupBy.map((key) => <button key={key} type="button" onClick={() => setGrouping(groupBy.filter((candidate) => candidate !== key))}>{columnByKey.get(key)?.header ?? key} ×</button>)}</div>}
+  return <div {...rest} className={rootClassName} aria-busy={gridLoading || undefined} style={rootStyle} data-sort-indicator-visibility={sortIndicatorVisibility} data-filter-indicator-visibility={filterIndicatorVisibility} data-column-virtualization={columnVirtualization ? 'true' : undefined} data-column-virtualization-overscan={columnVirtualizationOverscan}>
+    {toolbar && <div className="sp-datagridex__toolbar" role="toolbar" aria-label={toolbarAriaLabel}>{toolbarStart}<div className="sp-datagridex__toolbar-spacer" />{dataContext && dataContextOptions?.toolbarActions !== false && <><button type="button" onClick={addDataContextRow} aria-label={t('addNewRow')}>+</button><button type="button" onClick={deleteDataContextSelection} aria-label={t('delete')}>{t('delete')}</button><button type="button" onClick={saveDataContextChanges} disabled={!contextAdapter?.dirty || (contextAdapter?.blockInvalidSave && !contextAdapter.valid())} aria-label={t('save')}>{resolvedEditLabels.save}</button><button type="button" onClick={discardDataContextChanges} disabled={!contextAdapter?.dirty} aria-label={t('discard')}>{resolvedEditLabels.cancel}</button></>}{searchable && <input className="sp-datagridex__search" type="search" value={searchTerm} placeholder={t('search')} aria-label={t('search')} onChange={(event) => setSearchTerm(event.target.value)} />}{toolbarShowColumnSelector && columnSelector && <button type="button" onClick={() => setColumnSelectorOpen((open) => !open)} aria-expanded={columnSelectorOpen} aria-label={columnSelectorLabel}>{columnSelectorLabel}</button>}{toolbarEnd}</div>}
+    {toolbar && toolbarShowGroupedColumns && groupBy.length > 0 && <div className="sp-datagridex__grouping-toolbar" aria-label={t('groupedColumns')}>{groupBy.map((key, index) => { const column = columnByKey.get(key); const sort = groupSorts.find((entry) => entry.key === key); return <div key={key} className="sp-datagridex__group-chip" draggable={reorderable} onDragStart={() => setDraggedGroupKey(key)} onDragOver={(event) => { if (draggedGroupKey && draggedGroupKey !== key) event.preventDefault(); }} onDrop={() => { if (draggedGroupKey) moveGrouping(draggedGroupKey, key, false); setDraggedGroupKey(null); }}><button type="button" className="sp-datagridex__group-chip-label" aria-label={`${column?.header ?? key} ${t('group')}, ${index + 1} of ${groupBy.length}${sort ? `, ${sort.direction}` : ''}`} onClick={() => toggleGroupSort(key)} onKeyDown={(event) => { if (event.key === 'Delete' || event.key === 'Backspace') { event.preventDefault(); setGrouping(groupBy.filter((candidate) => candidate !== key)); return; } if (!event.altKey) return; const delta = event.key === 'ArrowLeft' ? -1 : event.key === 'ArrowRight' ? 1 : event.key === 'Home' ? -groupBy.length : event.key === 'End' ? groupBy.length : 0; if (delta === 0) return; event.preventDefault(); const nextIndex = Math.max(0, Math.min(groupBy.length - 1, index + delta)); const next = [...groupBy]; next.splice(index, 1); next.splice(nextIndex, 0, key); setGrouping(next); }}>{column?.header ?? key}{sort ? ` (${sort.direction})` : ''}</button><button type="button" className="sp-datagridex__group-chip-remove" aria-label={t('removeColumnGrouping', { column: column?.header ?? key })} onClick={() => setGrouping(groupBy.filter((candidate) => candidate !== key))}>×</button></div>; })}</div>}
     {!toolbar && columnSelector && <div className="sp-datagridex__standalone-actions"><button type="button" onClick={() => setColumnSelectorOpen((open) => !open)} aria-expanded={columnSelectorOpen}>{columnSelectorLabel}</button></div>}
-    {columnSelectorOpen && <ColumnSelector columns={allColumns} hidden={hiddenColumnKeys} onVisible={setColumnVisible} onMove={updateColumnOrder} />}
+    {columnSelectorOpen && <ColumnSelector columns={allColumns} hidden={hiddenColumnKeys} reorderable={reorderable} onVisible={setColumnVisible} onMove={updateColumnOrder} />}
     <div ref={viewportRef} className="sp-datagridex__viewport" onScroll={handleViewportScroll} style={{ maxHeight: autoHeight ? undefined : virtualScroll ? virtualScrollHeight : undefined }}>
-      <div className="sp-datagridex__grid" role="grid" aria-label={ariaLabel} aria-rowcount={totalRows} aria-colcount={leadingColumnCount + visibleColumns.length} style={{ minWidth: 'var(--sp-datagridex-min-width)' }}>
-        {groupHeaderKeys.length > 0 && <div role="row" className="sp-datagridex__group-header-row">{Array.from({ length: leadingColumnCount }).map((_, index) => <div key={`utility-${index}`} role="columnheader" className="sp-datagridex__header-cell sp-datagridex__header-cell--utility" />)}{groupHeaderKeys.map((group) => { const matching = visibleColumns.filter((column) => group.columnKeys.includes(column.key)); return matching.length === 0 ? null : <div key={group.key} role="columnheader" className="sp-datagridex__group-header-cell" style={{ gridColumn: `span ${matching.length}` }} draggable={reorderable && group.reorderable !== false} tabIndex={0} onDoubleClick={() => { const boundary = matching[matching.length - 1]; if (boundary) { const width = estimatedWidth(boundary); onColumnGroupResize?.({ key: group.key, width, columnKey: boundary.key, columnWidth: width }); } }} onKeyDown={(event) => { if (event.altKey && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) { event.preventDefault(); const index = groupHeaderKeys.findIndex((candidate) => candidate.key === group.key); const next = [...groupHeaderKeys]; const target = index + (event.key === 'ArrowLeft' ? -1 : 1); if (target >= 0 && target < next.length) { [next[index], next[target]] = [next[target], next[index]]; onColumnGroupOrderChange?.(next.map((candidate) => candidate.key)); } } }}>{group.header}</div>; })}</div>}
-        <div role="row" className="sp-datagridex__header-row">{Array.from({ length: leadingColumnCount }).map((_, index) => <div key={`utility-${index}`} role="columnheader" className="sp-datagridex__header-cell sp-datagridex__header-cell--utility">{index === 0 && selectionMode === 'multiple' && <input type="checkbox" aria-label="Select all visible rows" checked={allSelected} ref={(node) => { if (node) node.indeterminate = someSelected; }} onChange={(event) => setRowsSelected(selectableRows, event.target.checked)} />}</div>)}{visibleColumns.map(renderHeader)}</div>
-        {resolvedLoading && <div className="sp-datagridex__loading" role="status"><span className="sp-datagridex__spinner" aria-hidden="true" />{loadingMessage}</div>}
-        {!resolvedLoading && renderedItems.length === 0 && <div className="sp-datagridex__empty" role="row"><div role="gridcell" className="sp-datagridex__empty-cell" style={{ gridColumn: `1 / span ${leadingColumnCount + visibleColumns.length}` }}><strong>{activeFilters > 0 ? filterEmptyMessage : emptyMessage}</strong>{activeFilters > 0 ? filterEmptyStateDescription && <span>{filterEmptyStateDescription}</span> : emptyStateDescription && <span>{emptyStateDescription}</span>}{activeFilters > 0 && <button type="button" onClick={() => { setSearchTerm(''); setValueFilters(new Map()); setDynamicFilters(new Map()); onFilterChange?.([]); }}>Clear filters</button>}</div></div>}
+      <div className="sp-datagridex__grid" role="grid" aria-label={ariaLabel} aria-rowcount={totalRows} aria-colcount={leadingColumnCount + visibleColumns.length} aria-multiselectable={selectionMode === 'multiple' ? 'true' : undefined} style={{ minWidth: 'var(--sp-datagridex-min-width)' }}>
+        {groupHeaderKeys.length > 0 && <div role="row" className="sp-datagridex__group-header-row">{Array.from({ length: leadingColumnCount }).map((_, index) => <div key={`utility-${index}`} role="columnheader" className="sp-datagridex__header-cell sp-datagridex__header-cell--utility" />)}{groupHeaderKeys.map((group) => { const matching = visibleColumns.filter((column) => group.columnKeys.includes(column.key)); const groupCanReorder = reorderable && group.reorderable !== false; return matching.length === 0 ? null : <div key={group.key} role="columnheader" className="sp-datagridex__group-header-cell" style={{ gridColumn: `span ${matching.length}` }} draggable={groupCanReorder} tabIndex={0} onDragStart={() => groupCanReorder && setDraggedGroupKey(group.key)} onDragOver={(event) => { if (draggedGroupKey && draggedGroupKey !== group.key && groupCanReorder) event.preventDefault(); }} onDrop={() => { if (draggedGroupKey && draggedGroupKey !== group.key && groupCanReorder) { const next = [...groupHeaderKeys]; const from = next.findIndex((candidate) => candidate.key === draggedGroupKey); const target = next.findIndex((candidate) => candidate.key === group.key); if (from >= 0 && target >= 0) { const [moved] = next.splice(from, 1); next.splice(target, 0, moved); onColumnGroupOrderChange?.(next.map((candidate) => candidate.key)); } } setDraggedGroupKey(null); }} onDoubleClick={() => { const boundary = matching[matching.length - 1]; if (boundary) { const width = estimatedWidth(boundary); onColumnGroupResize?.({ key: group.key, width, columnKey: boundary.key, columnWidth: width }); } }} onKeyDown={(event) => { if (event.altKey && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) { event.preventDefault(); const index = groupHeaderKeys.findIndex((candidate) => candidate.key === group.key); const next = [...groupHeaderKeys]; const target = index + (event.key === 'ArrowLeft' ? -1 : 1); if (target >= 0 && target < next.length) { [next[index], next[target]] = [next[target], next[index]]; onColumnGroupOrderChange?.(next.map((candidate) => candidate.key)); } } }}>{group.header}</div>; })}</div>}
+        <div role="row" className="sp-datagridex__header-row">{Array.from({ length: leadingColumnCount }).map((_, index) => <div key={`utility-${index}`} role="columnheader" className="sp-datagridex__header-cell sp-datagridex__header-cell--utility">{index === 0 && selectionMode === 'multiple' && <input type="checkbox" aria-label={`${t('selectAllRowsOnPage')} (${t('rows')})`} checked={allSelected} ref={(node) => { if (node) node.indeterminate = someSelected; }} onChange={(event) => setRowsSelected(selectableRows, event.target.checked)} />}</div>)}{visibleColumns.map(renderHeader)}</div>
+        {gridLoading && <div className="sp-datagridex__loading" role="status"><span className="sp-datagridex__spinner" aria-hidden="true" />{loadingMessage}</div>}
+        {!gridLoading && renderedItems.length === 0 && <div className="sp-datagridex__empty" role="row"><div role="gridcell" className="sp-datagridex__empty-cell" style={{ gridColumn: `1 / span ${leadingColumnCount + visibleColumns.length}` }}><strong>{activeFilters > 0 ? filterEmptyMessage : emptyMessage}</strong>{activeFilters > 0 ? filterEmptyStateDescription && <span>{filterEmptyStateDescription}</span> : emptyStateDescription && <span>{emptyStateDescription}</span>}{activeFilters > 0 && <button type="button" onClick={() => { setSearchTerm(''); setValueFilters(new Map()); setDynamicFilters(new Map()); onFilterChange?.([]); }}>{t('clearFilters')}</button>}</div></div>}
         {virtualScroll && virtualStart > 0 && <div style={{ height: virtualStart * virtualRowHeight }} aria-hidden="true" />}
-        <div className="sp-datagridex__rows">{!resolvedLoading && renderedItems.map((item, index) => item.kind === 'group' ? renderGroup(item) : renderRow(item.display, virtualStart + index))}</div>
+        <div className="sp-datagridex__rows">{!gridLoading && renderedItems.map((item, index) => item.kind === 'group' ? renderGroup(item) : renderRow(item.display, virtualStart + index))}</div>
         {virtualScroll && virtualEnd < activeItemCount && <div style={{ height: (activeItemCount - virtualEnd) * virtualRowHeight }} aria-hidden="true" />}
         {footer && <div role="row" className="sp-datagridex__footer-row"><div role="gridcell" className="sp-datagridex__footer-cell" style={{ gridColumn: `1 / span ${leadingColumnCount + visibleColumns.length}` }}><strong>{footerLabel}</strong>{visibleColumns.map((column) => column.aggregate ? <span key={column.key} className="sp-datagridex__aggregate"><b>{column.header}</b> {(() => { const aggregate = aggregateValue(column.aggregate, filteredRows, column, 'footer'); const context: DatagridexAggregateValueContext<T> = { value: aggregate.value, values: filteredRows.map((row) => valueFor(row, column)), rows: filteredRows, column, scope: 'footer' }; return aggregate.formatter?.(context) ?? toText(aggregate.value); })()}</span> : null)}</div></div>}
       </div>
     </div>
-    {statusbar && <div className="sp-datagridex__statusbar" role="status" aria-label={statusbarAriaLabel}>{statusbarStart}<span className="sp-datagridex__statusbar-spacer" />{statusbarShowRowCount && <span>{totalRows} rows</span>}{statusbarShowSelectedRowCount && selectionMode !== 'none' && <span>{selectedRows.length} selected</span>}{statusbarEnd}{statusbarMergePagination && pagination && <Pagination page={currentPage} totalPages={totalPages} pageSize={pageSize} pageSizeOptions={pageSizeOptions} type={paginationType} onPage={goToPage} onPageSize={(size) => onPageSizeChange?.(size)} />}</div>}
-    {pagination && !statusbarMergePagination && <Pagination page={currentPage} totalPages={totalPages} pageSize={pageSize} pageSizeOptions={pageSizeOptions} type={paginationType} onPage={goToPage} onPageSize={(size) => onPageSizeChange?.(size)} />}
-    {detailPane && detailPaneRow && <aside className="sp-datagridex__detail-pane" style={{ width: detailPaneWidth }} aria-label={detailPaneTitle}><div className="sp-datagridex__detail-pane-header"><strong>{detailPaneTitle}</strong><button type="button" className="sp-datagridex__icon-button" onClick={() => setDetailRow(null)} aria-label="Close details"><Icon name="x" size={14} aria-hidden="true" /></button></div><div className="sp-datagridex__detail-pane-body">{paneRenderer}</div></aside>}
+    {statusbar && <div className="sp-datagridex__statusbar" role="status" aria-label={statusbarAriaLabel}>{statusbarStart}<span className="sp-datagridex__statusbar-spacer" />{statusbarShowRowCount && <span>{totalRows} {totalRows === 1 ? t('row') : t('rows')}</span>}{statusbarShowSelectedRowCount && selectionMode !== 'none' && <span>{selectedRows.length} {t('rowSelection')}</span>}{statusbarEnd}{statusbarMergePagination && (pagination || virtualPaging) && <Pagination page={currentPage} totalPages={totalPages} pageSize={pageSize} pageSizeOptions={pageSizeOptions} type={paginationType} virtualPaging={virtualPaging} hasPreviousPage={virtualHasPreviousPage ?? currentPage > 1} hasNextPage={virtualHasNextPage ?? currentPage < totalPages} pageLabel={t('paginationPageTotal', { current: currentPage, total: totalPages })} onPage={goToPage} onPageSize={changePageSize} />}</div>}
+    {(pagination || virtualPaging) && !statusbarMergePagination && <Pagination page={currentPage} totalPages={totalPages} pageSize={pageSize} pageSizeOptions={pageSizeOptions} type={paginationType} virtualPaging={virtualPaging} hasPreviousPage={virtualHasPreviousPage ?? currentPage > 1} hasNextPage={virtualHasNextPage ?? currentPage < totalPages} pageLabel={t('paginationPageTotal', { current: currentPage, total: totalPages })} onPage={goToPage} onPageSize={changePageSize} />}
+    {detailPane && detailPaneRow && <aside className="sp-datagridex__detail-pane" style={{ width: detailPaneWidth }} aria-label={detailPaneTitle}><div className="sp-datagridex__detail-pane-header"><strong>{detailPaneTitle}</strong><button type="button" className="sp-datagridex__icon-button" onClick={() => setDetailRow(null)} aria-label={t('closeDetailPane')}><Icon name="x" size={14} aria-hidden="true" /></button></div><div className="sp-datagridex__detail-pane-body">{paneRenderer}</div></aside>}
   </div>;
 }
 
 interface FilterPanelProps<T extends object> { column: DatagridexColumn<T>; options: readonly { value: unknown; row: T }[]; selected: ReadonlySet<string>; condition?: DatagridexDynamicFilterCondition; onApply: (values: ReadonlySet<string>, condition?: DatagridexDynamicFilterCondition) => void }
 function FilterPanel<T extends object>({ column, options, selected, condition, onApply }: FilterPanelProps<T>) {
+  const { t } = useI18n();
   const [query, setQuery] = useState('');
   const [draft, setDraft] = useState<ReadonlySet<string>>(selected);
   const [operator, setOperator] = useState<DatagridexDynamicFilterCondition['operator']>(condition?.operator ?? 'contains');
@@ -1273,22 +1489,32 @@ function FilterPanel<T extends object>({ column, options, selected, condition, o
   const [valueTo, setValueTo] = useState(String(condition?.valueTo ?? ''));
   const dynamic = column.filterVariant === 'dynamic';
   const visible = options.filter((option) => String(option.value ?? '').toLocaleLowerCase().includes(query.toLocaleLowerCase()));
-  return <div className="sp-datagridex__filter-panel"><strong>{column.header}</strong>{dynamic ? <><select aria-label="Filter operator" value={operator} onChange={(event) => setOperator(event.target.value as DatagridexDynamicFilterCondition['operator'])}><option value="contains">Contains</option><option value="notContains">Does not contain</option><option value="startsWith">Starts with</option><option value="endsWith">Ends with</option><option value="equals">Equals</option><option value="notEquals">Does not equal</option><option value="greaterThan">Greater than</option><option value="greaterThanOrEqual">At least</option><option value="lessThan">Less than</option><option value="lessThanOrEqual">At most</option><option value="between">Between</option><option value="isEmpty">Is empty</option><option value="isNotEmpty">Is not empty</option></select><input value={value} onChange={(event) => setValue(event.target.value)} placeholder="Value" />{operator === 'between' && <input value={valueTo} onChange={(event) => setValueTo(event.target.value)} placeholder="To" />}</> : <><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search values" aria-label="Search filter values" /><label><input type="checkbox" checked={draft.size === options.length && options.length > 0} ref={(node) => { if (node) node.indeterminate = draft.size > 0 && draft.size < options.length; }} onChange={(event) => setDraft(event.target.checked ? new Set(options.map((option) => filterValueKey(option.value))) : new Set())} /> Select all</label><div className="sp-datagridex__filter-values">{visible.map((option) => { const key = filterValueKey(option.value); return <label key={key}><input type="checkbox" checked={draft.has(key)} onChange={(event) => { const next = new Set(draft); if (event.target.checked) next.add(key); else next.delete(key); setDraft(next); }} />{column.filterValueFormatter?.(option.value, option.row) ?? toText(option.value)}</label>; })}</div></>}<div className="sp-datagridex__filter-actions"><button type="button" onClick={() => onApply(new Set(), undefined)}>Clear</button><button type="button" onClick={() => onApply(dynamic ? new Set() : draft, dynamic ? { operator, value, ...(operator === 'between' ? { valueTo } : {}) } : undefined)}>Apply</button></div></div>;
+  const operatorLabels: Readonly<Record<DatagridexDynamicFilterCondition['operator'], string>> = {
+    contains: t('opContains'), notContains: t('opDoesNotContain'), startsWith: t('opStartsWith'), endsWith: t('opEndsWith'),
+    equals: t('opEquals'), notEquals: t('opDoesNotEqual'), greaterThan: t('opGreaterThan'), greaterThanOrEqual: t('opGreaterThanOrEqual'),
+    lessThan: t('opLessThan'), lessThanOrEqual: t('opLessThanOrEqual'), between: t('opBetween'), isEmpty: t('opIsEmpty'), isNotEmpty: t('opIsNotEmpty'),
+  };
+  return <div className="sp-datagridex__filter-panel"><strong>{column.header}</strong>{dynamic ? <><select aria-label={t('condition')} value={operator} onChange={(event) => setOperator(event.target.value as DatagridexDynamicFilterCondition['operator'])}>{Object.entries(operatorLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select><input value={value} onChange={(event) => setValue(event.target.value)} placeholder={t('filterValue')} aria-label={t('filterValue')} />{operator === 'between' && <input value={valueTo} onChange={(event) => setValueTo(event.target.value)} placeholder={t('to')} aria-label={t('to')} />}</> : <><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t('searchValues')} aria-label={t('searchValues')} /><label><input type="checkbox" aria-label={t('selectAllRows')} checked={draft.size === options.length && options.length > 0} ref={(node) => { if (node) node.indeterminate = draft.size > 0 && draft.size < options.length; }} onChange={(event) => setDraft(event.target.checked ? new Set(options.map((option) => filterValueKey(option.value))) : new Set())} /> {t('selectAllRows')}</label><div className="sp-datagridex__filter-values">{visible.length === 0 ? <span>{t('noMatchingValues')}</span> : visible.map((option) => { const key = filterValueKey(option.value); return <label key={key}><input type="checkbox" checked={draft.has(key)} onChange={(event) => { const next = new Set(draft); if (event.target.checked) next.add(key); else next.delete(key); setDraft(next); }} />{column.filterValueFormatter?.(option.value, option.row) ?? toText(option.value)}</label>; })}</div></>}<div className="sp-datagridex__filter-actions"><button type="button" onClick={() => onApply(new Set(), undefined)}>{t('clear')}</button><button type="button" onClick={() => onApply(dynamic ? new Set() : draft, dynamic ? { operator, value, ...(operator === 'between' ? { valueTo } : {}) } : undefined)}>{t('apply')}</button></div></div>;
 }
 
 interface ColumnMenuProps<T extends object> { column: DatagridexColumn<T>; onClose: () => void; onSort: () => void; onHide: () => void; onGroup: () => void; onPin: (pin: DatagridexColumnPin | null) => void; onAutoSize: () => void }
 function ColumnMenu<T extends object>({ column, onClose, onSort, onHide, onGroup, onPin, onAutoSize }: ColumnMenuProps<T>) {
-  return <div className="sp-datagridex__column-menu" role="menu" onKeyDown={(event) => { if (event.key === 'Escape') onClose(); }}><button type="button" role="menuitem" onClick={() => { onSort(); onClose(); }}>Sort</button><button type="button" role="menuitem" onClick={() => { onAutoSize(); onClose(); }}>Auto size</button><button type="button" role="menuitem" onClick={() => { onGroup(); onClose(); }}>Group by this column</button><button type="button" role="menuitem" onClick={() => { onPin('left'); onClose(); }}>Pin left</button><button type="button" role="menuitem" onClick={() => { onPin('right'); onClose(); }}>Pin right</button><button type="button" role="menuitem" onClick={() => { onPin(null); onClose(); }}>Unpin</button><button type="button" role="menuitem" disabled={column.readonly === true} onClick={() => { onHide(); onClose(); }}>Hide column</button>{column.menuItems?.map((item) => <button key={item.label} type="button" role="menuitem" disabled={item.disabled} onClick={() => { item.command?.(); onClose(); }}>{item.label}</button>)}</div>;
+  const { t } = useI18n();
+  return <div className="sp-datagridex__column-menu" role="menu" aria-label={t('columnMenu')} onKeyDown={(event) => { if (event.key === 'Escape') onClose(); }}><button type="button" role="menuitem" onClick={() => { onSort(); onClose(); }}>{t('sortAscending')}</button><button type="button" role="menuitem" onClick={() => { onAutoSize(); onClose(); }}>{t('autoFitColumn')}</button><button type="button" role="menuitem" onClick={() => { onGroup(); onClose(); }}>{t('groupedColumns')}</button><button type="button" role="menuitem" onClick={() => { onPin('left'); onClose(); }}>{t('pinLeft')}</button><button type="button" role="menuitem" onClick={() => { onPin('right'); onClose(); }}>{t('pinRight')}</button><button type="button" role="menuitem" onClick={() => { onPin(null); onClose(); }}>{t('unpin')}</button><button type="button" role="menuitem" disabled={column.readonly === true} onClick={() => { onHide(); onClose(); }}>{t('hideColumn')}</button>{column.menuItems?.map((item) => <Fragment key={item.label}>{item.separator && <div role="separator" />}{item.children?.length ? <div role="group" aria-label={item.label}>{item.children.map((child) => <button key={child.label} type="button" role="menuitem" disabled={child.disabled} onClick={() => { child.command?.(); onClose(); }}>{child.label}</button>)}</div> : <button type="button" role="menuitem" disabled={item.disabled} onClick={() => { item.command?.(); onClose(); }}>{item.label}</button>}</Fragment>)}</div>;
 }
 
-interface ColumnSelectorProps<T extends object> { columns: readonly DatagridexColumn<T>[]; hidden: readonly string[]; onVisible: (key: string, visible: boolean) => void; onMove: (key: string, target: string, after?: boolean) => void }
-function ColumnSelector<T extends object>({ columns, hidden, onVisible, onMove }: ColumnSelectorProps<T>) {
-  return <div className="sp-datagridex__column-selector" role="dialog" aria-label="Column selector"><strong>Columns</strong>{columns.map((column, index) => <div key={column.key} className="sp-datagridex__column-selector-item"><input type="checkbox" checked={!hidden.includes(column.key)} onChange={(event) => onVisible(column.key, event.target.checked)} aria-label={`Show ${column.header}`} /><span>{column.header}</span><button type="button" aria-label={`Move ${column.header} up`} disabled={index === 0} onClick={() => onMove(column.key, columns[index - 1]?.key)}>↑</button><button type="button" aria-label={`Move ${column.header} down`} disabled={index === columns.length - 1} onClick={() => onMove(column.key, columns[index + 1]?.key, true)}>↓</button></div>)}</div>;
+interface ColumnSelectorProps<T extends object> { columns: readonly DatagridexColumn<T>[]; hidden: readonly string[]; reorderable: boolean; onVisible: (key: string, visible: boolean) => void; onMove: (key: string, target: string, after?: boolean) => void }
+function ColumnSelector<T extends object>({ columns, hidden, reorderable, onVisible, onMove }: ColumnSelectorProps<T>) {
+  const { t } = useI18n();
+  const [draggedKey, setDraggedKey] = useState<string | null>(null);
+  const canReorder = (column: DatagridexColumn<T>) => reorderable && column.reorderable !== false;
+  return <div className="sp-datagridex__column-selector" role="dialog" aria-label={t('columnVisibility')}><strong>{t('columns')}</strong>{columns.map((column, index) => <div key={column.key} className="sp-datagridex__column-selector-item" draggable={canReorder(column)} onDragStart={() => setDraggedKey(column.key)} onDragOver={(event) => { if (draggedKey && draggedKey !== column.key && canReorder(column)) event.preventDefault(); }} onDrop={() => { if (draggedKey && draggedKey !== column.key) onMove(draggedKey, column.key); setDraggedKey(null); }}><input type="checkbox" checked={!hidden.includes(column.key)} onChange={(event) => onVisible(column.key, event.target.checked)} aria-label={`${t('visibility')}: ${column.header}`} /><span>{column.header}</span><button type="button" aria-label={`${t('moveUp')} ${column.header}`} disabled={index === 0 || !canReorder(column)} onClick={() => { const target = columns[index - 1]?.key; if (target) onMove(column.key, target); }}>↑</button><button type="button" aria-label={`${t('moveDown')} ${column.header}`} disabled={index === columns.length - 1 || !canReorder(column)} onClick={() => { const target = columns[index + 1]?.key; if (target) onMove(column.key, target, true); }}>↓</button></div>)}</div>;
 }
 
-interface PaginationProps { page: number; totalPages: number; pageSize: number; pageSizeOptions: readonly number[]; type: DatagridexPaginationType; onPage: (page: number, trigger?: 'api' | 'button') => void; onPageSize: (size: number) => void }
-function Pagination({ page, totalPages, pageSize, pageSizeOptions, type, onPage, onPageSize }: PaginationProps) {
-  return <nav className={`sp-datagridex__pagination sp-datagridex__pagination--${type}`} aria-label="Pagination"><button type="button" onClick={() => onPage(page - 1, 'button')} disabled={page <= 1} aria-label="Previous page">‹</button>{type === 'full' && <button type="button" onClick={() => onPage(1, 'button')} disabled={page <= 1} aria-label="First page">«</button>}<span>Page {page} of {totalPages}</span>{type === 'full' && <span className="sp-datagridex__page-buttons">{Array.from({ length: Math.min(totalPages, 5) }, (_, index) => index + 1).map((number) => <button key={number} type="button" aria-current={number === page ? 'page' : undefined} onClick={() => onPage(number)}>{number}</button>)}</span>}<button type="button" onClick={() => onPage(page + 1, 'button')} disabled={page >= totalPages} aria-label="Next page">›</button>{type === 'full' && <button type="button" onClick={() => onPage(totalPages, 'button')} disabled={page >= totalPages} aria-label="Last page">»</button>}<label>Rows per page <select value={pageSize} onChange={(event) => onPageSize(Number(event.target.value))}>{pageSizeOptions.map((size) => <option key={size} value={size}>{size}</option>)}</select></label></nav>;
+interface PaginationProps { page: number; totalPages: number; pageSize: number; pageSizeOptions: readonly number[]; type: DatagridexPaginationType; virtualPaging: boolean; hasPreviousPage: boolean; hasNextPage: boolean; pageLabel: string; onPage: (page: number, trigger?: 'api' | 'button') => void; onPageSize: (size: number) => void }
+function Pagination({ page, totalPages, pageSize, pageSizeOptions, type, virtualPaging, hasPreviousPage, hasNextPage, pageLabel, onPage, onPageSize }: PaginationProps) {
+  const { t } = useI18n();
+  return <nav className={`sp-datagridex__pagination sp-datagridex__pagination--${type}`} aria-label={t('pagination')}><button type="button" onClick={() => onPage(page - 1, 'button')} disabled={!hasPreviousPage} aria-label={t('previousPage')}>‹</button>{type === 'full' && <button type="button" onClick={() => onPage(1, 'button')} disabled={!hasPreviousPage} aria-label={t('firstPage')}>«</button>}<span>{pageLabel}</span>{type === 'full' && !virtualPaging && <span className="sp-datagridex__page-buttons">{Array.from({ length: Math.min(totalPages, 5) }, (_, index) => index + 1).map((number) => <button key={number} type="button" aria-current={number === page ? 'page' : undefined} onClick={() => onPage(number)}>{number}</button>)}</span>}<button type="button" onClick={() => onPage(page + 1, 'button')} disabled={!hasNextPage} aria-label={t('nextPage')}>›</button>{type === 'full' && <button type="button" onClick={() => onPage(totalPages, 'button')} disabled={!hasNextPage} aria-label={t('lastPage')}>»</button>}<label>{t('rows')}: <select value={pageSize} onChange={(event) => onPageSize(Number(event.target.value))}>{pageSizeOptions.map((size) => <option key={size} value={size}>{size}</option>)}</select></label></nav>;
 }
 
 export const Datagridex = forwardRef(DatagridexInner) as <T extends object>(props: DatagridexProps<T> & { ref?: ForwardedRef<DatagridexHandle<T>> }) => ReactElement;

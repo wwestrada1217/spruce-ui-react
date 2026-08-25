@@ -58,10 +58,14 @@ export interface DatagridexCellContext<T extends object> {
 
 export interface DatagridexCellTemplateContext<T extends object>
   extends DatagridexCellContext<T> {
+  /** Raw cell value exposed as the render prop's default binding. */
+  readonly $implicit: unknown;
   readonly formattedValue: string;
 }
 
 export interface DatagridexCellEditorContext<T extends object> extends DatagridexCellContext<T> {
+  /** Current draft value exposed as the render prop's default binding. */
+  readonly $implicit: unknown;
   readonly originalValue: unknown;
   readonly invalid: boolean;
   readonly errors: readonly DatagridexValidationError[];
@@ -102,17 +106,20 @@ export interface DatagridexRowSpanContext<T extends object> extends DatagridexCe
 }
 
 export interface DatagridexRowDetailContext<T extends object> {
+  readonly $implicit: T;
   readonly row: T;
   readonly rowIndex: number;
 }
 
 export interface DatagridexDetailPaneContext<T extends object> {
+  readonly $implicit: T;
   readonly row: T;
   readonly rowIndex: number;
   readonly close: () => void;
 }
 
 export interface DatagridexLeadingRowActionsContext<T extends object> {
+  readonly $implicit: T;
   readonly row: T;
   readonly rowIndex: number;
   readonly detailPaneOpen: boolean;
@@ -379,6 +386,7 @@ export interface DatagridexValidationEvent<T extends object = object> {
 }
 
 export interface DatagridexRowTemplateContext<T extends object = object> {
+  readonly $implicit: T;
   readonly row: T;
   readonly rowIndex: number;
   readonly columns: readonly DatagridexColumn<T>[];

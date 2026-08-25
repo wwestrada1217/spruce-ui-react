@@ -76,6 +76,24 @@ const EDITING_CODE = `<Datagridex<Project>
   }}
 />`
 
+const PARITY_CODE = `<Datagridex<Project>
+  rows={projects}
+  columns={[
+    { key: 'owner', header: 'Owner', pinned: 'left', rowSpan: ({ value }) => value === 'Mina Patel' ? 2 : 1 },
+    { key: 'budget', header: 'Budget', aggregate: 'sum' },
+  ]}
+  columnPins={columnPins}
+  onColumnPinsChange={setColumnPins}
+  groupBy={groupBy}
+  groupSorting
+  groupSorts={groupSorts}
+  onGroupSortsChange={setGroupSorts}
+  virtualPaging
+  virtualTotalRows={totalRows}
+  virtualHasNextPage={hasNextPage}
+  onVirtualPageRequest={loadPage}
+/>`
+
 export function DatagridexPage() {
   const [projects, setProjects] = useState(PROJECTS)
   const [selectedRows, setSelectedRows] = useState<readonly Project[]>([])
@@ -172,6 +190,26 @@ export function DatagridexPage() {
               <DatagridexCellEditor<Project> columnKey="name">{({ value, update, commit }) => <input autoFocus value={String(value ?? '')} onChange={(event) => update(event.target.value)} onBlur={commit} aria-label="Project name" />}</DatagridexCellEditor>
             </Datagridex>
           </CodePreview>
+        </section>
+
+        <section id="parity" className="demo-section">
+          <h2>Angular parity features</h2>
+          <p className="section-desc">The React API keeps the Datagridex feature model controlled: pin overrides, row spans, grouped sorting, virtual paging, and editor callbacks can all be owned by application state.</p>
+          <CodePreview code={PARITY_CODE}>
+            <Datagridex<Project>
+              rows={projects}
+              columns={COLUMNS.map((column) => column.key === 'owner' ? { ...column, rowSpan: ({ value }) => value === 'Mina Patel' ? 2 : 1 } : column)}
+              columnPins={{ name: 'left' }}
+              groupBy={['owner']}
+              groupSorting
+              groupSorts={[{ key: 'owner', direction: 'asc' }]}
+              virtualPaging={false}
+              footer
+              statusbar
+            />
+          </CodePreview>
+          <p>Row spans are intentionally disabled when virtualization, grouping, or expanded detail rows are active. For large remote datasets, use <code>virtualPaging</code> with <code>onVirtualPageRequest</code> and the supplied next/previous flags.</p>
+          <p>Built-in chrome reads from the provider locale and direction. Pass <code>locale</code> for formatting/comparison overrides; use <code>cellEditors</code> or the editor slot for a richer grid-combobox experience.</p>
         </section>
 
         <section id="migration" className="demo-section">
