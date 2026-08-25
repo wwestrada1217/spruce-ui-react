@@ -17,6 +17,7 @@ export interface HttpDataSourceOptions<T> {
   deleteUrl?: string;
   searchUrl?: string;
   batchUrl?: string;
+  syncUrl?: string;
   headers?: Record<string, string>;
   idField?: keyof T | ((item: T) => string);
   interceptors?: DataSourceInterceptor[];
@@ -31,6 +32,7 @@ export class HttpDataSource<T> implements IDataSource<T> {
   private deleteUrl?: string;
   private searchUrl?: string;
   private batchUrl?: string;
+  private syncUrl?: string;
   private headers: Record<string, string>;
   private idField: keyof T | ((item: T) => string);
   private interceptors?: DataSourceInterceptor[];
@@ -44,6 +46,7 @@ export class HttpDataSource<T> implements IDataSource<T> {
     this.deleteUrl = options.deleteUrl;
     this.searchUrl = options.searchUrl;
     this.batchUrl = options.batchUrl;
+    this.syncUrl = options.syncUrl;
     this.idField = options.idField || ('id' as keyof T);
     this.interceptors = options.interceptors;
     this.mapResponse = options.mapResponse;
@@ -180,8 +183,8 @@ export class HttpDataSource<T> implements IDataSource<T> {
   }
 
   async sync(data: SyncPayload[]): Promise<T> {
-    const url = this.createUrl ? `${this.createUrl}/sync` : null;
-    if (!url) throw new Error('createUrl not configured for sync operation');
+    const url = this.syncUrl ?? (this.createUrl ? `${this.createUrl}/sync` : null);
+    if (!url) throw new Error('syncUrl or createUrl not configured for sync operation');
     return this.request<T>(url, 'POST', data);
   }
 }
@@ -194,6 +197,7 @@ export function createHttpDataSource<T>(
     delete?: string;
     search?: string;
     batch?: string;
+    sync?: string;
   },
   options?: {
     headers?: Record<string, string>;
@@ -210,6 +214,7 @@ export function createHttpDataSource<T>(
     deleteUrl: urls.delete,
     searchUrl: urls.search,
     batchUrl: urls.batch,
+    syncUrl: urls.sync,
     headers: options?.headers,
     idField: options?.idField,
     interceptors: options?.interceptors,

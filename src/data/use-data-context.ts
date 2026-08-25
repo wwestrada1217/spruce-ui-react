@@ -1,8 +1,12 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useSyncExternalStore } from 'react';
 import type { DataContext } from './data-context.js';
 import type { DetailDefinitions } from './data-context.js';
 import type { DataSourceQueryParams, DataSourcePagedResponse } from './types.js';
+import type { FormModel } from './form-model.js';
+import type { FormBridge, FormBridgeOptions } from './node-store/form-bridge.js';
+import { createFormBridge } from './node-store/form-bridge.js';
+import type { NodeStore } from './node-store/node-store.js';
 
 /**
  * A React hook that subscribes to a `DataContext` and triggers re-renders
@@ -23,6 +27,62 @@ export function useDataContext<
     useCallback(() => context.getSnapshot(), [context]),
   );
   return context;
+}
+
+/** Subscribes to a DataContext's linked, two-way form model. */
+export function useDataContextFormModel<
+  T extends Record<string, unknown>,
+  TDetails extends DetailDefinitions<T> = DetailDefinitions<T>,
+>(
+  context: DataContext<T, TDetails>,
+): FormModel<T> {
+  const model = useMemo(() => context.formModel, [context]);
+  const subscribe = useCallback((onStoreChange: () => void) => {
+    const unsubscribeContext = context.subscribe(onStoreChange);
+    const unsubscribeModel = model.subscribe(onStoreChange);
+    return () => {
+      unsubscribeContext();
+      unsubscribeModel();
+    };
+  }, [context, model]);
+  const getSnapshot = useCallback(() => model.getSnapshot(), [model]);
+  useSyncExternalStore(subscribe, getSnapshot);
+  return model;
+}
+
+/** Short alias for consumers that use form models as their primary API. */
+export const useFormModel = useDataContextFormModel;
+
+/** Subscribes to a framework-neutral NodeStore and returns the same instance. */
+export function useNodeStore<TRoot extends Record<string, unknown>>(
+  store: NodeStore<TRoot>,
+): NodeStore<TRoot> {
+  useSyncExternalStore(
+    useCallback((onStoreChange) => store.subscribe(onStoreChange), [store]),
+    useCallback(() => store.getSnapshot(), [store]),
+  );
+  return store;
+}
+
+/** React lifecycle wrapper for the NodeStore form bridge. */
+export function useFormBridge<TModel extends Record<string, unknown>>(
+  options: FormBridgeOptions<TModel>,
+): FormBridge<TModel> {
+  const bridge = useMemo(() => createFormBridge(options), [options]);
+  const getSnapshot = useCallback(() => bridge.model.getSnapshot(), [bridge]);
+  useSyncExternalStore(
+    useCallback((onStoreChange) => {
+      const unsubscribeStore = options.store.subscribe(onStoreChange);
+      const unsubscribeModel = bridge.model.subscribe(onStoreChange);
+      return () => {
+        unsubscribeStore();
+        unsubscribeModel();
+      };
+    }, [bridge, options.store]),
+    getSnapshot,
+  );
+  useEffect(() => () => bridge.dispose(), [bridge]);
+  return bridge;
 }
 
 /**
@@ -46,7 +106,6 @@ export function useDataContextLoad<
   const ctx = useDataContext(context);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const paramsKey = JSON.stringify(params ?? null);
 
   useEffect(() => {

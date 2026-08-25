@@ -48,7 +48,7 @@ const COMPONENT_SECTIONS: NavSection[] = [
       { icon: 'package',            label: 'Empty',             route: '#/components/empty',          description: 'Empty state illustrations with actions' },
       { icon: 'clock',              label: 'Timeline',          route: '#/components/timeline',       description: 'Vertical timelines with colors and icons' },
       { icon: 'git-fork',           label: 'Treeview',          route: '#/components/tree',           description: 'Hierarchical tree with checkboxes and drag-drop' },
-      { icon: 'table',              label: 'Datagrid',          route: '#/components/datagrid',       description: 'High-performance grid with sorting, filtering, and editing' },
+      { icon: 'table',              label: 'Datagridex',        route: '#/components/datagridex',     description: 'Canonical typed grid with sorting, filtering, editing, and DataContext integration' },
       { icon: 'calendar',           label: 'Scheduler',         route: '#/components/scheduler',      description: 'Calendar scheduler with day, week, month, and timeline views' },
       { icon: 'bar-chart',          label: 'Gantt Chart',       route: '#/components/gantt',          description: 'Project timeline with tasks, dependencies, and milestones' },
       { icon: 'columns',            label: 'Kanban',            route: '#/components/kanban',         description: 'Drag-and-drop Kanban board with column reordering' },

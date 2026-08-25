@@ -5,7 +5,8 @@
     "noEmit": true
   },
   "include": [
-    "./type-safety.ts",
+    "./**/*.ts",
+    "./**/*.tsx",
     "../src/tokens/index.ts",
     "../src/tokens/types.ts"
   ]

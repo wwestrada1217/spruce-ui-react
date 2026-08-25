@@ -300,7 +300,11 @@ export type { ComboboxProps, ComboboxOption } from './components/combobox/Combob
 export { GridCombobox } from './components/grid-combobox/GridCombobox.js';
 export type { GridComboboxProps, GridComboboxColumn, GridComboboxOption } from './components/grid-combobox/GridCombobox.js';
 
-// ─── Datagrid ───────────────────────────────────────────────────────────────
+// ─── Legacy Datagrid ────────────────────────────────────────────────────────
+/**
+ * @deprecated Use Datagridex. The legacy Datagrid API is frozen and is not the
+ * parity baseline for new grid work.
+ */
 export { Datagrid } from './components/datagrid/Datagrid.js';
 export type { DatagridProps } from './components/datagrid/Datagrid.js';
 export type {
@@ -334,6 +338,103 @@ export type {
   DetailPanelContext,
   TreeRowMeta,
 } from './components/datagrid/grid-types.js';
+
+// ─── Datagridex ─────────────────────────────────────────────────────────────
+export {
+  Datagridex,
+  DatagridexCellTemplate,
+  DatagridexCellEditor,
+  DatagridexRowDetail,
+  DatagridexDetailPane,
+  DatagridexLeadingRowActions,
+  DatagridexRowTemplate,
+  DatagridexDataContextAdapter,
+  createDatagridexDataContextAdapter,
+} from './components/datagridex/Datagridex.js';
+export type {
+  DatagridexProps,
+  DatagridexHandle,
+  DatagridexCellTemplateProps,
+  DatagridexCellEditorProps,
+  DatagridexRowDetailProps,
+  DatagridexDetailPaneProps,
+  DatagridexLeadingRowActionsProps,
+  DatagridexRowTemplateProps,
+} from './components/datagridex/Datagridex.js';
+export type {
+  DatagridexAggregate,
+  DatagridexAggregateContext,
+  DatagridexAggregateValueContext,
+  DatagridexBuiltInAggregate,
+  DatagridexCellContext,
+  DatagridexCellEditorContext,
+  DatagridexCellTemplateContext,
+  DatagridexChoiceOption,
+  DatagridexColumn,
+  DatagridexColumnFilter,
+  DatagridexColumnGroup,
+  DatagridexColumnGroupOrderChange,
+  DatagridexColumnGroupResize,
+  DatagridexColumnMenuItem,
+  DatagridexColumnOrderChange,
+  DatagridexColumnPin,
+  DatagridexColumnResize,
+  DatagridexColumnVisibilityChange,
+  DatagridexCustomAggregate,
+  DatagridexDataContext,
+  DatagridexDataContextOptions,
+  DatagridexDataContextStateDisplay,
+  DatagridexDetailPaneContext,
+  DatagridexDynamicFilterCondition,
+  DatagridexDynamicFilterOperator,
+  DatagridexEditCancel,
+  DatagridexEditLabels,
+  DatagridexEditMode,
+  DatagridexEditorOptions,
+  DatagridexEditorType,
+  DatagridexFilterChange,
+  DatagridexFilterDataType,
+  DatagridexFilterIndicatorVisibility,
+  DatagridexFilterMode,
+  DatagridexFilterVariant,
+  DatagridexGroupBy,
+  DatagridexGroupSort,
+  DatagridexGroupSortDirection,
+  DatagridexLeadingRowActionsContext,
+  DatagridexNewRowCommit,
+  DatagridexNewRowFactory,
+  DatagridexPageChange,
+  DatagridexPaginationType,
+  DatagridexRecordState,
+  DatagridexRowClassName,
+  DatagridexRowDetailContext,
+  DatagridexRowDetailExpandable,
+  DatagridexRowEditCommit,
+  DatagridexRowLabel,
+  DatagridexRowOrderChange,
+  DatagridexRowSpanContext,
+  DatagridexRowStyle,
+  DatagridexRowTemplateContext,
+  DatagridexSelectionChange,
+  DatagridexSelectionMode,
+  DatagridexSort,
+  DatagridexSortChange,
+  DatagridexSortDirection,
+  DatagridexSortIndicatorVisibility,
+  DatagridexSortMode,
+  DatagridexSortsChange,
+  DatagridexTrackBy,
+  DatagridexTrackedRecord,
+  DatagridexValidationError,
+  DatagridexValidationEvent,
+  DatagridexValidationRules,
+  DatagridexValidator,
+  DatagridexValidatorFn,
+  DatagridexValidatorRule,
+  DatagridexVirtualPageDirection,
+  DatagridexVirtualPageRequest,
+  DatagridexVirtualPageTrigger,
+} from './components/datagridex/datagridex-types.js';
 
 // ─── Gantt Chart ─────────────────────────────────────────────────────────────
 export { GanttChart } from './components/gantt-chart/GanttChart.js';

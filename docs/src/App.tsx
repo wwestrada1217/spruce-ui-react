@@ -71,7 +71,7 @@ import { GridPage } from './pages/components/GridPage'
 import { SelectPage } from './pages/components/SelectPage'
 import { ComboboxPage } from './pages/components/ComboboxPage'
 import { GridComboboxPage } from './pages/components/GridComboboxPage'
-import { DatagridPage } from './pages/components/DatagridPage'
+import { DatagridexPage } from './pages/components/DatagridexPage'
 import { GanttPage } from './pages/components/GanttPage'
 import { SchedulerPage } from './pages/components/SchedulerPage'
 import { KanbanPage } from './pages/components/KanbanPage'
@@ -248,7 +248,7 @@ function renderPage(hash: string): React.ReactElement {
     case '#/components/select':              return <SelectPage />
     case '#/components/combobox':            return <ComboboxPage />
     case '#/components/grid-combobox':       return <GridComboboxPage />
-    case '#/components/datagrid':            return <DatagridPage />
+    case '#/components/datagridex':          return <DatagridexPage />
     case '#/components/gantt':               return <GanttPage />
     case '#/components/scheduler':           return <SchedulerPage />
     case '#/components/kanban':              return <KanbanPage />

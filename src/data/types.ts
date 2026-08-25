@@ -20,7 +20,7 @@ export enum FilterOperator {
 
 export interface FilterCondition {
   field: string;
-  operator: string;
+  operator: FilterOperator | string;
   value?: unknown;
 }
 
@@ -183,7 +183,7 @@ export interface IBatchDataSource<T> {
 }
 
 export interface ISyncableDataSource<T> {
-  sync(data: SyncPayload[]): Promise<T>;
+  sync(data: SyncPayload[]): Promise<T | T[]>;
 }
 
 export interface IDataSource<T>
@@ -191,3 +191,68 @@ export interface IDataSource<T>
     IWritableDataSource<T>,
     IBatchDataSource<T>,
     ISyncableDataSource<T> {}
+
+/**
+ * The minimum source shape required by DataContext. Detail sources are often
+ * read-only, so write, batch, and sync capabilities remain optional here.
+ */
+export type FlexibleDataSource<T> = IReadableDataSource<T> &
+  Partial<IWritableDataSource<T>> &
+  Partial<IBatchDataSource<T>> &
+  Partial<ISyncableDataSource<T>>;
+
+// ============================================================================
+// DataContext Events, Plugins, Validation, and Change Inspection
+// ============================================================================
+
+export type DataContextEventType =
+  | 'add'
+  | 'update'
+  | 'delete'
+  | 'load'
+  | 'clear'
+  | 'discard'
+  | 'save'
+  | 'undo'
+  | 'redo';
+
+export interface DataContextEvent<T> {
+  type: DataContextEventType;
+  recordId?: string;
+  data?: Partial<T>;
+  previousState?: import('./record-state.js').RecordState;
+  newState?: import('./record-state.js').RecordState;
+  timestamp: number;
+}
+
+export interface DataContextPlugin<T> {
+  onBeforeAdd?(data: Partial<T>): Partial<T>;
+  onAfterAdd?(recordId: string, data: T): void;
+  onBeforeUpdate?(id: string, data: Partial<T>): Partial<T>;
+  onAfterUpdate?(id: string, data: T): void;
+  onBeforeDelete?(id: string): boolean;
+  onAfterDelete?(id: string): void;
+  onBeforeSave?(payloads: SyncPayload[]): SyncPayload[];
+  onAfterSave?(payloads: SyncPayload[]): void;
+}
+
+export interface ValidationError {
+  field: string;
+  message: string;
+  code?: string;
+}
+
+export type FieldValidator<T> = (value: unknown, record: T) => string | null;
+export type RecordValidator<T> = (record: T) => ValidationError[];
+
+export interface DataContextLogger {
+  warn(message: string, ...args: unknown[]): void;
+  error(message: string, ...args: unknown[]): void;
+}
+
+export interface ChangeEntry<T> {
+  data: T;
+  state: import('./record-state.js').RecordState;
+  modifiedFields: string[];
+  children?: Record<string, ChangeEntry<Record<string, unknown>>[]>;
+}

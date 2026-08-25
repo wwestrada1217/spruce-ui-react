@@ -1,6 +1,11 @@
 // ─── Record State & Tracking ──────────────────────────────────────────────────
 export { RecordState } from './record-state.js';
-export type { TrackedRecord } from './tracked-record.js';
+export type { FieldChange, TrackedRecord } from './tracked-record.js';
+export { DataContextError, DataContextErrorCode } from './errors.js';
+export { UndoManager } from './undo-manager.js';
+export type { ChangeCommand } from './undo-manager.js';
+export { NavigationCursor } from './navigation-cursor.js';
+export type { CursorListener, CursorObserver } from './navigation-cursor.js';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export { FilterOperator } from './types.js';
@@ -22,6 +27,15 @@ export type {
   IWritableDataSource,
   IBatchDataSource,
   ISyncableDataSource,
+  FlexibleDataSource,
+  DataContextEvent,
+  DataContextEventType,
+  DataContextPlugin,
+  ValidationError,
+  FieldValidator,
+  RecordValidator,
+  DataContextLogger,
+  ChangeEntry,
 } from './types.js';
 
 // ─── Filter Utilities ─────────────────────────────────────────────────────────
@@ -37,18 +51,48 @@ export type { HttpDataSourceOptions } from './http-data-source.js';
 export { DataContext, createDataContext } from './data-context.js';
 export type {
   DataContextConfig,
+  DataContextEventStream,
   DetailDefinition,
   DetailDefinitions,
   DetailNames,
   ExtractArrayElement,
   RecordHandle,
 } from './data-context.js';
+export { DetailContextManager } from './detail-context-manager.js';
+export { createDetailDataSource } from './detail-data-source.js';
+export { createContextFormModel } from './form-model.js';
+export type { FormModel, ContextFormModelOptions } from './form-model.js';
+
+// ─── NodeStore ───────────────────────────────────────────────────────────────
+export {
+  NodeStore,
+  createNodeStore,
+  NodeStoreError,
+  NodeStoreErrorCode,
+  createFormBridge,
+} from './node-store/index.js';
+export type {
+  AddChildOptions,
+  FormBridge,
+  FormBridgeOptions,
+  NodeStoreRecordState,
+  NodeStoreSyncPayload,
+  SyncState,
+  RelationConfig,
+  RelationState,
+  StoreConfig,
+  StoreNode,
+} from './node-store/index.js';
 
 // ─── React Hooks ──────────────────────────────────────────────────────────────
 export {
   useDataContext,
   useDataContextLoad,
   useDataSource,
+  useDataContextFormModel,
+  useFormModel,
+  useNodeStore,
+  useFormBridge,
 } from './use-data-context.js';
 
 // ─── Utilities ────────────────────────────────────────────────────────────────

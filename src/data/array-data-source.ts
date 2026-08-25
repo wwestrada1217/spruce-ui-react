@@ -268,8 +268,47 @@ export class ArrayDataSource<T> implements IDataSource<T> {
   }
 
   sync(data: SyncPayload[]): Promise<T> {
-    console.warn('ArrayDataSource.sync() called - this is a no-op for in-memory data sources');
-    return Promise.resolve(data as unknown as T);
+    const saved: T[] = [];
+    for (const payload of data) {
+      const state = payload._state;
+      const cleaned = this.stripMetadata(payload);
+      const id = getItemId(cleaned, this.idField);
+      if (state === 'New') {
+        this.data.push(cleaned);
+        this.index.set(id, this.data.length - 1);
+        saved.push(cleaned);
+      } else if (state === 'Modified') {
+        const index = this.findIndexById(id);
+        if (index === -1) throw new Error(`Item with id ${id} not found for sync update`);
+        this.data[index] = { ...this.data[index], ...cleaned };
+        saved.push(this.data[index]);
+      } else if (state === 'Deleted') {
+        const index = this.findIndexById(id);
+        if (index === -1) throw new Error(`Item with id ${id} not found for sync delete`);
+        this.data.splice(index, 1);
+        this.rebuildIndex();
+      } else {
+        const index = this.findIndexById(id);
+        saved.push(index === -1 ? cleaned : { ...this.data[index], ...cleaned });
+      }
+    }
+    return Promise.resolve(saved as unknown as T);
+  }
+
+  private stripMetadata(payload: SyncPayload): T {
+    const strip = (value: Record<string, unknown>): Record<string, unknown> => {
+      const cleaned: Record<string, unknown> = {};
+      Object.entries(value).forEach(([key, entry]) => {
+        if (key.startsWith('_')) return;
+        cleaned[key] = Array.isArray(entry)
+          ? entry.map((child) => child && typeof child === 'object' && !Array.isArray(child)
+            ? strip(child as Record<string, unknown>)
+            : child)
+          : entry;
+      });
+      return cleaned;
+    };
+    return strip(payload) as T;
   }
 
   getAllData(): T[] {

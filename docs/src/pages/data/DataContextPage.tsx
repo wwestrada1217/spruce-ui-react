@@ -30,8 +30,8 @@ const invoiceCtx = createDataContext<Invoice>({
 
 const LOAD = `// Load all records from the data source
 await invoiceCtx.loadById('2');       // load a specific record
-invoiceCtx.load();                    // fire-and-forget load from source
-invoiceCtx.load(someArray);           // load from a pre-fetched array
+await invoiceCtx.load();              // load from source
+invoiceCtx.loadRecords(someArray);    // load a pre-fetched array
 
 // Or via the React hook (recommended inside components)
 const { ctx, loading, error } = useDataContextLoad(invoiceCtx, { pageSize: 50 });`;
@@ -180,6 +180,28 @@ const changes = invoiceCtx.getChanges();
 //   }
 // ]`;
 
+const CORE_ADAPTERS = `import {
+  createNodeStore,
+  createFormBridge,
+  useNodeStore,
+  useFormBridge,
+} from 'spruce-react/data';
+
+const store = createNodeStore<Order>({
+  rootType: 'Order',
+  rootIdField: 'id',
+  load: () => fetch('/api/orders').then((response) => response.json()),
+  relations: [{
+    name: 'lines', childType: 'OrderLine', idField: 'id', foreignKey: 'orderId',
+    loadChildren: (order) => fetch('/api/orders/' + order.id + '/lines').then((response) => response.json()),
+  }],
+});
+
+// Outside React: store.load(), store.patch(), store.buildPayload()
+// In React: useNodeStore(store) and useFormBridge({ store, emptyValue })
+const bridge = createFormBridge({ store, emptyValue: () => ({ id: '', customer: '' }) });
+bridge.model.update((value) => ({ ...value, customer: 'Globex' }));`;
+
 // ─── Section list ─────────────────────────────────────────────────────────────
 
 interface Section { id: string; label: string }
@@ -193,6 +215,7 @@ const SECTIONS: Section[] = [
   { id: 'hooks',         label: 'React Hooks' },
   { id: 'details',       label: 'Detail Contexts' },
   { id: 'get-changes',   label: 'Inspecting Changes' },
+  { id: 'adapters',      label: 'Adapters & Integration' },
   { id: 'api',           label: 'API Reference' },
 ];
 
@@ -331,6 +354,23 @@ export function DataContextPage() {
           <CodePreview codeOnly={true} code={GET_CHANGES} />
         </section>
 
+        {/* Adapters */}
+        <section id="adapters" className="demo-section" aria-labelledby="adapters-heading">
+          <h2 id="adapters-heading">Adapters &amp; Integration Boundaries</h2>
+          <p className="section-desc">
+            The core data classes are framework-neutral. <code>Datagridex</code> consumes a
+            <code>DataContext</code> through its data-context adapter, while form integrations consume
+            <code>FormModel</code> or the <code>NodeStore</code> form bridge. React hooks only subscribe
+            to those classes; they do not change their CRUD, validation, undo, cursor, or sync behavior.
+          </p>
+          <CodePreview codeOnly={true} code={CORE_ADAPTERS} />
+          <ul className="docs-list">
+            <li><code>createDetailDataSource</code> adapts a parent-id loader to the detail read contract.</li>
+            <li><code>useDataContextFormModel</code>, <code>useNodeStore</code>, and <code>useFormBridge</code> are the React subscription layer.</li>
+            <li><code>FormBuilder</code> can bind to the bridge model without importing Angular signals; Datagridex remains responsible for rendering and row interaction.</li>
+          </ul>
+        </section>
+
         {/* API Reference */}
         <section id="api" className="demo-section" aria-labelledby="api-ref-heading">
           <h2 id="api-ref-heading">API Reference</h2>
@@ -353,6 +393,9 @@ export function DataContextPage() {
                 <tr><td><code>hasPrevious</code></td><td><code>boolean</code></td><td>Whether a previous record exists</td></tr>
                 <tr><td><code>idField</code></td><td><code>keyof T</code></td><td>Configured ID field</td></tr>
                 <tr><td><code>dataSource</code></td><td><code>IDataSource&lt;T&gt; | undefined</code></td><td>Backing data source</td></tr>
+                <tr><td><code>loading / lastError</code></td><td><code>boolean / Error | null</code></td><td>Async operation state and last failure</td></tr>
+                <tr><td><code>canUndo / canRedo</code></td><td><code>boolean</code></td><td>Bounded local history state</td></tr>
+                <tr><td><code>formModel</code></td><td><code>FormModel&lt;T&gt;</code></td><td>Current-record model with explicit write-through updates</td></tr>
               </tbody>
             </table>
           </div>
@@ -362,7 +405,7 @@ export function DataContextPage() {
             <table className="api-table">
               <thead><tr><th>Method</th><th>Returns</th><th>Description</th></tr></thead>
               <tbody>
-                <tr><td><code>load(records?)</code></td><td><code>void</code></td><td>Load records or fetch from source</td></tr>
+                <tr><td><code>load()</code></td><td><code>Promise&lt;void&gt;</code></td><td>Fetch from source; use <code>loadRecords()</code> for a pre-fetched array</td></tr>
                 <tr><td><code>loadRecords(records)</code></td><td><code>void</code></td><td>Sync-load an array, resets change tracking</td></tr>
                 <tr><td><code>loadById(id)</code></td><td><code>Promise&lt;void&gt;</code></td><td>Fetch one record by ID and load it</td></tr>
                 <tr><td><code>reload()</code></td><td><code>Promise&lt;void&gt;</code></td><td>Re-fetch the current record from the source</td></tr>
@@ -381,6 +424,8 @@ export function DataContextPage() {
                 <tr><td><code>skip(index)</code></td><td><code>boolean</code></td><td>Jump to a 0-based index</td></tr>
                 <tr><td><code>subscribe(listener)</code></td><td><code>() =&gt; void</code></td><td>Subscribe to changes; returns an unsubscribe fn</td></tr>
                 <tr><td><code>getSnapshot()</code></td><td><code>number</code></td><td>Version counter for <code>useSyncExternalStore</code></td></tr>
+                <tr><td><code>undo() / redo()</code></td><td><code>boolean</code></td><td>Revert or reapply local CRUD commands</td></tr>
+                <tr><td><code>acceptChanges()</code></td><td><code>void</code></td><td>Promote pending changes to the new baseline</td></tr>
               </tbody>
             </table>
           </div>

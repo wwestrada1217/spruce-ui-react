@@ -36,6 +36,11 @@
       "import": "./dist/spruce-react.es.js",
       "require": "./dist/spruce-react.umd.js"
     },
+    "./data": {
+      "types": "./dist/src/data/index.d.ts",
+      "import": "./dist/spruce-react.es.js",
+      "require": "./dist/spruce-react.umd.js"
+    },
     "./style.css": "./dist/spruce-react.css",
     "./tokens-static.css": "./dist/tokens-static.css"
   },
@@ -50,7 +55,11 @@
     "docs:build": "npm run build --workspace spruce-react-docs",
     "docs:preview": "npm run preview --workspace spruce-react-docs",
     "test:type": "tsc -p tests/tsconfig.json --noEmit",
-    "test": "npm run build && npm run test:type && node --experimental-strip-types --test tests/tokens.test.mjs tests/theme.test.mjs tests/i18n.test.mjs"
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "test:legacy": "node --experimental-strip-types --test tests/tokens.test.mjs tests/theme.test.mjs tests/i18n.test.mjs tests/datagridex.test.mjs tests/core-data.test.mjs",
+    "test:ci": "npm run test:type && npm run test:unit && npm run test:legacy",
+    "test": "npm run build && npm run test:ci"
   },
   "peerDependencies": {
     "react": "^19.0.0",
@@ -58,6 +67,9 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.6",
     "@types/node": "^24.12.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
@@ -66,11 +78,14 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
+    "jest-axe": "^11.0.0",
+    "jsdom": "^30.0.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.0",
     "vite": "^8.0.4",
-    "vite-plugin-dts": "^4.5.4"
+    "vite-plugin-dts": "^4.5.4",
+    "vitest": "^4.1.11"
   }
 }

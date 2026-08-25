@@ -45,6 +45,7 @@ export const NAV_SECTIONS: NavSection[] = [
     items: [
       { icon: 'database', label: 'Data Source',  route: '#/core/data-source'  },
       { icon: 'layers',   label: 'Data Context', route: '#/core/data-context' },
+      { icon: 'git-branch', label: 'Node Store', route: '#/core/data-context' },
     ],
   },
   {
@@ -63,7 +64,7 @@ export const NAV_SECTIONS: NavSection[] = [
       { icon: 'git-fork',           label: 'Treeview',          route: '#/components/tree'           },
       { icon: 'scan-line',          label: 'Barcode & QR Code', route: '#/components/barcode-qr'     },
       { icon: 'credit-card',        label: 'Credit Card',       route: '#/components/credit-card'    },
-      { icon: 'table',              label: 'Datagrid',          route: '#/components/datagrid'       },
+      { icon: 'table',              label: 'Datagridex',        route: '#/components/datagridex'     },
       { icon: 'calendar',           label: 'Scheduler',         route: '#/components/scheduler'      },
       { icon: 'bar-chart',          label: 'Gantt Chart',       route: '#/components/gantt'          },
       { icon: 'columns',            label: 'Kanban',            route: '#/components/kanban'         },
