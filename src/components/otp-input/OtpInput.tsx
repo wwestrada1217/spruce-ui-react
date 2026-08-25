@@ -7,6 +7,10 @@
 
 import React from 'react';
 import './OtpInput.css';
+import { useId } from 'react';
+import { useI18n } from '../../i18n/i18n-context.js';
+import { useFormFieldContext } from '../field/FormFieldContext.js';
+import { firstFormError, type FormValidationError } from '../field/form-types.js';
 
 export type OtpInputSize = 'sm' | 'md' | 'lg';
 
@@ -19,6 +23,14 @@ export interface OtpInputProps {
   separator?: boolean;
   separatorChar?: string;
   disabled?: boolean;
+  readOnly?: boolean;
+  hidden?: boolean;
+  invalid?: boolean;
+  errors?: readonly FormValidationError[];
+  required?: boolean;
+  ariaLabel?: string;
+  ariaLabelledBy?: string;
+  ariaDescribedBy?: string;
   error?: string;
   hint?: string;
   className?: string;
@@ -33,11 +45,31 @@ export function OtpInput({
   separator = false,
   separatorChar = '-',
   disabled = false,
+  readOnly = false,
+  hidden = false,
+  invalid,
+  errors,
+  required = false,
+  ariaLabel,
+  ariaLabelledBy,
+  ariaDescribedBy,
   error,
   hint,
   className,
 }: OtpInputProps) {
-  const hasError = Boolean(error);
+  const { t } = useI18n();
+  const field = useFormFieldContext();
+  const instanceId = useId().replace(/:/g, '');
+  const effectiveDisabled = disabled || Boolean(field?.disabled);
+  const effectiveReadOnly = readOnly || Boolean(field?.readOnly);
+  const effectiveHidden = hidden || Boolean(field?.hidden);
+  const effectiveRequired = required || Boolean(field?.required);
+  const errorMessage = firstFormError(errors || field?.errors, error);
+  const hasError = Boolean(errorMessage) || Boolean(invalid ?? field?.invalid);
+  const effectiveHint = hint || field?.hint;
+  const errorId = `sp-otp-${instanceId}-error`;
+  const hintId = `sp-otp-${instanceId}-hint`;
+  const describedBy = ariaDescribedBy || field?.describedBy || (errorMessage ? errorId : effectiveHint ? hintId : undefined);
   const inputsRef = React.useRef<(HTMLInputElement | null)[]>([]);
 
   // Derive digits from value prop
@@ -115,10 +147,13 @@ export function OtpInput({
     'sp-otp',
     size === 'sm' ? 'sp-otp--sm' : '',
     size === 'lg' ? 'sp-otp--lg' : '',
-    disabled ? 'sp-otp--disabled' : '',
+    effectiveDisabled ? 'sp-otp--disabled' : '',
+    effectiveReadOnly ? 'sp-otp--readonly' : '',
     hasError ? 'sp-otp--error' : '',
     className ?? '',
   ].filter(Boolean).join(' ');
+
+  if (effectiveHidden) return null;
 
   return (
     <div>
@@ -135,9 +170,14 @@ export function OtpInput({
               inputMode="numeric"
               maxLength={1}
               autoComplete="one-time-code"
-              disabled={disabled}
+              disabled={effectiveDisabled}
+              readOnly={effectiveReadOnly}
               value={digits[i] || ''}
-              aria-label={`Digit ${i + 1} of ${length}`}
+              aria-label={`${ariaLabel || t('codeBlock')} ${i + 1} of ${length}`}
+              aria-labelledby={ariaLabelledBy || undefined}
+              aria-describedby={describedBy}
+              aria-invalid={hasError || undefined}
+              aria-required={effectiveRequired || undefined}
               onInput={(e) => handleInput(e, i)}
               onKeyDown={(e) => handleKeyDown(e, i)}
               onPaste={(e) => handlePaste(e, i)}
@@ -149,11 +189,11 @@ export function OtpInput({
           </React.Fragment>
         ))}
       </div>
-      {hasError && (
-        <p className="sp-otp__error" role="alert">{error}</p>
+      {errorMessage && (
+        <p className="sp-otp__error" role="alert" id={errorId}>{errorMessage}</p>
       )}
-      {hint && !hasError && (
-        <p className="sp-otp__hint">{hint}</p>
+      {effectiveHint && !hasError && (
+        <p className="sp-otp__hint" id={hintId}>{effectiveHint}</p>
       )}
     </div>
   );

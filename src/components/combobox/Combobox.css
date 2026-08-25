@@ -233,3 +233,16 @@
     transform: translateY(0);
   }
 }
+
+.sp-combo__floating-label { position: absolute; z-index: 1; top: 0; left: var(--sp-space-3, 12px); padding: 0 var(--sp-space-1, 4px); transform: translateY(-50%); background: var(--sp-surface-0, #fff); color: var(--sp-text-subtle, #718096); font-size: var(--sp-text-xs, 11px); }
+.sp-combo--error .sp-combo__input-wrap { border-color: var(--sp-danger, #dc2626); }
+.sp-combo--readonly .sp-combo__input-wrap { cursor: default; }
+.sp-combo__option > span { display: inline-flex; align-items: center; gap: var(--sp-space-2, 8px); }
+.sp-combo__option small { display: block; color: var(--sp-text-subtle, #718096); font-weight: 400; }
+.sp-combo__loading, .sp-combo__paging { padding: var(--sp-space-3, 12px); color: var(--sp-text-subtle, #718096); font-size: var(--sp-text-sm, 13px); }
+.sp-combo__paging { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-space-2, 8px); border-top: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08)); }
+.sp-combo__paging button { border: 0; background: transparent; color: var(--sp-primary, #2563eb); cursor: pointer; }
+.sp-combo__paging button:disabled { color: var(--sp-text-disabled, #a0aec0); cursor: not-allowed; }
+.sp-combo-error, .sp-combo-hint { margin: var(--sp-space-1, 4px) 0 0; font-size: var(--sp-text-xs, 11px); }
+.sp-combo-error { color: var(--sp-danger, #dc2626); }
+.sp-combo-hint { color: var(--sp-text-subtle, #718096); }

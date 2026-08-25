@@ -99,3 +99,22 @@
   opacity: 0.6;
   pointer-events: none;
 }
+
+.sp-seg--invalid .sp-seg__track {
+  outline: var(--sp-border-width-hairline, 1px) solid var(--sp-danger, #dc2626);
+  outline-offset: var(--sp-space-0_5, 2px);
+}
+
+.sp-seg__error,
+.sp-seg__hint {
+  margin: var(--sp-space-1, 4px) 0 0;
+  font-size: var(--sp-text-xs, 11px);
+}
+
+.sp-seg__error {
+  color: var(--sp-danger, #dc2626);
+}
+
+.sp-seg__hint {
+  color: var(--sp-text-subtle, #718096);
+}

@@ -84,6 +84,7 @@ export function Textarea({
   onBlur,
 }: TextareaProps) {
   const field = useFormFieldContext();
+  const generatedId = React.useId().replace(/:/g, '');
   const [internalValue, setInternalValue] = React.useState(defaultValue);
   const [focused, setFocused] = React.useState(false);
   const isControlled = value !== undefined;
@@ -99,6 +100,12 @@ export function Textarea({
   const effectiveFloatingLabel = floatingLabel || Boolean(field?.floatingLabel);
   const effectiveHint = hint || field?.hint;
   const effectiveDescribedBy = ariaDescribedBy || field?.describedBy;
+  const effectiveChrome = chrome ?? field?.chrome;
+  const effectiveRadius = radius ?? field?.radius;
+  const effectiveBorder = border ?? field?.border;
+  const errorId = `${id ?? `sp-textarea-${generatedId}`}-error`;
+  const hintId = `${id ?? `sp-textarea-${generatedId}`}-hint`;
+  const describedBy = effectiveDescribedBy || (errorMessage ? errorId : effectiveHint ? hintId : undefined);
   const floated = effectiveFloatingLabel && (focused || Boolean(currentValue));
   const charCount = currentValue.length;
 
@@ -119,9 +126,9 @@ export function Textarea({
     effectiveDisabled ? 'sp-textarea--disabled' : '',
     hasError ? 'sp-textarea--error' : '',
     effectiveReadOnly ? 'sp-textarea--readonly' : '',
-    chrome ? `sp-textarea--chrome-${chrome}` : '',
-    radius ? `sp-textarea--radius-${radius}` : '',
-    border ? `sp-textarea--border-${border}` : '',
+    effectiveChrome ? `sp-textarea--chrome-${effectiveChrome}` : '',
+    effectiveRadius ? `sp-textarea--radius-${effectiveRadius}` : '',
+    effectiveBorder ? `sp-textarea--border-${effectiveBorder}` : '',
     focused ? 'sp-textarea--focused' : '',
     className ?? '',
   ].filter(Boolean).join(' ');
@@ -162,7 +169,7 @@ export function Textarea({
           maxLength={maxLength}
           aria-label={ariaLabel || (!effectiveLabel ? undefined : effectiveLabel)}
           aria-labelledby={ariaLabelledBy || undefined}
-          aria-describedby={effectiveDescribedBy}
+          aria-describedby={describedBy}
           aria-invalid={hasError || undefined}
           aria-required={effectiveRequired || undefined}
           aria-readonly={ariaReadonly ?? effectiveReadOnly ? true : undefined}
@@ -178,10 +185,10 @@ export function Textarea({
         )}
       </div>
       {errorMessage && !field?.describedBy && (
-        <p className="sp-textarea__error" role="alert">{errorMessage}</p>
+        <p className="sp-textarea__error" role="alert" id={errorId}>{errorMessage}</p>
       )}
       {effectiveHint && !hasError && !field?.describedBy && (
-        <p className="sp-textarea__hint">{effectiveHint}</p>
+        <p className="sp-textarea__hint" id={hintId}>{effectiveHint}</p>
       )}
     </div>
   );

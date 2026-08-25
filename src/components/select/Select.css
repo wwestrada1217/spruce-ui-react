@@ -231,6 +231,7 @@
   font-size: var(--sp-text-xs, 11px);
   color: var(--sp-danger, #dc2626);
 }
+.sp-select-hint { margin: var(--sp-space-1, 4px) 0 0; color: var(--sp-text-subtle, #718096); font-size: var(--sp-text-xs, 11px); }
 
 /* ── Loading ─────────────────────────────────────────────────────────────── */
 
@@ -290,3 +291,23 @@
     box-shadow: 0 0 0 3px var(--sp-focus-glow-color, rgba(37, 99, 235, 0.12));
   }
 }
+
+.sp-select__floating-label {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: var(--sp-space-3, 12px);
+  padding: 0 var(--sp-space-1, 4px);
+  transform: translateY(-50%);
+  background: var(--sp-select-bg);
+  color: var(--sp-text-subtle, #718096);
+  font-size: var(--sp-text-xs, 11px);
+}
+
+.sp-select--readonly .sp-select__trigger { cursor: default; }
+.sp-select__option-label { display: inline-flex; align-items: center; gap: var(--sp-space-2, 8px); flex: 1; }
+.sp-select__option-label small { display: block; color: var(--sp-text-subtle, #718096); font-weight: 400; }
+.sp-select__option-color { width: 10px; height: 10px; border-radius: var(--sp-radius-full, 9999px); flex: 0 0 auto; }
+.sp-select__paging { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-space-2, 8px); padding: var(--sp-space-2, 8px) var(--sp-space-3, 12px); border-top: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08)); font-size: var(--sp-text-xs, 11px); }
+.sp-select__paging button { border: 0; background: transparent; color: var(--sp-primary, #2563eb); cursor: pointer; }
+.sp-select__paging button:disabled { color: var(--sp-text-disabled, #a0aec0); cursor: not-allowed; }

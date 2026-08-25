@@ -1,423 +1,226 @@
-/*
- * Copyright (c) 2026-2027 Sprucestack. All Rights Reserved.
- * The term "Sprucestack" refers to Sprucestack Inc. and/or its subsidiaries.
- * This software is released under Apache license.
- * The full license information can be found in LICENSE in the root directory of this project.
- */
-
-import {
-  useState,
-  useRef,
-  useEffect,
-  useCallback,
-  useMemo,
-} from 'react';
-import { createPortal } from 'react-dom';
-import { Icon } from '../../icons/Icon.js';
-import { useI18n } from '../../i18n/i18n-context.js';
-import {
-  computePosition,
-  getScrollParents,
-  onClickOutside,
-} from '../../utils/positioning.js';
 import './GridCombobox.css';
+import { createPortal } from 'react-dom';
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type ChangeEvent, type KeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type UIEvent } from 'react';
+import { Icon } from '../../icons/Icon.js';
+import { computePosition, getScrollParents, type Placement } from '../../utils/positioning.js';
+import { useI18n } from '../../i18n/i18n-context.js';
+import { useFormFieldContext } from '../field/FormFieldContext.js';
+import { firstFormError, type FormValidationError } from '../field/form-types.js';
+import { normalizeLookupOption, readLookupPage, type LookupRenderContext, type LookupSource } from '../lookup/lookup-types.js';
 
-/* ── Public types ──────────────────────────────────────────────────── */
-
-export interface GridComboboxColumn {
-  /** Property key on the option object to display in this column. */
-  key: string;
-  /** Column header label. */
-  label: string;
-  /** CSS width — any valid grid track size (e.g. '200px', '1fr'). */
-  width?: string;
-}
-
-export interface GridComboboxOption {
-  /** Unique value used as the selection key. */
-  value: string;
-  /** Display label shown in the input when selected. */
-  label: string;
-  /** Additional properties matching column keys. */
-  [key: string]: unknown;
-}
+export interface GridComboboxColumn { key: string; label: string; width?: string; minWidth?: number; }
+export type GridComboboxSource = LookupSource<unknown>;
+export interface GridComboboxOption { value: string; label: string; disabled?: boolean; icon?: string; [key: string]: unknown; }
 
 export interface GridComboboxProps {
-  /** Column definitions for the grid dropdown. */
   columns: GridComboboxColumn[];
-  /** Available options to display. */
-  options: GridComboboxOption[];
-  /** Currently selected value (controlled). */
+  options?: GridComboboxSource | null;
+  source?: GridComboboxSource | null;
   value?: string;
-  /** Callback fired when the selected value changes. */
+  selectedItem?: unknown;
   onChange?: (value: string) => void;
-  /** Callback fired with the full option object on selection. */
   onSelect?: (item: GridComboboxOption) => void;
-  /** Placeholder text for the search input. */
+  onSelectedItem?: (item: unknown) => void;
+  onOpenChange?: (open: boolean) => void;
   placeholder?: string;
-  /** Property key(s) used for client-side filtering. Defaults to 'label'. */
   filterBy?: string | string[];
-  /** Disables the combobox when true. */
+  displayField?: string;
+  valueField?: string;
+  pageSize?: number;
+  autoOpen?: boolean;
   disabled?: boolean;
-  /** Additional CSS class name(s) on the root element. */
+  readOnly?: boolean;
+  hidden?: boolean;
+  error?: string;
+  hint?: string;
+  errors?: readonly FormValidationError[];
+  invalid?: boolean;
+  required?: boolean;
+  label?: string;
+  floatingLabel?: boolean;
+  placement?: Placement;
+  constrainToModal?: boolean;
+  dismissOnClickOutside?: boolean;
+  dismissOnScroll?: boolean;
+  virtualScroll?: boolean;
+  itemHeight?: number;
+  virtualPaging?: boolean;
+  showPagingFooter?: boolean;
+  resizableColumns?: boolean;
+  renderRow?: (context: LookupRenderContext<GridComboboxOption>) => ReactNode;
+  renderEmpty?: () => ReactNode;
+  ariaLabel?: string;
+  ariaLabelledBy?: string;
+  ariaDescribedBy?: string;
   className?: string;
+  id?: string;
 }
 
-/* ── Helpers ───────────────────────────────────────────────────────── */
-
-let instanceCounter = 0;
-
-function cellValue(opt: GridComboboxOption, key: string): string {
-  const v = opt[key];
-  return v == null ? '' : String(v);
-}
-
-/* ── Component ─────────────────────────────────────────────────────── */
-
-/**
- * A searchable combobox that displays options in a multi-column grid format.
- *
- * @example
- * ```tsx
- * <GridCombobox
- *   columns={[
- *     { key: 'code', label: 'Code', width: '80px' },
- *     { key: 'label', label: 'Name', width: '1fr' },
- *   ]}
- *   options={[
- *     { value: 'US', label: 'United States', code: 'US' },
- *     { value: 'CA', label: 'Canada', code: 'CA' },
- *   ]}
- *   value={selected}
- *   onChange={setSelected}
- * />
- * ```
- */
 export function GridCombobox({
-  columns,
-  options,
-  value,
-  onChange,
-  onSelect,
-  placeholder = 'Search...',
-  filterBy = 'label',
-  disabled = false,
-  className,
+  columns, options, source, value, selectedItem, onChange, onSelect, onSelectedItem, onOpenChange,
+  placeholder = 'Search...', filterBy = 'label', displayField = 'label', valueField = 'value', pageSize = 20,
+  autoOpen = false, disabled = false, readOnly = false, hidden = false, error, hint, errors, invalid, required = false,
+  label = '', floatingLabel = false, placement = 'bottom-start', constrainToModal = true,
+  dismissOnClickOutside = true, dismissOnScroll = true, virtualScroll = false, itemHeight = 32,
+  virtualPaging = false, showPagingFooter = true, resizableColumns = false, renderRow, renderEmpty,
+  ariaLabel, ariaLabelledBy, ariaDescribedBy, className = '', id,
 }: GridComboboxProps) {
-  const { t } = useI18n();
-  const [instanceId] = useState(() => instanceCounter++);
+  const { direction, t } = useI18n();
+  const field = useFormFieldContext();
+  const instanceId = useId().replace(/:/g, '');
+  const lookupSource = useMemo(() => source ?? options ?? [], [options, source]);
+  const inputId = id ?? `sp-grid-combo-${instanceId}`;
+  const errorId = `${inputId}-error`;
+  const hintId = `${inputId}-hint`;
+  const filterKeys = useMemo(() => Array.isArray(filterBy) ? filterBy : [filterBy], [filterBy]);
+  const effectiveDisabled = disabled || Boolean(field?.disabled);
+  const effectiveReadOnly = readOnly || Boolean(field?.readOnly);
+  const effectiveHidden = hidden || Boolean(field?.hidden);
+  const effectiveRequired = required || Boolean(field?.required);
+  const errorMessage = firstFormError(errors || field?.errors, error);
+  const hasError = Boolean(errorMessage) || Boolean(invalid ?? field?.invalid);
+  const effectiveHint = hint || field?.hint;
+  const describedBy = ariaDescribedBy || field?.describedBy || (errorMessage ? errorId : effectiveHint ? hintId : undefined);
   const [query, setQuery] = useState('');
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(autoOpen);
+  const [items, setItems] = useState<GridComboboxOption[]>(Array.isArray(lookupSource) ? lookupSource as GridComboboxOption[] : []);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
-  const [panelPos, setPanelPos] = useState({ top: 0, left: 0 });
-  const [panelMinWidth, setPanelMinWidth] = useState(0);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
-
+  const [virtualStart, setVirtualStart] = useState(0);
+  const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
+  const [columnWidths, setColumnWidths] = useState<Record<string, string>>({});
   const anchorRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const rafId = useRef(0);
 
-  /* ── Derived values ───────────────────────────────────────────────── */
-
-  const filterKeys = useMemo(
-    () => (Array.isArray(filterBy) ? filterBy : [filterBy]),
-    [filterBy],
-  );
-
-  const gridTemplate = useMemo(() => {
-    if (columns.length === 0) return '1fr';
-    return columns.map((c) => c.width ?? '1fr').join(' ');
-  }, [columns]);
-
-  const filteredOptions = useMemo(() => {
-    const q = query.toLowerCase();
-    if (!q) return options;
-    return options.filter((o) =>
-      filterKeys.some((k) =>
-        String(o[k] ?? '')
-          .toLowerCase()
-          .includes(q),
-      ),
-    );
-  }, [options, query, filterKeys]);
-
-  const activeDescendant =
-    highlightedIndex >= 0
-      ? `sp-gc-opt-${instanceId}-${highlightedIndex}`
-      : undefined;
-
-  /* ── Positioning ──────────────────────────────────────────────────── */
+  const load = useCallback(async (requestedPage: number, searchTerm: string) => {
+    setLoading(true);
+    try {
+      const response = await readLookupPage(lookupSource, { pageNumber: requestedPage, pageSize, searchTerm, searchFields: filterKeys.join(',') });
+      setItems(response.data as GridComboboxOption[]);
+      setPage(response.pageNumber);
+      setTotalPages(response.totalPages);
+    } catch { setItems([]); setTotalPages(1); }
+    finally { setLoading(false); }
+  }, [filterKeys, lookupSource, pageSize]);
 
   const reposition = useCallback(() => {
     const anchor = anchorRef.current;
     const panel = panelRef.current;
     if (!anchor || !panel) return;
-    const result = computePosition(anchor, panel, 'bottom-start', 4);
-    setPanelPos({ top: result.top, left: result.left });
-    setPanelMinWidth(anchor.offsetWidth);
+    const result = computePosition(anchor, panel, placement, 4);
+    setPosition({ top: result.top, left: result.left, width: anchor.offsetWidth });
     setReady(true);
-  }, []);
-
-  // Position the panel when it opens
-  useEffect(() => {
-    if (!open) {
-      setReady(false);
-      return;
-    }
-    rafId.current = requestAnimationFrame(reposition);
-    return () => cancelAnimationFrame(rafId.current);
-  }, [open, reposition]);
-
-  // Re-position on scroll
+  }, [placement]);
+  const setOpenState = useCallback((next: boolean) => {
+    if (effectiveDisabled || effectiveReadOnly) return;
+    setOpen(next);
+    onOpenChange?.(next);
+    if (next) { setReady(false); setHighlightedIndex(0); setVirtualStart(0); void load(1, ''); }
+    else setHighlightedIndex(-1);
+  }, [effectiveDisabled, effectiveReadOnly, load, onOpenChange]);
+  useEffect(() => { if (autoOpen && !effectiveDisabled && !effectiveReadOnly) setOpenState(true); }, [autoOpen, effectiveDisabled, effectiveReadOnly, setOpenState]);
   useEffect(() => {
     if (!open) return;
+    const frame = requestAnimationFrame(reposition);
     const anchor = anchorRef.current;
-    if (!anchor) return;
-    const scrollables = getScrollParents(anchor);
-    const onScroll = () => {
-      rafId.current = requestAnimationFrame(reposition);
-    };
-    scrollables.forEach((el) =>
-      el.addEventListener('scroll', onScroll, { passive: true }),
-    );
-    return () => {
-      scrollables.forEach((el) => el.removeEventListener('scroll', onScroll));
-      cancelAnimationFrame(rafId.current);
-    };
-  }, [open, reposition]);
-
-  // Click-outside to dismiss
+    const parents = anchor ? getScrollParents(anchor) : [];
+    const onScroll = () => dismissOnScroll ? setOpenState(false) : reposition();
+    parents.forEach((parent) => parent.addEventListener('scroll', onScroll, { passive: true }));
+    window.addEventListener('resize', reposition);
+    if (dismissOnScroll) window.addEventListener('scroll', onScroll, { passive: true });
+    return () => { cancelAnimationFrame(frame); parents.forEach((parent) => parent.removeEventListener('scroll', onScroll)); window.removeEventListener('resize', reposition); if (dismissOnScroll) window.removeEventListener('scroll', onScroll); };
+  }, [dismissOnScroll, open, reposition, setOpenState]);
   useEffect(() => {
-    if (!open) return;
-    const els = [anchorRef.current, panelRef.current].filter(
-      Boolean,
-    ) as HTMLElement[];
-    return onClickOutside(els, () => closePanel());
-  }, [open]);
+    if (!open || !dismissOnClickOutside) return;
+    const handler = (event: globalThis.MouseEvent) => { const target = event.target as Node; if (!anchorRef.current?.contains(target) && !panelRef.current?.contains(target)) setOpenState(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [dismissOnClickOutside, open, setOpenState]);
+  useEffect(() => {
+    if (!value) { setQuery(''); return; }
+    const selected = items.map((item) => normalizeLookupOption(item, displayField, valueField)).find((item) => item.value === value);
+    if (selected) setQuery(selected.label);
+    else if (selectedItem) setQuery(normalizeLookupOption(selectedItem, displayField, valueField).label);
+  }, [displayField, items, selectedItem, value, valueField]);
 
-  /* ── Helpers ──────────────────────────────────────────────────────── */
+  const normalized = useMemo(() => items.map((item) => normalizeLookupOption(item, displayField, valueField)), [displayField, items, valueField]);
+  const visibleItems = virtualScroll ? items.slice(virtualStart, virtualStart + Math.ceil(240 / itemHeight) + 8) : items;
+  const activeIndex = virtualScroll ? virtualStart + highlightedIndex : highlightedIndex;
+  const gridTemplate = columns.map((column) => columnWidths[column.key] ?? column.width ?? '1fr').join(' ');
 
-  function isSelected(optionValue: string): boolean {
-    return value === optionValue;
-  }
-
-  function openPanel() {
-    if (disabled) return;
-    setOpen(true);
-  }
-
-  function closePanel() {
-    setOpen(false);
-    setHighlightedIndex(-1);
-  }
-
-  function selectOption(opt: GridComboboxOption) {
-    onChange?.(opt.value);
-    onSelect?.(opt);
-    setQuery(opt.label);
-    closePanel();
-  }
-
-  function scrollRowIntoView(index: number) {
-    const panel = panelRef.current;
-    if (!panel) return;
-    // +1 because the first child is the sticky header
-    const row = panel.children[index + 1] as HTMLElement | undefined;
-    row?.scrollIntoView({ block: 'nearest' });
-  }
-
-  /* ── Event handlers ───────────────────────────────────────────────── */
-
-  function handleQueryChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setQuery(e.target.value);
-    openPanel();
-    setHighlightedIndex(-1);
-  }
-
-  function handleFocus() {
-    openPanel();
-  }
-
-  function handleClear(e: React.MouseEvent) {
-    e.preventDefault();
-    setQuery('');
-    onChange?.('');
+  function selectOption(index: number) {
+    const item = items[index];
+    const option = normalized[index];
+    if (!item || !option || option.disabled) return;
+    onChange?.(option.value);
+    onSelect?.(item);
+    onSelectedItem?.(item);
+    setQuery(option.label);
+    setOpenState(false);
     inputRef.current?.focus();
   }
-
-  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    switch (e.key) {
-      case 'ArrowDown': {
-        e.preventDefault();
-        if (!open) {
-          openPanel();
-          return;
-        }
-        const next =
-          highlightedIndex + 1 >= filteredOptions.length
-            ? 0
-            : highlightedIndex + 1;
-        setHighlightedIndex(next);
-        requestAnimationFrame(() => scrollRowIntoView(next));
-        break;
-      }
-      case 'ArrowUp': {
-        e.preventDefault();
-        if (!open) {
-          openPanel();
-          return;
-        }
-        const prev =
-          highlightedIndex - 1 < 0
-            ? filteredOptions.length - 1
-            : highlightedIndex - 1;
-        setHighlightedIndex(prev);
-        requestAnimationFrame(() => scrollRowIntoView(prev));
-        break;
-      }
-      case 'Home': {
-        if (!open) return;
-        e.preventDefault();
-        setHighlightedIndex(0);
-        requestAnimationFrame(() => scrollRowIntoView(0));
-        break;
-      }
-      case 'End': {
-        if (!open) return;
-        e.preventDefault();
-        const last = filteredOptions.length - 1;
-        setHighlightedIndex(last);
-        requestAnimationFrame(() => scrollRowIntoView(last));
-        break;
-      }
-      case 'Enter': {
-        e.preventDefault();
-        if (
-          highlightedIndex >= 0 &&
-          highlightedIndex < filteredOptions.length
-        ) {
-          selectOption(filteredOptions[highlightedIndex]);
-        }
-        break;
-      }
-      case 'Escape':
-        e.preventDefault();
-        closePanel();
-        break;
-      case 'Tab':
-        closePanel();
-        break;
-    }
+  function moveHighlight(delta: number) {
+    if (!items.length) return;
+    let next = activeIndex + delta;
+    if (next < 0) next = items.length - 1;
+    if (next >= items.length) { if (virtualPaging && page < totalPages) { void load(page + 1, query); setHighlightedIndex(0); return; } next = 0; }
+    if (normalized[next]?.disabled) { moveHighlight(delta > 0 ? 1 : -1); return; }
+    if (virtualScroll) setVirtualStart(Math.max(0, Math.min(next, items.length - 1)));
+    setHighlightedIndex(virtualScroll ? next - virtualStart : next);
+  }
+  function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (effectiveDisabled || effectiveReadOnly) return;
+    if (!open && ['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(event.key)) { event.preventDefault(); setOpenState(true); return; }
+    if (!open) return;
+    if (event.key === 'ArrowDown') { event.preventDefault(); moveHighlight(1); }
+    else if (event.key === 'ArrowUp') { event.preventDefault(); moveHighlight(-1); }
+    else if (event.key === 'Home') { event.preventDefault(); setHighlightedIndex(0); }
+    else if (event.key === 'End') { event.preventDefault(); setHighlightedIndex(items.length - 1); }
+    else if (event.key === 'PageDown' && virtualPaging && page < totalPages) { event.preventDefault(); void load(page + 1, query); setHighlightedIndex(0); }
+    else if (event.key === 'PageUp' && virtualPaging && page > 1) { event.preventDefault(); void load(page - 1, query); setHighlightedIndex(0); }
+    else if (event.key === 'Enter' && activeIndex >= 0) { event.preventDefault(); selectOption(activeIndex); }
+    else if (event.key === 'Escape') { event.preventDefault(); setOpenState(false); }
+    else if (event.key === 'Tab') setOpenState(false);
+  }
+  function handlePanelScroll(event: UIEvent<HTMLDivElement>) {
+    const element = event.currentTarget;
+    if (virtualScroll) setVirtualStart(Math.max(0, Math.floor(element.scrollTop / itemHeight) - 4));
+    if (virtualPaging && element.scrollHeight - element.scrollTop - element.clientHeight < 20 && page < totalPages) void load(page + 1, query);
+  }
+  function beginResize(key: string, event: ReactPointerEvent<HTMLButtonElement>) {
+    if (!resizableColumns) return;
+    event.preventDefault();
+    const startX = event.clientX;
+    const startWidth = (event.currentTarget.parentElement?.getBoundingClientRect().width ?? 80);
+    const move = (moveEvent: PointerEvent) => setColumnWidths((current) => ({ ...current, [key]: `${Math.max(40, startWidth + moveEvent.clientX - startX)}px` }));
+    const stop = () => { window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', stop); };
+    window.addEventListener('pointermove', move); window.addEventListener('pointerup', stop, { once: true });
   }
 
-  /* ── Render ───────────────────────────────────────────────────────── */
-
-  const rootCls = [
-    'sp-gc',
-    open && 'sp-gc--open',
-    disabled && 'sp-gc--disabled',
-    className,
-  ]
-    .filter(Boolean)
-    .join(' ');
-
-  return (
-    <>
-      <div ref={anchorRef} className={rootCls}>
-        <div className="sp-gc__input-wrap">
-          <Icon name="search" size={14} className="sp-gc__search-icon" />
-          <input
-            ref={inputRef}
-            className="sp-gc__input"
-            placeholder={placeholder}
-            disabled={disabled}
-            value={query}
-            onChange={handleQueryChange}
-            onFocus={handleFocus}
-            onKeyDown={handleKeyDown}
-            role="combobox"
-            aria-expanded={open}
-            aria-autocomplete="list"
-            aria-activedescendant={activeDescendant}
-          />
-          {query && (
-            <button
-              className="sp-gc__clear"
-              type="button"
-              tabIndex={-1}
-              aria-label={t('clear')}
-              onMouseDown={handleClear}
-            >
-              <Icon name="x" size={12} />
-            </button>
-          )}
-        </div>
+  if (effectiveHidden) return null;
+  const rootClasses = ['sp-gc', floatingLabel && 'sp-gc--floating', open && 'sp-gc--open', effectiveDisabled && 'sp-gc--disabled', effectiveReadOnly && 'sp-gc--readonly', hasError && 'sp-gc--error', className].filter(Boolean).join(' ');
+  const activeDescendant = activeIndex >= 0 ? `sp-gc-opt-${instanceId}-${activeIndex}` : undefined;
+  return <>
+    <div ref={anchorRef} className={rootClasses} dir={direction} data-constrain-to-modal={constrainToModal}>
+      {floatingLabel && <label className="sp-gc__floating-label" htmlFor={inputId}>{label}{effectiveRequired && <span aria-hidden="true">*</span>}</label>}
+      <div className="sp-gc__input-wrap">
+        <Icon name="search" size={14} className="sp-gc__search-icon" />
+        <input ref={inputRef} id={inputId} className="sp-gc__input" placeholder={placeholder === 'Search...' ? t('search') : placeholder} disabled={effectiveDisabled} readOnly={effectiveReadOnly} value={query} onChange={(event: ChangeEvent<HTMLInputElement>) => { setQuery(event.target.value); if (!open) setOpenState(true); else void load(1, event.target.value); }} onFocus={() => setOpenState(true)} onKeyDown={handleKeyDown} role="combobox" aria-expanded={open} aria-haspopup="listbox" aria-autocomplete="list" aria-activedescendant={activeDescendant} aria-label={ariaLabel || (!label ? undefined : label)} aria-labelledby={ariaLabelledBy || undefined} aria-describedby={describedBy} aria-invalid={hasError || undefined} aria-required={effectiveRequired || undefined} aria-readonly={effectiveReadOnly || undefined} />
+        {query && !effectiveDisabled && <button type="button" className="sp-gc__clear" tabIndex={-1} aria-label={t('clear')} onMouseDown={(event) => { event.preventDefault(); setQuery(''); onChange?.(''); inputRef.current?.focus(); }}><Icon name="x" size={12} /></button>}
       </div>
-
-      {open &&
-        createPortal(
-          <div
-            ref={panelRef}
-            className="sp-gc__dropdown"
-            role="listbox"
-            style={{
-              position: 'fixed',
-              top: panelPos.top,
-              left: panelPos.left,
-              minWidth: panelMinWidth,
-              zIndex: 999,
-              opacity: ready ? 1 : 0,
-            }}
-          >
-            {/* Column headers */}
-            <div
-              className="sp-gc__header"
-              style={{ gridTemplateColumns: gridTemplate }}
-            >
-              {columns.map((col) => (
-                <div key={col.key} className="sp-gc__header-cell">
-                  {col.label}
-                </div>
-              ))}
-            </div>
-
-            {/* Rows */}
-            {filteredOptions.length > 0 ? (
-              filteredOptions.map((opt, i) => (
-                <button
-                  key={opt.value}
-                  id={`sp-gc-opt-${instanceId}-${i}`}
-                  className={[
-                    'sp-gc__row',
-                    i === highlightedIndex && 'sp-gc__row--highlighted',
-                    isSelected(opt.value) && 'sp-gc__row--selected',
-                  ]
-                    .filter(Boolean)
-                    .join(' ')}
-                  type="button"
-                  role="option"
-                  aria-selected={isSelected(opt.value)}
-                  style={{ gridTemplateColumns: gridTemplate }}
-                  onMouseDown={() => selectOption(opt)}
-                  onMouseEnter={() => setHighlightedIndex(i)}
-                >
-                  {columns.map((col) => (
-                    <span key={col.key} className="sp-gc__cell">
-                      {cellValue(opt, col.key)}
-                    </span>
-                  ))}
-                  {isSelected(opt.value) && (
-                    <Icon name="check" size={14} className="sp-gc__check" />
-                  )}
-                </button>
-              ))
-            ) : query ? (
-              <div className="sp-gc__empty">No matches for "{query}"</div>
-            ) : null}
-          </div>,
-          document.body,
-        )}
-    </>
-  );
+    </div>
+    {open && createPortal(<div ref={panelRef} className="sp-gc__dropdown" role="listbox" style={{ position: 'fixed', top: position.top, left: position.left, width: position.width, zIndex: 999, opacity: ready ? 1 : 0 }} onScroll={handlePanelScroll}>
+      <div className="sp-gc__header" style={{ gridTemplateColumns: gridTemplate }}>{columns.map((column) => <div key={column.key} className="sp-gc__header-cell">{column.label}{resizableColumns && <button type="button" className="sp-gc__resizer" aria-label={t('resizeColumn', { column: column.label })} onPointerDown={(event) => beginResize(column.key, event)} />}</div>)}</div>
+      {loading && <div className="sp-gc__loading" role="status">{t('loading')}</div>}
+      {!loading && visibleItems.length > 0 && <div style={virtualScroll ? { paddingTop: `${virtualStart * itemHeight}px`, paddingBottom: `${Math.max(0, items.length - virtualStart - visibleItems.length) * itemHeight}px` } : undefined}>{visibleItems.map((item, offset) => { const index = virtualScroll ? virtualStart + offset : offset; const option = normalized[index]; const selected = option?.value === value; const highlighted = index === activeIndex; const context = { item, option, selected, highlighted }; return <button key={`${option?.value ?? index}-${index}`} id={`sp-gc-opt-${instanceId}-${index}`} type="button" role="option" aria-selected={selected} disabled={option?.disabled} className={['sp-gc__row', selected && 'sp-gc__row--selected', highlighted && 'sp-gc__row--highlighted'].filter(Boolean).join(' ')} style={{ gridTemplateColumns: gridTemplate }} onMouseEnter={() => setHighlightedIndex(virtualScroll ? offset : index)} onClick={() => selectOption(index)}>{renderRow ? renderRow(context) : columns.map((column) => <span key={column.key} className="sp-gc__cell">{column.key === valueField && option?.icon && <Icon name={option.icon} size={14} />}{String(item[column.key] ?? '')}</span>)}{selected && <Icon name="check" size={14} className="sp-gc__check" />}</button>; })}</div>}
+      {!loading && !visibleItems.length && <div className="sp-gc__empty">{renderEmpty ? renderEmpty() : t('noResults')}</div>}
+      {virtualPaging && showPagingFooter && <div className="sp-gc__paging"><button type="button" disabled={page <= 1 || loading} onClick={() => void load(page - 1, query)}>{t('previous')}</button><span>{t('page')} {page} {t('of')} {totalPages}</span><button type="button" disabled={page >= totalPages || loading} onClick={() => void load(page + 1, query)}>{t('next')}</button></div>}
+    </div>, document.body)}
+    {errorMessage && <p className="sp-gc-error" id={errorId} role="alert">{errorMessage}</p>}
+    {effectiveHint && !errorMessage && <p className="sp-gc-hint" id={hintId}>{effectiveHint}</p>}
+  </>;
 }

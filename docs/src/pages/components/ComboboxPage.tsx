@@ -90,11 +90,14 @@ export function ComboboxPage() {
               <thead><tr><th>Name</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
               <tbody>
                 <tr><td><code>options</code></td><td><code>ComboboxOption[]</code></td><td>—</td><td>Options to search</td></tr>
+                <tr><td><code>source</code></td><td><code>LookupSource</code></td><td>—</td><td>Array, readable data source, or URL</td></tr>
                 <tr><td><code>value</code></td><td><code>string | string[]</code></td><td>—</td><td>Controlled value</td></tr>
                 <tr><td><code>onChange</code></td><td><code>(value) =&gt; void</code></td><td>—</td><td>Selection callback</td></tr>
                 <tr><td><code>placeholder</code></td><td><code>string</code></td><td><code>'Search...'</code></td><td>Input placeholder</td></tr>
                 <tr><td><code>multiple</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Multi-select mode</td></tr>
                 <tr><td><code>disabled</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Disable the combobox</td></tr>
+                <tr><td><code>renderOption</code></td><td><code>(context) =&gt; ReactNode</code></td><td>—</td><td>Custom option renderer</td></tr>
+                <tr><td><code>virtualPaging</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Enable remote/page navigation</td></tr>
               </tbody>
             </table>
           </div>

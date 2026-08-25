@@ -12,7 +12,17 @@ import { useFormFieldContext } from '../field/FormFieldContext.js';
 import { firstFormError, type FormBorder, type FormChrome, type FormRadius, type FormValidationError } from '../field/form-types.js';
 import './Input.css';
 
-export type InputType = 'text' | 'password' | 'email' | 'number' | 'search' | 'tel' | 'url' | 'date' | 'time';
+export type InputType =
+  | 'text'
+  | 'password'
+  | 'email'
+  | 'number'
+  | 'search'
+  | 'tel'
+  | 'url'
+  | 'date'
+  | 'time'
+  | 'datetime-local';
 export type InputSize = 'sm' | 'md' | 'lg';
 export type InputVariant = 'default' | 'outline' | 'outlined' | 'filled';
 
@@ -95,6 +105,7 @@ export function Input({
 }: InputProps) {
   const { t } = useI18n();
   const field = useFormFieldContext();
+  const generatedId = React.useId().replace(/:/g, '');
   const [internalValue, setInternalValue] = React.useState(defaultValue);
   const [focused, setFocused] = React.useState(false);
   const isControlled = value !== undefined;
@@ -109,6 +120,12 @@ export function Input({
   const effectiveFloatingLabel = floatingLabel || Boolean(field?.floatingLabel);
   const effectiveHint = hint || field?.hint;
   const effectiveDescribedBy = ariaDescribedBy || field?.describedBy;
+  const effectiveChrome = chrome ?? field?.chrome;
+  const effectiveRadius = radius ?? field?.radius;
+  const effectiveBorder = border ?? field?.border;
+  const errorId = `${id ?? `sp-input-${generatedId}`}-error`;
+  const hintId = `${id ?? `sp-input-${generatedId}`}-hint`;
+  const describedBy = effectiveDescribedBy || (errorMessage ? errorId : effectiveHint ? hintId : undefined);
   const effectiveAriaLabel = ariaLabel || undefined;
   const effectiveAriaLabelledBy = ariaLabelledBy || undefined;
 
@@ -140,9 +157,9 @@ export function Input({
     effectiveDisabled ? 'sp-input-wrap--disabled' : '',
     hasError ? 'sp-input-wrap--error' : '',
     effectiveReadOnly ? 'sp-input-wrap--readonly' : '',
-    chrome ? `sp-input-wrap--chrome-${chrome}` : '',
-    radius ? `sp-input-wrap--radius-${radius}` : '',
-    border ? `sp-input-wrap--border-${border}` : '',
+    effectiveChrome ? `sp-input-wrap--chrome-${effectiveChrome}` : '',
+    effectiveRadius ? `sp-input-wrap--radius-${effectiveRadius}` : '',
+    effectiveBorder ? `sp-input-wrap--border-${effectiveBorder}` : '',
     focused ? 'sp-input-wrap--focused' : '',
     className ?? '',
   ].filter(Boolean).join(' ');
@@ -181,7 +198,7 @@ export function Input({
           step={step}
           aria-label={effectiveAriaLabel || (!effectiveLabel ? undefined : effectiveLabel)}
           aria-labelledby={effectiveAriaLabelledBy}
-          aria-describedby={effectiveDescribedBy}
+          aria-describedby={describedBy}
           aria-invalid={hasError || undefined}
           aria-required={effectiveRequired || undefined}
           aria-readonly={ariaReadonly ?? effectiveReadOnly ? true : undefined}
@@ -207,10 +224,10 @@ export function Input({
         )}
       </div>
       {errorMessage && !field?.describedBy && (
-        <p className="sp-input-error" role="alert">{errorMessage}</p>
+        <p className="sp-input-error" role="alert" id={errorId}>{errorMessage}</p>
       )}
       {effectiveHint && !hasError && !field?.describedBy && (
-        <p className="sp-input-hint">{effectiveHint}</p>
+        <p className="sp-input-hint" id={hintId}>{effectiveHint}</p>
       )}
     </div>
   );

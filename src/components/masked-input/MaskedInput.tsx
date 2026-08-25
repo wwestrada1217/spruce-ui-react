@@ -8,6 +8,8 @@
 import React from 'react';
 import { Icon } from '../../icons/Icon.js';
 import { useI18n } from '../../i18n/i18n-context.js';
+import { useFormFieldContext } from '../field/FormFieldContext.js';
+import { firstFormError, type FormBorder, type FormChrome, type FormRadius, type FormValidationError } from '../field/form-types.js';
 import './MaskedInput.css';
 
 export type MaskedInputSize = 'sm' | 'md' | 'lg';
@@ -85,9 +87,21 @@ export interface MaskedInputProps {
   iconRight?: string | null;
   disabled?: boolean;
   readOnly?: boolean;
+  hidden?: boolean;
+  invalid?: boolean;
+  errors?: readonly FormValidationError[];
   error?: string;
   hint?: string;
   required?: boolean;
+  ariaLabel?: string;
+  ariaLabelledBy?: string;
+  ariaDescribedBy?: string;
+  variant?: 'default' | 'outline' | 'outlined' | 'filled';
+  label?: string;
+  floatingLabel?: boolean;
+  chrome?: FormChrome;
+  radius?: FormRadius;
+  border?: FormBorder;
   className?: string;
   id?: string;
   name?: string;
@@ -106,14 +120,27 @@ export function MaskedInput({
   iconRight = null,
   disabled = false,
   readOnly = false,
+  hidden = false,
+  invalid,
+  errors,
   error,
   hint,
   required = false,
+  ariaLabel,
+  ariaLabelledBy,
+  ariaDescribedBy,
+  variant = 'default',
+  label = '',
+  floatingLabel = false,
+  chrome,
+  radius,
+  border,
   className,
   id,
   name,
 }: MaskedInputProps) {
   const { t } = useI18n();
+  const field = useFormFieldContext();
   const [displayValue, setDisplayValue] = React.useState(() => {
     if (value) {
       const raw = stripLiterals(value, mask);
@@ -128,7 +155,22 @@ export function MaskedInput({
   const [focused, setFocused] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
 
-  const hasError = Boolean(error);
+  const effectiveDisabled = disabled || Boolean(field?.disabled);
+  const effectiveReadOnly = readOnly || Boolean(field?.readOnly);
+  const effectiveHidden = hidden || Boolean(field?.hidden);
+  const effectiveRequired = required || Boolean(field?.required);
+  const effectiveLabel = label || (field?.floatingLabel ? field.label : '');
+  const effectiveFloatingLabel = floatingLabel || Boolean(field?.floatingLabel);
+  const effectiveHint = hint || field?.hint;
+  const errorMessage = firstFormError(errors || field?.errors, error);
+  const hasError = Boolean(errorMessage) || Boolean(invalid ?? field?.invalid);
+  const effectiveChrome = chrome ?? field?.chrome;
+  const effectiveRadius = radius ?? field?.radius;
+  const effectiveBorder = border ?? field?.border;
+  const idBase = React.useId().replace(/:/g, '');
+  const errorId = `${id ?? `sp-mask-${idBase}`}-error`;
+  const hintId = `${id ?? `sp-mask-${idBase}`}-hint`;
+  const describedBy = ariaDescribedBy || field?.describedBy || (errorMessage ? errorId : effectiveHint ? hintId : undefined);
   const iconSize = size === 'sm' ? 12 : size === 'lg' ? 18 : 14;
   const placeholderText = placeholder || (showMaskGuide ? buildGuide(mask) : '');
 
@@ -174,6 +216,7 @@ export function MaskedInput({
   }
 
   function handleClear() {
+    if (effectiveDisabled || effectiveReadOnly) return;
     setDisplayValue('');
     setRawValue('');
     onChange?.('');
@@ -184,15 +227,27 @@ export function MaskedInput({
     'sp-mask',
     size === 'sm' ? 'sp-mask--sm' : '',
     size === 'lg' ? 'sp-mask--lg' : '',
-    disabled ? 'sp-mask--disabled' : '',
+    effectiveDisabled ? 'sp-mask--disabled' : '',
+    effectiveReadOnly ? 'sp-mask--readonly' : '',
+    variant === 'outline' || variant === 'outlined' ? 'sp-mask--outline' : '',
+    variant === 'filled' ? 'sp-mask--filled' : '',
+    effectiveFloatingLabel ? 'sp-mask--floating' : '',
+    effectiveChrome ? `sp-mask--chrome-${effectiveChrome}` : '',
+    effectiveRadius ? `sp-mask--radius-${effectiveRadius}` : '',
+    effectiveBorder ? `sp-mask--border-${effectiveBorder}` : '',
     hasError ? 'sp-mask--error' : '',
     focused ? 'sp-mask--focused' : '',
     className ?? '',
   ].filter(Boolean).join(' ');
 
+  if (effectiveHidden) return null;
+
   return (
     <div>
       <div className={wrapCls}>
+        {effectiveFloatingLabel && <label className="sp-mask__floating-label" htmlFor={id}>
+          {effectiveLabel}{effectiveRequired && <span aria-hidden="true">*</span>}
+        </label>}
         {iconLeft && (
           <Icon name={iconLeft} size={iconSize} className="sp-mask__icon" />
         )}
@@ -202,19 +257,23 @@ export function MaskedInput({
           name={name}
           className="sp-mask__field"
           type="text"
-          placeholder={placeholderText}
-          disabled={disabled}
-          readOnly={readOnly}
+          placeholder={effectiveFloatingLabel && !focused ? '' : placeholderText}
+          disabled={effectiveDisabled}
+          readOnly={effectiveReadOnly}
           value={displayValue}
           aria-invalid={hasError || undefined}
-          aria-required={required || undefined}
+          aria-required={effectiveRequired || undefined}
+          aria-readonly={effectiveReadOnly || undefined}
+          aria-label={ariaLabel || (!effectiveLabel ? undefined : effectiveLabel)}
+          aria-labelledby={ariaLabelledBy || undefined}
+          aria-describedby={describedBy}
           onInput={handleInput}
           onKeyDown={handleKeyDown}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           onChange={() => {/* controlled via onInput */}}
         />
-        {clearable && rawValue && (
+        {clearable && rawValue && !effectiveReadOnly && (
           <button
             className="sp-mask__clear"
             type="button"
@@ -229,11 +288,11 @@ export function MaskedInput({
           <Icon name={iconRight} size={iconSize} className="sp-mask__icon" />
         )}
       </div>
-      {hasError && (
-        <p className="sp-mask__error" role="alert">{error}</p>
+      {errorMessage && (
+        <p className="sp-mask__error" role="alert" id={errorId}>{errorMessage}</p>
       )}
-      {hint && !hasError && (
-        <p className="sp-mask__hint">{hint}</p>
+      {effectiveHint && !hasError && (
+        <p className="sp-mask__hint" id={hintId}>{effectiveHint}</p>
       )}
     </div>
   );

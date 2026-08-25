@@ -97,12 +97,15 @@ export function GridComboboxPage() {
               <tbody>
                 <tr><td><code>columns</code></td><td><code>GridComboboxColumn[]</code></td><td>—</td><td>Column definitions</td></tr>
                 <tr><td><code>options</code></td><td><code>GridComboboxOption[]</code></td><td>—</td><td>Data rows</td></tr>
+                <tr><td><code>source</code></td><td><code>LookupSource</code></td><td>—</td><td>Array, readable data source, or URL</td></tr>
                 <tr><td><code>value</code></td><td><code>string</code></td><td>—</td><td>Selected value</td></tr>
                 <tr><td><code>onChange</code></td><td><code>(value: string) =&gt; void</code></td><td>—</td><td>Selection callback</td></tr>
                 <tr><td><code>onSelect</code></td><td><code>(item) =&gt; void</code></td><td>—</td><td>Full item callback</td></tr>
                 <tr><td><code>placeholder</code></td><td><code>string</code></td><td><code>'Search...'</code></td><td>Input placeholder</td></tr>
                 <tr><td><code>filterBy</code></td><td><code>string | string[]</code></td><td><code>'label'</code></td><td>Keys to filter on</td></tr>
                 <tr><td><code>disabled</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Disable the combobox</td></tr>
+                <tr><td><code>resizableColumns</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Enable accessible column resize handles</td></tr>
+                <tr><td><code>renderRow</code></td><td><code>(context) =&gt; ReactNode</code></td><td>—</td><td>Custom row renderer</td></tr>
               </tbody>
             </table>
           </div>

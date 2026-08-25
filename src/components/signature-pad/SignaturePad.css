@@ -1,19 +1,59 @@
 .sp-signature-pad {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-}
-
-.sp-signature-canvas {
-  border: 1px dashed var(--sp-border-subtle, #cbd5e1);
-  border-radius: var(--sp-radius-md, 8px);
-  background-color: var(--sp-bg-surface, #ffffff);
-  touch-action: none;
-  cursor: crosshair;
-}
-
-.sp-signature-actions {
   display: flex;
-  gap: 8px;
+  flex-direction: column;
+  gap: var(--sp-space-2, 8px);
+  padding: var(--sp-space-3, 12px);
+  border: var(--sp-border-width-hairline, 1px) solid var(--sp-border, #cbd5e1);
+  border-radius: var(--sp-radius-lg, 8px);
+  background: var(--sp-surface-0, #fff);
 }
+
+.sp-signature-pad--chrome-outlined { box-shadow: none; }
+.sp-signature-pad--chrome-elevated { border-color: transparent; box-shadow: var(--sp-shadow-md); }
+.sp-signature-pad--chrome-filled { background: var(--sp-surface-50, #f8f9fb); }
+.sp-signature-pad--chrome-ghost,
+.sp-signature-pad--chrome-flush { background: transparent; border-color: transparent; }
+.sp-signature-pad--chrome-flush { border-radius: 0; }
+.sp-signature-pad--radius-none { border-radius: 0; }
+.sp-signature-pad--radius-sm { border-radius: var(--sp-radius-sm); }
+.sp-signature-pad--radius-md { border-radius: var(--sp-radius-md); }
+.sp-signature-pad--radius-lg { border-radius: var(--sp-radius-lg); }
+.sp-signature-pad--radius-xl { border-radius: var(--sp-radius-xl); }
+.sp-signature-pad--radius-full { border-radius: var(--sp-radius-full); }
+.sp-signature-pad--border-none { border-color: transparent; }
+.sp-signature-pad--border-subtle { border-color: var(--sp-border); }
+.sp-signature-pad--border-strong { border-color: var(--sp-border-strong); }
+.sp-signature-pad--disabled { opacity: 0.6; }
+.sp-signature-pad--readonly { cursor: default; }
+.sp-signature-pad--invalid { border-color: var(--sp-danger); }
+
+.sp-signature-pad__toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sp-space-2, 8px);
+  padding-bottom: var(--sp-space-2, 8px);
+  border-bottom: var(--sp-border-width-hairline, 1px) solid var(--sp-border);
+}
+
+.sp-signature-pad__tool-label {
+  color: var(--sp-text-muted);
+  font-size: var(--sp-text-xs, 11px);
+  font-weight: var(--sp-font-semibold, 600);
+  text-transform: uppercase;
+}
+
+.sp-signature-pad__color-input { width: 32px; height: 28px; padding: 2px; accent-color: var(--sp-primary); }
+.sp-signature-pad__size-slider { width: 96px; accent-color: var(--sp-primary); }
+.sp-signature-pad__size-value { min-width: 32px; color: var(--sp-text-color); font-size: var(--sp-text-xs, 11px); }
+.sp-signature-pad__tool-spacer { flex: 1; }
+.sp-signature-pad__clear { min-height: var(--sp-density-control-height, 32px); padding: 0 var(--sp-space-2, 8px); border: 1px solid var(--sp-border-strong); border-radius: var(--sp-radius-sm); background: transparent; color: var(--sp-text-color); cursor: pointer; }
+.sp-signature-pad__clear:focus-visible { outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color); outline-offset: var(--sp-focus-ring-offset, 2px); }
+
+.sp-signature-pad__canvas-wrap { position: relative; max-width: 100%; overflow: auto; }
+.sp-signature-pad__canvas { display: block; max-width: 100%; border: 1px dashed var(--sp-border-subtle, #cbd5e1); border-radius: var(--sp-radius-md, 8px); touch-action: none; cursor: crosshair; }
+.sp-signature-pad__placeholder { position: absolute; inset: 0; display: grid; place-items: center; color: var(--sp-text-subtle); pointer-events: none; }
+.sp-signature-pad__error,
+.sp-signature-pad__hint { margin: 0; font-size: var(--sp-text-xs, 11px); }
+.sp-signature-pad__error { color: var(--sp-danger); }
+.sp-signature-pad__hint { color: var(--sp-text-subtle); }

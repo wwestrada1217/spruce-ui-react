@@ -182,3 +182,15 @@
   font-size: 13px;
   color: var(--sp-text-subtle, #718096);
 }
+
+.sp-gc__floating-label { position: absolute; z-index: 1; top: 0; left: var(--sp-space-3, 12px); padding: 0 var(--sp-space-1, 4px); transform: translateY(-50%); background: var(--sp-surface-0, #fff); color: var(--sp-text-subtle, #718096); font-size: var(--sp-text-xs, 11px); }
+.sp-gc--error .sp-gc__input-wrap { border-color: var(--sp-danger, #dc2626); }
+.sp-gc--readonly .sp-gc__input-wrap { cursor: default; }
+.sp-gc__loading, .sp-gc__paging { padding: var(--sp-space-3, 12px); color: var(--sp-text-subtle, #718096); font-size: var(--sp-text-sm, 13px); }
+.sp-gc__paging { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-space-2, 8px); border-top: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08)); }
+.sp-gc__paging button { border: 0; background: transparent; color: var(--sp-primary, #2563eb); cursor: pointer; }
+.sp-gc__paging button:disabled { color: var(--sp-text-disabled, #a0aec0); cursor: not-allowed; }
+.sp-gc__resizer { position: absolute; inset-block: 0; inset-inline-end: 0; width: var(--sp-space-2, 8px); border: 0; background: transparent; cursor: col-resize; }
+.sp-gc__header-cell { position: relative; }
+.sp-gc-error { margin: var(--sp-space-1, 4px) 0 0; color: var(--sp-danger, #dc2626); font-size: var(--sp-text-xs, 11px); }
+.sp-gc-hint { margin: var(--sp-space-1, 4px) 0 0; color: var(--sp-text-subtle, #718096); font-size: var(--sp-text-xs, 11px); }

@@ -1,465 +1,275 @@
-/*
- * Copyright (c) 2026-2027 Sprucestack. All Rights Reserved.
- * The term "Sprucestack" refers to Sprucestack Inc. and/or its subsidiaries.
- * This software is released under Apache license.
- * The full license information can be found in LICENSE in the root directory of this project.
- */
-
 import './Select.css';
-import { useState, useRef, useEffect, useCallback, useMemo, useId } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
-import { computePosition, getScrollParents } from '../../utils/positioning.js';
+import { computePosition, getScrollParents, type Placement } from '../../utils/positioning.js';
 import { useI18n } from '../../i18n/i18n-context.js';
 import { useFormFieldContext } from '../field/FormFieldContext.js';
 import { firstFormError, type FormValidationError } from '../field/form-types.js';
-
-/* ── Public types ────────────────────────────────────────────────────────── */
+import { getLookupItemValue, isLookupSource, normalizeLookupOption, readLookupPage, type LookupRenderContext, type LookupSource } from '../lookup/lookup-types.js';
 
 export interface SelectOption {
   label: string;
   value: string;
   disabled?: boolean;
+  description?: string;
+  icon?: string;
+  color?: string;
 }
 
+export type SelectSource = LookupSource<unknown>;
 export type SelectSize = 'sm' | 'md' | 'lg';
 
 export interface SelectProps {
-  options: SelectOption[];
+  options: SelectSource | null;
   value?: string | string[];
   onChange?: (value: string | string[]) => void;
+  onSelectedItem?: (item: unknown) => void;
+  onOpenChange?: (open: boolean) => void;
+  displayField?: string;
+  valueField?: string;
+  dataKey?: string;
+  pageSize?: number;
+  searchable?: boolean;
+  autoOpen?: boolean;
   placeholder?: string;
   size?: SelectSize;
   multiple?: boolean;
   disabled?: boolean;
+  readOnly?: boolean;
+  hidden?: boolean;
   error?: string;
+  hint?: string;
   errors?: readonly FormValidationError[];
   invalid?: boolean;
   required?: boolean;
-  readOnly?: boolean;
-  hidden?: boolean;
-  id?: string;
+  label?: string;
+  floatingLabel?: boolean;
+  variant?: 'default' | 'outline' | 'outlined' | 'filled';
+  icon?: string | null;
+  placement?: Placement;
+  constrainToModal?: boolean;
+  dismissOnClickOutside?: boolean;
+  dismissOnScroll?: boolean;
+  virtualScroll?: boolean;
+  itemHeight?: number;
+  virtualPaging?: boolean;
+  showPagingFooter?: boolean;
+  renderOption?: (context: LookupRenderContext) => ReactNode;
+  renderEmpty?: () => ReactNode;
   ariaLabel?: string;
   ariaLabelledBy?: string;
   ariaDescribedBy?: string;
   className?: string;
+  id?: string;
 }
 
-/* ── Component ───────────────────────────────────────────────────────────── */
-
 export function Select({
-  options,
-  value,
-  onChange,
-  placeholder = 'Select...',
-  size = 'md',
-  multiple = false,
-  disabled = false,
-  error,
-  errors,
-  invalid,
-  required = false,
-  readOnly = false,
-  hidden = false,
-  id,
-  ariaLabel,
-  ariaLabelledBy,
-  ariaDescribedBy,
-  className,
+  options, value, onChange, onSelectedItem, onOpenChange, displayField = 'label', valueField = 'value', dataKey,
+  pageSize = 20, searchable = false, autoOpen = false, placeholder = 'Select...', size = 'md', multiple = false,
+  disabled = false, readOnly = false, hidden = false, error, hint, errors, invalid, required = false, label = '',
+  floatingLabel = false, variant = 'default', icon = null, placement = 'bottom-start', constrainToModal = true,
+  dismissOnClickOutside = true, dismissOnScroll = true, virtualScroll = false, itemHeight = 32,
+  virtualPaging = false, showPagingFooter = true, renderOption, renderEmpty, ariaLabel, ariaLabelledBy,
+  ariaDescribedBy, className = '', id,
 }: SelectProps) {
-  const { t } = useI18n();
+  const { direction, t } = useI18n();
   const field = useFormFieldContext();
+  const instanceId = useId().replace(/:/g, '');
+  const anchorRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
   const effectiveDisabled = disabled || Boolean(field?.disabled);
   const effectiveReadOnly = readOnly || Boolean(field?.readOnly);
-  const resolvedPlaceholder = placeholder === 'Select...' ? t('select') : placeholder;
-  const instanceId = useId();
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
-
-  const [open, setOpen] = useState(false);
-  const [highlightedIndex, setHighlightedIndex] = useState(-1);
-  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
-  const [panelWidth, setPanelWidth] = useState(0);
-  const [ready, setReady] = useState(false);
-  const rafId = useRef(0);
-
-  /* ── Derived state ───────────────────────────────────────────────────── */
-
-  const selected: string = typeof value === 'string' ? value : '';
-  const selectedItems: string[] = useMemo(
-    () => (Array.isArray(value) ? value : []),
-    [value],
-  );
-  const hasValue = multiple ? selectedItems.length > 0 : !!selected;
-
-  const selectedLabel =
-    options.find((o) => o.value === selected)?.label ?? '';
-
-  const displayLabel = multiple
-    ? resolvedPlaceholder
-    : selectedLabel || resolvedPlaceholder;
-
-  const selectedChips = selectedItems.map((v) => ({
-    value: v,
-    label: options.find((o) => o.value === v)?.label ?? v,
-  }));
-
-  function isSelected(val: string): boolean {
-    return multiple ? selectedItems.includes(val) : selected === val;
-  }
-
-  /* ── Open / close ────────────────────────────────────────────────────── */
-
-  const reposition = useCallback(() => {
-    const anchor = wrapperRef.current;
-    const panel = panelRef.current;
-    if (!anchor || !panel) return;
-    const result = computePosition(anchor, panel, 'bottom-start', 4);
-    setDropdownPos({ top: result.top, left: result.left });
-    setPanelWidth(anchor.offsetWidth);
-    setReady(true);
-  }, []);
-
-  const openPanel = useCallback(() => {
-    // Prime the panel width before first paint so the smart-position pass
-    // measures the panel at its real size.
-    if (wrapperRef.current) setPanelWidth(wrapperRef.current.offsetWidth);
-    setReady(false);
-    setOpen(true);
-    const selectedIdx = options.findIndex((o) =>
-      multiple ? selectedItems.includes(o.value) : selected === o.value,
-    );
-    setHighlightedIndex(selectedIdx >= 0 ? selectedIdx : 0);
-  }, [options, multiple, selectedItems, selected]);
-
-  const closePanel = useCallback(() => {
-    setOpen(false);
-    setHighlightedIndex(-1);
-  }, []);
-
-  const toggle = useCallback(() => {
-    if (effectiveDisabled || effectiveReadOnly) return;
-    if (open) {
-      closePanel();
-    } else {
-      openPanel();
-    }
-  }, [effectiveDisabled, effectiveReadOnly, open, openPanel, closePanel]);
-
-  /* ── Click outside ───────────────────────────────────────────────────── */
-
-  useEffect(() => {
-    if (!open) return;
-    function handleMouseDown(e: MouseEvent) {
-      const target = e.target as Node;
-      if (wrapperRef.current?.contains(target)) return;
-      if (panelRef.current?.contains(target)) return;
-      closePanel();
-    }
-    document.addEventListener('mousedown', handleMouseDown);
-    return () => document.removeEventListener('mousedown', handleMouseDown);
-  }, [open, closePanel]);
-
-  /* ── Position panel after open ───────────────────────────────────────── */
-
-  useEffect(() => {
-    if (!open) return;
-    rafId.current = requestAnimationFrame(reposition);
-    return () => cancelAnimationFrame(rafId.current);
-  }, [open, reposition]);
-
-  /* ── Reposition on scroll / resize ───────────────────────────────────── */
-
-  useEffect(() => {
-    if (!open) return;
-    const anchor = wrapperRef.current;
-    const scrollables = anchor ? getScrollParents(anchor) : [];
-    const onScroll = () => {
-      rafId.current = requestAnimationFrame(reposition);
-    };
-    scrollables.forEach((el) => el.addEventListener('scroll', onScroll, { passive: true }));
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
-    return () => {
-      scrollables.forEach((el) => el.removeEventListener('scroll', onScroll));
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
-      cancelAnimationFrame(rafId.current);
-    };
-  }, [open, reposition]);
-
-  /* ── Scroll highlighted option into view ─────────────────────────────── */
-
-  useEffect(() => {
-    if (!open || highlightedIndex < 0) return;
-    const optionEl = document.getElementById(
-      `sp-select-opt-${instanceId}-${highlightedIndex}`,
-    );
-    optionEl?.scrollIntoView({ block: 'nearest' });
-  }, [highlightedIndex, open, instanceId]);
-
-  /* ── Selection ───────────────────────────────────────────────────────── */
-
-  function selectOption(opt: SelectOption) {
-    if (opt.disabled) return;
-    if (multiple) {
-      const current = selectedItems;
-      const next = current.includes(opt.value)
-        ? current.filter((v) => v !== opt.value)
-        : [...current, opt.value];
-      onChange?.(next);
-    } else {
-      onChange?.(opt.value);
-      closePanel();
-      triggerRef.current?.focus();
-    }
-  }
-
-  function removeChip(e: React.MouseEvent, val: string) {
-    e.stopPropagation();
-    const next = selectedItems.filter((v) => v !== val);
-    onChange?.(next);
-  }
-
-  /* ── Keyboard ────────────────────────────────────────────────────────── */
-
-  function navigateDown() {
-    let next = highlightedIndex + 1;
-    while (next < options.length && options[next].disabled) next++;
-    if (next < options.length) setHighlightedIndex(next);
-  }
-
-  function navigateUp() {
-    let prev = highlightedIndex - 1;
-    while (prev >= 0 && options[prev].disabled) prev--;
-    if (prev >= 0) setHighlightedIndex(prev);
-  }
-
-  function navigateHome() {
-    let first = 0;
-    while (first < options.length && options[first].disabled) first++;
-    if (first < options.length) setHighlightedIndex(first);
-  }
-
-  function navigateEnd() {
-    let last = options.length - 1;
-    while (last >= 0 && options[last].disabled) last--;
-    if (last >= 0) setHighlightedIndex(last);
-  }
-
-  function handleKeydown(event: React.KeyboardEvent) {
-    if (!open) {
-      switch (event.key) {
-        case 'ArrowDown':
-        case 'ArrowUp':
-        case 'Enter':
-        case ' ':
-          event.preventDefault();
-          openPanel();
-          return;
-        default:
-          return;
-      }
-    }
-
-    switch (event.key) {
-      case 'ArrowDown':
-        event.preventDefault();
-        navigateDown();
-        break;
-      case 'ArrowUp':
-        event.preventDefault();
-        navigateUp();
-        break;
-      case 'Home':
-        event.preventDefault();
-        navigateHome();
-        break;
-      case 'End':
-        event.preventDefault();
-        navigateEnd();
-        break;
-      case 'Enter':
-      case ' ':
-        event.preventDefault();
-        if (
-          highlightedIndex >= 0 &&
-          highlightedIndex < options.length &&
-          !options[highlightedIndex].disabled
-        ) {
-          selectOption(options[highlightedIndex]);
-        }
-        break;
-      case 'Escape':
-        event.preventDefault();
-        closePanel();
-        triggerRef.current?.focus();
-        break;
-      case 'Tab':
-        closePanel();
-        break;
-    }
-  }
-
-  /* ── CSS class composition ───────────────────────────────────────────── */
-
-  const errorMessage = firstFormError(errors, error);
-  const hasError = Boolean(errorMessage) || Boolean(invalid ?? field?.invalid);
   const effectiveHidden = hidden || Boolean(field?.hidden);
   const effectiveRequired = required || Boolean(field?.required);
-  const effectiveDescribedBy = ariaDescribedBy || field?.describedBy;
-  const wrapperClasses = [
-    'sp-select',
-    size === 'sm' && 'sp-select--sm',
-    size === 'lg' && 'sp-select--lg',
-    effectiveDisabled && 'sp-select--disabled',
-    hasError && 'sp-select--error',
-    effectiveReadOnly && 'sp-select--readonly',
-    open && 'sp-select--open',
-    className,
-  ]
-    .filter(Boolean)
-    .join(' ');
+  const errorMessage = firstFormError(errors || field?.errors, error);
+  const hasError = Boolean(errorMessage) || Boolean(invalid ?? field?.invalid);
+  const effectiveHint = hint || field?.hint;
+  const errorId = `sp-select-${instanceId}-error`;
+  const hintId = `sp-select-${instanceId}-hint`;
+  const describedBy = ariaDescribedBy || field?.describedBy || (errorMessage ? errorId : effectiveHint ? hintId : undefined);
+  const selectedValues = useMemo(() => Array.isArray(value) ? value : value ? [value] : [], [value]);
+  const [open, setOpen] = useState(autoOpen);
+  const [query, setQuery] = useState('');
+  const [items, setItems] = useState<unknown[]>(Array.isArray(options) ? [...options] : []);
+  const [rawItems, setRawItems] = useState<unknown[]>(Array.isArray(options) ? [...options] : []);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
+  const [ready, setReady] = useState(false);
+  const [virtualStart, setVirtualStart] = useState(0);
 
-  /* ── Active descendant for a11y ──────────────────────────────────────── */
+  const load = useCallback(async (requestedPage: number, searchTerm: string, append = false) => {
+    if (!options) return;
+    setLoading(true);
+    try {
+      const response = await readLookupPage(options, {
+        pageNumber: requestedPage, pageSize,
+        searchTerm: searchable ? searchTerm : undefined,
+        searchFields: dataKey,
+      });
+      const nextItems = response.data;
+      setRawItems((current) => append ? [...current, ...nextItems] : nextItems);
+      setItems((current) => append ? [...current, ...nextItems] : nextItems);
+      setPage(response.pageNumber);
+      setTotalPages(response.totalPages);
+      setTotalRecords(response.totalRecords);
+    } catch {
+      setItems([]);
+      setRawItems([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [dataKey, options, pageSize, searchable]);
 
-  const activeDescendant =
-    highlightedIndex >= 0
-      ? `sp-select-opt-${instanceId}-${highlightedIndex}`
-      : undefined;
+  const reposition = useCallback(() => {
+    const anchor = anchorRef.current;
+    const panel = panelRef.current;
+    if (!anchor || !panel) return;
+    const result = computePosition(anchor, panel, placement, 4);
+    setPosition({ top: result.top, left: result.left, width: anchor.offsetWidth });
+    setReady(true);
+  }, [placement]);
 
-  /* ── Render ──────────────────────────────────────────────────────────── */
+  const setOpenState = useCallback((next: boolean) => {
+    if (effectiveDisabled || effectiveReadOnly) return;
+    setOpen(next);
+    onOpenChange?.(next);
+    if (next) {
+      setQuery('');
+      setHighlightedIndex(0);
+      setVirtualStart(0);
+      void load(virtualPaging ? 1 : 1, '');
+    } else {
+      setHighlightedIndex(-1);
+      setQuery('');
+    }
+  }, [effectiveDisabled, effectiveReadOnly, load, onOpenChange, virtualPaging]);
+
+  useEffect(() => {
+    if (autoOpen && !effectiveDisabled && !effectiveReadOnly) setOpenState(true);
+  }, [autoOpen, effectiveDisabled, effectiveReadOnly, setOpenState]);
+  useEffect(() => {
+    if (!open) return;
+    const frame = requestAnimationFrame(reposition);
+    const anchor = anchorRef.current;
+    const scrollParents = anchor ? getScrollParents(anchor) : [];
+    const onScroll = () => dismissOnScroll ? setOpenState(false) : reposition();
+    scrollParents.forEach((element) => element.addEventListener('scroll', onScroll, { passive: true }));
+    window.addEventListener('resize', reposition);
+    if (dismissOnScroll) window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      scrollParents.forEach((element) => element.removeEventListener('scroll', onScroll));
+      window.removeEventListener('resize', reposition);
+      if (dismissOnScroll) window.removeEventListener('scroll', onScroll);
+    };
+  }, [dismissOnScroll, open, reposition, setOpenState]);
+  useEffect(() => {
+    if (!open || !dismissOnClickOutside) return;
+    const handler = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (!anchorRef.current?.contains(target) && !panelRef.current?.contains(target)) setOpenState(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [dismissOnClickOutside, open, setOpenState]);
+  useEffect(() => {
+    if (open && searchable) searchRef.current?.focus();
+  }, [open, searchable]);
+
+  const normalized = useMemo(() => items.map((item) => normalizeLookupOption(item, displayField, valueField)), [displayField, items, valueField]);
+  const selectedOptions = normalized.filter((option) => selectedValues.includes(option.value));
+  const renderedItems = virtualScroll ? normalized.slice(virtualStart, virtualStart + Math.ceil(240 / itemHeight) + 8) : normalized;
+  const activeIndex = virtualScroll ? virtualStart + highlightedIndex : highlightedIndex;
+  const selectedLabel = selectedOptions.map((option) => option.label).join(', ');
+
+  function selectOption(index: number) {
+    const item = items[index];
+    const option = normalized[index];
+    if (!option || option.disabled) return;
+    onSelectedItem?.(item ?? getLookupItemValue(rawItems, option.value, valueField, displayField));
+    const next = multiple
+      ? (selectedValues.includes(option.value) ? selectedValues.filter((entry) => entry !== option.value) : [...selectedValues, option.value])
+      : option.value;
+    onChange?.(next);
+    if (!multiple) { setOpenState(false); triggerRef.current?.focus(); }
+  }
+  function moveHighlight(delta: number) {
+    if (!normalized.length) return;
+    let next = activeIndex + delta;
+    while (next >= 0 && next < normalized.length && normalized[next].disabled) next += delta;
+    if (next < 0) next = normalized.length - 1;
+    if (next >= normalized.length) {
+      if (virtualPaging && page < totalPages) { setPage(page + 1); void load(page + 1, query); setHighlightedIndex(0); return; }
+      next = 0;
+    }
+    if (virtualScroll) setVirtualStart(Math.max(0, Math.min(next, normalized.length - 1)));
+    setHighlightedIndex(virtualScroll ? next - virtualStart : next);
+  }
+  function handleKeyDown(event: React.KeyboardEvent) {
+    if (!open && ['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(event.key)) { event.preventDefault(); setOpenState(true); return; }
+    if (!open) return;
+    if (event.key === 'ArrowDown') { event.preventDefault(); moveHighlight(1); }
+    else if (event.key === 'ArrowUp') { event.preventDefault(); moveHighlight(-1); }
+    else if (event.key === 'Home') { event.preventDefault(); setHighlightedIndex(0); }
+    else if (event.key === 'End') { event.preventDefault(); setHighlightedIndex(Math.max(0, normalized.length - 1)); }
+    else if (event.key === 'PageDown' && virtualPaging && page < totalPages) { event.preventDefault(); setPage(page + 1); void load(page + 1, query); setHighlightedIndex(0); }
+    else if (event.key === 'PageUp' && virtualPaging && page > 1) { event.preventDefault(); setPage(page - 1); void load(page - 1, query); setHighlightedIndex(0); }
+    else if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); if (activeIndex >= 0) selectOption(activeIndex); }
+    else if (event.key === 'Escape') { event.preventDefault(); setOpenState(false); triggerRef.current?.focus(); }
+    else if (event.key === 'Tab') setOpenState(false);
+  }
+  function removeValue(valueToRemove: string) {
+    if (!multiple) return;
+    onChange?.(selectedValues.filter((entry) => entry !== valueToRemove));
+  }
+  function handlePanelScroll(event: React.UIEvent<HTMLDivElement>) {
+    const element = event.currentTarget;
+    if (virtualScroll) setVirtualStart(Math.max(0, Math.floor(element.scrollTop / itemHeight) - 4));
+    if (virtualPaging && element.scrollHeight - element.scrollTop - element.clientHeight < 20 && page < totalPages) { setPage(page + 1); void load(page + 1, query); }
+    if (!virtualPaging && isLookupSource(options ?? [] as unknown[]) && element.scrollHeight - element.scrollTop - element.clientHeight < 40 && page < totalPages) { setPage(page + 1); void load(page + 1, query, true); }
+  }
 
   if (effectiveHidden) return null;
-
+  const triggerClasses = ['sp-select', size !== 'md' && `sp-select--${size}`, variant !== 'default' && `sp-select--${variant === 'outlined' ? 'outline' : variant}`,
+    floatingLabel && 'sp-select--floating', selectedValues.length > 0 && 'sp-select--floated', open && 'sp-select--open', effectiveDisabled && 'sp-select--disabled', effectiveReadOnly && 'sp-select--readonly', hasError && 'sp-select--error', className].filter(Boolean).join(' ');
+  const activeDescendant = activeIndex >= 0 ? `sp-select-opt-${instanceId}-${activeIndex}` : undefined;
   return (
     <>
-      <div ref={wrapperRef} className={wrapperClasses}>
-        <button
-          ref={triggerRef}
-          className="sp-select__trigger"
-          type="button"
-          id={id}
-          disabled={effectiveDisabled}
-          aria-haspopup="listbox"
-          aria-expanded={open}
-          aria-activedescendant={activeDescendant}
-          aria-label={ariaLabel || undefined}
-          aria-labelledby={ariaLabelledBy || undefined}
-          aria-describedby={effectiveDescribedBy}
-          aria-invalid={hasError || undefined}
-          aria-required={effectiveRequired || undefined}
-          aria-readonly={effectiveReadOnly || undefined}
-          onClick={toggle}
-          onKeyDown={handleKeydown}
-        >
-          {multiple && selectedItems.length > 0 ? (
-            <span className="sp-select__chips">
-              {selectedChips.map((chip) => (
-                <span key={chip.value} className="sp-select__chip">
-                  {chip.label}
-                  <button
-                    className="sp-select__chip-remove"
-                    type="button"
-                    tabIndex={-1}
-                    aria-label={t('remove')}
-                    onClick={(e) => removeChip(e, chip.value)}
-                  >
-                    <Icon name="x" size={10} />
-                  </button>
-                </span>
-              ))}
-            </span>
-          ) : (
-            <span
-              className={[
-                'sp-select__value',
-                !hasValue && 'sp-select__value--placeholder',
-              ]
-                .filter(Boolean)
-                .join(' ')}
-            >
-              {displayLabel}
-            </span>
-          )}
+      <div ref={anchorRef} className={triggerClasses} dir={direction} data-constrain-to-modal={constrainToModal}>
+        {floatingLabel && <label className="sp-select__floating-label" htmlFor={id}>{label}{effectiveRequired && <span aria-hidden="true">*</span>}</label>}
+        <div ref={triggerRef} id={id} className="sp-select__trigger" role="button" tabIndex={effectiveDisabled ? -1 : 0} aria-disabled={effectiveDisabled || undefined}
+          aria-haspopup="listbox" aria-expanded={open} aria-activedescendant={activeDescendant}
+          aria-label={ariaLabel || (!label ? undefined : label)} aria-labelledby={ariaLabelledBy || undefined}
+          aria-describedby={describedBy} aria-invalid={hasError || undefined} aria-required={effectiveRequired || undefined}
+          aria-readonly={effectiveReadOnly || undefined} onClick={() => setOpenState(!open)} onKeyDown={handleKeyDown}>
+          {icon && <Icon name={icon} size={14} className="sp-select__icon" />}
+          {multiple && selectedOptions.length > 0 ? <span className="sp-select__chips">{selectedOptions.map((option) => <span key={option.value} className="sp-select__chip">{option.label}<button type="button" className="sp-select__chip-remove" tabIndex={-1} aria-label={t('remove')} onClick={(event) => { event.stopPropagation(); removeValue(option.value); }}><Icon name="x" size={10} /></button></span>)}</span>
+            : <span className={['sp-select__value', !selectedLabel && 'sp-select__value--placeholder'].filter(Boolean).join(' ')}>{selectedLabel || (placeholder === 'Select...' ? t('select') : placeholder)}</span>}
           <Icon name="chevron-down" size={12} className="sp-select__chevron" />
-        </button>
+        </div>
       </div>
-
-      {open &&
-        createPortal(
-          <div
-            ref={panelRef}
-            className="sp-select__dropdown"
-            role="listbox"
-            aria-multiselectable={multiple || undefined}
-            style={{
-              position: 'fixed',
-              top: dropdownPos.top,
-              left: dropdownPos.left,
-              width: panelWidth,
-              zIndex: 999,
-              opacity: ready ? 1 : 0,
-            }}
-          >
-            {options.length > 0 ? (
-              options.map((opt, i) => (
-                <button
-                  key={opt.value}
-                  id={`sp-select-opt-${instanceId}-${i}`}
-                  className={[
-                    'sp-select__option',
-                    isSelected(opt.value) && 'sp-select__option--selected',
-                    highlightedIndex === i && 'sp-select__option--highlighted',
-                    opt.disabled && 'sp-select__option--disabled',
-                  ]
-                    .filter(Boolean)
-                    .join(' ')}
-                  type="button"
-                  role="option"
-                  aria-selected={isSelected(opt.value)}
-                  disabled={opt.disabled}
-                  onClick={() => selectOption(opt)}
-                  onMouseEnter={() => setHighlightedIndex(i)}
-                >
-                  {multiple && (
-                    <span
-                      className={[
-                        'sp-select__option-checkbox',
-                        isSelected(opt.value) &&
-                          'sp-select__option-checkbox--checked',
-                      ]
-                        .filter(Boolean)
-                        .join(' ')}
-                    >
-                      {isSelected(opt.value) && (
-                        <Icon name="check" size={10} />
-                      )}
-                    </span>
-                  )}
-                  <span>{opt.label}</span>
-                  {!multiple && isSelected(opt.value) && (
-                    <Icon
-                      name="check"
-                      size={14}
-                      className="sp-select__check"
-                    />
-                  )}
-                </button>
-              ))
-            ) : (
-              <div className="sp-select__empty">{t('noOptions')}</div>
-            )}
-          </div>,
-          document.body,
-        )}
-
-      {errorMessage && !field?.describedBy && (
-        <p className="sp-select-error" role="alert">
-          {errorMessage}
-        </p>
-      )}
+      {open && createPortal(<div ref={panelRef} className="sp-select__dropdown" role="listbox" aria-multiselectable={multiple || undefined} data-total-records={totalRecords}
+        style={{ position: 'fixed', top: position.top, left: position.left, width: position.width, zIndex: 999, opacity: ready ? 1 : 0 }} onScroll={handlePanelScroll}>
+        {searchable && <input ref={searchRef} className="sp-select__search" value={query} placeholder={t('search')} aria-label={t('search')} onChange={(event) => { setQuery(event.target.value); setPage(1); void load(1, event.target.value); }} onKeyDown={handleKeyDown} />}
+        {loading && <div className="sp-select__loading" role="status">{t('loading')}</div>}
+        {!loading && renderedItems.length > 0 && <div style={virtualScroll ? { paddingTop: `${virtualStart * itemHeight}px`, paddingBottom: `${Math.max(0, normalized.length - virtualStart - renderedItems.length) * itemHeight}px` } : undefined}>
+          {renderedItems.map((option, offset) => { const index = virtualScroll ? virtualStart + offset : offset; const item = items[index]; const selected = selectedValues.includes(option.value); const highlighted = index === activeIndex; const context = { item, option, selected, highlighted };
+            return <button key={`${option.value}-${index}`} id={`sp-select-opt-${instanceId}-${index}`} type="button" role="option" aria-selected={selected} disabled={option.disabled} className={['sp-select__option', selected && 'sp-select__option--selected', highlighted && 'sp-select__option--highlighted', option.disabled && 'sp-select__option--disabled'].filter(Boolean).join('')} onMouseEnter={() => setHighlightedIndex(virtualScroll ? offset : index)} onClick={() => selectOption(index)}>
+              {renderOption ? renderOption(context) : <><span className="sp-select__option-label">{option.icon && <Icon name={option.icon} size={14} ariaLabel={undefined} />}{option.color && <span className="sp-select__option-color" style={{ background: option.color }} aria-hidden="true" />}{option.label}{option.description && <small>{option.description}</small>}</span>{selected && <Icon name="check" size={14} className="sp-select__check" />}</>}
+            </button>; })}
+        </div>}
+        {!loading && renderedItems.length === 0 && <div className="sp-select__empty">{renderEmpty ? renderEmpty() : t('noOptions')}</div>}
+        {virtualPaging && showPagingFooter && <div className="sp-select__paging"><button type="button" disabled={page <= 1 || loading} onClick={() => { setPage(page - 1); void load(page - 1, query); }}>{t('previous')}</button><span>{t('page')} {page} {t('of')} {totalPages}</span><button type="button" disabled={page >= totalPages || loading} onClick={() => { setPage(page + 1); void load(page + 1, query); }}>{t('next')}</button></div>}
+      </div>, document.body)}
+      {errorMessage && <p className="sp-select-error" role="alert" id={errorId}>{errorMessage}</p>}
+      {effectiveHint && !errorMessage && <p className="sp-select-hint" id={hintId}>{effectiveHint}</p>}
     </>
   );
 }

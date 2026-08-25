@@ -74,7 +74,7 @@ export type { DropdownProps, DropdownItem } from './components/dropdown/Dropdown
 
 // ─── Select ──────────────────────────────────────────────────────────────────
 export { Select } from './components/select/Select.js';
-export type { SelectProps, SelectOption, SelectSize } from './components/select/Select.js';
+export type { SelectProps, SelectOption, SelectSize, SelectSource } from './components/select/Select.js';
 
 // ─── Avatar ───────────────────────────────────────────────────────────────────
 export { Avatar } from './components/avatar/Avatar.js';
@@ -336,11 +336,14 @@ export type { ContainerProps, RowProps, ColProps } from './components/grid/Grid.
 
 // ─── Combobox ────────────────────────────────────────────────────────────────
 export { Combobox } from './components/combobox/Combobox.js';
-export type { ComboboxProps, ComboboxOption } from './components/combobox/Combobox.js';
+export type { ComboboxProps, ComboboxOption, ComboboxSource } from './components/combobox/Combobox.js';
 
 // ─── GridCombobox ────────────────────────────────────────────────────────────
 export { GridCombobox } from './components/grid-combobox/GridCombobox.js';
-export type { GridComboboxProps, GridComboboxColumn, GridComboboxOption } from './components/grid-combobox/GridCombobox.js';
+export type { GridComboboxProps, GridComboboxColumn, GridComboboxOption, GridComboboxSource } from './components/grid-combobox/GridCombobox.js';
+
+// ─── Lookup contracts ───────────────────────────────────────────────────────
+export type { LookupOption, LookupColumn, LookupRenderContext, LookupSource, LookupRenderer } from './components/lookup/lookup-types.js';
 
 // ─── Legacy Datagrid ────────────────────────────────────────────────────────
 /**
@@ -638,7 +641,7 @@ export type { DiffEditorProps } from './components/diff-editor/DiffEditor.js';
 
 // ─── SignaturePad ────────────────────────────────────────────────────────────
 export { SignaturePad } from './components/signature-pad/SignaturePad.js';
-export type { SignaturePadProps } from './components/signature-pad/SignaturePad.js';
+export type { SignaturePadProps, SignaturePadHandle } from './components/signature-pad/SignaturePad.js';
 
 // ─── Charts Framework ────────────────────────────────────────────────────────
 export { ChartContainer } from './charts/ChartContainer.js';
