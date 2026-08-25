@@ -174,11 +174,53 @@ export type { SwitchProps } from './components/switch/Switch.js';
 
 // ─── Input ────────────────────────────────────────────────────────────────────
 export { Input } from './components/input/Input.js';
-export type { InputProps, InputType, InputSize } from './components/input/Input.js';
+export type { InputProps, InputType, InputSize, InputVariant } from './components/input/Input.js';
 
 // ─── Textarea ─────────────────────────────────────────────────────────────────
 export { Textarea } from './components/textarea/Textarea.js';
-export type { TextareaProps, TextareaSize, TextareaResize } from './components/textarea/Textarea.js';
+export type { TextareaProps, TextareaSize, TextareaResize, TextareaVariant } from './components/textarea/Textarea.js';
+
+// ─── Form Foundation ─────────────────────────────────────────────────────────
+export { Field } from './components/field/Field.js';
+export type {
+  FieldProps,
+  FieldLayout,
+  FormBorder,
+  FormChrome,
+  FormRadius,
+  FormValidationError,
+  FormControlContractProps,
+} from './components/field/Field.js';
+export { useFormFieldContext } from './components/field/FormFieldContext.js';
+export type { FormFieldContextValue } from './components/field/FormFieldContext.js';
+export { FormLayout } from './components/form-layout/FormLayout.js';
+export type {
+  FormLayoutProps,
+  FormLayoutMode,
+  FormLayoutGap,
+  FormLayoutColumns,
+} from './components/form-layout/FormLayout.js';
+export { useFormLayoutContext } from './components/form-layout/FormLayoutContext.js';
+export type { FormLayoutContextValue } from './components/form-layout/FormLayoutContext.js';
+export {
+  InputGroup,
+  InputGroupInput,
+  InputGroupAddon,
+  InputGroupActions,
+  InputGroupSpacer,
+  InputGroupButton,
+} from './components/input-group/InputGroup.js';
+export type {
+  InputGroupProps,
+  InputGroupInputProps,
+  InputGroupAddonProps,
+  InputGroupActionsProps,
+  InputGroupSpacerProps,
+  InputGroupButtonProps,
+  InputGroupSize,
+  InputGroupLayout,
+  InputGroupButtonVariant,
+} from './components/input-group/InputGroup.js';
 
 // ─── PasswordInput ────────────────────────────────────────────────────────────
 export { PasswordInput } from './components/password-input/PasswordInput.js';

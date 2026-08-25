@@ -1,0 +1,194 @@
+.sp-input-group {
+  --sp-input-group-bg: var(--sp-surface-0);
+  --sp-input-group-border: var(--sp-control-border-color, var(--sp-border-strong));
+  --sp-input-group-radius: var(--sp-radius-md);
+  --sp-input-group-height: var(--sp-density-control-height, 32px);
+  --sp-input-group-padding-x: var(--sp-density-control-padding-x, 10px);
+  --sp-input-group-text: var(--sp-text-color);
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  min-height: var(--sp-input-group-height);
+  overflow: hidden;
+  color: var(--sp-input-group-text);
+  background: var(--sp-input-group-bg);
+  border: var(--sp-border-width-hairline, 1px) solid var(--sp-input-group-border);
+  border-radius: var(--sp-input-group-radius);
+  transition: border-color var(--sp-duration-normal) var(--sp-ease-default),
+    box-shadow var(--sp-duration-normal) var(--sp-ease-default);
+}
+
+.sp-input-group--composition {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--sp-space-3, 12px);
+  min-height: 92px;
+  padding: var(--sp-space-3, 12px);
+  border-radius: var(--sp-radius-lg, 8px);
+}
+
+.sp-input-group--composition.sp-input-group--sm {
+  min-height: 78px;
+  gap: var(--sp-space-2, 8px);
+  padding: var(--sp-space-2, 8px);
+}
+
+.sp-input-group--composition.sp-input-group--lg {
+  min-height: 132px;
+  gap: var(--sp-space-4, 16px);
+  padding: var(--sp-space-5, 20px);
+  border-radius: var(--sp-radius-xl, 12px);
+}
+
+.sp-input-group:focus-within {
+  border-color: var(--sp-focus-ring-color);
+  box-shadow: 0 0 0 var(--sp-focus-ring-width, 2px) var(--sp-focus-glow-color);
+}
+
+.sp-input-group--sm {
+  --sp-input-group-height: 28px;
+  --sp-input-group-padding-x: var(--sp-space-2, 8px);
+}
+
+.sp-input-group--lg {
+  --sp-input-group-height: 44px;
+  --sp-input-group-padding-x: var(--sp-space-4, 16px);
+}
+
+.sp-input-group--invalid {
+  --sp-input-group-border: var(--sp-danger);
+}
+
+.sp-input-group--invalid:focus-within {
+  border-color: var(--sp-danger);
+  box-shadow: 0 0 0 var(--sp-focus-ring-width, 2px) var(--sp-danger-subtle);
+}
+
+.sp-input-group--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--sp-surface-100);
+}
+
+.sp-input-group__control {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: calc(var(--sp-input-group-height) - 2px);
+  padding: 0 var(--sp-input-group-padding-x);
+  color: var(--sp-input-group-text);
+  font: inherit;
+  font-size: var(--sp-text-sm, 13px);
+  line-height: 1.4;
+  background: transparent;
+  border: 0;
+  outline: 0;
+}
+
+.sp-input-group--composition .sp-input-group__control {
+  min-height: 0;
+  padding: 0;
+  font-size: var(--sp-text-base, 14px);
+}
+
+.sp-input-group--sm .sp-input-group__control { font-size: var(--sp-text-xs, 11px); }
+.sp-input-group--lg .sp-input-group__control { font-size: var(--sp-text-base, 14px); }
+
+textarea.sp-input-group__control {
+  min-height: 84px;
+  padding-block: var(--sp-space-2, 8px);
+  resize: vertical;
+}
+
+.sp-input-group--composition textarea.sp-input-group__control {
+  min-height: 40px;
+  padding: 0;
+  resize: none;
+}
+
+.sp-input-group--composition.sp-input-group--lg textarea.sp-input-group__control {
+  min-height: 58px;
+  font-size: var(--sp-text-lg, 18px);
+}
+
+.sp-input-group__control::placeholder { color: var(--sp-text-disabled); }
+.sp-input-group__control:disabled { cursor: not-allowed; }
+
+.sp-input-group-addon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-space-1_5, 6px);
+  min-height: calc(var(--sp-input-group-height) - 2px);
+  padding-inline: var(--sp-input-group-padding-x, 10px);
+  color: var(--sp-text-muted);
+  font-size: var(--sp-text-sm, 13px);
+  white-space: nowrap;
+  background: var(--sp-surface-50);
+  border-inline-end: var(--sp-border-width-hairline, 1px) solid var(--sp-border);
+}
+
+.sp-input-group-addon:last-child {
+  border-inline-start: var(--sp-border-width-hairline, 1px) solid var(--sp-border);
+  border-inline-end: 0;
+}
+
+.sp-input-group-addon:only-child { border-inline: 0; }
+.sp-input-group--hide-addon-background .sp-input-group-addon { background: transparent; }
+.sp-input-group--hide-addon-separator .sp-input-group-addon { border-inline: 0; }
+
+.sp-input-group-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-space-2, 8px);
+  min-width: 0;
+  width: 100%;
+}
+
+.sp-input-group-actions--end { justify-content: flex-end; }
+
+.sp-input-group-spacer {
+  display: block;
+  flex: 1 1 auto;
+  min-width: var(--sp-space-2, 8px);
+}
+
+.sp-input-group-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-space-1_5, 6px);
+  min-width: var(--sp-input-group-height, 32px);
+  min-height: calc(var(--sp-input-group-height, 32px) - 2px);
+  padding-inline: var(--sp-input-group-padding-x, 10px);
+  color: var(--sp-text-color);
+  font: inherit;
+  font-size: var(--sp-text-sm, 13px);
+  font-weight: var(--sp-font-medium, 500);
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  background: var(--sp-surface-50);
+  border: 0;
+  border-inline-start: var(--sp-border-width-hairline, 1px) solid var(--sp-border);
+  transition: background var(--sp-duration-fast) var(--sp-ease-default), color var(--sp-duration-fast) var(--sp-ease-default);
+}
+
+.sp-input-group-button:hover:not(:disabled) { background: var(--sp-content-hover-bg); }
+.sp-input-group-button:active:not(:disabled) { background: var(--sp-content-active-bg); }
+.sp-input-group-button:focus-visible { outline: var(--sp-focus-ring-width) solid var(--sp-focus-ring-color); outline-offset: calc(var(--sp-focus-ring-offset) * -1); }
+.sp-input-group-button:disabled { cursor: not-allowed; opacity: 0.5; }
+.sp-input-group-button--ghost { background: transparent; }
+.sp-input-group-button--soft { color: var(--sp-primary-on-tint, var(--sp-primary)); background: var(--sp-primary-tint); border-inline: 0; border-radius: var(--sp-radius-full); }
+.sp-input-group-button--icon { width: var(--sp-input-group-height, 32px); padding-inline: 0; border-radius: var(--sp-radius-full); }
+
+.sp-input-group-button:first-child { border-inline-start: 0; border-inline-end: var(--sp-border-width-hairline, 1px) solid var(--sp-border); }
+
+.sp-input-group--composition .sp-input-group-button {
+  min-width: 28px;
+  min-height: 28px;
+  padding-inline: var(--sp-space-2, 8px);
+  border: 0;
+  border-radius: var(--sp-radius-full);
+}
+
+.sp-input-group--composition .sp-input-group-button--icon { width: 28px; padding-inline: 0; }

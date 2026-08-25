@@ -6,10 +6,13 @@
  */
 
 import React from 'react';
+import { useFormFieldContext } from '../field/FormFieldContext.js';
+import { firstFormError, type FormBorder, type FormChrome, type FormRadius, type FormValidationError } from '../field/form-types.js';
 import './Textarea.css';
 
 export type TextareaSize = 'sm' | 'md' | 'lg';
 export type TextareaResize = 'none' | 'vertical' | 'horizontal' | 'both';
+export type TextareaVariant = 'default' | 'outline' | 'outlined' | 'filled';
 
 export interface TextareaProps {
   value?: string;
@@ -23,13 +26,27 @@ export interface TextareaProps {
   showCount?: boolean;
   disabled?: boolean;
   readOnly?: boolean;
+  hidden?: boolean;
   error?: string;
+  errors?: readonly FormValidationError[];
+  invalid?: boolean;
   hint?: string;
   required?: boolean;
+  label?: string;
+  floatingLabel?: boolean;
+  variant?: TextareaVariant;
+  chrome?: FormChrome;
+  radius?: FormRadius;
+  border?: FormBorder;
   ariaLabel?: string;
+  ariaLabelledBy?: string;
+  ariaDescribedBy?: string;
+  ariaReadonly?: boolean;
   className?: string;
   id?: string;
   name?: string;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }
 
 export function Textarea({
@@ -44,20 +61,45 @@ export function Textarea({
   showCount = true,
   disabled = false,
   readOnly = false,
+  hidden = false,
   error,
+  errors,
+  invalid,
   hint,
   required = false,
+  label = '',
+  floatingLabel = false,
+  variant = 'default',
+  chrome,
+  radius,
+  border,
   ariaLabel,
+  ariaLabelledBy,
+  ariaDescribedBy,
+  ariaReadonly,
   className,
   id,
   name,
+  onFocus,
+  onBlur,
 }: TextareaProps) {
+  const field = useFormFieldContext();
   const [internalValue, setInternalValue] = React.useState(defaultValue);
   const [focused, setFocused] = React.useState(false);
   const isControlled = value !== undefined;
   const currentValue = isControlled ? value : internalValue;
 
-  const hasError = Boolean(error);
+  const errorMessage = firstFormError(errors, error);
+  const hasError = Boolean(errorMessage) || Boolean(invalid ?? field?.invalid);
+  const effectiveDisabled = disabled || Boolean(field?.disabled);
+  const effectiveReadOnly = readOnly || Boolean(field?.readOnly);
+  const effectiveHidden = hidden || Boolean(field?.hidden);
+  const effectiveRequired = required || Boolean(field?.required);
+  const effectiveLabel = label || (field?.floatingLabel ? field.label : '');
+  const effectiveFloatingLabel = floatingLabel || Boolean(field?.floatingLabel);
+  const effectiveHint = hint || field?.hint;
+  const effectiveDescribedBy = ariaDescribedBy || field?.describedBy;
+  const floated = effectiveFloatingLabel && (focused || Boolean(currentValue));
   const charCount = currentValue.length;
 
   function handleChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
@@ -70,8 +112,16 @@ export function Textarea({
     'sp-textarea',
     size === 'sm' ? 'sp-textarea--sm' : '',
     size === 'lg' ? 'sp-textarea--lg' : '',
-    disabled ? 'sp-textarea--disabled' : '',
+    variant === 'outline' || variant === 'outlined' ? 'sp-textarea--outline' : '',
+    variant === 'filled' ? 'sp-textarea--filled' : '',
+    effectiveFloatingLabel ? 'sp-textarea--floating' : '',
+    floated ? 'sp-textarea--floated' : '',
+    effectiveDisabled ? 'sp-textarea--disabled' : '',
     hasError ? 'sp-textarea--error' : '',
+    effectiveReadOnly ? 'sp-textarea--readonly' : '',
+    chrome ? `sp-textarea--chrome-${chrome}` : '',
+    radius ? `sp-textarea--radius-${radius}` : '',
+    border ? `sp-textarea--border-${border}` : '',
     focused ? 'sp-textarea--focused' : '',
     className ?? '',
   ].filter(Boolean).join(' ');
@@ -81,26 +131,45 @@ export function Textarea({
     maxLength !== undefined && charCount >= maxLength ? 'sp-textarea__count--limit' : '',
   ].filter(Boolean).join(' ');
 
+  if (effectiveHidden) return null;
+
   return (
-    <div>
+    <div className="sp-textarea-field">
       <div className={wrapCls}>
+        {effectiveFloatingLabel && (
+          <label
+            className={[
+              'sp-textarea__floating-label',
+              floated && 'sp-textarea__floating-label--floated',
+              focused && 'sp-textarea__floating-label--focused',
+              hasError && 'sp-textarea__floating-label--error',
+            ].filter(Boolean).join(' ')}
+            htmlFor={id}
+          >
+            {effectiveLabel}
+            {effectiveRequired && <span className="sp-textarea__required" aria-hidden="true">*</span>}
+          </label>
+        )}
         <textarea
           id={id}
           name={name}
           className="sp-textarea__field"
-          placeholder={placeholder}
-          disabled={disabled}
-          readOnly={readOnly}
+          placeholder={effectiveFloatingLabel && !floated ? '' : placeholder}
+          disabled={effectiveDisabled}
+          readOnly={effectiveReadOnly}
           rows={rows}
           value={currentValue}
           maxLength={maxLength}
-          aria-label={ariaLabel || undefined}
+          aria-label={ariaLabel || (!effectiveLabel ? undefined : effectiveLabel)}
+          aria-labelledby={ariaLabelledBy || undefined}
+          aria-describedby={effectiveDescribedBy}
           aria-invalid={hasError || undefined}
-          aria-required={required || undefined}
+          aria-required={effectiveRequired || undefined}
+          aria-readonly={ariaReadonly ?? effectiveReadOnly ? true : undefined}
           style={{ resize }}
           onChange={handleChange}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
+          onFocus={() => { setFocused(true); onFocus?.(); }}
+          onBlur={() => { setFocused(false); onBlur?.(); }}
         />
         {maxLength !== undefined && showCount && (
           <div className="sp-textarea__footer">
@@ -108,11 +177,11 @@ export function Textarea({
           </div>
         )}
       </div>
-      {hasError && (
-        <p className="sp-textarea__error" role="alert">{error}</p>
+      {errorMessage && !field?.describedBy && (
+        <p className="sp-textarea__error" role="alert">{errorMessage}</p>
       )}
-      {hint && !hasError && (
-        <p className="sp-textarea__hint">{hint}</p>
+      {effectiveHint && !hasError && !field?.describedBy && (
+        <p className="sp-textarea__hint">{effectiveHint}</p>
       )}
     </div>
   );

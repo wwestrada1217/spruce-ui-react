@@ -41,6 +41,9 @@ import { TimelinePage } from './pages/components/TimelinePage'
 import { SwitchPage } from './pages/components/SwitchPage'
 import { InputPage } from './pages/components/InputPage'
 import { TextareaPage } from './pages/components/TextareaPage'
+import { FieldPage } from './pages/components/FieldPage'
+import { FormLayoutPage } from './pages/components/FormLayoutPage'
+import { InputGroupPage } from './pages/components/InputGroupPage'
 import { PasswordInputPage } from './pages/components/PasswordInputPage'
 import { PasswordProgressPage } from './pages/components/PasswordProgressPage'
 import { OtpInputPage } from './pages/components/OtpInputPage'
@@ -212,6 +215,9 @@ function renderPage(hash: string): React.ReactElement {
     case '#/components/switch':               return <SwitchPage />
     case '#/components/input':                return <InputPage />
     case '#/components/textarea':             return <TextareaPage />
+    case '#/components/field':                return <FieldPage />
+    case '#/components/form-layout':          return <FormLayoutPage />
+    case '#/components/input-group':          return <InputGroupPage />
     case '#/components/password-input':       return <PasswordInputPage />
     case '#/components/password-progress':    return <PasswordProgressPage />
     case '#/components/otp-input':            return <OtpInputPage />

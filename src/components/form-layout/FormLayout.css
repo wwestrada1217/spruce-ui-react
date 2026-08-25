@@ -1,0 +1,94 @@
+.sp-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-form-gap, var(--sp-density-stack-gap, var(--sp-space-4, 16px)));
+  min-width: 0;
+}
+
+.sp-form--gap-sm {
+  --sp-form-gap: var(--sp-density-inline-gap, var(--sp-space-2, 8px));
+}
+
+.sp-form--gap-lg {
+  --sp-form-gap: calc(var(--sp-density-stack-gap, var(--sp-space-4, 16px)) + var(--sp-space-2, 8px));
+}
+
+.sp-form--compact {
+  --sp-form-gap: var(--sp-density-inline-gap, var(--sp-space-2, 8px));
+}
+
+.sp-form--horizontal {
+  --sp-form-label-width: 140px;
+}
+
+.sp-form--grid {
+  display: grid;
+  grid-template-columns: repeat(var(--sp-form-cols, 2), minmax(0, 1fr));
+  align-items: start;
+}
+
+.sp-form__section-title {
+  margin: 0;
+  padding-block-end: var(--sp-space-1_5, 6px);
+  border-block-end: var(--sp-border-width-hairline, 1px) solid var(--sp-border);
+  color: var(--sp-text-subtle);
+  font-size: var(--sp-text-xs, 11px);
+  font-weight: var(--sp-font-semibold, 600);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sp-form--grid .sp-form__section-title,
+.sp-form--grid .sp-form__full,
+.sp-form--grid .sp-form__divider,
+.sp-form--grid .sp-form__actions {
+  grid-column: 1 / -1;
+}
+
+.sp-form__row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--sp-form-gap, var(--sp-density-stack-gap, var(--sp-space-4, 16px)));
+  align-items: start;
+}
+
+.sp-form--grid .sp-form__row {
+  display: contents;
+}
+
+.sp-form__row--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.sp-form__row--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.sp-form__row--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+.sp-form__divider {
+  margin: 0;
+  border: 0;
+  border-block-start: var(--sp-border-width-hairline, 1px) solid var(--sp-border);
+}
+
+.sp-form__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-density-inline-gap, var(--sp-space-2, 8px));
+  padding-block-start: var(--sp-space-1, 4px);
+}
+
+.sp-form__actions--end { justify-content: flex-end; }
+.sp-form__actions--between { justify-content: space-between; }
+
+@media (max-width: 640px) {
+  .sp-form--responsive.sp-form--grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sp-form--responsive.sp-form--horizontal {
+    --sp-form-label-width: auto;
+  }
+
+  .sp-form--responsive .sp-form__row,
+  .sp-form--responsive .sp-form__row--2,
+  .sp-form--responsive .sp-form__row--3,
+  .sp-form--responsive .sp-form__row--4 {
+    grid-template-columns: 1fr;
+  }
+}

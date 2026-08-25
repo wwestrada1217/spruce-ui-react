@@ -11,6 +11,8 @@ import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
 import { computePosition, getScrollParents } from '../../utils/positioning.js';
 import { useI18n } from '../../i18n/i18n-context.js';
+import { useFormFieldContext } from '../field/FormFieldContext.js';
+import { firstFormError, type FormValidationError } from '../field/form-types.js';
 
 /* ── Public types ────────────────────────────────────────────────────────── */
 
@@ -31,6 +33,15 @@ export interface SelectProps {
   multiple?: boolean;
   disabled?: boolean;
   error?: string;
+  errors?: readonly FormValidationError[];
+  invalid?: boolean;
+  required?: boolean;
+  readOnly?: boolean;
+  hidden?: boolean;
+  id?: string;
+  ariaLabel?: string;
+  ariaLabelledBy?: string;
+  ariaDescribedBy?: string;
   className?: string;
 }
 
@@ -45,9 +56,21 @@ export function Select({
   multiple = false,
   disabled = false,
   error,
+  errors,
+  invalid,
+  required = false,
+  readOnly = false,
+  hidden = false,
+  id,
+  ariaLabel,
+  ariaLabelledBy,
+  ariaDescribedBy,
   className,
 }: SelectProps) {
   const { t } = useI18n();
+  const field = useFormFieldContext();
+  const effectiveDisabled = disabled || Boolean(field?.disabled);
+  const effectiveReadOnly = readOnly || Boolean(field?.readOnly);
   const resolvedPlaceholder = placeholder === 'Select...' ? t('select') : placeholder;
   const instanceId = useId();
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -116,13 +139,13 @@ export function Select({
   }, []);
 
   const toggle = useCallback(() => {
-    if (disabled) return;
+    if (effectiveDisabled || effectiveReadOnly) return;
     if (open) {
       closePanel();
     } else {
       openPanel();
     }
-  }, [disabled, open, openPanel, closePanel]);
+  }, [effectiveDisabled, effectiveReadOnly, open, openPanel, closePanel]);
 
   /* ── Click outside ───────────────────────────────────────────────────── */
 
@@ -281,12 +304,18 @@ export function Select({
 
   /* ── CSS class composition ───────────────────────────────────────────── */
 
+  const errorMessage = firstFormError(errors, error);
+  const hasError = Boolean(errorMessage) || Boolean(invalid ?? field?.invalid);
+  const effectiveHidden = hidden || Boolean(field?.hidden);
+  const effectiveRequired = required || Boolean(field?.required);
+  const effectiveDescribedBy = ariaDescribedBy || field?.describedBy;
   const wrapperClasses = [
     'sp-select',
     size === 'sm' && 'sp-select--sm',
     size === 'lg' && 'sp-select--lg',
-    disabled && 'sp-select--disabled',
-    error && 'sp-select--error',
+    effectiveDisabled && 'sp-select--disabled',
+    hasError && 'sp-select--error',
+    effectiveReadOnly && 'sp-select--readonly',
     open && 'sp-select--open',
     className,
   ]
@@ -302,6 +331,8 @@ export function Select({
 
   /* ── Render ──────────────────────────────────────────────────────────── */
 
+  if (effectiveHidden) return null;
+
   return (
     <>
       <div ref={wrapperRef} className={wrapperClasses}>
@@ -309,10 +340,17 @@ export function Select({
           ref={triggerRef}
           className="sp-select__trigger"
           type="button"
-          disabled={disabled}
+          id={id}
+          disabled={effectiveDisabled}
           aria-haspopup="listbox"
           aria-expanded={open}
           aria-activedescendant={activeDescendant}
+          aria-label={ariaLabel || undefined}
+          aria-labelledby={ariaLabelledBy || undefined}
+          aria-describedby={effectiveDescribedBy}
+          aria-invalid={hasError || undefined}
+          aria-required={effectiveRequired || undefined}
+          aria-readonly={effectiveReadOnly || undefined}
           onClick={toggle}
           onKeyDown={handleKeydown}
         >
@@ -417,9 +455,9 @@ export function Select({
           document.body,
         )}
 
-      {error && (
+      {errorMessage && !field?.describedBy && (
         <p className="sp-select-error" role="alert">
-          {error}
+          {errorMessage}
         </p>
       )}
     </>

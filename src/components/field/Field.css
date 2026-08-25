@@ -1,0 +1,111 @@
+.sp-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-density-control-padding-y, var(--sp-space-1_5, 6px));
+  min-width: 0;
+}
+
+.sp-field--inline {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--sp-density-stack-gap, var(--sp-space-3, 12px));
+}
+
+.sp-field--inline .sp-field__label {
+  width: var(--sp-field-label-width, var(--sp-form-label-width, 120px));
+  flex: 0 0 auto;
+  padding-block-start: calc(var(--sp-density-control-padding-y, 6px) + var(--sp-space-0_5, 2px));
+}
+
+.sp-field--inline .sp-field__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.sp-field__label {
+  color: var(--sp-text-color);
+  font-size: var(--sp-text-sm, 13px);
+  font-weight: var(--sp-font-medium, 500);
+  line-height: var(--sp-leading-snug, 1.375);
+  cursor: default;
+}
+
+.sp-field__required {
+  color: var(--sp-danger);
+  margin-inline-start: var(--sp-space-0_5, 2px);
+  font-weight: var(--sp-font-semibold, 600);
+}
+
+.sp-field__body,
+.sp-field__control {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sp-field__body {
+  gap: calc(var(--sp-density-control-padding-y, 6px) - var(--sp-space-0_5, 2px));
+}
+
+.sp-field__helper,
+.sp-field__feedback {
+  margin: 0;
+  font-size: var(--sp-text-xs, 12px);
+  line-height: var(--sp-leading-normal, 1.5);
+}
+
+.sp-field__helper {
+  color: var(--sp-text-subtle);
+}
+
+.sp-field__feedback {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-space-1, 4px);
+}
+
+.sp-field__feedback--error {
+  color: var(--sp-danger);
+}
+
+.sp-field__feedback--success {
+  color: var(--sp-success);
+}
+
+.sp-field__feedback-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--sp-space-3, 12px);
+  height: var(--sp-space-3, 12px);
+  font-size: var(--sp-text-2xs, 10px);
+  font-weight: var(--sp-font-bold, 700);
+}
+
+.sp-field--disabled {
+  opacity: 0.65;
+}
+
+.sp-field--readonly .sp-field__label {
+  color: var(--sp-text-muted);
+}
+
+.sp-field--error .sp-field__control :where(.sp-input-wrap, .sp-textarea, .sp-input-group, .sp-select, .sp-combobox) {
+  --sp-control-border-color: var(--sp-danger);
+}
+
+.sp-field--success .sp-field__control :where(.sp-input-wrap, .sp-textarea, .sp-input-group, .sp-select, .sp-combobox) {
+  --sp-control-border-color: var(--sp-success);
+}
+
+@media (max-width: 639px) {
+  .sp-field--inline.sp-field--stack-on-mobile {
+    flex-direction: column;
+    gap: var(--sp-space-1_5, 6px);
+  }
+
+  .sp-field--inline.sp-field--stack-on-mobile .sp-field__label {
+    width: auto;
+    padding-block-start: 0;
+  }
+}
