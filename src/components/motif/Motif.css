@@ -1,0 +1,54 @@
+.sp-motif {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+  color: var(--sp-motif-color, currentColor);
+}
+
+.sp-motif__shape {
+  position: absolute;
+  display: block;
+  aspect-ratio: 1;
+  opacity: var(--sp-motif-opacity, 0.1);
+  transform-origin: center;
+}
+
+.sp-motif__art,
+.sp-motif__art svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.sp-motif__art svg {
+  stroke-width: var(--sp-motif-stroke-width, 1.5px);
+}
+
+.sp-motif__art svg * {
+  vector-effect: non-scaling-stroke;
+}
+
+.sp-motif__shape--filled [data-motif-shape] {
+  fill: currentColor;
+  stroke: none;
+}
+
+[data-theme='dark'] .sp-motif__shape,
+.dark .sp-motif__shape {
+  opacity: calc(var(--sp-motif-opacity, 0.1) * var(--sp-motif-dark-boost, 1.3));
+}
+
+@media (forced-colors: active), (prefers-reduced-motion: reduce) {
+  .sp-motif {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .sp-motif {
+    display: none;
+  }
+}

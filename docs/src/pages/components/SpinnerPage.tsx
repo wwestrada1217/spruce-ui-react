@@ -15,9 +15,21 @@ const INLINE_CODE = `<p style={{ display: 'flex', alignItems: 'center', gap: 8 }
   Saving changes <Spinner size="sm" />
 </p>`
 
+const VARIANTS_CODE = `<Spinner variant="ring" />
+<Spinner variant="chasing-dots" />
+<Spinner variant="wave-bars" />
+<Spinner variant="grid-cube" />`
+
+const COLORS_CODE = `<Spinner variant="arc" colorVariant="primary" />
+<Spinner variant="pulse-dot" colorVariant="success" />
+<Spinner variant="three-dots" colorVariant="warning" />
+<Spinner variant="bars" colorVariant="danger" />`
+
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
   { id: 'sizes',  label: 'Sizes' },
+  { id: 'variants', label: 'Variants' },
+  { id: 'colors', label: 'Colors' },
   { id: 'label',  label: 'With Label' },
   { id: 'inline', label: 'Inline Usage' },
   { id: 'api',    label: 'API' },
@@ -66,6 +78,32 @@ export function SpinnerPage() {
           </CodePreview>
         </section>
 
+        <section id="variants" className="demo-section" aria-labelledby="variants-heading">
+          <h2 id="variants-heading">Variants</h2>
+          <p className="section-desc">Choose from ring, dots, bars, orbit, ripple, and geometric loading animations.</p>
+          <CodePreview code={VARIANTS_CODE}>
+            <div className="demo-row" style={{ alignItems: 'center' }}>
+              <Spinner variant="ring" />
+              <Spinner variant="chasing-dots" />
+              <Spinner variant="wave-bars" />
+              <Spinner variant="grid-cube" />
+            </div>
+          </CodePreview>
+        </section>
+
+        <section id="colors" className="demo-section" aria-labelledby="colors-heading">
+          <h2 id="colors-heading">Colors</h2>
+          <p className="section-desc">Use semantic color variants or provide a custom CSS color.</p>
+          <CodePreview code={COLORS_CODE}>
+            <div className="demo-row" style={{ alignItems: 'center' }}>
+              <Spinner variant="arc" colorVariant="primary" />
+              <Spinner variant="pulse-dot" colorVariant="success" />
+              <Spinner variant="three-dots" colorVariant="warning" />
+              <Spinner variant="bars" colorVariant="danger" />
+            </div>
+          </CodePreview>
+        </section>
+
         <section id="label" className="demo-section" aria-labelledby="label-heading">
           <h2 id="label-heading">With Label</h2>
           <p className="section-desc">
@@ -103,7 +141,7 @@ export function SpinnerPage() {
               <tbody>
                 <tr>
                   <td><code>size</code></td>
-                  <td><code>'sm' | 'md' | 'lg' | 'xl'</code></td>
+                  <td><code>'xs' | 'sm' | 'md' | 'lg' | 'xl'</code></td>
                   <td><code>'md'</code></td>
                   <td>Spinner size</td>
                 </tr>
@@ -112,6 +150,24 @@ export function SpinnerPage() {
                   <td><code>string</code></td>
                   <td><code>''</code></td>
                   <td>Accessible label text shown beside the spinner</td>
+                </tr>
+                <tr>
+                  <td><code>variant</code></td>
+                  <td><code>SpinnerVariant</code></td>
+                  <td><code>'ring'</code></td>
+                  <td>Loading animation variant</td>
+                </tr>
+                <tr>
+                  <td><code>colorVariant</code></td>
+                  <td><code>'primary' | 'success' | 'warning' | 'danger' | 'info' | 'neutral' | 'white'</code></td>
+                  <td><code>'primary'</code></td>
+                  <td>Semantic spinner color</td>
+                </tr>
+                <tr>
+                  <td><code>ariaLabel</code></td>
+                  <td><code>string</code></td>
+                  <td>Localized loading label</td>
+                  <td>Accessible status text when no visible label is supplied</td>
                 </tr>
               </tbody>
             </table>

@@ -20,7 +20,17 @@ export { RadioGroup, Radio } from './components/radio/Radio.js';
 export type { RadioGroupProps, RadioProps } from './components/radio/Radio.js';
 
 export { Alert } from './components/alert/Alert.js';
-export type { AlertProps, AlertVariant } from './components/alert/Alert.js';
+export type { AlertProps, AlertVariant, AlertSize } from './components/alert/Alert.js';
+
+// ─── Decorative motifs ───────────────────────────────────────────────────────
+export { Motif } from './components/motif/Motif.js';
+export type {
+  MotifProps,
+  SpDecorativeBackground,
+  SpMotifAppearanceOption,
+  SpMotifPosition,
+} from './components/motif/Motif.js';
+export { resolveDecorativeBackground } from './components/motif/motif-utils.js';
 
 export { Card, CardHeader, CardMedia, CardFooter } from './components/card/Card.js';
 export type { CardProps, CardVariant, CardPadding, CardHeaderProps, CardMediaProps, CardFooterProps } from './components/card/Card.js';
@@ -150,11 +160,19 @@ export type { KbdProps, KbdSize } from './components/kbd/Kbd.js';
 
 // ─── ProgressBar ──────────────────────────────────────────────────────────────
 export { ProgressBar } from './components/progress-bar/ProgressBar.js';
-export type { ProgressBarProps, ProgressBarVariant, ProgressBarSize } from './components/progress-bar/ProgressBar.js';
+export type { ProgressBarProps, ProgressBarVariant, ProgressBarSize, ProgressSegmentShape } from './components/progress-bar/ProgressBar.js';
 
 // ─── Spinner ──────────────────────────────────────────────────────────────────
 export { Spinner } from './components/spinner/Spinner.js';
-export type { SpinnerProps, SpinnerSize } from './components/spinner/Spinner.js';
+export type { SpinnerProps, SpinnerSize, SpinnerVariant, SpinnerColorVariant } from './components/spinner/Spinner.js';
+
+// ─── CircularProgress ────────────────────────────────────────────────────────
+export { CircularProgress } from './components/circular-progress/CircularProgress.js';
+export type {
+  CircularProgressProps,
+  CircularProgressVariant,
+  CircularProgressSize,
+} from './components/circular-progress/CircularProgress.js';
 
 // ─── StatCard ─────────────────────────────────────────────────────────────────
 export { StatCard } from './components/stat-card/StatCard.js';
@@ -330,11 +348,27 @@ export type { WindowProps, WindowSize } from './components/window/Window.js';
 
 // ─── Toast ───────────────────────────────────────────────────────────────────
 export { ToastProvider, useToast } from './components/toast/Toast.js';
-export type { ToastConfig, ToastVariant, ToastPosition, ToastContextValue } from './components/toast/Toast.js';
+export type { ToastConfig, ToastVariant, ToastPosition, ToastStackMode, ToastContextValue } from './components/toast/Toast.js';
 
 // ─── Snackbar ────────────────────────────────────────────────────────────────
 export { SnackbarProvider, useSnackbar } from './components/snackbar/Snackbar.js';
 export type { SnackbarConfig, SnackbarContextValue } from './components/snackbar/Snackbar.js';
+
+// ─── NotificationCenter ──────────────────────────────────────────────────────
+export { NotificationCenter } from './components/notification-center/NotificationCenter.js';
+export type {
+  NotificationCenterProps,
+  NotificationSeverity,
+  NotificationCenterVariant,
+  NotificationCenterTone,
+  NotificationCenterPosition,
+  NotificationCenterDensity,
+  NotificationToolbarButton,
+  NotificationAction,
+  NotificationItem,
+  NotificationActionEvent,
+  NotificationToolbarEvent,
+} from './components/notification-center/NotificationCenter.js';
 
 // ─── CommandPalette ──────────────────────────────────────────────────────────
 export { CommandPalette } from './components/command-palette/CommandPalette.js';

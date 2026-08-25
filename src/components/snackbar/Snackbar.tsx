@@ -161,13 +161,14 @@ export function SnackbarProvider({ children }: SnackbarProviderProps) {
           <span className="sp-snackbar__message">{current.message}</span>
 
           {current.action && (
-            <button className="sp-snackbar__action" onClick={handleAction}>
+            <button type="button" className="sp-snackbar__action" onClick={handleAction}>
               {current.action.label}
             </button>
           )}
 
           {current.dismissible !== false && (
             <button
+              type="button"
               className="sp-snackbar__close"
               aria-label={t('dismiss')}
               onClick={dismiss}

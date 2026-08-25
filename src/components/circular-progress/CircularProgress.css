@@ -1,0 +1,79 @@
+.sp-circular-progress {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  --sp-circular-progress-color: var(--sp-circular-progress-color-custom, var(--sp-primary, #2563eb));
+}
+
+.sp-circular-progress__svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  transform-origin: center;
+}
+
+.sp-circular-progress--indeterminate .sp-circular-progress__svg {
+  transform: rotate(0deg);
+  animation: sp-circular-progress-spin 1.4s linear infinite;
+}
+
+.sp-circular-progress__track {
+  fill: transparent;
+  stroke: var(--sp-surface-200, rgba(0, 0, 0, 0.08));
+}
+
+.sp-circular-progress__fill {
+  fill: transparent;
+  stroke: var(--sp-circular-progress-color);
+  transition: stroke-dashoffset var(--sp-duration-slow, 300ms) var(--sp-ease-in-out, ease-in-out);
+}
+
+.sp-circular-progress--primary { --sp-circular-progress-color: var(--sp-circular-progress-color-custom, var(--sp-primary, #2563eb)); }
+.sp-circular-progress--success { --sp-circular-progress-color: var(--sp-circular-progress-color-custom, var(--sp-success, #16a34a)); }
+.sp-circular-progress--warning { --sp-circular-progress-color: var(--sp-circular-progress-color-custom, var(--sp-warning, #f59e0b)); }
+.sp-circular-progress--danger { --sp-circular-progress-color: var(--sp-circular-progress-color-custom, var(--sp-danger, #dc2626)); }
+.sp-circular-progress--info { --sp-circular-progress-color: var(--sp-circular-progress-color-custom, var(--sp-info, #0ea5e9)); }
+.sp-circular-progress--neutral { --sp-circular-progress-color: var(--sp-circular-progress-color-custom, var(--sp-text-muted, #64748b)); }
+
+.sp-circular-progress--indeterminate .sp-circular-progress__fill {
+  animation: sp-circular-progress-dash 1.4s ease-in-out infinite;
+  transition: none;
+}
+
+.sp-circular-progress__center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+}
+
+.sp-circular-progress__value {
+  color: var(--sp-text-color, #1f2937);
+  font-size: var(--sp-text-xs, 12px);
+  font-weight: var(--sp-font-semibold, 600);
+  line-height: 1;
+  user-select: none;
+}
+
+@keyframes sp-circular-progress-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes sp-circular-progress-dash {
+  0% { stroke-dasharray: 1, 200; stroke-dashoffset: 0; }
+  50% { stroke-dasharray: 89, 200; stroke-dashoffset: -35px; }
+  100% { stroke-dasharray: 89, 200; stroke-dashoffset: -124px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-circular-progress__svg,
+  .sp-circular-progress__fill {
+    animation: none;
+    transition: none;
+  }
+}

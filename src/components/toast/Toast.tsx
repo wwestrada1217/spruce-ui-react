@@ -13,6 +13,8 @@ import {
   useCallback,
   useRef,
   useEffect,
+  type CSSProperties,
+  type FocusEvent,
   type ReactNode,
 } from 'react';
 import { createPortal } from 'react-dom';
@@ -29,6 +31,7 @@ export type ToastPosition =
   | 'bottom-left'
   | 'bottom-center'
   | 'bottom-right';
+export type ToastStackMode = 'default' | 'collapsible';
 
 export interface ToastConfig {
   message: string;
@@ -75,6 +78,10 @@ export interface ToastContextValue {
   danger: (message: string, opts?: Partial<ToastConfig>) => number;
   dismiss: (id: number) => void;
   dismissAll: () => void;
+  position: ToastPosition;
+  stackMode: ToastStackMode;
+  setPosition: (position: ToastPosition) => void;
+  setStackMode: (mode: ToastStackMode) => void;
 }
 
 const ToastContext = createContext<ToastContextValue | null>(null);
@@ -112,6 +119,8 @@ export interface ToastProviderProps {
   children: ReactNode;
   /** Position of the toast container. Default "top-right". */
   position?: ToastPosition;
+  /** Initial stack behavior. The hook can change it at runtime. */
+  stackMode?: ToastStackMode;
 }
 
 /**
@@ -124,17 +133,35 @@ export interface ToastProviderProps {
  * </ToastProvider>
  * ```
  */
-export function ToastProvider({ children, position = 'top-right' }: ToastProviderProps) {
+export function ToastProvider({ children, position = 'top-right', stackMode = 'default' }: ToastProviderProps) {
   const { t } = useI18n();
   const [toasts, setToasts] = useState<ToastInstance[]>([]);
+  const [positionOverride, setPositionOverride] = useState<ToastPosition>();
+  const [stackModeOverride, setStackModeOverride] = useState<ToastStackMode>();
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
   const nextIdRef = useRef(0);
   const timersRef = useRef(new Map<number, ReturnType<typeof setTimeout>>());
+  const removalTimersRef = useRef(new Map<number, ReturnType<typeof setTimeout>>());
+  const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const toastsRef = useRef<ToastInstance[]>([]);
+  useEffect(() => {
+    toastsRef.current = toasts;
+  }, [toasts]);
+
+  const currentPosition = positionOverride ?? position;
+  const currentStackMode = stackModeOverride ?? stackMode;
 
   // Clean up all timers on unmount
   useEffect(() => {
+    const timers = timersRef.current;
+    const removalTimers = removalTimersRef.current;
     return () => {
-      timersRef.current.forEach((timer) => clearTimeout(timer));
-      timersRef.current.clear();
+      timers.forEach((timer) => clearTimeout(timer));
+      timers.clear();
+      removalTimers.forEach((timer) => clearTimeout(timer));
+      removalTimers.clear();
+      if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
     };
   }, []);
 
@@ -146,13 +173,17 @@ export function ToastProvider({ children, position = 'top-right' }: ToastProvide
       timersRef.current.delete(id);
     }
 
-    // Mark as removing for exit animation
+    const toast = toastsRef.current.find((item) => item.id === id);
+    if (!toast || toast.removing) return;
+
     setToasts((prev) => prev.map((t) => (t.id === id ? { ...t, removing: true } : t)));
 
     // Remove after exit animation completes
-    setTimeout(() => {
+    const removalTimer = setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
+      removalTimersRef.current.delete(id);
     }, 300);
+    removalTimersRef.current.set(id, removalTimer);
   }, []);
 
   const show = useCallback(
@@ -206,13 +237,11 @@ export function ToastProvider({ children, position = 'top-right' }: ToastProvide
   );
 
   const dismissAll = useCallback(() => {
-    setToasts((prev) => {
-      for (const t of prev) {
-        dismiss(t.id);
-      }
-      return prev;
-    });
+    for (const toast of toastsRef.current) dismiss(toast.id);
   }, [dismiss]);
+
+  const setPosition = useCallback((next: ToastPosition) => setPositionOverride(next), []);
+  const setStackMode = useCallback((next: ToastStackMode) => setStackModeOverride(next), []);
 
   const contextValue: ToastContextValue = {
     show,
@@ -222,6 +251,10 @@ export function ToastProvider({ children, position = 'top-right' }: ToastProvide
     danger,
     dismiss,
     dismissAll,
+    position: currentPosition,
+    stackMode: currentStackMode,
+    setPosition,
+    setStackMode,
   };
 
   const handleAction = (toast: ToastInstance) => {
@@ -229,29 +262,60 @@ export function ToastProvider({ children, position = 'top-right' }: ToastProvide
     dismiss(toast.id);
   };
 
+  const isExpanded = hovered || focused;
+  const activeToasts = toasts.filter((toast) => !toast.removing);
   const containerClass = [
     'sp-toast-container',
-    `sp-toast-container--${position}`,
-  ].join(' ');
+    `sp-toast-container--${currentPosition}`,
+    currentStackMode === 'collapsible' && 'sp-toast-container--collapsible',
+    isExpanded && 'sp-toast-container--expanded',
+  ].filter(Boolean).join(' ');
 
   const portal = createPortal(
-    <div className={containerClass} aria-live="polite" aria-atomic="false">
+    <div
+      className={containerClass}
+      aria-live="polite"
+      aria-atomic="false"
+      onMouseEnter={() => {
+        if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+        setHovered(true);
+      }}
+      onMouseLeave={() => {
+        if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+        hoverTimerRef.current = setTimeout(() => setHovered(false), 150);
+      }}
+      onFocus={() => {
+        if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+        setFocused(true);
+      }}
+      onBlur={(event: FocusEvent<HTMLDivElement>) => {
+        const next = event.relatedTarget;
+        if (!(next instanceof Node) || !event.currentTarget.contains(next)) setFocused(false);
+      }}
+    >
       {toasts.map((toast) => {
         const classes = [
           'sp-toast',
           `sp-toast--${toast.variant}`,
           toast.solid ? 'sp-toast--solid' : '',
           toast.removing ? 'sp-toast--removing' : '',
-          isLeftPosition(position) ? 'sp-toast--enter-left' : '',
-          isRightPosition(position) ? 'sp-toast--enter-right' : '',
-          position === 'top-center' ? 'sp-toast--enter-center-top' : '',
-          position === 'bottom-center' ? 'sp-toast--enter-center-bottom' : '',
+          isLeftPosition(currentPosition) ? 'sp-toast--enter-left' : '',
+          isRightPosition(currentPosition) ? 'sp-toast--enter-right' : '',
+          currentPosition === 'top-center' ? 'sp-toast--enter-center-top' : '',
+          currentPosition === 'bottom-center' ? 'sp-toast--enter-center-bottom' : '',
         ]
           .filter(Boolean)
           .join(' ');
 
+        const activeIndex = activeToasts.findIndex((item) => item.id === toast.id);
+        const depth = toast.removing || activeIndex < 0 ? 0 : activeToasts.length - 1 - activeIndex;
         return (
-          <div key={toast.id} className={classes} role="alert">
+          <div
+            key={toast.id}
+            className="sp-toast-wrapper"
+            style={{ '--toast-depth': depth, '--toast-z-index': 100 - depth } as CSSProperties}
+          >
+            <div className={classes} role="alert">
             <Icon
               name={iconForVariant(toast.variant)}
               size={18}
@@ -261,7 +325,8 @@ export function ToastProvider({ children, position = 'top-right' }: ToastProvide
               {toast.title && <div className="sp-toast__title">{toast.title}</div>}
               <div className="sp-toast__message">{toast.message}</div>
               {toast.action && (
-                <button
+                  <button
+                    type="button"
                   className="sp-toast__action"
                   onClick={() => handleAction(toast)}
                 >
@@ -271,6 +336,7 @@ export function ToastProvider({ children, position = 'top-right' }: ToastProvide
             </div>
             {toast.dismissible && (
               <button
+                type="button"
                 className="sp-toast__close"
                 aria-label={t('dismissNotification')}
                 onClick={() => dismiss(toast.id)}
@@ -278,6 +344,7 @@ export function ToastProvider({ children, position = 'top-right' }: ToastProvide
                 <Icon name="x" size={14} />
               </button>
             )}
+            </div>
           </div>
         );
       })}

@@ -23,6 +23,14 @@ const STRIPED_CODE = `<ProgressBar value={55} striped />
 const INDETERMINATE_CODE = `<ProgressBar indeterminate />
 <ProgressBar indeterminate variant="info" label="Loading..." />`
 
+const SEGMENTS_CODE = `<ProgressBar
+  value={72}
+  segments={12}
+  segmentShape="pill"
+  segmentGap={4}
+  showValue
+/>`
+
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
   { id: 'basic',         label: 'Basic' },
@@ -31,6 +39,7 @@ const SECTIONS: Section[] = [
   { id: 'with-label',    label: 'With Label' },
   { id: 'striped',       label: 'Striped' },
   { id: 'indeterminate', label: 'Indeterminate' },
+  { id: 'segments',      label: 'Segments' },
   { id: 'api',           label: 'API' },
 ]
 
@@ -165,6 +174,16 @@ export function ProgressBarPage() {
           </CodePreview>
         </section>
 
+        <section id="segments" className="demo-section" aria-labelledby="segments-heading">
+          <h2 id="segments-heading">Segments</h2>
+          <p className="section-desc">Render proportional segments with bar, tick, or pill shapes and a tokenized gap.</p>
+          <CodePreview code={SEGMENTS_CODE}>
+            <div style={progressWrap}>
+              <ProgressBar value={72} segments={12} segmentShape="pill" segmentGap={4} showValue />
+            </div>
+          </CodePreview>
+        </section>
+
         <section id="api" className="demo-section">
           <h2>API</h2>
           <h3>Props</h3>
@@ -183,6 +202,9 @@ export function ProgressBarPage() {
                 <tr><td><code>striped</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Striped pattern</td></tr>
                 <tr><td><code>animated</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Animate stripes</td></tr>
                 <tr><td><code>indeterminate</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Indeterminate loading state</td></tr>
+                <tr><td><code>segments</code></td><td><code>number</code></td><td><code>0</code></td><td>Number of segments to render</td></tr>
+                <tr><td><code>segmentShape</code></td><td><code>'bar' | 'tick' | 'pill'</code></td><td><code>'bar'</code></td><td>Segment visual shape</td></tr>
+                <tr><td><code>segmentGap</code></td><td><code>number | string</code></td><td><code>0</code></td><td>Gap between segments</td></tr>
               </tbody>
             </table>
           </div>

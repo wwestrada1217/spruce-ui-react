@@ -16,15 +16,87 @@
   padding: var(--sp-space-4, 16px);
   pointer-events: none;
   max-height: 100vh;
-  overflow: hidden;
+  overflow: visible;
 }
 
-.sp-toast-container--top-left     { top: 0; left: 0; align-items: flex-start; }
-.sp-toast-container--top-center   { top: 0; left: 50%; transform: translateX(-50%); align-items: center; }
-.sp-toast-container--top-right    { top: 0; right: 0; align-items: flex-end; }
-.sp-toast-container--bottom-left  { bottom: 0; left: 0; align-items: flex-start; flex-direction: column-reverse; }
-.sp-toast-container--bottom-center { bottom: 0; left: 50%; transform: translateX(-50%); align-items: center; flex-direction: column-reverse; }
-.sp-toast-container--bottom-right { bottom: 0; right: 0; align-items: flex-end; flex-direction: column-reverse; }
+.sp-toast-container--top-left     { inset-block-start: 0; inset-inline-start: 0; align-items: flex-start; }
+.sp-toast-container--top-center   { inset-block-start: 0; inset-inline-start: 50%; transform: translateX(-50%); align-items: center; }
+.sp-toast-container--top-right    { inset-block-start: 0; inset-inline-end: 0; align-items: flex-end; }
+.sp-toast-container--bottom-left  { inset-block-end: 0; inset-inline-start: 0; align-items: flex-start; flex-direction: column-reverse; }
+.sp-toast-container--bottom-center { inset-block-end: 0; inset-inline-start: 50%; transform: translateX(-50%); align-items: center; flex-direction: column-reverse; }
+.sp-toast-container--bottom-right { inset-block-end: 0; inset-inline-end: 0; align-items: flex-end; flex-direction: column-reverse; }
+
+.sp-toast-container--collapsible {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: flex-start;
+  transition: gap var(--sp-duration-slow, 300ms) var(--sp-ease-spring, ease-out);
+}
+
+.sp-toast-container--bottom-left.sp-toast-container--collapsible,
+.sp-toast-container--bottom-center.sp-toast-container--collapsible,
+.sp-toast-container--bottom-right.sp-toast-container--collapsible {
+  align-items: flex-end;
+}
+
+.sp-toast-container--collapsible:not(.sp-toast-container--expanded) { gap: 0; }
+.sp-toast-container--collapsible.sp-toast-container--expanded { gap: var(--sp-space-2, 8px); }
+
+.sp-toast-wrapper {
+  position: relative;
+}
+
+.sp-toast-container--collapsible .sp-toast-wrapper {
+  pointer-events: auto;
+  transition: transform var(--sp-duration-slow, 300ms) var(--sp-ease-spring, ease-out), opacity var(--sp-duration-normal, 200ms) var(--sp-ease-default, ease-out);
+  will-change: transform, opacity;
+}
+
+.sp-toast-container--collapsible:not(.sp-toast-container--expanded) .sp-toast-wrapper {
+  grid-area: 1 / 1;
+}
+
+.sp-toast-container--collapsible .sp-toast-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: -12px 0;
+  pointer-events: auto;
+  z-index: -1;
+}
+
+.sp-toast-container--collapsible.sp-toast-container--top-left:not(.sp-toast-container--expanded) .sp-toast-wrapper,
+.sp-toast-container--collapsible.sp-toast-container--top-center:not(.sp-toast-container--expanded) .sp-toast-wrapper,
+.sp-toast-container--collapsible.sp-toast-container--top-right:not(.sp-toast-container--expanded) .sp-toast-wrapper {
+  transform: translateY(calc(min(var(--toast-depth, 0), 3) * 10px)) scale(calc(1 - min(var(--toast-depth, 0), 3) * .05));
+  transform-origin: top center;
+  z-index: var(--toast-z-index, 1);
+  opacity: calc(1 - max(0, var(--toast-depth, 0) - 2));
+}
+
+.sp-toast-container--collapsible.sp-toast-container--bottom-left:not(.sp-toast-container--expanded) .sp-toast-wrapper,
+.sp-toast-container--collapsible.sp-toast-container--bottom-center:not(.sp-toast-container--expanded) .sp-toast-wrapper,
+.sp-toast-container--collapsible.sp-toast-container--bottom-right:not(.sp-toast-container--expanded) .sp-toast-wrapper {
+  transform: translateY(calc(min(var(--toast-depth, 0), 3) * -10px)) scale(calc(1 - min(var(--toast-depth, 0), 3) * .05));
+  transform-origin: bottom center;
+  z-index: var(--toast-z-index, 1);
+  opacity: calc(1 - max(0, var(--toast-depth, 0) - 2));
+}
+
+.sp-toast-container--collapsible.sp-toast-container--expanded .sp-toast-wrapper {
+  grid-area: auto;
+  transform: translateY(0) scale(1) !important;
+  opacity: 1 !important;
+  z-index: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-toast-container--collapsible .sp-toast-wrapper,
+  .sp-toast {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+  }
+}
 
 /* ── Toast ──────────────────────────────────────────────────────────────── */
 

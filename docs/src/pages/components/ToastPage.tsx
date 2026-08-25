@@ -20,12 +20,16 @@ const ACTION_CODE = `toast.show({
 const SOLID_CODE = `toast.show({ message: 'Solid info toast', variant: 'info', solid: true })
 toast.show({ message: 'Solid success toast', variant: 'success', solid: true })`
 
+const STACK_CODE = `toast.setStackMode('collapsible')
+toast.show({ message: 'Hover or focus the stack to expand it', duration: 0 })`
+
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
   { id: 'basic',  label: 'Basic' },
   { id: 'title',  label: 'With Title' },
   { id: 'action', label: 'With Action' },
   { id: 'solid',  label: 'Solid' },
+  { id: 'stack',  label: 'Position & Stack' },
   { id: 'api',    label: 'API' },
 ]
 
@@ -74,6 +78,20 @@ function ToastDemos() {
           </div>
         </CodePreview>
       </section>
+
+      <section id="stack" className="demo-section" aria-labelledby="stack-heading">
+        <h2 id="stack-heading">Position &amp; Stack</h2>
+        <p className="section-desc">Move the container at runtime or collapse a busy toast stack until it receives hover or keyboard focus.</p>
+        <CodePreview code={STACK_CODE}>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Button variant="outline" size="sm" onClick={() => toast.setPosition('bottom-right')}>Bottom right</Button>
+            <Button variant="outline" size="sm" onClick={() => toast.setPosition('top-right')}>Top right</Button>
+            <Button variant="outline" size="sm" onClick={() => toast.setStackMode('collapsible')}>Collapsible stack</Button>
+            <Button variant="outline" size="sm" onClick={() => toast.setStackMode('default')}>Default stack</Button>
+            <Button size="sm" onClick={() => toast.show({ message: 'Hover or focus the stack to expand it', duration: 0 })}>Add persistent toast</Button>
+          </div>
+        </CodePreview>
+      </section>
     </>
   )
 }
@@ -103,6 +121,7 @@ export function ToastPage() {
             <h3>ToastProvider Props</h3>
             <div className="api-table-wrap"><table className="api-table"><thead><tr><th>Name</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody>
               <tr><td><code>position</code></td><td><code>ToastPosition</code></td><td><code>'top-right'</code></td><td>Container position</td></tr>
+              <tr><td><code>stackMode</code></td><td><code>'default' | 'collapsible'</code></td><td><code>'default'</code></td><td>Whether stacked toasts collapse until interaction</td></tr>
               <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>—</td><td>App content</td></tr>
             </tbody></table></div>
             <h3 style={{ marginTop: 16 }}>useToast() Methods</h3>
@@ -114,6 +133,8 @@ export function ToastPage() {
               <tr><td><code>danger(message, opts?)</code></td><td><code>number</code></td><td>Danger toast</td></tr>
               <tr><td><code>dismiss(id)</code></td><td><code>void</code></td><td>Dismiss by ID</td></tr>
               <tr><td><code>dismissAll()</code></td><td><code>void</code></td><td>Dismiss all</td></tr>
+              <tr><td><code>setPosition(position)</code></td><td><code>void</code></td><td>Change container position</td></tr>
+              <tr><td><code>setStackMode(mode)</code></td><td><code>void</code></td><td>Change stacking behavior</td></tr>
             </tbody></table></div>
             <h3 style={{ marginTop: 16 }}>ToastConfig</h3>
             <div className="api-table-wrap"><table className="api-table"><thead><tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody>

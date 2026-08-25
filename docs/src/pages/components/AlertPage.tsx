@@ -24,11 +24,19 @@ const DISMISSIBLE_CODE = `<Alert variant="warning" title="Session expiring" dism
   Click the X to dismiss this alert.
 </Alert>`;
 
+const MOTIF_CODE = `<Alert variant="info" size="sm" backgroundMotif="arc-orbit">
+  Compact contextual feedback with a decorative background motif.
+</Alert>
+<Alert variant="success" backgroundMotif="overlapping-diamonds" motifPosition="bottom-right">
+  Motifs stay behind the content and are aria-hidden.
+</Alert>`;
+
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
   { id: 'variants',    label: 'Variants' },
   { id: 'with-title',  label: 'With Title' },
   { id: 'dismissible', label: 'Dismissible' },
+  { id: 'motif',       label: 'Motif & Size' },
   { id: 'api',         label: 'API' },
 ];
 
@@ -130,6 +138,23 @@ export function AlertPage() {
           </CodePreview>
         </section>
 
+        <section id="motif" className="demo-section" aria-labelledby="motif-heading">
+          <h2 id="motif-heading">Motif &amp; Size</h2>
+          <p className="section-desc">
+            Use the compact size for dense layouts and add a decorative motif without changing the alert semantics.
+          </p>
+          <CodePreview code={MOTIF_CODE}>
+            <div className="docs-stack" style={{ width: '100%' }}>
+              <Alert variant="info" size="sm" backgroundMotif="arc-orbit">
+                Compact contextual feedback with a decorative background motif.
+              </Alert>
+              <Alert variant="success" backgroundMotif="overlapping-diamonds" motifPosition="bottom-right">
+                Motifs stay behind the content and are aria-hidden.
+              </Alert>
+            </div>
+          </CodePreview>
+        </section>
+
         <section id="api" className="demo-section">
           <h2>API</h2>
           <h3>Props</h3>
@@ -142,6 +167,9 @@ export function AlertPage() {
                 <tr><td><code>variant</code></td><td><code>'info' | 'success' | 'warning' | 'danger'</code></td><td><code>'info'</code></td><td>Visual style of the alert</td></tr>
                 <tr><td><code>title</code></td><td><code>string</code></td><td><code>''</code></td><td>Optional alert title</td></tr>
                 <tr><td><code>dismissible</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Show dismiss button</td></tr>
+                <tr><td><code>size</code></td><td><code>'sm' | 'md'</code></td><td><code>'md'</code></td><td>Alert density</td></tr>
+                <tr><td><code>backgroundMotif</code></td><td><code>string</code></td><td>—</td><td>Decorative background motif name</td></tr>
+                <tr><td><code>motifPosition</code></td><td><code>SpMotifPosition</code></td><td><code>'center-right'</code></td><td>Logical visual anchor for the motif</td></tr>
                 <tr><td><code>onClose</code></td><td><code>() =&gt; void</code></td><td>—</td><td>Called when the alert is dismissed</td></tr>
               </tbody>
             </table>

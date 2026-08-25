@@ -6,6 +6,7 @@
  */
 
 .sp-alert {
+  position: relative;
   display: flex;
   align-items: flex-start;
   gap: var(--sp-space-3, 12px);
@@ -21,6 +22,11 @@
   --sp-alert-danger-bg: var(--sp-danger-subtle, rgba(220, 38, 38, 0.1));
 }
 
+.sp-alert--has-motif {
+  isolation: isolate;
+  overflow: hidden;
+}
+
 /* ── Variants ──────────────────────────────────────────────────────────────── */
 
 .sp-alert--info {
@@ -28,34 +34,61 @@
   border-color: color-mix(in srgb, var(--sp-info, #0891b2) 25%, transparent);
   color: var(--sp-text-color, #1a202c);
 }
-.sp-alert--info .sp-alert__icon { color: var(--sp-info, #0891b2); }
+.sp-alert--info { --sp-motif-color: var(--sp-info-on-tint, var(--sp-info)); }
+.sp-alert--info .sp-alert__icon { color: var(--sp-info-on-tint, var(--sp-info, #0891b2)); }
 
 .sp-alert--success {
   background: var(--sp-alert-success-bg, rgba(22, 163, 74, 0.1));
   border-color: color-mix(in srgb, var(--sp-success, #16a34a) 25%, transparent);
   color: var(--sp-text-color, #1a202c);
 }
-.sp-alert--success .sp-alert__icon { color: var(--sp-success, #16a34a); }
+.sp-alert--success { --sp-motif-color: var(--sp-success-on-tint, var(--sp-success)); }
+.sp-alert--success .sp-alert__icon { color: var(--sp-success-on-tint, var(--sp-success, #16a34a)); }
 
 .sp-alert--warning {
   background: var(--sp-alert-warning-bg, rgba(217, 119, 6, 0.1));
   border-color: color-mix(in srgb, var(--sp-warning, #d97706) 25%, transparent);
   color: var(--sp-text-color, #1a202c);
 }
-.sp-alert--warning .sp-alert__icon { color: var(--sp-warning, #d97706); }
+.sp-alert--warning { --sp-motif-color: var(--sp-warning-on-tint, var(--sp-warning)); }
+.sp-alert--warning .sp-alert__icon { color: var(--sp-warning-on-tint, var(--sp-warning, #d97706)); }
 
 .sp-alert--danger {
   background: var(--sp-alert-danger-bg, rgba(220, 38, 38, 0.1));
   border-color: color-mix(in srgb, var(--sp-danger, #dc2626) 25%, transparent);
   color: var(--sp-text-color, #1a202c);
 }
-.sp-alert--danger .sp-alert__icon { color: var(--sp-danger, #dc2626); }
+.sp-alert--danger { --sp-motif-color: var(--sp-danger-on-tint, var(--sp-danger)); }
+.sp-alert--danger .sp-alert__icon { color: var(--sp-danger-on-tint, var(--sp-danger, #dc2626)); }
 
 /* ── Elements ──────────────────────────────────────────────────────────────── */
 
 .sp-alert__icon {
   flex-shrink: 0;
   margin-top: 1px;
+}
+
+.sp-alert--sm {
+  gap: var(--sp-space-2, 8px);
+  padding: var(--sp-space-2, 8px) var(--sp-space-3, 12px);
+  font-size: var(--sp-text-xs, 12px);
+}
+
+.sp-alert--sm .sp-alert__icon {
+  margin-top: 0;
+}
+
+.sp-alert--sm .sp-alert__title {
+  margin-bottom: 0;
+  font-size: var(--sp-text-xs, 12px);
+}
+
+.sp-alert--no-title {
+  align-items: center;
+}
+
+.sp-alert--no-title .sp-alert__icon {
+  margin-top: 0;
 }
 
 .sp-alert__body {
@@ -88,6 +121,17 @@
   transition:
     background var(--sp-duration-fast, 100ms) var(--sp-ease-default, cubic-bezier(0.2, 0, 0, 1)),
     color var(--sp-duration-fast, 100ms) var(--sp-ease-default, cubic-bezier(0.2, 0, 0, 1));
+}
+
+.sp-alert__close:focus-visible {
+  outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color, var(--sp-primary));
+  outline-offset: var(--sp-focus-ring-offset, 2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-alert {
+    animation: none;
+  }
 }
 
 .sp-alert__close:hover {

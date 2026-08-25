@@ -8,7 +8,7 @@
 .sp-progress {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--sp-space-1, 4px);
   width: 100%;
 }
 
@@ -28,18 +28,18 @@
 }
 
 .sp-progress__track {
-  height: 8px;
-  border-radius: 9999px;
+  height: var(--sp-progress-height, 8px);
+  border-radius: var(--sp-radius-full, 9999px);
   background: var(--sp-surface-200, #e5e7eb);
   overflow: hidden;
 }
 
 .sp-progress__track--sm {
-  height: 4px;
+  --sp-progress-height: 4px;
 }
 
 .sp-progress__track--lg {
-  height: 12px;
+  --sp-progress-height: 12px;
 }
 
 .sp-progress__fill {
@@ -81,6 +81,91 @@
   animation: sp-progress-indeterminate 1.5s ease infinite;
 }
 
+/* ── Segments ─────────────────────────────────────────────────────────── */
+
+.sp-progress__segments {
+  display: flex;
+  width: 100%;
+  height: var(--sp-progress-height, 8px);
+  gap: var(--sp-space-1, 4px);
+}
+
+.sp-progress__segments--sm {
+  --sp-progress-height: 4px;
+  gap: var(--sp-space-0_5, 2px);
+}
+
+.sp-progress__segments--lg {
+  --sp-progress-height: 12px;
+  gap: var(--sp-space-1_5, 6px);
+}
+
+.sp-progress__segment {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+  border-radius: var(--sp-radius-xs, 2px);
+  background: var(--sp-surface-200, #e5e7eb);
+  transition: background var(--sp-duration-slow, 300ms) var(--sp-ease-in-out, ease-in-out);
+}
+
+.sp-progress__segments--tick,
+.sp-progress__segments--pill {
+  height: var(--sp-space-5, 20px);
+  gap: var(--sp-space-0_5, 2px);
+}
+
+.sp-progress__segments--tick.sp-progress__segments--sm,
+.sp-progress__segments--pill.sp-progress__segments--sm {
+  height: var(--sp-space-3_5, 14px);
+}
+
+.sp-progress__segments--tick.sp-progress__segments--lg,
+.sp-progress__segments--pill.sp-progress__segments--lg {
+  height: var(--sp-space-7, 28px);
+}
+
+.sp-progress__segments--tick .sp-progress__segment {
+  border-radius: var(--sp-radius-sm, 4px);
+}
+
+.sp-progress__segments--pill .sp-progress__segment {
+  border-radius: var(--sp-radius-full, 9999px);
+}
+
+.sp-progress__segment--filled,
+.sp-progress__segment--indeterminate {
+  background: var(--sp-progress-color, var(--sp-primary, #2563eb));
+}
+
+.sp-progress__segment--primary { --sp-progress-color: var(--sp-primary, #2563eb); }
+.sp-progress__segment--success { --sp-progress-color: var(--sp-success, #16a34a); }
+.sp-progress__segment--warning { --sp-progress-color: var(--sp-warning, #f59e0b); }
+.sp-progress__segment--danger { --sp-progress-color: var(--sp-danger, #dc2626); }
+.sp-progress__segment--info { --sp-progress-color: var(--sp-info, #0ea5e9); }
+
+.sp-progress__segment--striped {
+  background-image: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.15) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.15) 50%,
+    rgba(255, 255, 255, 0.15) 75%,
+    transparent 75%
+  );
+  background-size: 1rem 1rem;
+}
+
+.sp-progress__segment--animated {
+  animation: sp-progress-stripe 1s linear infinite;
+}
+
+.sp-progress__segment--indeterminate {
+  animation: sp-progress-segment-wave 1.2s ease-in-out infinite;
+}
+
 /* ── Animations ────────────────────────────────────────────────────────── */
 
 @keyframes sp-progress-stripe {
@@ -89,7 +174,22 @@
 }
 
 @keyframes sp-progress-indeterminate {
-  0%   { width: 30%; margin-left: 0; }
-  50%  { width: 30%; margin-left: 70%; }
-  100% { width: 30%; margin-left: 0; }
+  0%   { width: 30%; margin-inline-start: 0; }
+  50%  { width: 30%; margin-inline-start: 70%; }
+  100% { width: 30%; margin-inline-start: 0; }
+}
+
+@keyframes sp-progress-segment-wave {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-progress__fill,
+  .sp-progress__segment,
+  .sp-progress__segment--animated,
+  .sp-progress__segment--indeterminate {
+    animation: none;
+    transition: none;
+  }
 }

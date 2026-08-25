@@ -6,18 +6,39 @@
  */
 
 import './Alert.css';
-import { useState, type ReactNode } from 'react';
+import { useState, type CSSProperties, type ReactNode } from 'react';
 import { Icon } from '../../icons/Icon.js';
 import { useI18n } from '../../i18n/i18n-context.js';
+import {
+  Motif,
+  type SpDecorativeBackground,
+  type SpMotifAppearanceOption,
+  type SpMotifPosition,
+} from '../motif/Motif.js';
 
 export type AlertVariant = 'info' | 'success' | 'warning' | 'danger';
+export type AlertSize = 'sm' | 'md';
 
 export interface AlertProps {
   variant?: AlertVariant;
+  size?: AlertSize;
   title?: string;
   dismissible?: boolean;
   onClose?: () => void;
   className?: string;
+  style?: CSSProperties;
+  backgroundMotif?: string;
+  motifIcon?: string;
+  motifSvg?: string;
+  motifPosition?: SpMotifPosition;
+  motifSize?: number | string;
+  motifOpacity?: number;
+  motifRotation?: number;
+  motifOffsetX?: number | string;
+  motifOffsetY?: number | string;
+  motifAppearance?: SpMotifAppearanceOption;
+  motifColor?: string;
+  decorativeBackground?: SpDecorativeBackground;
   children?: ReactNode;
 }
 
@@ -32,10 +53,24 @@ function iconNameForVariant(variant: AlertVariant): string {
 
 export function Alert({
   variant = 'info',
+  size = 'md',
   title = '',
   dismissible = false,
   onClose,
   className = '',
+  style,
+  backgroundMotif,
+  motifIcon,
+  motifSvg,
+  motifPosition,
+  motifSize,
+  motifOpacity,
+  motifRotation,
+  motifOffsetX,
+  motifOffsetY,
+  motifAppearance,
+  motifColor,
+  decorativeBackground,
   children,
 }: AlertProps) {
   const [dismissed, setDismissed] = useState(false);
@@ -43,7 +78,18 @@ export function Alert({
 
   if (dismissed) return null;
 
-  const classes = ['sp-alert', `sp-alert--${variant}`, className]
+  const hasMotif = Boolean(
+    backgroundMotif || motifIcon || motifSvg || decorativeBackground?.motif ||
+      decorativeBackground?.icon || decorativeBackground?.svg,
+  );
+  const classes = [
+    'sp-alert',
+    `sp-alert--${variant}`,
+    size !== 'md' && `sp-alert--${size}`,
+    !title && 'sp-alert--no-title',
+    hasMotif && 'sp-alert--has-motif',
+    className,
+  ]
     .filter(Boolean)
     .join(' ');
 
@@ -53,14 +99,30 @@ export function Alert({
   }
 
   return (
-    <div className={classes} role="alert">
+    <div className={classes} role="alert" style={style}>
+      {hasMotif && (
+        <Motif
+          config={decorativeBackground}
+          motif={backgroundMotif}
+          icon={motifIcon}
+          svg={motifSvg}
+          position={motifPosition}
+          size={motifSize}
+          opacity={motifOpacity}
+          rotation={motifRotation}
+          offsetX={motifOffsetX}
+          offsetY={motifOffsetY}
+          appearance={motifAppearance}
+          color={motifColor}
+        />
+      )}
       <Icon name={iconNameForVariant(variant)} size={18} className="sp-alert__icon" />
       <div className="sp-alert__body">
         {title && <div className="sp-alert__title">{title}</div>}
         <div className="sp-alert__message">{children}</div>
       </div>
       {dismissible && (
-        <button className="sp-alert__close" aria-label={t('dismiss')} onClick={handleDismiss}>
+        <button type="button" className="sp-alert__close" aria-label={t('dismiss')} onClick={handleDismiss}>
           <Icon name="x" size={14} />
         </button>
       )}

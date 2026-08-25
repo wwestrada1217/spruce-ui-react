@@ -20,6 +20,7 @@ import { BadgePage } from './pages/components/BadgePage'
 import { CheckboxPage } from './pages/components/CheckboxPage'
 import { RadioPage } from './pages/components/RadioPage'
 import { AlertPage } from './pages/components/AlertPage'
+import { CircularProgressPage } from './pages/components/CircularProgressPage'
 import { CardPage } from './pages/components/CardPage'
 import { SidebarPage } from './pages/components/SidebarPage'
 import { CodeEditorPage } from './pages/components/CodeEditorPage'
@@ -66,6 +67,7 @@ import { ModalPage } from './pages/components/ModalPage'
 import { WindowPage } from './pages/components/WindowPage'
 import { ToastPage } from './pages/components/ToastPage'
 import { SnackbarPage } from './pages/components/SnackbarPage'
+import { NotificationCenterPage } from './pages/components/NotificationCenterPage'
 import { CommandPalettePage } from './pages/components/CommandPalettePage'
 import { ButtonGroupPage } from './pages/components/ButtonGroupPage'
 import { SliderRangePage } from './pages/components/SliderRangePage'
@@ -198,6 +200,7 @@ function renderPage(hash: string): React.ReactElement {
     case '#/components/checkbox':       return <CheckboxPage />
     case '#/components/radio':          return <RadioPage />
     case '#/components/alert':          return <AlertPage />
+    case '#/components/circular-progress': return <CircularProgressPage />
     case '#/components/card':           return <CardPage />
     case '#/components/sidebar':        return <SidebarPage />
     case '#/components/code-editor':    return <CodeEditorPage />
@@ -246,6 +249,7 @@ function renderPage(hash: string): React.ReactElement {
     case '#/components/window':              return <WindowPage />
     case '#/components/toast':               return <ToastPage />
     case '#/components/snackbar':            return <SnackbarPage />
+    case '#/components/notification-center': return <NotificationCenterPage />
     case '#/components/command-palette':     return <CommandPalettePage />
     case '#/components/button-group':        return <ButtonGroupPage />
     case '#/components/slider':
