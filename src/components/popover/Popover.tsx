@@ -7,12 +7,15 @@
 
 import './Popover.css';
 import {
+  cloneElement,
   useCallback,
   useEffect,
   useId,
   useRef,
   useState,
+  isValidElement,
   type FocusEvent,
+  type ReactElement,
   type ReactNode,
 } from 'react';
 import { createPortal } from 'react-dom';
@@ -53,6 +56,11 @@ export interface PopoverProps {
   hoverDelay?: number;
   hoverCloseDelay?: number;
   className?: string;
+}
+
+interface PopoverTriggerProps {
+  'aria-expanded'?: boolean;
+  'aria-haspopup'?: string;
 }
 
 /** A smart-positioned, controlled-friendly floating panel. */
@@ -223,6 +231,12 @@ export function Popover({
   };
 
   const side = activePlacement.split('-')[0];
+  const renderedTrigger = isValidElement<PopoverTriggerProps>(trigger)
+    ? cloneElement(trigger as ReactElement<PopoverTriggerProps>, {
+      'aria-expanded': isOpen,
+      'aria-haspopup': trigger.props['aria-haspopup'] ?? 'dialog',
+    })
+    : trigger;
   const arrowStyle = arrowPos?.axis === 'x'
     ? { left: arrowPos.px }
     : arrowPos?.axis === 'y'
@@ -236,21 +250,20 @@ export function Popover({
         className={['sp-popover-anchor', className].filter(Boolean).join(' ')}
         data-sp-overlay-anchor={popoverId}
         aria-haspopup="dialog"
-        aria-expanded={isOpen}
         onClick={() => triggerType === 'click' && setOpen(!isOpen)}
         onMouseEnter={scheduleOpen}
         onMouseLeave={() => scheduleClose()}
         onFocusCapture={scheduleOpen}
         onBlurCapture={scheduleClose}
       >
-        {trigger}
+        {renderedTrigger}
       </div>
       {isOpen && createPortal(
         <div
           className="sp-popover-outer"
           data-sp-overlay-owner={popoverId}
           data-sp-overlay-interactive="true"
-          style={{ position: 'fixed', top: coords.top, left: coords.left, zIndex: 1100, visibility: ready ? 'visible' : 'hidden' }}
+          style={{ position: 'fixed', top: coords.top, left: coords.left, zIndex: 1100, visibility: ready || isOpen ? 'visible' : 'hidden' }}
           onMouseEnter={triggerType === 'hover' ? scheduleOpen : undefined}
           onMouseLeave={triggerType === 'hover' ? () => scheduleClose() : undefined}
           onFocusCapture={triggerType === 'hover' ? scheduleOpen : undefined}

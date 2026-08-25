@@ -1,67 +1,13 @@
-/*
- * Copyright (c) 2026-2027 Sprucestack. All Rights Reserved.
- * The term "Sprucestack" refers to Sprucestack Inc. and/or its subsidiaries.
- * This software is released under Apache license.
- * The full license information can be found in LICENSE in the root directory of this project.
- */
-
-.sp-breadcrumbs {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--sp-space-1, 4px);
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  font-size: var(--sp-text-sm, 13px);
-}
-
-/* ── Item ─────────────────────────────────────────────────────────────────── */
-
-.sp-breadcrumbs__item {
-  display: inline-flex;
-  align-items: center;
-}
-
-/* Hide separator on the last item */
-.sp-breadcrumbs__item:last-child .sp-breadcrumbs__sep {
-  display: none;
-}
-
-/* ── Link ─────────────────────────────────────────────────────────────────── */
-
-.sp-breadcrumbs__link {
-  color: var(--sp-text-muted, #4a5568);
-  text-decoration: none;
-  transition: color var(--sp-duration-normal, 200ms) var(--sp-ease-default, cubic-bezier(0.2, 0, 0, 1));
-}
-
-.sp-breadcrumbs__link:hover {
-  color: var(--sp-primary, #2563eb);
-  text-decoration: underline;
-}
-
-.sp-breadcrumbs__link:focus-visible {
-  outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color, #2563eb);
-  outline-offset: var(--sp-focus-ring-offset, 2px);
-  border-radius: var(--sp-radius-sm, 4px);
-}
-
-/* ── Text ─────────────────────────────────────────────────────────────────── */
-
-.sp-breadcrumbs__text {
-  color: var(--sp-text-muted, #4a5568);
-}
-
-.sp-breadcrumbs__text--active {
-  color: var(--sp-text-color, #1a202c);
-  font-weight: var(--sp-font-semibold, 600);
-}
-
-/* ── Separator ────────────────────────────────────────────────────────────── */
-
-.sp-breadcrumbs__sep {
-  color: var(--sp-text-subtle, #a0aec0);
-  margin: 0 var(--sp-space-1, 4px);
-  user-select: none;
-}
+.sp-breadcrumbs { align-items: center; display: flex; flex-wrap: wrap; gap: var(--sp-space-1, 4px); list-style: none; margin: 0; padding: 0; font-size: var(--sp-text-sm, 13px); }
+.sp-breadcrumbs__item { align-items: center; display: inline-flex; min-width: 0; }
+.sp-breadcrumbs__link, .sp-breadcrumbs__text { align-items: center; color: var(--sp-text-muted, #4a5568); display: inline-flex; gap: var(--sp-space-1, 4px); min-width: 0; text-decoration: none; }
+.sp-breadcrumbs__link { background: transparent; border: 0; cursor: pointer; font: inherit; }
+.sp-breadcrumbs__link:hover { color: var(--sp-primary, #2563eb); text-decoration: underline; }
+.sp-breadcrumbs__link:focus-visible, .sp-breadcrumbs__ellipsis:focus-visible, .sp-breadcrumbs__menu-item:focus-visible { border-radius: var(--sp-radius-sm, 4px); outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color, #2563eb); outline-offset: var(--sp-focus-ring-offset, 2px); }
+.sp-breadcrumbs__text--active { color: var(--sp-text-color, #1a202c); font-weight: var(--sp-font-semibold, 600); }
+.sp-breadcrumbs__sep { color: var(--sp-text-subtle, #a0aec0); margin-inline: var(--sp-space-1, 4px); user-select: none; }
+.sp-breadcrumbs__ellipsis { background: transparent; border: 0; color: var(--sp-text-muted, #4a5568); cursor: pointer; font: inherit; min-width: 32px; padding: var(--sp-space-1, 4px) var(--sp-space-2, 8px); }
+.sp-breadcrumbs__menu-panel { min-width: 180px; }
+.sp-breadcrumbs__menu { display: flex; flex-direction: column; gap: 2px; }
+.sp-breadcrumbs__menu-item { align-items: center; background: transparent; border: 0; color: var(--sp-text-color, #1a202c); cursor: pointer; display: flex; font: inherit; gap: var(--sp-space-2, 8px); padding: var(--sp-space-2, 8px); text-align: start; text-decoration: none; width: 100%; }
+.sp-breadcrumbs__menu-item:hover { background: var(--sp-content-hover-bg, rgba(0, 0, 0, .04)); }

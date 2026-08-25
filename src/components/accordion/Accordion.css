@@ -1,87 +1,25 @@
-/*
- * Copyright (c) 2026-2027 Sprucestack. All Rights Reserved.
- * The term "Sprucestack" refers to Sprucestack Inc. and/or its subsidiaries.
- * This software is released under Apache license.
- * The full license information can be found in LICENSE in the root directory of this project.
- */
-
-.sp-accordion {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-space-2, 8px);
-}
-
-/* ── Item ─────────────────────────────────────────────────────────────────── */
-
-.sp-acc-item {
-  border: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08));
-  border-radius: var(--sp-radius-lg, 8px);
-  overflow: hidden;
-  background: var(--sp-surface-0, #fff);
-  transition: box-shadow var(--sp-duration-normal, 200ms) var(--sp-ease-default, cubic-bezier(0.2, 0, 0, 1));
-}
-
-.sp-acc-item--open {
-  box-shadow: var(--sp-shadow-xs, 0 1px 2px rgba(0, 0, 0, 0.05));
-}
-
-/* ── Header button ────────────────────────────────────────────────────────── */
-
-.sp-acc-item__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: var(--sp-space-3, 12px) var(--sp-space-4, 16px);
-  font-size: var(--sp-text-sm, 13px);
-  font-weight: var(--sp-font-medium, 500);
-  font-family: inherit;
-  color: var(--sp-text-color, #1a202c);
-  background: none;
-  border: none;
-  cursor: pointer;
-  text-align: left;
-  transition: background var(--sp-duration-fast, 100ms) var(--sp-ease-default, cubic-bezier(0.2, 0, 0, 1));
-}
-
-.sp-acc-item__header:hover:not(:disabled) {
-  background: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04));
-}
-
-.sp-acc-item__header:focus-visible {
-  outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color, #2563eb);
-  outline-offset: -2px;
-}
-
-.sp-acc-item__header:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* ── Icon ─────────────────────────────────────────────────────────────────── */
-
-.sp-acc-item__icon {
-  flex-shrink: 0;
-  color: var(--sp-text-muted, #6b7280);
-  transition: transform var(--sp-duration-normal, 200ms) var(--sp-ease-default, cubic-bezier(0.2, 0, 0, 1));
-}
-
-.sp-acc-item--open .sp-acc-item__icon {
-  transform: rotate(180deg);
-}
-
-/* ── Body ─────────────────────────────────────────────────────────────────── */
-
-.sp-acc-item__body {
-  padding: 0 var(--sp-space-4, 16px) var(--sp-space-4, 16px);
-  font-size: var(--sp-text-sm, 13px);
-  color: var(--sp-text-muted, #6b7280);
-  line-height: var(--sp-leading-normal, 1.5);
-  border-top: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08));
-  animation: sp-accordion-open var(--sp-duration-normal, 200ms) var(--sp-ease-out, ease-out) both;
-}
-
-@keyframes sp-accordion-open {
-  from { opacity: 0; transform: translateY(-4px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+.sp-accordion { display: flex; flex-direction: column; gap: var(--sp-space-2, 8px); }
+.sp-accordion__all-toggle { align-self: flex-start; border: 0; color: var(--sp-primary, #2563eb); background: transparent; cursor: pointer; font: inherit; padding: var(--sp-space-1, 4px) 0; }
+.sp-accordion-item { background: var(--sp-surface-0, #fff); color: var(--sp-text-color, #1a202c); overflow: hidden; transition: box-shadow var(--sp-duration-normal, 200ms) var(--sp-ease-default, ease); }
+.sp-accordion--contained .sp-accordion-item, .sp-accordion--separated .sp-accordion-item { border: 1px solid var(--sp-border, rgba(0, 0, 0, .12)); border-radius: var(--sp-radius-lg, 8px); }
+.sp-accordion--separated { gap: var(--sp-space-3, 12px); }
+.sp-accordion--flush .sp-accordion-item { border-block-end: 1px solid var(--sp-border, rgba(0, 0, 0, .12)); }
+.sp-accordion-item--open { box-shadow: var(--sp-shadow-xs, 0 1px 2px rgba(0, 0, 0, .05)); }
+.sp-accordion-item--disabled { opacity: .58; }
+.sp-accordion-item__header { align-items: stretch; display: flex; min-width: 0; }
+.sp-accordion-item__trigger { align-items: center; background: transparent; border: 0; color: inherit; cursor: pointer; display: flex; flex: 1; font: inherit; gap: var(--sp-space-3, 12px); min-width: 0; padding: var(--sp-space-3, 12px) var(--sp-space-4, 16px); text-align: start; }
+.sp-accordion--sm .sp-accordion-item__trigger { font-size: var(--sp-text-sm, 13px); padding-block: var(--sp-space-2, 8px); }
+.sp-accordion--lg .sp-accordion-item__trigger { font-size: var(--sp-text-md, 15px); padding-block: var(--sp-space-4, 16px); }
+.sp-accordion-item__trigger:hover:not(:disabled), .sp-accordion-item__indicator:hover:not(:disabled) { background: var(--sp-content-hover-bg, rgba(0, 0, 0, .04)); }
+.sp-accordion-item__trigger:focus-visible, .sp-accordion-item__indicator:focus-visible, .sp-accordion__all-toggle:focus-visible { outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color, #2563eb); outline-offset: -2px; }
+.sp-accordion-item__title-wrap { align-items: center; display: flex; flex: 1; gap: var(--sp-space-2, 8px); min-width: 0; }
+.sp-accordion-item__title { min-width: 0; }
+.sp-accordion-item__description { color: var(--sp-text-muted, #6b7280); font-size: var(--sp-text-sm, 13px); font-weight: 400; }
+.sp-accordion-item__indicator { align-items: center; background: transparent; border: 0; color: var(--sp-text-muted, #6b7280); cursor: pointer; display: inline-flex; justify-content: center; min-width: 40px; padding: var(--sp-space-3, 12px); }
+.sp-accordion-item__actions { align-items: center; display: inline-flex; padding-inline-end: var(--sp-space-2, 8px); }
+.sp-accordion-item__body { border-block-start: 1px solid var(--sp-border, rgba(0, 0, 0, .12)); color: var(--sp-text-muted, #6b7280); font-size: var(--sp-text-sm, 13px); line-height: var(--sp-leading-normal, 1.5); padding: 0 var(--sp-space-4, 16px) var(--sp-space-4, 16px); }
+.sp-accordion-item__body:not([hidden]) { animation: sp-accordion-open var(--sp-duration-normal, 200ms) var(--sp-ease-out, ease-out) both; }
+.sp-accordion-item__body[hidden]:not([hidden="until-found"]) { display: none; }
+.sp-accordion-item__body[data-findable="true"][aria-hidden="true"] { border-block-start: 0; display: block; height: 0; overflow: hidden; padding-block: 0; }
+@keyframes sp-accordion-open { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .sp-accordion-item, .sp-accordion-item__body { animation: none; transition: none; } }

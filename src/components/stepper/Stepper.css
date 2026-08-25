@@ -127,7 +127,7 @@
   flex: 1;
   margin: 4px 0;
   position: absolute;
-  left: calc(4px + 16px - 1px); /* padding + half indicator - half line */
+  inset-inline-start: calc(4px + 16px - 1px); /* padding + half indicator - half line */
   top: 36px;
   bottom: -4px;
 }

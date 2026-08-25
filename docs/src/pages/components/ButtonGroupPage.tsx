@@ -103,7 +103,11 @@ export function ButtonGroupPage() {
             <tr><td><code>orientation</code></td><td><code>'horizontal' | 'vertical'</code></td><td><code>'horizontal'</code></td><td>Layout direction</td></tr>
             <tr><td><code>toggleMode</code></td><td><code>'none' | 'single' | 'multiple'</code></td><td><code>'none'</code></td><td>Selection behavior</td></tr>
             <tr><td><code>value</code></td><td><code>string[]</code></td><td><code>[]</code></td><td>Selected values</td></tr>
+            <tr><td><code>defaultValue</code></td><td><code>string[]</code></td><td><code>[]</code></td><td>Initial uncontrolled selection</td></tr>
             <tr><td><code>onChange</code></td><td><code>(value: string[]) =&gt; void</code></td><td>—</td><td>Selection callback</td></tr>
+            <tr><td><code>onValueChange</code></td><td><code>(value: string[]) =&gt; void</code></td><td>—</td><td>Controlled-model callback alias</td></tr>
+            <tr><td><code>ariaLabel</code></td><td><code>string</code></td><td>—</td><td>Accessible group name</td></tr>
+            <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>—</td><td>Use Spruce <code>Button</code> elements with a <code>value</code> for compound composition</td></tr>
             <tr><td><code>variant</code></td><td><code>string</code></td><td><code>'outline'</code></td><td>Button variant</td></tr>
             <tr><td><code>size</code></td><td><code>'sm' | 'md' | 'lg'</code></td><td><code>'md'</code></td><td>Button size</td></tr>
           </tbody></table></div>

@@ -99,6 +99,7 @@ export function OverflowPage() {
                 <tr><td><code>menuContent</code></td><td><code>(hiddenIds: Set&lt;string&gt;) =&gt; ReactNode</code></td><td>—</td><td>Render prop for overflow menu</td></tr>
                 <tr><td><code>minimumVisible</code></td><td><code>number</code></td><td><code>0</code></td><td>Minimum items always visible</td></tr>
                 <tr><td><code>gap</code></td><td><code>number</code></td><td><code>0</code></td><td>Gap between items in px</td></tr>
+                <tr><td><code>menuWidth</code></td><td><code>number</code></td><td><code>40</code></td><td>Reserved overflow trigger width during measurement</td></tr>
                 <tr><td><code>onOverflowChange</code></td><td><code>(event) =&gt; void</code></td><td>—</td><td>Fired when overflow state changes</td></tr>
               </tbody>
             </table>
@@ -112,6 +113,7 @@ export function OverflowPage() {
               <tbody>
                 <tr><td><code>id</code></td><td><code>string</code></td><td>—</td><td>Unique identifier</td></tr>
                 <tr><td><code>priority</code></td><td><code>number</code></td><td><code>0</code></td><td>Higher priority items stay visible longer</td></tr>
+                <tr><td><code>className</code> / <code>style</code></td><td><code>string</code> / <code>CSSProperties</code></td><td>—</td><td>Style the measured item wrapper</td></tr>
                 <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>—</td><td>Item content</td></tr>
               </tbody>
             </table>

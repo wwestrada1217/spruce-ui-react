@@ -130,6 +130,10 @@ export function SplitButtonPage() {
                 <tr><td><code>variant</code></td><td><code>SplitButtonVariant</code></td><td><code>'primary'</code></td><td>Color variant</td></tr>
                 <tr><td><code>size</code></td><td><code>'sm' | 'md' | 'lg'</code></td><td><code>'md'</code></td><td>Button size</td></tr>
                 <tr><td><code>items</code></td><td><code>SplitButtonItem[]</code></td><td><code>[]</code></td><td>Dropdown menu items</td></tr>
+                <tr><td><code>placement</code></td><td><code>Placement</code></td><td><code>'bottom-end'</code></td><td>Collision-aware, RTL-aware menu placement</td></tr>
+                <tr><td><code>iconOnly</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Hide primary text while retaining an accessible label</td></tr>
+                <tr><td><code>ariaLabel</code> / <code>toggleAriaLabel</code> / <code>menuAriaLabel</code></td><td><code>string</code></td><td>i18n defaults</td><td>Group, toggle, and menu accessible names</td></tr>
+                <tr><td><code>open</code> / <code>onOpenChange</code></td><td><code>boolean</code> / callback</td><td>—</td><td>Controlled popup lifecycle</td></tr>
                 <tr><td><code>disabled</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Disable both buttons</td></tr>
                 <tr><td><code>loading</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Show loading spinner</td></tr>
                 <tr><td><code>iconLeft</code></td><td><code>string</code></td><td>—</td><td>Icon before label</td></tr>

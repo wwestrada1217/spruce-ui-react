@@ -114,9 +114,11 @@ export function StepperPage() {
               <tbody>
                 <tr><td><code>steps</code></td><td><code>StepItem[]</code></td><td>—</td><td>Array of step definitions</td></tr>
                 <tr><td><code>activeStep</code></td><td><code>number</code></td><td><code>0</code></td><td>Currently active step index</td></tr>
+                <tr><td><code>defaultActiveStep</code></td><td><code>number</code></td><td><code>0</code></td><td>Initial uncontrolled step</td></tr>
                 <tr><td><code>orientation</code></td><td><code>'horizontal' | 'vertical'</code></td><td><code>'horizontal'</code></td><td>Layout direction</td></tr>
                 <tr><td><code>linear</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Only allow forward progression</td></tr>
                 <tr><td><code>onStepChange</code></td><td><code>(index: number) =&gt; void</code></td><td>—</td><td>Called when a step is clicked</td></tr>
+                <tr><td><code>ariaLabel</code></td><td><code>string</code></td><td>—</td><td>Accessible name for the tablist step navigation</td></tr>
               </tbody>
             </table>
           </div>

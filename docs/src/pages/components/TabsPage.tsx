@@ -120,6 +120,10 @@ export function TabsPage() {
                 <tr><td><code>defaultActiveIndex</code></td><td><code>number</code></td><td><code>0</code></td><td>Initial active tab (uncontrolled)</td></tr>
                 <tr><td><code>onChange</code></td><td><code>(index: number) =&gt; void</code></td><td>—</td><td>Callback on tab change</td></tr>
                 <tr><td><code>vertical</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Vertical tab layout</td></tr>
+                <tr><td><code>lazy</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Mount panels on first activation and keep them available afterward</td></tr>
+                <tr><td><code>reorderable</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Enable pointer drag reorder callbacks</td></tr>
+                <tr><td><code>onTabClose</code> / <code>onTabContextMenu</code> / <code>onTabReorder</code></td><td>callbacks</td><td>—</td><td>Close, context-menu, and reorder lifecycle callbacks</td></tr>
+                <tr><td><code>toolbar</code> / <code>toolbarPlacement</code></td><td><code>ReactNode</code> / <code>'end' | 'after-tabs'</code></td><td>— / <code>'end'</code></td><td>Place auxiliary controls beside or below the tab strip</td></tr>
               </tbody>
             </table>
           </div>
@@ -133,6 +137,8 @@ export function TabsPage() {
                 <tr><td><code>label</code></td><td><code>string</code></td><td>Tab label text</td></tr>
                 <tr><td><code>icon</code></td><td><code>string</code></td><td>Optional icon name</td></tr>
                 <tr><td><code>disabled</code></td><td><code>boolean</code></td><td>Disable this tab</td></tr>
+                <tr><td><code>badge</code> / <code>closeable</code></td><td><code>ReactNode</code> / <code>boolean</code></td><td>— / <code>false</code></td><td>Optional badge and localized close affordance</td></tr>
+                <tr><td><code>lazy</code> / <code>routeFragment</code></td><td><code>boolean</code> / <code>string</code></td><td><code>false</code> / —</td><td>Per-tab lazy content and URL fragment synchronization</td></tr>
                 <tr><td><code>content</code></td><td><code>ReactNode</code></td><td>Panel content rendered when active</td></tr>
               </tbody>
             </table>

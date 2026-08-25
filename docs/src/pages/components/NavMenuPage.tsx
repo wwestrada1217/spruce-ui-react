@@ -241,6 +241,9 @@ export function NavMenuPage() {
               </thead>
               <tbody>
                 <tr><td><code>items</code></td><td><code>NavMenuItem[]</code></td><td><code>[]</code></td><td>Array of top-level navigation items</td></tr>
+                <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>—</td><td>Compound <code>NavMenuItem</code> composition</td></tr>
+                <tr><td><code>openIndex</code> / <code>onOpenChange</code></td><td><code>number | null</code> / callback</td><td>—</td><td>Controlled open item state</td></tr>
+                <tr><td><code>ariaLabel</code></td><td><code>string</code></td><td>i18n main navigation</td><td>Accessible navigation name</td></tr>
                 <tr><td><code>className</code></td><td><code>string</code></td><td><code>''</code></td><td>Additional CSS class for the root element</td></tr>
               </tbody>
             </table>
@@ -278,6 +281,9 @@ export function NavMenuPage() {
               </tbody>
             </table>
           </div>
+
+          <h3>Compound primitives</h3>
+          <p className="section-desc"><code>NavMenuContent</code> provides a surface for arbitrary panel content; <code>NavMenuLink</code> renders an accessible menu item with optional icon and description. Hover opening is delayed and Escape/outside clicks dismiss the panel.</p>
 
           <h3>Keyboard Interactions</h3>
           <div className="api-table-wrap">

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Accordion, AccordionItem, Button } from 'spruce-react';
+import { Accordion, AccordionItem } from 'spruce-react';
 import { CodePreview } from '../../components/CodePreview';
 
 const BASIC_CODE = `<Accordion>
@@ -163,6 +163,13 @@ export function AccordionPage() {
               </thead>
               <tbody>
                 <tr><td><code>multiple</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Allow multiple panels open simultaneously.</td></tr>
+                <tr><td><code>value</code> / <code>defaultValue</code></td><td><code>string[]</code></td><td><code>[]</code></td><td>Controlled or initial open item values.</td></tr>
+                <tr><td><code>onValueChange</code></td><td><code>(value: string[]) =&gt; void</code></td><td>—</td><td>Controlled open-value callback.</td></tr>
+                <tr><td><code>collapsible</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Whether the active item can be closed in single mode.</td></tr>
+                <tr><td><code>variant</code> / <code>size</code></td><td><code>AccordionVariant</code> / <code>AccordionSize</code></td><td><code>'contained'</code> / <code>'md'</code></td><td>Surface treatment and density.</td></tr>
+                <tr><td><code>indicator</code> / <code>indicatorPosition</code></td><td><code>'chevron' | 'plus' | 'none'</code> / <code>'start' | 'end'</code></td><td><code>'chevron'</code> / <code>'end'</code></td><td>Disclosure affordance and placement.</td></tr>
+                <tr><td><code>lazy</code> / <code>findable</code></td><td><code>boolean</code></td><td><code>false</code> / <code>true</code></td><td>Lazy body mounting and find-in-page support.</td></tr>
+                <tr><td><code>allToggle</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Show localized expand-all/collapse-all control.</td></tr>
                 <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>—</td><td><code>AccordionItem</code> elements.</td></tr>
               </tbody>
             </table>
@@ -175,6 +182,10 @@ export function AccordionPage() {
               </thead>
               <tbody>
                 <tr><td><code>header</code></td><td><code>ReactNode</code></td><td>—</td><td>Content of the clickable header row.</td></tr>
+                <tr><td><code>value</code></td><td><code>string</code></td><td>generated</td><td>Stable controlled item identifier.</td></tr>
+                <tr><td><code>open</code> / <code>onOpenChange</code></td><td><code>boolean</code> / callback</td><td>—</td><td>Optional controlled standalone item state.</td></tr>
+                <tr><td><code>description</code> / <code>icon</code></td><td><code>ReactNode</code> / <code>string</code></td><td>—</td><td>Optional header metadata.</td></tr>
+                <tr><td><code>trigger</code></td><td><code>'row' | 'indicator'</code></td><td><code>'row'</code></td><td>Choose whether the whole row or only the indicator toggles.</td></tr>
                 <tr><td><code>defaultOpen</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Open on first render.</td></tr>
                 <tr><td><code>disabled</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Prevent toggling.</td></tr>
                 <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>—</td><td>Collapsible body content.</td></tr>

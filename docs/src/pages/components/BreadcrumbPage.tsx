@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Breadcrumbs, BreadcrumbItem, Icon } from 'spruce-react';
+import { Breadcrumbs, BreadcrumbItem } from 'spruce-react';
 import { CodePreview } from '../../components/CodePreview';
 
 const BASIC_CODE = `<Breadcrumbs>
@@ -130,6 +130,10 @@ export function BreadcrumbPage() {
               </thead>
               <tbody>
                 <tr><td><code>separator</code></td><td><code>string</code></td><td><code>'/'</code></td><td>Character rendered between items.</td></tr>
+                <tr><td><code>items</code></td><td><code>BreadcrumbItemDef[]</code></td><td><code>null</code></td><td>Data-driven item definitions; children remain supported.</td></tr>
+                <tr><td><code>maxItems</code></td><td><code>number | null</code></td><td><code>null</code></td><td>Collapse a deep trail into a localized menu.</td></tr>
+                <tr><td><code>itemsBeforeCollapse</code> / <code>itemsAfterCollapse</code></td><td><code>number</code></td><td><code>1</code> / <code>1</code></td><td>Visible items kept on each side of the truncation menu.</td></tr>
+                <tr><td><code>showTruncatedDropdown</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Enable the keyboard-accessible hidden-items menu.</td></tr>
                 <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>—</td><td><code>BreadcrumbItem</code> elements.</td></tr>
               </tbody>
             </table>
@@ -143,6 +147,8 @@ export function BreadcrumbPage() {
               <tbody>
                 <tr><td><code>href</code></td><td><code>string | null</code></td><td><code>null</code></td><td>Navigation URL. Renders an <code>&lt;a&gt;</code> when set.</td></tr>
                 <tr><td><code>active</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Marks item as current page (<code>aria-current="page"</code>).</td></tr>
+                <tr><td><code>icon</code></td><td><code>string</code></td><td>—</td><td>Optional leading icon.</td></tr>
+                <tr><td><code>onClick</code></td><td><code>() =&gt; void</code></td><td>—</td><td>Callback for button/data-item selection.</td></tr>
                 <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>—</td><td>Label content.</td></tr>
               </tbody>
             </table>

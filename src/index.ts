@@ -96,11 +96,11 @@ export type { AvatarGroupProps, AvatarGroupItem } from './components/avatar-grou
 
 // ─── Breadcrumb ───────────────────────────────────────────────────────────────
 export { Breadcrumbs, BreadcrumbItem } from './components/breadcrumb/Breadcrumb.js';
-export type { BreadcrumbsProps, BreadcrumbItemProps } from './components/breadcrumb/Breadcrumb.js';
+export type { BreadcrumbsProps, BreadcrumbItemProps, BreadcrumbItemDef } from './components/breadcrumb/Breadcrumb.js';
 
 // ─── Accordion ────────────────────────────────────────────────────────────────
 export { Accordion, AccordionItem } from './components/accordion/Accordion.js';
-export type { AccordionProps, AccordionItemProps } from './components/accordion/Accordion.js';
+export type { AccordionProps, AccordionItemProps, AccordionVariant, AccordionSize, AccordionIndicator, AccordionIndicatorPosition, AccordionTriggerMode, AccordionToggleEvent } from './components/accordion/Accordion.js';
 
 // ─── Code Editor ──────────────────────────────────────────────────────────────
 export { CodeEditor } from './components/code-editor/CodeEditor.js';
@@ -312,7 +312,7 @@ export type { StepperProps, StepItem } from './components/stepper/Stepper.js';
 
 // ─── Tabs ────────────────────────────────────────────────────────────────────
 export { Tabs } from './components/tabs/Tabs.js';
-export type { TabsProps, TabItem } from './components/tabs/Tabs.js';
+export type { TabsProps, TabItem, TabHeaderRenderProps, TabContextMenuEvent, TabReorderEvent, TabsToolbarPlacement } from './components/tabs/Tabs.js';
 
 // ─── SplitButton ─────────────────────────────────────────────────────────────
 export { SplitButton } from './components/split-button/SplitButton.js';
@@ -324,11 +324,12 @@ export type { SegmentedControlProps, SegmentedOption, SegmentedSize } from './co
 
 // ─── Overflow ────────────────────────────────────────────────────────────────
 export { Overflow, OverflowItem } from './components/overflow/Overflow.js';
-export type { OverflowProps, OverflowItemProps } from './components/overflow/Overflow.js';
+export { computeOverflowHidden } from './components/overflow/Overflow.js';
+export type { OverflowProps, OverflowItemProps, OverflowChangeEvent, OverflowHandle, OverflowItemMeasurement } from './components/overflow/Overflow.js';
 
 // ─── Toolbar ─────────────────────────────────────────────────────────────────
-export { Toolbar } from './components/toolbar/Toolbar.js';
-export type { ToolbarProps, ToolbarButtonItem, ToolbarSize } from './components/toolbar/Toolbar.js';
+export { Toolbar, ToolbarButton, ToolbarGroup, ToolbarDivider, ToolbarSpacer } from './components/toolbar/Toolbar.js';
+export type { ToolbarProps, ToolbarButtonItem, ToolbarSize, ToolbarButtonProps, ToolbarGroupProps, ToolbarButtonPresentation, ToolbarChrome, ToolbarRadius, ToolbarOverflowEvent } from './components/toolbar/Toolbar.js';
 
 // ─── Splitter ────────────────────────────────────────────────────────────────
 export { Splitter, SplitterPane } from './components/splitter/Splitter.js';
@@ -375,8 +376,8 @@ export { CommandPalette } from './components/command-palette/CommandPalette.js';
 export type { CommandPaletteProps, CommandPaletteItem } from './components/command-palette/CommandPalette.js';
 
 // ─── ButtonGroup ─────────────────────────────────────────────────────────────
-export { ButtonGroup } from './components/button-group/ButtonGroup.js';
-export type { ButtonGroupProps, ButtonGroupItem } from './components/button-group/ButtonGroup.js';
+export { ButtonGroup, ButtonGroupButton, ButtonGroupItemIcon } from './components/button-group/ButtonGroup.js';
+export type { ButtonGroupProps, ButtonGroupItem, ButtonGroupOrientation, ButtonGroupToggleMode, ButtonGroupVariant, ButtonGroupSize, ButtonGroupButtonProps } from './components/button-group/ButtonGroup.js';
 
 // ─── Slider ──────────────────────────────────────────────────────────────────
 export { Slider } from './components/slider/Slider.js';
@@ -616,8 +617,8 @@ export { AppHeader } from './components/app-header/AppHeader.js';
 export type { AppHeaderProps } from './components/app-header/AppHeader.js';
 
 // ─── NavMenu ─────────────────────────────────────────────────────────────────
-export { NavMenu } from './components/nav-menu/NavMenu.js';
-export type { NavMenuProps, NavMenuItem, NavMenuLink } from './components/nav-menu/NavMenu.js';
+export { NavMenu, NavMenuItem, NavMenuContent, NavMenuLink } from './components/nav-menu/NavMenu.js';
+export type { NavMenuProps, NavMenuItem as NavMenuItemData, NavMenuLink as NavMenuLinkData, NavMenuItemComponentProps, NavMenuContentProps, NavMenuLinkProps } from './components/nav-menu/NavMenu.js';
 
 // ─── Coachmark ───────────────────────────────────────────────────────────────
 export { Coachmark } from './components/coachmark/Coachmark.js';

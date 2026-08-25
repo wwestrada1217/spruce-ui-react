@@ -18,6 +18,12 @@
   border: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08));
   border-radius: var(--sp-radius-md, 6px);
 }
+.sp-toolbar--chrome-subtle { background: var(--sp-surface-50, rgba(0, 0, 0, .02)); }
+.sp-toolbar--chrome-none { background: transparent; }
+.sp-toolbar--borderless { border: 0; }
+.sp-toolbar--radius-none { border-radius: 0; }
+.sp-toolbar--radius-sm { border-radius: var(--sp-radius-sm, 4px); }
+.sp-toolbar--radius-lg { border-radius: var(--sp-radius-lg, 8px); }
 
 /* ─── Button ──────────────────────────────────────────────────────── */
 
@@ -45,6 +51,7 @@
 .sp-toolbar-btn:hover:not(:disabled) {
   background: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04));
 }
+.sp-toolbar-btn--active { background: var(--sp-primary-subtle, rgba(37, 99, 235, .12)); color: var(--sp-primary, #2563eb); }
 
 .sp-toolbar-btn:focus-visible {
   outline: 2px solid var(--sp-focus-ring-color, #2563eb);
@@ -79,6 +86,9 @@
   flex-shrink: 0;
   align-self: center;
 }
+.sp-toolbar__item { display: inline-flex; flex-shrink: 0; }
+.sp-toolbar__group { align-items: center; display: inline-flex; gap: 2px; }
+.sp-toolbar__spacer { flex: 1 1 auto; min-width: var(--sp-space-2, 8px); }
 
 .sp-toolbar--sm .sp-toolbar__divider {
   height: 12px;
@@ -92,7 +102,7 @@
 
 .sp-toolbar__menu {
   flex-shrink: 0;
-  margin-left: auto;
+  margin-inline-start: auto;
 }
 
 .sp-toolbar__menu-trigger {
@@ -129,3 +139,5 @@
   height: 40px;
   min-width: 40px;
 }
+
+@media (prefers-reduced-motion: reduce) { .sp-toolbar-btn, .sp-toolbar__menu-trigger { transition: none; } }

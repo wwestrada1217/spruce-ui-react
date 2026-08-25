@@ -16,5 +16,6 @@
 
 .sp-overflow__menu {
   flex-shrink: 0;
-  margin-left: auto;
+  margin-inline-start: auto;
+  min-width: 32px;
 }

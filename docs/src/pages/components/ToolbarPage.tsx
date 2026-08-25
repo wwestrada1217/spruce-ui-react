@@ -101,6 +101,9 @@ export function ToolbarPage() {
                 <tr><td><code>items</code></td><td><code>ToolbarButtonItem[]</code></td><td>—</td><td>Array of button definitions</td></tr>
                 <tr><td><code>size</code></td><td><code>'sm' | 'md' | 'lg'</code></td><td><code>'md'</code></td><td>Toolbar size</td></tr>
                 <tr><td><code>dividerAfter</code></td><td><code>number[]</code></td><td><code>[]</code></td><td>Indices after which to insert dividers</td></tr>
+                <tr><td><code>chrome</code> / <code>radius</code> / <code>border</code></td><td>unions / <code>boolean</code></td><td>default / md / true</td><td>Surface chrome and container treatment</td></tr>
+                <tr><td><code>ariaLabel</code></td><td><code>string</code></td><td>—</td><td>Accessible toolbar name</td></tr>
+                <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>—</td><td>Compound ToolbarButton, ToolbarGroup, ToolbarDivider, ToolbarSpacer, or control elements</td></tr>
               </tbody>
             </table>
           </div>
@@ -115,6 +118,8 @@ export function ToolbarPage() {
                 <tr><td><code>label</code></td><td><code>string</code></td><td>Button label (shown in tooltip and overflow menu)</td></tr>
                 <tr><td><code>disabled</code></td><td><code>boolean</code></td><td>Disable this button</td></tr>
                 <tr><td><code>priority</code></td><td><code>number</code></td><td>Overflow priority (higher stays visible longer)</td></tr>
+                <tr><td><code>active</code> / <code>toggle</code></td><td><code>boolean</code></td><td>—</td><td>Active and <code>aria-pressed</code> toggle state</td></tr>
+                <tr><td><code>iconOnly</code> / <code>presentation</code></td><td><code>boolean</code> / <code>ToolbarButtonPresentation</code></td><td>false / auto</td><td>Adaptive icon/text presentation with localized tooltip labels</td></tr>
                 <tr><td><code>onClick</code></td><td><code>() =&gt; void</code></td><td>Click handler</td></tr>
               </tbody>
             </table>

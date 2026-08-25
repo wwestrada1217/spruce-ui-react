@@ -1,82 +1,13 @@
-/*
- * Copyright (c) 2026-2027 Sprucestack. All Rights Reserved.
- * The term "Sprucestack" refers to Sprucestack Inc. and/or its subsidiaries.
- * This software is released under Apache license.
- * The full license information can be found in LICENSE in the root directory of this project.
- */
-
-/* ── ButtonGroup ───────────────────────────────────────────────────────── */
-
-.sp-button-group {
-  display: inline-flex;
-  flex-direction: row;
-}
-
-/* ── Horizontal: connected borders ────────────────────────────────────── */
-
-.sp-button-group > .sp-btn:not(:first-child) {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-}
-
-.sp-button-group > .sp-btn:not(:last-child) {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-.sp-button-group > .sp-btn + .sp-btn {
-  margin-left: -1px;
-}
-
-/* ── Vertical ─────────────────────────────────────────────────────────── */
-
-.sp-button-group--vertical {
-  flex-direction: column;
-}
-
-.sp-button-group--vertical > .sp-btn:not(:first-child) {
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  /* Reset horizontal overrides */
-  border-bottom-left-radius: var(--sp-btn-radius, 6px);
-}
-
-.sp-button-group--vertical > .sp-btn:not(:last-child) {
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  /* Reset horizontal overrides */
-  border-top-right-radius: var(--sp-btn-radius, 6px);
-}
-
-.sp-button-group--vertical > .sp-btn:not(:first-child):not(:last-child) {
-  border-radius: 0;
-}
-
-.sp-button-group--vertical > .sp-btn:first-child {
-  border-top-left-radius: var(--sp-btn-radius, 6px);
-  border-top-right-radius: var(--sp-btn-radius, 6px);
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-.sp-button-group--vertical > .sp-btn:last-child {
-  border-bottom-left-radius: var(--sp-btn-radius, 6px);
-  border-bottom-right-radius: var(--sp-btn-radius, 6px);
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
-
-.sp-button-group--vertical > .sp-btn + .sp-btn {
-  margin-left: 0;
-  margin-top: -1px;
-}
-
-/* ── Hover z-index to show full border ────────────────────────────────── */
-
-.sp-button-group > .sp-btn:hover {
-  z-index: 1;
-}
-
-.sp-button-group > .sp-btn:focus-visible {
-  z-index: 2;
-}
+.sp-button-group { display: inline-flex; flex-direction: row; }
+.sp-button-group > .sp-btn:not(:first-child) { border-start-start-radius: 0; border-end-start-radius: 0; }
+.sp-button-group > .sp-btn:not(:last-child) { border-start-end-radius: 0; border-end-end-radius: 0; }
+.sp-button-group > .sp-btn + .sp-btn { margin-inline-start: -1px; }
+.sp-button-group--vertical { flex-direction: column; }
+.sp-button-group--vertical > .sp-btn:not(:first-child) { border-start-start-radius: 0; border-start-end-radius: 0; border-end-start-radius: var(--sp-btn-radius, 6px); }
+.sp-button-group--vertical > .sp-btn:not(:last-child) { border-end-start-radius: 0; border-end-end-radius: 0; border-start-end-radius: var(--sp-btn-radius, 6px); }
+.sp-button-group--vertical > .sp-btn:not(:first-child):not(:last-child) { border-radius: 0; }
+.sp-button-group--vertical > .sp-btn:first-child { border-start-start-radius: var(--sp-btn-radius, 6px); border-start-end-radius: var(--sp-btn-radius, 6px); border-end-start-radius: 0; border-end-end-radius: 0; }
+.sp-button-group--vertical > .sp-btn:last-child { border-end-start-radius: var(--sp-btn-radius, 6px); border-end-end-radius: var(--sp-btn-radius, 6px); border-start-start-radius: 0; border-start-end-radius: 0; }
+.sp-button-group--vertical > .sp-btn + .sp-btn { margin-inline-start: 0; margin-block-start: -1px; }
+.sp-button-group > .sp-btn:hover { position: relative; z-index: 1; }
+.sp-button-group > .sp-btn:focus-visible { position: relative; z-index: 2; }

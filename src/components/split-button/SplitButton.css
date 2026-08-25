@@ -66,18 +66,26 @@
 /* ── Main button ──────────────────────────────────────────────────────────── */
 
 .sp-split__btn--main {
-  border-radius: 6px 0 0 6px;
+  border-start-start-radius: var(--sp-radius-md, 6px);
+  border-end-start-radius: var(--sp-radius-md, 6px);
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
   flex: 1;
 }
 
 /* ── Toggle button ────────────────────────────────────────────────────────── */
 
 .sp-split__btn--toggle {
-  border-radius: 0 6px 6px 0;
+  border-start-start-radius: 0;
+  border-end-start-radius: 0;
+  border-start-end-radius: var(--sp-radius-md, 6px);
+  border-end-end-radius: var(--sp-radius-md, 6px);
   width: 32px;
   padding: 0;
-  border-left-color: color-mix(in srgb, currentColor 18%, transparent);
+  border-inline-start-color: color-mix(in srgb, currentColor 18%, transparent);
 }
+
+.sp-split__btn--main:only-child { border-radius: var(--sp-radius-md, 6px); }
 
 /* ── Size variants ────────────────────────────────────────────────────────── */
 
@@ -239,7 +247,7 @@
   font-size: 13px;
   color: var(--sp-text-color, #1a202c);
   cursor: pointer;
-  text-align: left;
+  text-align: start;
   transition: background var(--sp-duration-fast, 100ms) var(--sp-ease-default, cubic-bezier(0.2, 0, 0, 1));
 }
 
@@ -289,4 +297,9 @@
 @keyframes sp-spin {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-split__menu, .sp-split__spinner { animation: none; }
+  .sp-split__btn { transition: none; }
 }

@@ -6,12 +6,13 @@
  */
 
 import './SplitButton.css';
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useId } from 'react';
 import { createPortal } from 'react-dom';
 import {
   computePosition,
   getScrollParents,
   onClickOutside,
+  type Placement,
 } from '../../utils/positioning.js';
 import { Icon } from '../../icons/Icon.js';
 import { useI18n } from '../../i18n/i18n-context.js';
@@ -60,6 +61,22 @@ export interface SplitButtonProps {
   iconRight?: string | null;
   /** Menu items shown when the toggle button is clicked. */
   items?: SplitButtonItem[];
+  /** Preferred popup placement. RTL-aware collision positioning is applied. */
+  placement?: Placement;
+  /** Overflow priority used when rendered inside an adaptive toolbar. */
+  priority?: number;
+  /** Renders the primary action without visible text. */
+  iconOnly?: boolean;
+  /** Accessible name for the split-button group. */
+  ariaLabel?: string;
+  /** Accessible name for the menu trigger. */
+  toggleAriaLabel?: string;
+  /** Accessible name for the popup menu. */
+  menuAriaLabel?: string;
+  /** Controlled popup state. */
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
   /** Callback fired when the main button is clicked. */
   onPrimaryClick?: (e: React.MouseEvent) => void;
   /** Callback fired when a menu item is selected. */
@@ -98,35 +115,53 @@ export function SplitButton({
   iconLeft = null,
   iconRight = null,
   items = [],
+  placement = 'bottom-end',
+  priority = 0,
+  iconOnly = false,
+  ariaLabel,
+  toggleAriaLabel,
+  menuAriaLabel,
+  open: controlledOpen,
+  defaultOpen = false,
+  onOpenChange,
   onPrimaryClick,
   onItemSelect,
   className = '',
 }: SplitButtonProps) {
   const { t } = useI18n();
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(defaultOpen);
+  const open = controlledOpen ?? internalOpen;
   const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
   const [menuMinWidth, setMenuMinWidth] = useState(0);
   const [ready, setReady] = useState(false);
+  const menuId = useId();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const rafId = useRef(0);
 
   const iconSize = ICON_SIZES[size];
+  const primaryLabel = label ?? t('action');
+  const setOpen = useCallback((next: boolean) => {
+    if (controlledOpen === undefined) setInternalOpen(next);
+    onOpenChange?.(next);
+  }, [controlledOpen, onOpenChange]);
 
   const reposition = useCallback(() => {
     const anchor = containerRef.current;
     const menu = menuRef.current;
     if (!anchor || !menu) return;
-    const result = computePosition(anchor, menu, 'bottom-start', 4);
+    const result = computePosition(anchor, menu, placement, 4);
     setMenuPos({ top: result.top, left: result.left });
     setMenuMinWidth(anchor.offsetWidth);
     setReady(true);
-  }, []);
+  }, [placement]);
 
   // Position the menu after open
   useEffect(() => {
     if (!open) {
+      // Reset positioning readiness when a controlled popup closes.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setReady(false);
       return;
     }
@@ -155,11 +190,11 @@ export function SplitButton({
     if (!open) return;
     const els = [containerRef.current, menuRef.current].filter(Boolean) as HTMLElement[];
     return onClickOutside(els, () => setOpen(false));
-  }, [open]);
+  }, [open, setOpen]);
 
   function handleToggle() {
     if (disabled || loading) return;
-    setOpen((v) => !v);
+    setOpen(!open);
   }
 
   function handleItemClick(item: SplitButtonItem) {
@@ -194,17 +229,17 @@ export function SplitButton({
 
   return (
     <>
-      <div ref={containerRef} className={containerClasses}>
+      <div ref={containerRef} className={containerClasses} role="group" aria-label={ariaLabel} data-priority={priority}>
         {/* Main action button */}
         <button
           className={`${btnClasses} sp-split__btn--main`}
           type="button"
           disabled={disabled || loading}
           onClick={handlePrimaryClick}
-          aria-label={label}
+          aria-label={iconOnly ? (ariaLabel ?? primaryLabel) : undefined}
         >
           {iconLeft && <Icon name={iconLeft} size={iconSize} />}
-          {label && <span className="sp-split__label">{label}</span>}
+          {!iconOnly && <span className="sp-split__label">{primaryLabel}</span>}
           {iconRight && <Icon name={iconRight} size={iconSize} />}
           {loading && <Icon name="loader" size={iconSize} className="sp-split__spinner" />}
         </button>
@@ -215,9 +250,10 @@ export function SplitButton({
           type="button"
           disabled={disabled || loading}
           onClick={handleToggle}
-          aria-haspopup="true"
+          aria-haspopup="menu"
           aria-expanded={open}
-          aria-label={t('moreActions')}
+          aria-controls={open ? menuId : undefined}
+          aria-label={toggleAriaLabel ?? t('openActionsMenu')}
         >
           <Icon name="chevron-down" size={iconSize} />
         </button>
@@ -228,8 +264,10 @@ export function SplitButton({
         createPortal(
           <div
             ref={menuRef}
+            id={menuId}
             className="sp-split__menu"
             role="menu"
+            aria-label={menuAriaLabel ?? t('moreActions')}
             style={{
               position: 'fixed',
               top: menuPos.top,
