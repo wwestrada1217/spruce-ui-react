@@ -230,6 +230,32 @@ export type { PasswordInputProps, PasswordInputSize } from './components/passwor
 export { PasswordProgress } from './components/password-progress/PasswordProgress.js';
 export type { PasswordProgressProps, PasswordStrength } from './components/password-progress/PasswordProgress.js';
 
+// ─── Missing form primitives ─────────────────────────────────────────────────
+export { ColorPicker } from './components/color-picker/ColorPicker.js';
+export type { ColorPickerColor, ColorPickerHandle, ColorPickerProps } from './components/color-picker/ColorPicker.js';
+export { EmojiPicker } from './components/emoji-picker/EmojiPicker.js';
+export type { EmojiPickerEmoji, EmojiPickerHandle, EmojiPickerProps } from './components/emoji-picker/EmojiPicker.js';
+export { FormBuilder } from './components/form-builder/FormBuilder.js';
+export type {
+  FormBuilderField,
+  FormBuilderFieldType,
+  FormBuilderGridColumn,
+  FormBuilderHandle,
+  FormBuilderMode,
+  FormBuilderOption,
+  FormBuilderProps,
+  FormBuilderSchema,
+  FormBuilderSection,
+  FormBuilderSubmitEvent,
+  FormBuilderTab,
+} from './components/form-builder/FormBuilder.js';
+export {
+  FormBuilderDataContextAdapter,
+  createFormBuilderDataContextAdapter,
+  useFormBuilderDataContextAdapter,
+} from './components/form-builder/FormBuilderDataContextAdapter.js';
+export type { FormBuilderDataContextAdapterOptions } from './components/form-builder/FormBuilderDataContextAdapter.js';
+
 // ─── OtpInput ─────────────────────────────────────────────────────────────────
 export { OtpInput } from './components/otp-input/OtpInput.js';
 export type { OtpInputProps, OtpInputSize } from './components/otp-input/OtpInput.js';

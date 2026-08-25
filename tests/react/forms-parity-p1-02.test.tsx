@@ -34,6 +34,16 @@ describe('P1.0-02 form and lookup parity', () => {
         hasPrevious: pageNumber > 1,
         hasNext: pageNumber < 2,
       })),
+      getById: vi.fn(async (id: string) => ({ label: `Remote ${id}`, value: id })),
+      search: vi.fn(async (query: string, _searchFields?: string[], params = {}) => ({
+        pageNumber: params.pageNumber ?? 1,
+        pageSize: params.pageSize ?? 1,
+        totalPages: 1,
+        totalRecords: query ? 1 : 0,
+        data: query ? [{ label: 'Remote one', value: 'one' }] : [],
+        hasPrevious: false,
+        hasNext: false,
+      })),
     };
     const { getByRole, user } = renderWithSpruce(
       <Select options={source} pageSize={1} virtualPaging onChange={onChange} />,

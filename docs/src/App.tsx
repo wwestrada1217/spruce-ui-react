@@ -74,6 +74,10 @@ import { GridPage } from './pages/components/GridPage'
 import { SelectPage } from './pages/components/SelectPage'
 import { ComboboxPage } from './pages/components/ComboboxPage'
 import { GridComboboxPage } from './pages/components/GridComboboxPage'
+import { ColorPickerPage } from './pages/components/ColorPickerPage'
+import { EmojiPickerPage } from './pages/components/EmojiPickerPage'
+import { FormBuilderPage } from './pages/components/FormBuilderPage'
+import { LookupsPage } from './pages/components/LookupsPage'
 import { DatagridexPage } from './pages/components/DatagridexPage'
 import { GanttPage } from './pages/components/GanttPage'
 import { SchedulerPage } from './pages/components/SchedulerPage'
@@ -254,6 +258,10 @@ function renderPage(hash: string): React.ReactElement {
     case '#/components/select':              return <SelectPage />
     case '#/components/combobox':            return <ComboboxPage />
     case '#/components/grid-combobox':       return <GridComboboxPage />
+    case '#/components/color-picker':         return <ColorPickerPage />
+    case '#/components/emoji-picker':         return <EmojiPickerPage />
+    case '#/components/form-builder':         return <FormBuilderPage />
+    case '#/components/lookups':              return <LookupsPage />
     case '#/components/datagridex':          return <DatagridexPage />
     case '#/components/gantt':               return <GanttPage />
     case '#/components/scheduler':           return <SchedulerPage />
