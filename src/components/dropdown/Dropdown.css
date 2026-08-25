@@ -14,6 +14,7 @@
   min-width: 160px;
   animation: sp-slide-down-in var(--sp-duration-fast, 100ms) var(--sp-ease-out, ease-out) both;
   outline: none;
+  backdrop-filter: var(--sp-backdrop-filter, none);
 }
 
 .sp-dropdown__item-wrap {
@@ -32,7 +33,7 @@
   font-size: var(--sp-text-sm, 13px);
   color: var(--sp-text-color, #1a202c);
   cursor: pointer;
-  text-align: left;
+  text-align: start;
   transition: background var(--sp-duration-fast, 100ms) var(--sp-ease-default, cubic-bezier(0.2, 0, 0, 1));
 }
 
@@ -53,6 +54,23 @@
 
 .sp-dropdown__label {
   flex: 1;
+}
+
+.sp-dropdown__icon-slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.sp-dropdown__shortcut {
+  flex-shrink: 0;
+  margin-inline-start: var(--sp-space-4, 16px);
+  color: var(--sp-text-subtle);
+  font-size: var(--sp-text-xs, 12px);
+  font-variant-numeric: tabular-nums;
 }
 
 .sp-dropdown__chevron {

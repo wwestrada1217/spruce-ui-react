@@ -7,61 +7,55 @@
 
 import './Popover.css';
 import {
-  useState,
-  useRef,
-  useEffect,
   useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type FocusEvent,
   type ReactNode,
 } from 'react';
 import { createPortal } from 'react-dom';
+import { useI18n } from '../../i18n/i18n-context.js';
 import {
   computePosition,
   getScrollParents,
-  onClickOutside,
+  modalBoundary,
+  onEscapeCapture,
   type Placement,
+  type PositionAnchor,
 } from '../../utils/positioning.js';
 
 export type PopoverTriggerType = 'click' | 'hover';
 
-export interface PopoverProps {
-  /** The element that opens the popover when interacted with. */
-  trigger: ReactNode;
-  /** Content rendered inside the popover panel. */
-  children: ReactNode;
-  /** Preferred placement relative to the trigger. */
-  placement?: Placement;
-  /** How the popover is opened — `'click'` (default) or `'hover'`. */
-  triggerType?: PopoverTriggerType;
-  /** Gap in pixels between the trigger and the panel. */
-  offset?: number;
-  /** Show a directional arrow on the panel. */
-  arrow?: boolean;
-  /** Close the popover when clicking outside. */
-  dismissOnClickOutside?: boolean;
-  /** Extra CSS class applied to the panel element. */
-  panelClassName?: string;
-  /** Override the panel's default padding (CSS value, e.g. `'0'`). */
-  padding?: string;
-  /** Controlled open state. */
-  open?: boolean;
-  /** Callback fired when the open state changes. */
-  onOpenChange?: (open: boolean) => void;
-  /** Delay in ms before opening on hover. */
-  hoverDelay?: number;
-  /** Delay in ms before closing on hover-out. */
-  hoverCloseDelay?: number;
+interface OpenPopoverEntry {
+  containsTarget: (target: Node | null) => boolean;
 }
 
-/**
- * A floating panel anchored to a trigger element.
- *
- * @example
- * ```tsx
- * <Popover trigger={<Button>More info</Button>} placement="bottom">
- *   <p>Details go here.</p>
- * </Popover>
- * ```
- */
+const openPopovers: OpenPopoverEntry[] = [];
+
+export interface PopoverProps {
+  trigger: ReactNode;
+  children: ReactNode;
+  placement?: Placement;
+  triggerType?: PopoverTriggerType;
+  offset?: number;
+  arrow?: boolean;
+  showArrow?: boolean;
+  constrainToModal?: boolean;
+  dismissOnScroll?: boolean;
+  anchorRect?: DOMRectReadOnly | null;
+  dismissOnClickOutside?: boolean;
+  panelClassName?: string;
+  padding?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  hoverDelay?: number;
+  hoverCloseDelay?: number;
+  className?: string;
+}
+
+/** A smart-positioned, controlled-friendly floating panel. */
 export function Popover({
   trigger,
   children,
@@ -69,6 +63,10 @@ export function Popover({
   triggerType = 'click',
   offset = 6,
   arrow = false,
+  showArrow,
+  constrainToModal = true,
+  dismissOnScroll = true,
+  anchorRect = null,
   dismissOnClickOutside = true,
   panelClassName = '',
   padding,
@@ -76,145 +74,201 @@ export function Popover({
   onOpenChange,
   hoverDelay = 200,
   hoverCloseDelay = 150,
+  className = '',
 }: PopoverProps) {
+  const { isRtl } = useI18n();
   const anchorRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
-  const [internalOpen, setInternalOpen] = useState(false);
-  const [coords, setCoords] = useState({ top: 0, left: 0 });
-  const [arrowSide, setArrowSide] = useState('bottom');
-  const [ready, setReady] = useState(false);
-  const rafId = useRef(0);
   const hoverOpenTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hoverCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
+  const rafId = useRef<number | null>(null);
+  const popoverId = useId();
+  const [internalOpen, setInternalOpen] = useState(false);
+  const [coords, setCoords] = useState({ top: 0, left: 0 });
+  const [activePlacement, setActivePlacement] = useState<Placement>(placement);
+  const [arrowPos, setArrowPos] = useState<{ axis: 'x' | 'y'; px: number } | null>(null);
+  const [ready, setReady] = useState(false);
   const isControlled = controlledOpen !== undefined;
-  const isOpen = isControlled ? (controlledOpen ?? false) : internalOpen;
+  const isOpen = isControlled ? controlledOpen ?? false : internalOpen;
+  const hasArrow = showArrow ?? arrow;
 
   const setOpen = useCallback(
-    (v: boolean) => {
-      if (!isControlled) setInternalOpen(v);
-      onOpenChange?.(v);
+    (next: boolean) => {
+      if (next) setReady(false);
+      if (!isControlled) setInternalOpen(next);
+      onOpenChange?.(next);
     },
     [isControlled, onOpenChange],
   );
+
+  const clearHoverTimers = useCallback(() => {
+    if (hoverOpenTimer.current) clearTimeout(hoverOpenTimer.current);
+    if (hoverCloseTimer.current) clearTimeout(hoverCloseTimer.current);
+    hoverOpenTimer.current = null;
+    hoverCloseTimer.current = null;
+  }, []);
 
   const reposition = useCallback(() => {
     const anchor = anchorRef.current;
     const panel = panelRef.current;
     if (!anchor || !panel) return;
-    const effectiveOffset = arrow ? Math.max(offset, 8) : offset;
-    const result = computePosition(anchor, panel, placement, effectiveOffset);
+    const boundary = constrainToModal ? modalBoundary(anchor) : undefined;
+    const result = computePosition(
+      anchorRect ?? (anchor as PositionAnchor),
+      panel,
+      placement,
+      hasArrow ? Math.max(offset, 8) : offset,
+      boundary,
+      isRtl ? 'rtl' : 'ltr',
+    );
     setCoords({ top: result.top, left: result.left });
-    setArrowSide(result.placement.split('-')[0]);
+    setActivePlacement(result.placement);
+    if (hasArrow) {
+      const anchorBounds = anchor.getBoundingClientRect();
+      const panelBounds = panel.getBoundingClientRect();
+      const side = result.placement.split('-')[0];
+      if (side === 'top' || side === 'bottom') {
+        const raw = anchorBounds.left + anchorBounds.width / 2 - result.left - 5;
+        const max = Math.max(10, panelBounds.width - 20);
+        setArrowPos({ axis: 'x', px: Math.max(10, Math.min(max, raw)) });
+      } else {
+        const raw = anchorBounds.top + anchorBounds.height / 2 - result.top - 5;
+        const max = Math.max(10, panelBounds.height - 20);
+        setArrowPos({ axis: 'y', px: Math.max(10, Math.min(max, raw)) });
+      }
+    } else {
+      setArrowPos(null);
+    }
     setReady(true);
-  }, [arrow, offset, placement]);
+  }, [anchorRect, constrainToModal, hasArrow, isRtl, offset, placement]);
 
-  // Position floating panel after open
   useEffect(() => {
     if (!isOpen) {
-      setReady(false);
-      return;
+      const frame = requestAnimationFrame(() => setReady(false));
+      return () => cancelAnimationFrame(frame);
     }
     rafId.current = requestAnimationFrame(reposition);
-    return () => cancelAnimationFrame(rafId.current);
+    return () => {
+      if (rafId.current !== null) cancelAnimationFrame(rafId.current);
+      rafId.current = null;
+    };
   }, [isOpen, reposition]);
 
-  // Re-position on scroll
   useEffect(() => {
     if (!isOpen) return;
     const anchor = anchorRef.current;
     if (!anchor) return;
-    const scrollables = getScrollParents(anchor);
     const onScroll = () => {
-      rafId.current = requestAnimationFrame(reposition);
+      if (dismissOnScroll) setOpen(false);
+      else {
+        if (rafId.current !== null) cancelAnimationFrame(rafId.current);
+        rafId.current = requestAnimationFrame(reposition);
+      }
     };
-    scrollables.forEach((el) => el.addEventListener('scroll', onScroll, { passive: true }));
+    const parents = getScrollParents(anchor);
+    parents.forEach((parent) => parent.addEventListener('scroll', onScroll, { passive: true }));
+    window.addEventListener('scroll', onScroll, { passive: true });
     return () => {
-      scrollables.forEach((el) => el.removeEventListener('scroll', onScroll));
-      cancelAnimationFrame(rafId.current);
+      parents.forEach((parent) => parent.removeEventListener('scroll', onScroll));
+      window.removeEventListener('scroll', onScroll);
     };
-  }, [isOpen, reposition]);
+  }, [dismissOnScroll, isOpen, reposition, setOpen]);
 
-  // Click-outside to dismiss
   useEffect(() => {
-    if (!isOpen || !dismissOnClickOutside) return;
-    const els = [anchorRef.current, panelRef.current].filter(Boolean) as HTMLElement[];
-    return onClickOutside(els, () => setOpen(false));
-  }, [isOpen, dismissOnClickOutside, setOpen]);
+    if (!isOpen) return;
+    const entry: OpenPopoverEntry = {
+      containsTarget: (target) =>
+        !!target && (!!anchorRef.current?.contains(target) || !!panelRef.current?.contains(target)),
+    };
+    openPopovers.push(entry);
+    const closeIfOutside = (event: MouseEvent) => {
+      const target = event.target instanceof Node ? event.target : null;
+      if (!dismissOnClickOutside || entry.containsTarget(target)) return;
+      const index = openPopovers.indexOf(entry);
+      for (let i = index + 1; i < openPopovers.length; i += 1) {
+        if (openPopovers[i].containsTarget(target)) return;
+      }
+      setOpen(false);
+    };
+    const timer = window.setTimeout(() => document.addEventListener('click', closeIfOutside, true), 0);
+    const removeEscape = onEscapeCapture((event) => {
+      if (openPopovers[openPopovers.length - 1] !== entry) return;
+      event.preventDefault();
+      event.stopPropagation();
+      setOpen(false);
+    });
+    return () => {
+      window.clearTimeout(timer);
+      document.removeEventListener('click', closeIfOutside, true);
+      removeEscape();
+      const index = openPopovers.indexOf(entry);
+      if (index !== -1) openPopovers.splice(index, 1);
+    };
+  }, [dismissOnClickOutside, isOpen, setOpen]);
 
-  // Hover timers cleanup
-  useEffect(
-    () => () => {
-      if (hoverOpenTimer.current) clearTimeout(hoverOpenTimer.current);
-      if (hoverCloseTimer.current) clearTimeout(hoverCloseTimer.current);
-    },
-    [],
-  );
+  useEffect(() => () => clearHoverTimers(), [clearHoverTimers]);
 
-  function clearHoverTimers() {
-    if (hoverOpenTimer.current) clearTimeout(hoverOpenTimer.current);
-    if (hoverCloseTimer.current) clearTimeout(hoverCloseTimer.current);
-  }
-
-  function handleTriggerClick() {
-    if (triggerType === 'click') setOpen(!isOpen);
-  }
-
-  function handleMouseEnter() {
+  const scheduleOpen = () => {
     if (triggerType !== 'hover') return;
     clearHoverTimers();
     hoverOpenTimer.current = setTimeout(() => setOpen(true), hoverDelay);
-  }
+  };
 
-  function handleMouseLeave() {
+  const scheduleClose = (event?: FocusEvent<HTMLDivElement>) => {
     if (triggerType !== 'hover') return;
+    const related = event?.relatedTarget;
+    if (related instanceof Node && (anchorRef.current?.contains(related) || panelRef.current?.contains(related))) return;
     clearHoverTimers();
     hoverCloseTimer.current = setTimeout(() => setOpen(false), hoverCloseDelay);
-  }
+  };
 
-  const panelClasses = ['sp-popover-panel', panelClassName].filter(Boolean).join(' ');
+  const side = activePlacement.split('-')[0];
+  const arrowStyle = arrowPos?.axis === 'x'
+    ? { left: arrowPos.px }
+    : arrowPos?.axis === 'y'
+      ? { top: arrowPos.px }
+      : undefined;
 
   return (
     <>
       <div
         ref={anchorRef}
-        className="sp-popover-anchor"
-        onClick={handleTriggerClick}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
+        className={['sp-popover-anchor', className].filter(Boolean).join(' ')}
+        data-sp-overlay-anchor={popoverId}
+        aria-haspopup="dialog"
+        aria-expanded={isOpen}
+        onClick={() => triggerType === 'click' && setOpen(!isOpen)}
+        onMouseEnter={scheduleOpen}
+        onMouseLeave={() => scheduleClose()}
+        onFocusCapture={scheduleOpen}
+        onBlurCapture={scheduleClose}
       >
         {trigger}
       </div>
-      {isOpen &&
-        createPortal(
+      {isOpen && createPortal(
+        <div
+          className="sp-popover-outer"
+          data-sp-overlay-owner={popoverId}
+          data-sp-overlay-interactive="true"
+          style={{ position: 'fixed', top: coords.top, left: coords.left, zIndex: 1100, visibility: ready ? 'visible' : 'hidden' }}
+          onMouseEnter={triggerType === 'hover' ? scheduleOpen : undefined}
+          onMouseLeave={triggerType === 'hover' ? () => scheduleClose() : undefined}
+          onFocusCapture={triggerType === 'hover' ? scheduleOpen : undefined}
+          onBlurCapture={triggerType === 'hover' ? scheduleClose : undefined}
+        >
+          {hasArrow && <div className="sp-popover-arrow" data-popover-side={side} style={arrowStyle} aria-hidden="true" />}
           <div
-            style={{
-              position: 'fixed',
-              top: coords.top,
-              left: coords.left,
-              zIndex: 999,
-              opacity: ready ? 1 : 0,
-            }}
-            onMouseEnter={triggerType === 'hover' ? handleMouseEnter : undefined}
-            onMouseLeave={triggerType === 'hover' ? handleMouseLeave : undefined}
+            ref={panelRef}
+            className={['sp-popover-panel', hasArrow && 'sp-popover-panel--has-arrow', panelClassName].filter(Boolean).join(' ')}
+            style={padding != null ? { padding } : undefined}
+            role="dialog"
+            aria-label="Popover"
           >
-            {arrow && (
-              <div
-                className="sp-popover-arrow"
-                data-popover-side={arrowSide}
-                aria-hidden
-              />
-            )}
-            <div
-              ref={panelRef}
-              className={panelClasses}
-              style={padding != null ? { padding } : undefined}
-            >
-              {children}
-            </div>
-          </div>,
-          document.body,
-        )}
+            {children}
+          </div>
+        </div>,
+        document.body,
+      )}
     </>
   );
 }

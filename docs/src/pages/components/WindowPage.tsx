@@ -76,7 +76,10 @@ export function WindowPage() {
             <tr><td><code>resizable</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Enable resize handles</td></tr>
             <tr><td><code>minWidth</code></td><td><code>number</code></td><td><code>280</code></td><td>Minimum width in px</td></tr>
             <tr><td><code>minHeight</code></td><td><code>number</code></td><td><code>200</code></td><td>Minimum height in px</td></tr>
-            <tr><td><code>showBackdrop</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Show overlay behind window</td></tr>
+                <tr><td><code>showBackdrop</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Show overlay behind window</td></tr>
+                <tr><td><code>closeOnEscape</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Allow Escape to request close</td></tr>
+                <tr><td><code>focusTrap</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Trap focus in the topmost window</td></tr>
+                <tr><td><code>onMaximizeChange</code></td><td><code>(maximized) =&gt; void</code></td><td>—</td><td>Called when maximize state changes</td></tr>
             <tr><td><code>footer</code></td><td><code>ReactNode</code></td><td>—</td><td>Footer content</td></tr>
           </tbody></table></div>
         </section>

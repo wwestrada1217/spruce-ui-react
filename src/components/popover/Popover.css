@@ -7,6 +7,11 @@
 
 .sp-popover-anchor {
   display: inline-block;
+  position: relative;
+}
+
+.sp-popover-outer {
+  pointer-events: none;
 }
 
 /* ── Panel ────────────────────────────────────────────────────────────────── */
@@ -19,6 +24,7 @@
   box-shadow: var(--sp-shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1));
   padding: var(--sp-space-3, 12px);
   min-width: 200px;
+  pointer-events: auto;
   animation: sp-scale-in var(--sp-duration-fast, 100ms) var(--sp-ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)) both;
 }
 

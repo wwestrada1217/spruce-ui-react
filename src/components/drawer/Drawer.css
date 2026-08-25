@@ -35,11 +35,11 @@
 
 /* ── Sizes (horizontal) ────────────────────────────────────────────────── */
 .sp-drawer--left.sp-drawer--sm,
-.sp-drawer--right.sp-drawer--sm   { width: 320px; }
+.sp-drawer--right.sp-drawer--sm   { width: min(320px, 100%); }
 .sp-drawer--left.sp-drawer--md,
-.sp-drawer--right.sp-drawer--md   { width: 480px; }
+.sp-drawer--right.sp-drawer--md   { width: min(480px, 100%); }
 .sp-drawer--left.sp-drawer--lg,
-.sp-drawer--right.sp-drawer--lg   { width: 640px; }
+.sp-drawer--right.sp-drawer--lg   { width: min(640px, 100%); }
 .sp-drawer--left.sp-drawer--full,
 .sp-drawer--right.sp-drawer--full { width: 100vw; }
 
@@ -48,6 +48,13 @@
 .sp-drawer--bottom.sp-drawer--md   { height: 50vh; }
 .sp-drawer--bottom.sp-drawer--lg   { height: 70vh; }
 .sp-drawer--bottom.sp-drawer--full { height: 100vh; }
+
+@media (max-width: 640px) {
+  .sp-drawer--left,
+  .sp-drawer--right {
+    width: 100%;
+  }
+}
 
 /* ── Internals ──────────────────────────────────────────────────────────── */
 .sp-drawer__header {

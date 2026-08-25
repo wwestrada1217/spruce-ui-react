@@ -6,101 +6,99 @@
  */
 
 import './Modal.css';
-import { useEffect, useCallback, type ReactNode } from 'react';
+import { useEffect, useId, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
 import { useI18n } from '../../i18n/i18n-context.js';
+import { useFocusTrap } from '../../utils/FocusUtils.js';
 
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
 
 export interface ModalProps {
-  /** Whether the modal is open. */
   open: boolean;
-  /** Callback fired when the modal requests to close. */
   onClose: () => void;
-  /** Title displayed in the header. */
   title?: string;
-  /** Controls the maximum width of the modal. */
+  description?: string;
+  ariaLabel?: string;
   size?: ModalSize;
-  /** Whether clicking the backdrop closes the modal. */
   closeOnBackdrop?: boolean;
-  /** Main content of the modal. */
+  closeOnEscape?: boolean;
+  focusTrap?: boolean;
   children?: ReactNode;
-  /** Content rendered in the footer area. */
   footer?: ReactNode;
-  /** Additional CSS class applied to the modal panel. */
   className?: string;
 }
 
-/**
- * A centered dialog overlay. Rendered into a portal on `document.body`.
- *
- * @example
- * ```tsx
- * <Modal open={isOpen} onClose={() => setOpen(false)} title="Confirm">
- *   <p>Are you sure?</p>
- * </Modal>
- * ```
- */
+/** A centered, focus-managed dialog rendered through a body portal. */
 export function Modal({
   open,
   onClose,
-  title,
+  title = '',
+  description,
+  ariaLabel,
   size = 'md',
   closeOnBackdrop = true,
+  closeOnEscape = true,
+  focusTrap = true,
   children,
   footer,
-  className,
+  className = '',
 }: ModalProps) {
   const { t } = useI18n();
-  // Close on Escape key
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    },
-    [onClose],
-  );
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
+  const descriptionId = useId();
+  const backdropPointerDown = useRef(false);
+
+  useFocusTrap(dialogRef, { active: open && focusTrap, autoFocus: open && focusTrap, restoreFocus: true });
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || !closeOnEscape) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [open, handleKeyDown]);
+  }, [closeOnEscape, onClose, open]);
 
-  // Lock body scroll when open
   useEffect(() => {
     if (!open) return;
-    const prev = document.body.style.overflow;
+    const previous = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = prev;
-    };
+    return () => { document.body.style.overflow = previous; };
   }, [open]);
 
   if (!open) return null;
 
-  const panelClasses = ['sp-modal', `sp-modal--${size}`, className]
-    .filter(Boolean)
-    .join(' ');
+  const panelClasses = ['sp-modal', `sp-modal--${size}`, className].filter(Boolean).join(' ');
+  const label = title || ariaLabel || undefined;
 
   return createPortal(
     <div
       className="sp-modal-backdrop"
-      onClick={closeOnBackdrop ? onClose : undefined}
+      onPointerDown={(event) => { backdropPointerDown.current = event.target === event.currentTarget; }}
+      onClick={(event) => {
+        if (closeOnBackdrop && backdropPointerDown.current && event.target === event.currentTarget) onClose();
+        backdropPointerDown.current = false;
+      }}
     >
       <div
+        ref={dialogRef}
         className={panelClasses}
         role="dialog"
-        aria-label={title}
-        onClick={(e) => e.stopPropagation()}
+        aria-modal="true"
+        aria-label={label}
+        aria-labelledby={title ? titleId : undefined}
+        aria-describedby={description ? descriptionId : undefined}
+        tabIndex={-1}
+        onClick={(event) => event.stopPropagation()}
       >
         <div className="sp-modal__header">
-          <span className="sp-modal__title">{title}</span>
-          <button
-            className="sp-modal__close"
-            onClick={onClose}
-            aria-label={t('close')}
-          >
+          <div className="sp-modal__heading">
+            {title && <span id={titleId} className="sp-modal__title">{title}</span>}
+            {description && <p id={descriptionId} className="sp-modal__description">{description}</p>}
+          </div>
+          <button className="sp-modal__close" type="button" onClick={onClose} aria-label={t('close')}>
             <Icon name="x" size={16} />
           </button>
         </div>

@@ -12,14 +12,18 @@ import {
   useEffect,
   useCallback,
   type ReactNode,
+  type MouseEvent as ReactMouseEvent,
 } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
 import { useI18n } from '../../i18n/i18n-context.js';
+import { useFocusTrap } from '../../utils/FocusUtils.js';
 
 /* ── Z-index management ──────────────────────────────────────────────── */
 
 let globalZIndex = 1000;
+let activeWindowZIndex = 1001;
+const windowStackListeners = new Set<() => void>();
 
 function nextZIndex(): number {
   return ++globalZIndex;
@@ -39,9 +43,12 @@ export interface WindowProps {
   minHeight?: number;
   showBackdrop?: boolean;
   closeOnBackdrop?: boolean;
+  closeOnEscape?: boolean;
+  focusTrap?: boolean;
   children?: ReactNode;
   footer?: ReactNode;
   className?: string;
+  onMaximizeChange?: (maximized: boolean) => void;
 }
 
 /* ── Size presets ─────────────────────────────────────────────────────── */
@@ -68,12 +75,15 @@ export function Window({
   size = 'md',
   resizable = true,
   minWidth = 280,
-  minHeight = 180,
+  minHeight = 200,
   showBackdrop = false,
   closeOnBackdrop = true,
+  closeOnEscape = true,
+  focusTrap = true,
   children,
   footer,
   className = '',
+  onMaximizeChange,
 }: WindowProps) {
   const { t } = useI18n();
   const preset = SIZE_PRESETS[size];
@@ -83,40 +93,59 @@ export function Window({
   const [maximized, setMaximized] = useState(false);
   const [zIndex, setZIndex] = useState(() => nextZIndex());
   const [initialized, setInitialized] = useState(false);
+  const [activeZ, setActiveZ] = useState(activeWindowZIndex);
+  const savedBounds = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
 
   const windowRef = useRef<HTMLDivElement>(null);
 
+  useFocusTrap(windowRef, {
+    active: open && focusTrap && zIndex === activeZ,
+    autoFocus: open && focusTrap && zIndex === activeZ,
+    restoreFocus: true,
+  });
+
+  useEffect(() => {
+    const listener = () => setActiveZ(activeWindowZIndex);
+    windowStackListeners.add(listener);
+    return () => { windowStackListeners.delete(listener); };
+  }, []);
+
   // Reset state when opening or size changes
   useEffect(() => {
-    if (!open) {
-      setInitialized(false);
-      setMaximized(false);
-      return;
-    }
-    const p = SIZE_PRESETS[size];
-    setDim({ width: p.width, height: p.height });
-    setPos({
-      x: Math.round((window.innerWidth - p.width) / 2),
-      y: Math.round((window.innerHeight - p.height) / 2),
+    const frame = requestAnimationFrame(() => {
+      if (!open) {
+        setInitialized(false);
+        setMaximized(false);
+        return;
+      }
+      const p = SIZE_PRESETS[size];
+      setDim({ width: p.width, height: p.height });
+      setPos({
+        x: Math.round((window.innerWidth - p.width) / 2),
+        y: Math.round((window.innerHeight - p.height) / 2),
+      });
+      setZIndex(nextZIndex());
+      setInitialized(true);
     });
-    setZIndex(nextZIndex());
-    setInitialized(true);
+    return () => cancelAnimationFrame(frame);
   }, [open, size]);
 
   // Escape to close
   useEffect(() => {
     if (!open) return;
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape' && closeOnEscape && zIndex === activeWindowZIndex) onClose();
     };
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [open, onClose]);
+  }, [closeOnEscape, onClose, open, zIndex]);
 
   // Bring to front
   const bringToFront = useCallback(() => {
     setZIndex((prev) => {
       const next = nextZIndex();
+      activeWindowZIndex = next;
+      windowStackListeners.forEach((listener) => listener());
       return next === prev ? prev : next;
     });
   }, []);
@@ -210,12 +239,25 @@ export function Window({
   // Toggle maximize
   function toggleMaximize() {
     if (!resizable) return;
-    setMaximized((prev) => !prev);
+    setMaximized((prev) => {
+      if (prev) {
+        const bounds = savedBounds.current;
+        if (bounds) {
+          setPos({ x: bounds.x, y: bounds.y });
+          setDim({ width: bounds.width, height: bounds.height });
+        }
+        onMaximizeChange?.(false);
+        return false;
+      }
+      savedBounds.current = { ...pos, ...dim };
+      onMaximizeChange?.(true);
+      return true;
+    });
   }
 
   // Backdrop click
-  function onBackdropClick() {
-    if (closeOnBackdrop) onClose();
+  function onBackdropClick(event: ReactMouseEvent<HTMLDivElement>) {
+    if (closeOnBackdrop && event.target === event.currentTarget) onClose();
   }
 
   if (!open) return null;
@@ -257,6 +299,8 @@ export function Window({
         }}
         role="dialog"
         aria-label={title || undefined}
+        aria-modal={showBackdrop ? 'true' : undefined}
+        tabIndex={-1}
         onMouseDown={bringToFront}
       >
         {/* Header */}

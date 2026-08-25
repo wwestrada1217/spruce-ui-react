@@ -68,11 +68,15 @@ export function CommandPalettePage() {
             <tr><td><code>items</code></td><td><code>CommandPaletteItem[]</code></td><td>—</td><td>Searchable items</td></tr>
             <tr><td><code>open</code></td><td><code>boolean</code></td><td>—</td><td>Controls visibility</td></tr>
             <tr><td><code>onClose</code></td><td><code>() =&gt; void</code></td><td>—</td><td>Called on close</td></tr>
+            <tr><td><code>onOpenChange</code></td><td><code>(open) =&gt; void</code></td><td>—</td><td>Receives the global shortcut open request</td></tr>
             <tr><td><code>onSelect</code></td><td><code>(item) =&gt; void</code></td><td>—</td><td>Called on item selection</td></tr>
             <tr><td><code>placeholder</code></td><td><code>string</code></td><td><code>'Search...'</code></td><td>Search input placeholder</td></tr>
             <tr><td><code>emptyMessage</code></td><td><code>string</code></td><td><code>'No results found.'</code></td><td>Empty state message</td></tr>
             <tr><td><code>shortcutKey</code></td><td><code>string</code></td><td><code>'k'</code></td><td>Keyboard shortcut key (with Ctrl/Cmd)</td></tr>
             <tr><td><code>fuzzySearch</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Enable fuzzy matching</td></tr>
+            <tr><td><code>highlightQuery</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Highlight matching label text</td></tr>
+            <tr><td><code>showShortcuts</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Render item shortcut KBD controls</td></tr>
+            <tr><td><code>showFooter</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Render localized keyboard hints</td></tr>
           </tbody></table></div>
           <h3 style={{ marginTop: 16 }}>CommandPaletteItem</h3>
           <div className="api-table-wrap"><table className="api-table"><thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead><tbody>
@@ -81,6 +85,7 @@ export function CommandPalettePage() {
             <tr><td><code>icon</code></td><td><code>string</code></td><td>Optional icon name</td></tr>
             <tr><td><code>category</code></td><td><code>string</code></td><td>Group category</td></tr>
             <tr><td><code>keywords</code></td><td><code>string[]</code></td><td>Additional search terms</td></tr>
+            <tr><td><code>shortcut</code></td><td><code>string[] | string</code></td><td>Optional item keyboard shortcut</td></tr>
           </tbody></table></div>
         </section>
       </div>

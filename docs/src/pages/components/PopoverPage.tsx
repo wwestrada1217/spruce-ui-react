@@ -308,6 +308,9 @@ export function PopoverPage() {
                 <tr><td><code>offset</code></td><td><code>number</code></td><td><code>6</code></td><td>Gap between trigger and panel</td></tr>
                 <tr><td><code>arrow</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Show directional arrow</td></tr>
                 <tr><td><code>dismissOnClickOutside</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Close on outside click</td></tr>
+                <tr><td><code>dismissOnScroll</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Close on scroll; reposition when false</td></tr>
+                <tr><td><code>constrainToModal</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Keep the panel inside the nearest modal</td></tr>
+                <tr><td><code>anchorRect</code></td><td><code>DOMRectReadOnly | null</code></td><td><code>null</code></td><td>Use an explicit pointer/context-menu anchor rectangle</td></tr>
                 <tr><td><code>padding</code></td><td><code>string</code></td><td>—</td><td>Override panel padding</td></tr>
                 <tr><td><code>open</code></td><td><code>boolean</code></td><td>—</td><td>Controlled open state</td></tr>
                 <tr><td><code>onOpenChange</code></td><td><code>(open: boolean) =&gt; void</code></td><td>—</td><td>Open state change callback</td></tr>
@@ -328,10 +331,13 @@ export function PopoverPage() {
                 <tr><td><code>placement</code></td><td><code>Placement</code></td><td><code>'top'</code></td><td>Preferred position</td></tr>
                 <tr><td><code>offset</code></td><td><code>number</code></td><td><code>6</code></td><td>Gap between anchor and tooltip</td></tr>
                 <tr><td><code>arrow</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Show directional arrow</td></tr>
+                <tr><td><code>delay</code></td><td><code>number</code></td><td><code>200</code></td><td>Initial hover/focus delay in milliseconds</td></tr>
                 <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>—</td><td>Trigger element</td></tr>
               </tbody>
             </table>
           </div>
+
+          <p className="section-desc">Wrap related controls in <code>TooltipGroup</code> to warm the delay after the first tooltip and keep one tooltip visible at a time.</p>
 
           <h3 style={{ marginTop: 16 }}>Placement values</h3>
           <p className="section-desc">

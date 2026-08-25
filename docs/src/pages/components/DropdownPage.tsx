@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Dropdown, Button, type DropdownItem } from 'spruce-react';
+import { Dropdown, Button } from 'spruce-react';
 import { CodePreview } from '../../components/CodePreview';
 
 const BASIC_CODE = `<Dropdown
@@ -48,13 +48,6 @@ const SUBMENU_CODE = `<Dropdown
     { label: 'Send by email',icon: 'mail' },
   ]}
 />`;
-
-const ITEMS: DropdownItem[] = [
-  { label: 'Edit',      icon: 'edit' },
-  { label: 'Duplicate', icon: 'copy' },
-  { separator: true },
-  { label: 'Delete',    icon: 'trash' },
-];
 
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
@@ -198,7 +191,12 @@ export function DropdownPage() {
                 <tr><td><code>trigger</code></td><td><code>ReactNode</code></td><td>—</td><td>Element that toggles the menu.</td></tr>
                 <tr><td><code>items</code></td><td><code>DropdownItem[]</code></td><td><code>[]</code></td><td>Menu item definitions.</td></tr>
                 <tr><td><code>placement</code></td><td><code>Placement</code></td><td><code>'bottom-start'</code></td><td>Preferred menu position.</td></tr>
+                <tr><td><code>open</code> / <code>onOpenChange</code></td><td><code>boolean</code> / <code>(open) =&gt; void</code></td><td>—</td><td>Controlled visibility.</td></tr>
+                <tr><td><code>anchorRect</code></td><td><code>DOMRectReadOnly | null</code></td><td><code>null</code></td><td>Explicit pointer/context-menu anchor.</td></tr>
+                <tr><td><code>constrainToModal</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Keep the menu inside the nearest modal.</td></tr>
+                <tr><td><code>dismissOnScroll</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Close on scroll; reposition when false.</td></tr>
                 <tr><td><code>onItemClick</code></td><td><code>(item) =&gt; void</code></td><td>—</td><td>Called when any item is clicked.</td></tr>
+                <tr><td><code>onOpened</code> / <code>onClosed</code></td><td><code>() =&gt; void</code></td><td>—</td><td>Lifecycle callbacks.</td></tr>
                 <tr><td><code>dismissOnClickOutside</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Close menu on outside click.</td></tr>
                 <tr><td><code>className</code></td><td><code>string</code></td><td><code>''</code></td><td>Extra CSS class on the trigger wrapper.</td></tr>
               </tbody>

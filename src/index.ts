@@ -61,8 +61,8 @@ export {
 } from './i18n/index.js';
 
 // ─── Tooltip ─────────────────────────────────────────────────────────────────
-export { Tooltip } from './components/tooltip/Tooltip.js';
-export type { TooltipProps } from './components/tooltip/Tooltip.js';
+export { Tooltip, TooltipGroup } from './components/tooltip/Tooltip.js';
+export type { TooltipProps, TooltipGroupProps } from './components/tooltip/Tooltip.js';
 
 // ─── Popover ──────────────────────────────────────────────────────────────────
 export { Popover } from './components/popover/Popover.js';
@@ -743,8 +743,9 @@ export { Fade } from './effects/Fade.js';
 export type { FadeProps } from './effects/Fade.js';
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
-export { FocusTrap, AutoFocus } from './utils/FocusUtils.js';
-export type { FocusTrapProps, AutoFocusProps } from './utils/FocusUtils.js';
+export { FocusTrap, AutoFocus, useFocusTrap } from './utils/FocusUtils.js';
+export type { FocusTrapProps, AutoFocusProps, UseFocusTrapOptions } from './utils/FocusUtils.js';
+export type { Placement, PositionAnchor, PositionBoundary, PositionDirection, PositionResult } from './utils/positioning.js';
 export { Highlight } from './utils/Highlight.js';
 export type { HighlightProps } from './utils/Highlight.js';
 

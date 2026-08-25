@@ -6,114 +6,98 @@
  */
 
 import './Drawer.css';
-import { useEffect, useCallback, type ReactNode } from 'react';
+import { useEffect, useId, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
 import { useI18n } from '../../i18n/i18n-context.js';
+import { useFocusTrap } from '../../utils/FocusUtils.js';
 
 export type DrawerPosition = 'left' | 'right' | 'bottom';
 export type DrawerSize = 'sm' | 'md' | 'lg' | 'full';
 
 export interface DrawerProps {
-  /** Whether the drawer is open. */
   open: boolean;
-  /** Callback fired when the drawer requests to close. */
   onClose: () => void;
-  /** Title displayed in the header. */
   title?: string;
-  /** Which edge the drawer slides in from. */
   position?: DrawerPosition;
-  /** Width (left/right) or height (bottom) of the drawer panel. */
   size?: DrawerSize;
-  /** Whether clicking the backdrop closes the drawer. */
   closeOnBackdrop?: boolean;
-  /** Main content of the drawer. */
+  closeOnEscape?: boolean;
+  focusTrap?: boolean;
   children?: ReactNode;
-  /** Content rendered in the footer area. */
   footer?: ReactNode;
-  /** Additional CSS class applied to the drawer panel. */
   className?: string;
 }
 
-/**
- * A sliding panel that enters from the left, right, or bottom edge of the
- * viewport. Rendered into a portal on `document.body`.
- *
- * @example
- * ```tsx
- * <Drawer open={isOpen} onClose={() => setOpen(false)} title="Settings">
- *   <p>Drawer content</p>
- * </Drawer>
- * ```
- */
+/** A focus-managed sliding surface rendered through a body portal. */
 export function Drawer({
   open,
   onClose,
-  title,
+  title = '',
   position = 'right',
   size = 'md',
   closeOnBackdrop = true,
+  closeOnEscape = true,
+  focusTrap = true,
   children,
   footer,
-  className,
+  className = '',
 }: DrawerProps) {
   const { t } = useI18n();
-  // Close on Escape key
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    },
-    [onClose],
-  );
+  const panelRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
+  const backdropPointerDown = useRef(false);
+
+  useFocusTrap(panelRef, { active: open && focusTrap, autoFocus: open && focusTrap, restoreFocus: true });
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || !closeOnEscape) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [open, handleKeyDown]);
+  }, [closeOnEscape, onClose, open]);
 
-  // Lock body scroll when open
   useEffect(() => {
     if (!open) return;
-    const prev = document.body.style.overflow;
+    const previous = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = prev;
-    };
+    return () => { document.body.style.overflow = previous; };
   }, [open]);
 
   if (!open) return null;
-
-  const panelClasses = [
-    'sp-drawer',
-    `sp-drawer--${position}`,
-    `sp-drawer--${size}`,
-    className,
-  ]
-    .filter(Boolean)
-    .join(' ');
+  const panelClasses = ['sp-drawer', `sp-drawer--${position}`, `sp-drawer--${size}`, className].filter(Boolean).join(' ');
 
   return createPortal(
-    <>
+    <div
+      className="sp-drawer-backdrop"
+      onPointerDown={(event) => { backdropPointerDown.current = event.target === event.currentTarget; }}
+      onClick={(event) => {
+        if (closeOnBackdrop && backdropPointerDown.current && event.target === event.currentTarget) onClose();
+        backdropPointerDown.current = false;
+      }}
+    >
       <div
-        className="sp-drawer-backdrop"
-        onClick={closeOnBackdrop ? onClose : undefined}
-      />
-      <div className={panelClasses} role="dialog" aria-label={title}>
+        ref={panelRef}
+        className={panelClasses}
+        role="dialog"
+        aria-modal="true"
+        aria-label={title || undefined}
+        aria-labelledby={title ? titleId : undefined}
+        tabIndex={-1}
+        onClick={(event) => event.stopPropagation()}
+      >
         <div className="sp-drawer__header">
-          <span className="sp-drawer__title">{title}</span>
-          <button
-            className="sp-drawer__close"
-            onClick={onClose}
-            aria-label={t('close')}
-          >
+          {title && <span id={titleId} className="sp-drawer__title">{title}</span>}
+          <button className="sp-drawer__close" type="button" onClick={onClose} aria-label={t('close')}>
             <Icon name="x" size={16} />
           </button>
         </div>
         <div className="sp-drawer__body">{children}</div>
         {footer && <div className="sp-drawer__footer">{footer}</div>}
       </div>
-    </>,
+    </div>,
     document.body,
   );
 }

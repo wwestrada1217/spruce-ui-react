@@ -18,18 +18,29 @@ export interface PositionResult {
   placement: Placement;
 }
 
+export type PositionDirection = 'ltr' | 'rtl';
+
+export type PositionAnchor = HTMLElement | DOMRectReadOnly;
+
+export interface PositionBoundary {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+}
+
 const DEFAULT_OFFSET = 4;
 
 export function computePosition(
-  anchor: HTMLElement,
+  anchor: PositionAnchor,
   floating: HTMLElement,
   preferred: Placement,
   offset: number = DEFAULT_OFFSET,
+  boundary: PositionBoundary = viewportBoundary(),
+  direction: PositionDirection = getAnchorDirection(anchor),
 ): PositionResult {
-  const anchorRect = anchor.getBoundingClientRect();
+  const anchorRect = getAnchorRect(anchor);
   const floatingRect = floating.getBoundingClientRect();
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
 
   const fw = floatingRect.width;
   const fh = floatingRect.height;
@@ -37,23 +48,37 @@ export function computePosition(
   const attempts = getFlipOrder(preferred);
 
   for (const placement of attempts) {
-    const pos = calcPosition(anchorRect, fw, fh, placement, offset);
-    if (fitsViewport(pos, fw, fh, vw, vh)) {
+    const pos = calcPosition(anchorRect, fw, fh, placement, offset, direction);
+    if (fitsBoundary(pos, fw, fh, boundary)) {
       return { ...pos, placement };
     }
   }
 
-  // Fallback: clamp to viewport with preferred placement
-  const pos = calcPosition(anchorRect, fw, fh, preferred, offset);
+  // Fallback: clamp to the active collision boundary with preferred placement.
+  const pos = calcPosition(anchorRect, fw, fh, preferred, offset, direction);
   return {
-    top: clamp(pos.top, 0, vh - fh),
-    left: clamp(pos.left, 0, vw - fw),
+    top: clamp(pos.top, boundary.top, boundary.bottom - fh),
+    left: clamp(pos.left, boundary.left, boundary.right - fw),
     placement: preferred,
   };
 }
 
+function getAnchorRect(anchor: PositionAnchor): DOMRectReadOnly {
+  return anchor instanceof HTMLElement ? anchor.getBoundingClientRect() : anchor;
+}
+
+function getAnchorDirection(anchor: PositionAnchor): PositionDirection {
+  if (!(anchor instanceof HTMLElement) || typeof window === 'undefined') return 'ltr';
+  return getComputedStyle(anchor).direction === 'rtl' ? 'rtl' : 'ltr';
+}
+
 function calcPosition(
-  a: DOMRect, fw: number, fh: number, placement: Placement, offset: number,
+  a: DOMRectReadOnly,
+  fw: number,
+  fh: number,
+  placement: Placement,
+  offset: number,
+  direction: PositionDirection,
 ): { top: number; left: number } {
   const [side, align] = splitPlacement(placement);
 
@@ -73,6 +98,9 @@ function calcPosition(
       case 'end':   left = a.right - fw; break;
       default:      left = a.left + (a.width - fw) / 2; break;
     }
+    if (direction === 'rtl' && align !== 'center') {
+      left = align === 'start' ? a.right - fw : a.left;
+    }
   }
 
   if (side === 'left' || side === 'right') {
@@ -91,10 +119,18 @@ function splitPlacement(p: Placement): [string, string] {
   return [parts[0], parts[1] ?? 'center'];
 }
 
-function fitsViewport(
-  pos: { top: number; left: number }, fw: number, fh: number, vw: number, vh: number,
+function fitsBoundary(
+  pos: { top: number; left: number },
+  fw: number,
+  fh: number,
+  boundary: PositionBoundary,
 ): boolean {
-  return pos.top >= 0 && pos.left >= 0 && pos.top + fh <= vh && pos.left + fw <= vw;
+  return (
+    pos.top >= boundary.top &&
+    pos.left >= boundary.left &&
+    pos.top + fh <= boundary.bottom &&
+    pos.left + fw <= boundary.right
+  );
 }
 
 function getFlipOrder(preferred: Placement): Placement[] {
@@ -115,6 +151,29 @@ function getFlipOrder(preferred: Placement): Placement[] {
 
 function clamp(val: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, val));
+}
+
+function viewportBoundary(): PositionBoundary {
+  return {
+    top: 0,
+    right: typeof window === 'undefined' ? 0 : window.innerWidth,
+    bottom: typeof window === 'undefined' ? 0 : window.innerHeight,
+    left: 0,
+  };
+}
+
+/** Returns the collision boundary of the nearest modal, when present. */
+export function modalBoundary(el: HTMLElement): PositionBoundary | undefined {
+  return el.closest('.sp-modal')?.getBoundingClientRect();
+}
+
+/** Capture-phase Escape handling lets nested floating panels close first. */
+export function onEscapeCapture(callback: (event: KeyboardEvent) => void): () => void {
+  const handler = (event: KeyboardEvent) => {
+    if (event.key === 'Escape') callback(event);
+  };
+  document.addEventListener('keydown', handler, true);
+  return () => document.removeEventListener('keydown', handler, true);
 }
 
 /** Returns the opposite side for arrow positioning. */

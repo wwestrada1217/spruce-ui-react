@@ -103,7 +103,10 @@ export function ModalPage() {
             <tr><td><code>onClose</code></td><td><code>() =&gt; void</code></td><td>—</td><td>Called on close</td></tr>
             <tr><td><code>title</code></td><td><code>string</code></td><td><code>''</code></td><td>Header title</td></tr>
             <tr><td><code>size</code></td><td><code>'sm' | 'md' | 'lg' | 'xl' | 'full'</code></td><td><code>'md'</code></td><td>Max width</td></tr>
-            <tr><td><code>closeOnBackdrop</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Close on backdrop click</td></tr>
+                <tr><td><code>closeOnBackdrop</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Close on backdrop click</td></tr>
+                <tr><td><code>closeOnEscape</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Allow Escape to request close</td></tr>
+                <tr><td><code>focusTrap</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Autofocus, trap, and restore focus</td></tr>
+                <tr><td><code>description</code></td><td><code>string</code></td><td>—</td><td>Accessible dialog description</td></tr>
             <tr><td><code>footer</code></td><td><code>ReactNode</code></td><td>—</td><td>Footer content</td></tr>
           </tbody></table></div>
         </section>

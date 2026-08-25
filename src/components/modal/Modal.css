@@ -50,9 +50,22 @@
   border-bottom: 1px solid var(--sp-modal-border, rgba(0, 0, 0, 0.08));
 }
 
+.sp-modal__heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-space-1, 4px);
+  min-width: 0;
+}
+
 .sp-modal__title {
   font-size: var(--sp-text-lg, 18px);
   font-weight: var(--sp-font-semibold, 600);
+}
+
+.sp-modal__description {
+  margin: 0;
+  color: var(--sp-text-subtle);
+  font-size: var(--sp-text-xs, 12px);
 }
 
 .sp-modal__close {
