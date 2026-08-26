@@ -691,6 +691,104 @@ export type { CoachmarkProps, CoachmarkStep } from './components/coachmark/Coach
 export { Mention } from './components/mention/Mention.js';
 export type { MentionProps, MentionItem, MentionInsertEvent, MentionTrigger } from './components/mention/Mention.js';
 
+// ─── P1 productivity surfaces ───────────────────────────────────────────────
+export { Table } from './components/table/Table.js';
+export type {
+  TableProps,
+  TableColumn,
+  TableSort,
+  TableSortDirection,
+  TableDensity,
+  TableCellAlign,
+  SpTableProps,
+  SpTableColumn,
+  SpTableDensity,
+  SpTableCellAlign,
+} from './components/table/Table.js';
+export { ComposeBar } from './components/compose-bar/ComposeBar.js';
+export type { ComposeBarProps, ComposeBarSize, ComposeBarShape, SpComposeBarProps, SpComposeBarSize, SpComposeBarShape } from './components/compose-bar/ComposeBar.js';
+export { CommentThread, formatRelativeTime, renderCommentBody, DEFAULT_REACTION_PALETTE } from './components/comment-thread/CommentThread.js';
+export type {
+  Comment,
+  CommentAuthor,
+  CommentReaction,
+  CommentSubmitEvent,
+  ReactionToggleEvent,
+  CommentThreadProps,
+  SpComment,
+  SpCommentAuthor,
+  SpCommentReaction,
+  SpCommentSubmitEvent,
+  SpReactionToggleEvent,
+  SpCommentThreadProps,
+} from './components/comment-thread/CommentThread.js';
+export { PropertyPanel } from './components/property-panel/PropertyPanel.js';
+export type {
+  PropertyPanelProps,
+  PropertyPanelMode,
+  PropertyPanelValue,
+  PropertyPanelEditor,
+  PropertyPanelOption,
+  PropertyPanelCompoundField,
+  PropertyPanelProperty,
+  PropertyPanelValues,
+  PropertyPanelCollapsedGroups,
+  PropertyPanelChange,
+  SpPropertyPanelProps,
+  SpPropertyPanelMode,
+  SpPropertyPanelValue,
+  SpPropertyPanelEditor,
+  SpPropertyPanelOption,
+  SpPropertyPanelCompoundField,
+  SpPropertyPanelProperty,
+  SpPropertyPanelValues,
+  SpPropertyPanelCollapsedGroups,
+  SpPropertyPanelChange,
+} from './components/property-panel/PropertyPanel.js';
+export { PdfViewer } from './components/pdf-viewer/PdfViewer.js';
+export type { PdfViewerProps, SpPdfViewerProps } from './components/pdf-viewer/PdfViewer.js';
+export { TextDiff, diffText } from './components/text-diff/TextDiff.js';
+export type {
+  TextDiffProps,
+  TextDiffGranularity,
+  TextDiffAppearance,
+  TextDiffDeletionStyle,
+  TextDiffInsertionStyle,
+  TextDiffSegment,
+  SpTextDiffProps,
+} from './components/text-diff/TextDiff.js';
+export { PlanCards } from './components/plan-cards/PlanCards.js';
+export type {
+  PlanCardsProps,
+  PlanCardModel,
+  PlanCardFeatureGroup,
+  SpPlanCardsProps,
+  SpPlanCardModel,
+  SpPlanCardFeatureGroup,
+} from './components/plan-cards/PlanCards.js';
+export {
+  EntitlementsProvider,
+  useEntitlements,
+  useHasFeature,
+  FeatureGate,
+  FeatureLocked,
+  SP_ENTITLEMENTS_URL,
+} from './components/entitlements/Entitlements.js';
+export type {
+  EntitlementFeature,
+  EntitlementsResponse,
+  EntitlementsSnapshot,
+  EntitlementsFetcher,
+  EntitlementsContextValue,
+  EntitlementsProviderProps,
+  FeatureGateProps,
+  FeatureLockedProps,
+  SpEntitlementFeature,
+  SpEntitlementsProviderProps,
+  SpFeatureGateProps,
+  SpFeatureLockedProps,
+} from './components/entitlements/Entitlements.js';
+
 // ─── List ────────────────────────────────────────────────────────────────────
 export { List, ListItem, ListItemLine } from './components/list/List.js';
 export type { ListProps, ListItemProps, ListItemLineProps, ListSize, ListVariant } from './components/list/List.js';

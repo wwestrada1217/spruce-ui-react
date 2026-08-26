@@ -1,0 +1,28 @@
+.sp-comment-thread { display: flex; flex-direction: column; width: 100%; height: 100%; min-height: 0; }
+.sp-comment-thread__list { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; gap: var(--sp-space-4, 16px); overflow-y: auto; }
+.sp-comment-thread__empty { margin: var(--sp-space-2, 8px) 0; color: var(--sp-text-muted); font-size: var(--sp-text-sm, 13px); }
+.sp-comment__item { display: flex; gap: var(--sp-space-3, 12px); }
+.sp-comment__main { flex: 1; min-width: 0; }
+.sp-comment__head { display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--sp-space-2, 8px); }
+.sp-comment__name { color: var(--sp-text-color); font-size: var(--sp-text-sm, 13px); font-weight: var(--sp-font-semibold, 600); }
+.sp-comment__email,
+.sp-comment__time { color: var(--sp-text-subtle, #94a3b8); font-size: var(--sp-text-xs, 12px); }
+.sp-comment__time { margin-inline-start: auto; color: var(--sp-text-muted); }
+.sp-comment__body { margin-block-start: var(--sp-space-1, 2px); color: var(--sp-text-color); font-size: var(--sp-text-sm, 13px); line-height: var(--sp-leading-normal, 1.5); white-space: pre-wrap; overflow-wrap: anywhere; }
+.sp-comment__mention { padding-inline: 0.2em; color: var(--sp-primary-on-tint, var(--sp-primary, #2563eb)); background: var(--sp-primary-tint, var(--sp-primary-subtle)); border-radius: var(--sp-radius-sm, 4px); font-weight: var(--sp-font-medium, 500); }
+.sp-comment__actions { display: flex; align-items: center; flex-wrap: wrap; gap: var(--sp-space-1, 4px); margin-block-start: var(--sp-space-2, 8px); }
+.sp-comment__chip { display: inline-flex; align-items: center; gap: var(--sp-space-1, 4px); padding: var(--sp-space-1, 1px) var(--sp-space-2, 8px); color: var(--sp-text-color); background: var(--sp-surface-50); border: var(--sp-border-width-hairline, 1px) solid var(--sp-border); border-radius: var(--sp-radius-full, 999px); cursor: pointer; font: inherit; font-size: var(--sp-text-xs, 12px); }
+.sp-comment__chip:hover { background: var(--sp-surface-100); }
+.sp-comment__chip--mine { color: var(--sp-primary-on-tint, var(--sp-primary)); background: var(--sp-primary-tint, var(--sp-primary-subtle)); border-color: var(--sp-primary); }
+.sp-comment__react { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 24px; color: var(--sp-text-muted); background: transparent; border: var(--sp-border-width-hairline, 1px) solid var(--sp-border); border-radius: var(--sp-radius-full, 999px); cursor: pointer; }
+.sp-comment__react:hover { color: var(--sp-text-color); background: var(--sp-content-hover-bg); }
+.sp-comment__link { display: inline-flex; align-items: center; gap: var(--sp-space-1, 4px); padding: var(--sp-space-1, 2px) var(--sp-space-1_5, 6px); color: var(--sp-text-muted); background: transparent; border: 0; border-radius: var(--sp-radius-sm, 4px); cursor: pointer; font: inherit; font-size: var(--sp-text-xs, 12px); }
+.sp-comment__link:hover { color: var(--sp-text-color); background: var(--sp-content-hover-bg); }
+.sp-comment__palette { display: flex; gap: var(--sp-space-1, 2px); }
+.sp-comment__palette-btn { padding: var(--sp-space-1, 4px); color: inherit; background: transparent; border: 0; border-radius: var(--sp-radius-sm, 4px); cursor: pointer; font-size: 18px; line-height: 1; }
+.sp-comment__palette-btn:hover { background: var(--sp-content-hover-bg); transform: scale(1.15); }
+.sp-comment__replies { display: flex; flex-direction: column; gap: var(--sp-space-3, 12px); padding-inline-start: var(--sp-space-3, 12px); margin-block-start: var(--sp-space-3, 12px); margin-inline-start: var(--sp-space-5, 20px); border-inline-start: var(--sp-border-width-hairline, 1px) solid var(--sp-border); }
+.sp-comment__composer--reply { margin-block-start: var(--sp-space-3, 12px); margin-inline-start: var(--sp-space-5, 20px); }
+.sp-comment__composer-actions { display: flex; justify-content: flex-end; gap: var(--sp-space-2, 8px); margin-block-start: var(--sp-space-2, 8px); }
+.sp-comment-thread__composer { display: flex; flex-shrink: 0; gap: var(--sp-space-3, 12px); padding-block-start: var(--sp-space-4, 16px); margin-block-start: var(--sp-space-4, 16px); border-block-start: var(--sp-border-width-hairline, 1px) solid var(--sp-border); }
+.sp-comment-thread__composer-body { flex: 1; min-width: 0; }
