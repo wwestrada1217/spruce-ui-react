@@ -113,6 +113,57 @@ describe('Datagridex', () => {
     expect(document.documentElement).toHaveAttribute('dir', 'rtl');
   });
 
+  it('applies sticky offsets to pinned headers and cells', async () => {
+    const { container } = renderWithSpruce(
+      <Datagridex<Person>
+        rows={rows}
+        columns={columns}
+        selectionMode="multiple"
+        columnPins={{ name: 'left', age: 'right' }}
+      />,
+    );
+
+    const nameHeader = container.querySelector<HTMLElement>('[data-sp-datagridex-column="name"]');
+    const ageHeader = container.querySelector<HTMLElement>('[data-sp-datagridex-column="age"]');
+    const nameCell = container.querySelector<HTMLElement>('[data-sp-datagridex-cell="name"]');
+    const ageCell = container.querySelector<HTMLElement>('[data-sp-datagridex-cell="age"]');
+
+    await waitFor(() => {
+      expect(nameHeader?.style.insetInlineStart).toBe('40px');
+      expect(ageHeader?.style.insetInlineEnd).toBe('0px');
+      expect(nameCell?.style.insetInlineStart).toBe('40px');
+      expect(ageCell?.style.insetInlineEnd).toBe('0px');
+    });
+  });
+
+  it('sizes default columns to intrinsic content', () => {
+    const { container } = renderWithSpruce(
+      <Datagridex<Person> rows={rows} columns={columns} />,
+    );
+
+    expect(container.querySelector<HTMLElement>('.sp-datagridex__grid')?.style.gridTemplateColumns)
+      .toBe('minmax(min-content, max-content) minmax(min-content, max-content)');
+  });
+
+  it('uses shared dropdown and popover overlays for column controls', async () => {
+    const { getByRole, user } = renderWithSpruce(
+      <Datagridex<Person> rows={rows} columns={columns} toolbar columnMenu columnSelector />,
+    );
+
+    const menuTrigger = getByRole('button', { name: 'Column menu for Name' });
+    expect(menuTrigger).toHaveClass('sp-btn--ghost');
+    expect(menuTrigger.closest('.sp-dropdown-trigger')).toBeInTheDocument();
+
+    await user.click(menuTrigger);
+    await waitFor(() => expect(getByRole('menu')).toBeInTheDocument());
+    expect(getByRole('button', { name: 'Auto-size Column' })).toBeInTheDocument();
+    expect(document.querySelector('.sp-datagridex__column-menu-panel')).not.toBeInTheDocument();
+
+    await user.click(getByRole('button', { name: 'Columns' }));
+    await waitFor(() => expect(getByRole('dialog', { name: 'Columns' })).toBeInTheDocument());
+    expect(document.querySelector('.sp-popover-panel.sp-datagridex__column-selector-popover')).not.toBeNull();
+  });
+
   it('renders row spans with accessible span metadata and omits covered cells', () => {
     const spanColumns: readonly DatagridexColumn<Person>[] = [
       { key: 'name', header: 'Name', resizable: false, sortable: false, rowSpan: 2 },

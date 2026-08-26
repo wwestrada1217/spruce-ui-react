@@ -18,8 +18,11 @@ import {
   type ReactNode,
 } from 'react';
 import { createPortal } from 'react-dom';
+import { Button } from '../button/Button.js';
 import { Checkbox } from '../checkbox/Checkbox.js';
+import { Dropdown, type DropdownItem } from '../dropdown/Dropdown.js';
 import { Icon } from '../../icons/Icon.js';
+import { Popover } from '../popover/Popover.js';
 import { useI18n } from '../../i18n/i18n-context.js';
 import {
   createDatagridexDataContextAdapter,
@@ -32,6 +35,7 @@ import type {
   DatagridexCellEditCommit,
   DatagridexCellTemplate as DatagridexCellTemplateRenderer,
   DatagridexColumn,
+  DatagridexColumnMenuItem,
   DatagridexColumnFilter,
   DatagridexColumnGroup,
   DatagridexColumnGroupOrderChange,
@@ -312,13 +316,19 @@ export interface DatagridexProps<T extends object = Record<string, unknown>> {
 }
 
 const DEFAULT_COLUMN_WIDTH = 160;
-const DEFAULT_MIN_COLUMN_WIDTH = 96;
+const DEFAULT_MIN_COLUMN_WIDTH = 72;
 const DEFAULT_MAX_COLUMN_WIDTH = 480;
 const DEFAULT_VIRTUAL_OVERSCAN = 6;
 const DEFAULT_COLUMN_VIRTUALIZATION_OVERSCAN = 320;
 const DEFAULT_ROW_DETAIL_HEIGHT = 112;
 const DEFAULT_ROW_NUMBER_WIDTH = 52;
+const DEFAULT_ROW_ACTIONS_WIDTH = 156;
 const DEFAULT_PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
+
+interface DatagridexPinnedColumnOffset {
+  readonly left?: number;
+  readonly right?: number;
+}
 
 const DEFAULT_EDIT_LABELS: DatagridexEditLabels = {
   actions: 'Actions',
@@ -752,6 +762,19 @@ function normalizeClassName(
     : '';
 }
 
+function toDropdownItems(items: readonly DatagridexColumnMenuItem[]): DropdownItem[] {
+  return items.flatMap((item) => [
+    ...(item.separator ? [{ separator: true }] : []),
+    {
+      label: item.label,
+      icon: item.icon,
+      disabled: item.disabled,
+      command: item.command,
+      children: item.children ? toDropdownItems(item.children) : undefined,
+    },
+  ]);
+}
+
 function editorValueFor<T extends object>(
   value: unknown,
   row: T,
@@ -1127,10 +1150,9 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
   } | null>(null);
   const [activeColumnMenu, setActiveColumnMenu] = useState<{
     key: string;
-    triggerRect: DOMRect;
   } | null>(null);
   const [showColumnSelectorPopover, setShowColumnSelectorPopover] = useState<{
-    triggerRect: DOMRect;
+    source: 'toolbar' | 'statusbar';
   } | null>(null);
 
   // Error badge floating position
@@ -1146,6 +1168,7 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
 
   const gridContainerRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
+  const [pinnedColumnOffsets, setPinnedColumnOffsets] = useState<ReadonlyMap<string, DatagridexPinnedColumnOffset>>(new Map());
 
   const effectiveSelectionMode: DatagridexSelectionMode =
     selectionMode === 'none' && dataContextAdapter?.synchronizeSelection ? 'single' : selectionMode;
@@ -1255,7 +1278,7 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
         : typeof configured === 'string' && configured.endsWith('%')
           ? defaultColumnWidth
           : defaultColumnWidth;
-      return Math.min(column.maxWidth ?? Number.POSITIVE_INFINITY, Math.max(column.minWidth ?? 96, width));
+      return Math.min(column.maxWidth ?? Number.POSITIVE_INFINITY, Math.max(column.minWidth ?? DEFAULT_MIN_COLUMN_WIDTH, width));
     };
     if (!columnVirtualization || centerColumns.length === 0 || horizontalViewportWidth <= 0) {
       return { columns: visibleColumns, beforeWidth: 0, afterWidth: 0 };
@@ -1473,9 +1496,13 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
         const minW = col.minWidth ? `${col.minWidth}px` : 'min-content';
         parts.push(`minmax(${minW}, ${col.flex}fr)`);
       } else {
-        const minW = `${col.minWidth ?? (autoColumnWidth ? DEFAULT_MIN_COLUMN_WIDTH : defaultColumnWidth)}px`;
+        const minW = col.minWidth !== undefined
+          ? `${col.minWidth}px`
+          : autoColumnWidth
+            ? 'min-content'
+            : `${defaultColumnWidth}px`;
         if (autoColumnWidth) {
-          parts.push(`minmax(${minW}, ${col.maxWidth ? `${col.maxWidth}px` : `${DEFAULT_MAX_COLUMN_WIDTH}px`})`);
+          parts.push(`minmax(${minW}, ${fitColumnsToWidth ? '1fr' : col.maxWidth ? `${col.maxWidth}px` : 'max-content'})`);
         } else {
           const width = Math.min(col.maxWidth ?? defaultColumnWidth, Math.max(col.minWidth ?? DEFAULT_MIN_COLUMN_WIDTH, defaultColumnWidth));
           parts.push(`${width}px`);
@@ -1505,8 +1532,110 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
     columnVirtualization,
     columnVirtualLayout,
     columnWidths,
+    fitColumnsToWidth,
     showRowEditActions,
   ]);
+
+  // Measure the rendered tracks so sticky columns remain anchored when column widths,
+  // responsive layout, or row actions change.
+  useEffect(() => {
+    const grid = gridContainerRef.current;
+    if (!grid || !hasPinnedColumns) {
+      return;
+    }
+
+    const measure = () => {
+      const headerCells = new Map(
+        Array.from(
+          grid.querySelectorAll<HTMLElement>('.sp-datagridex__header-row [data-sp-datagridex-column]'),
+        ).flatMap((cell) => {
+          const key = cell.dataset.spDatagridexColumn;
+          return key ? [[key, cell] as const] : [];
+        }),
+      );
+      const widthFor = (column: DatagridexColumn<T>) => {
+        const renderedWidth = headerCells.get(column.key)?.getBoundingClientRect().width ?? 0;
+        if (renderedWidth > 0) return renderedWidth;
+
+        const configured = columnWidths.get(column.key) ?? column.width;
+        const width = typeof configured === 'number' ? configured : defaultColumnWidth;
+        return Math.min(
+          column.maxWidth ?? DEFAULT_MAX_COLUMN_WIDTH,
+          Math.max(column.minWidth ?? DEFAULT_MIN_COLUMN_WIDTH, width),
+        );
+      };
+
+      const next = new Map<string, DatagridexPinnedColumnOffset>();
+      let left =
+        (rowDetail ? 40 : 0) +
+        (hasLeadingRowActions ? Math.max(32, leadingRowActionsWidth) : 0) +
+        (isRowReorder ? 32 : 0) +
+        (effectiveSelectionMode !== 'none' ? 40 : 0) +
+        (showRowNumbers ? DEFAULT_ROW_NUMBER_WIDTH : 0);
+
+      for (const column of visibleColumns) {
+        const pin = columnPinsProp?.[column.key] ?? column.pinned;
+        if (pin === 'left') {
+          next.set(column.key, { left });
+          left += widthFor(column);
+        }
+      }
+
+      const actionsHeader = grid.querySelector<HTMLElement>('.sp-datagridex__actions-header');
+      let right = showRowEditActions
+        ? actionsHeader?.getBoundingClientRect().width || DEFAULT_ROW_ACTIONS_WIDTH
+        : 0;
+      for (const column of [...visibleColumns].reverse()) {
+        const pin = columnPinsProp?.[column.key] ?? column.pinned;
+        if (pin === 'right') {
+          next.set(column.key, { right });
+          right += widthFor(column);
+        }
+      }
+
+      setPinnedColumnOffsets((previous) => {
+        const unchanged =
+          previous.size === next.size &&
+          [...next].every(([key, offset]) => {
+            const current = previous.get(key);
+            return current?.left === offset.left && current?.right === offset.right;
+          });
+        return unchanged ? previous : next;
+      });
+    };
+
+    measure();
+    if (typeof ResizeObserver === 'undefined') return;
+
+    const observer = new ResizeObserver(measure);
+    observer.observe(grid);
+    grid.querySelectorAll<HTMLElement>('.sp-datagridex__header-row [data-sp-datagridex-column]').forEach((cell) => {
+      observer.observe(cell);
+    });
+    const actionsHeader = grid.querySelector<HTMLElement>('.sp-datagridex__actions-header');
+    if (actionsHeader) observer.observe(actionsHeader);
+    return () => observer.disconnect();
+  }, [
+    columnPinsProp,
+    columnWidths,
+    defaultColumnWidth,
+    effectiveSelectionMode,
+    hasLeadingRowActions,
+    hasPinnedColumns,
+    isRowReorder,
+    leadingRowActionsWidth,
+    rowDetail,
+    showRowEditActions,
+    showRowNumbers,
+    visibleColumns,
+  ]);
+
+  const pinnedColumnStyle = (key: string, pin: DatagridexColumnPin | undefined): CSSProperties | undefined => {
+    const offset = pinnedColumnOffsets.get(key);
+    if (pin === 'left' && offset?.left !== undefined) return { insetInlineStart: offset.left };
+    if (pin === 'right' && offset?.right !== undefined) return { insetInlineEnd: offset.right };
+    return undefined;
+  };
 
   const ariaColumnOffset =
     (rowDetail ? 1 : 0) +
@@ -2052,18 +2181,6 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
       ) {
         setActiveFilterPopover(null);
       }
-      if (
-        !target.closest('.sp-datagridex__column-menu-panel') &&
-        !target.closest('.sp-datagridex__column-menu-trigger')
-      ) {
-        setActiveColumnMenu(null);
-      }
-      if (
-        !target.closest('.sp-datagridex__column-selector-panel') &&
-        !target.closest('.sp-datagridex__column-selector-trigger')
-      ) {
-        setShowColumnSelectorPopover(null);
-      }
     }
     document.addEventListener('pointerdown', handleClickOutside);
     return () => document.removeEventListener('pointerdown', handleClickOutside);
@@ -2160,6 +2277,136 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
     ...style,
   };
 
+  const columnMenuItemsFor = (column: DatagridexColumn<T>): DropdownItem[] => {
+    const items: DropdownItem[] = [];
+    if (column.sortable !== false) {
+      items.push(
+        {
+          label: 'Sort Ascending',
+          icon: 'arrow-up',
+          command: () => handleSortColumn(column.key),
+        },
+        {
+          label: 'Sort Descending',
+          icon: 'arrow-down',
+          command: () => {
+            const next = [{ key: column.key, direction: 'desc' as const }];
+            setInternalSorts(next);
+            onSortChange?.({ key: column.key, direction: 'desc' });
+          },
+        },
+        { separator: true },
+      );
+    }
+    items.push(
+      {
+        label: 'Auto-size Column',
+        command: () => setColumnWidths((prev) => new Map(prev).set(column.key, 'auto')),
+      },
+      {
+        label: `Group by ${column.header}`,
+        command: () => {
+          if (!activeGroupBy.includes(column.key)) {
+            const next = [...activeGroupBy, column.key];
+            setInternalGroupBy(next);
+            onGroupByChange?.(next);
+          }
+        },
+      },
+      {
+        label: 'Hide Column',
+        command: () => {
+          setInternalHiddenColumns((prev) => {
+            const next = new Set(prev);
+            next.add(column.key);
+            return next;
+          });
+        },
+      },
+      ...toDropdownItems(column.menuItems ?? []),
+    );
+    return items;
+  };
+
+  const renderColumnSelectorContent = () => (
+    <>
+      <div className="sp-datagridex__column-selector-header">
+        <h3>{columnSelectorLabel ?? t('columns')}</h3>
+        <p>Show, hide, and reorder columns</p>
+      </div>
+      <div className="sp-datagridex__column-selector-list">
+        {selectorColumns.map((column) => {
+          const isVis = !internalHiddenColumns.has(column.key);
+          return (
+            <div
+              key={column.key}
+              className={[
+                'sp-datagridex__column-selector-item',
+                draggedSelectorColumnKey === column.key ? 'sp-datagridex__column-selector-item--dragging' : '',
+                selectorDropTarget?.key === column.key && selectorDropTarget.position === 'before' ? 'sp-datagridex__column-selector-item--drop-before' : '',
+                selectorDropTarget?.key === column.key && selectorDropTarget.position === 'after' ? 'sp-datagridex__column-selector-item--drop-after' : '',
+              ].filter(Boolean).join(' ')}
+              draggable={reorderable && column.reorderable !== false}
+              onDragStart={() => setDraggedSelectorColumnKey(column.key)}
+              onDragEnd={() => {
+                setDraggedSelectorColumnKey(null);
+                setSelectorDropTarget(null);
+              }}
+              onDragOver={(event) => {
+                if (!draggedSelectorColumnKey || draggedSelectorColumnKey === column.key) return;
+                event.preventDefault();
+                const rect = event.currentTarget.getBoundingClientRect();
+                setSelectorDropTarget({ key: column.key, position: event.clientY < rect.top + rect.height / 2 ? 'before' : 'after' });
+              }}
+              onDrop={(event) => {
+                event.preventDefault();
+                if (draggedSelectorColumnKey && selectorDropTarget) {
+                  const next = activeColumnOrder.filter((key) => key !== draggedSelectorColumnKey);
+                  const target = next.indexOf(selectorDropTarget.key);
+                  next.splice(selectorDropTarget.position === 'after' ? target + 1 : target, 0, draggedSelectorColumnKey);
+                  setInternalColumnOrder(next);
+                  onColumnOrderChange?.(next);
+                }
+                setDraggedSelectorColumnKey(null);
+                setSelectorDropTarget(null);
+              }}
+            >
+              <span className="sp-datagridex__column-selector-handle">
+                <Icon name="grip-vertical" size={14} />
+              </span>
+              <Checkbox
+                checked={isVis}
+                onChange={(checked) => {
+                  setInternalHiddenColumns((prev) => {
+                    const next = new Set(prev);
+                    if (checked) next.delete(column.key);
+                    else next.add(column.key);
+                    onColumnVisibilityChange?.({
+                      visibleKeys: columnsProp.filter((item) => !next.has(item.key)).map((item) => item.key),
+                      hiddenKeys: [...next],
+                    });
+                    return next;
+                  });
+                }}
+              >
+                {column.header}
+              </Checkbox>
+            </div>
+          );
+        })}
+      </div>
+      <div className="sp-datagridex__filter-actions">
+        <Button
+          size="sm"
+          variant="primary"
+          onClick={() => setShowColumnSelectorPopover(null)}
+        >
+          Done
+        </Button>
+      </div>
+    </>
+  );
+
   return (
     <div
       ref={gridContainerRef}
@@ -2241,16 +2488,28 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
           <div className="sp-datagridex__toolbar-end">
             {toolbarEnd}
             {showColumnSelectorInToolbar && (
-              <button
-                type="button"
-                className="sp-btn sp-btn--sm sp-btn--secondary sp-datagridex__column-selector-trigger"
-                onClick={(e) => {
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  setShowColumnSelectorPopover({ triggerRect: rect });
-                }}
+              <Popover
+                trigger={(
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    iconLeft="columns"
+                    className="sp-datagridex__column-selector-trigger"
+                  >
+                    {columnSelectorLabel ?? t('columns')}
+                  </Button>
+                )}
+                open={showColumnSelectorPopover?.source === 'toolbar'}
+                onOpenChange={(open) => setShowColumnSelectorPopover(open ? { source: 'toolbar' } : null)}
+                placement="bottom-end"
+                panelClassName="sp-datagridex__column-selector-popover"
+                panelAriaLabel={columnSelectorLabel ?? t('columns')}
+                padding="0"
               >
-                <Icon name="columns" size={14} /> {columnSelectorLabel ?? t('columns')}
-              </button>
+                <div className="sp-datagridex__column-selector-panel">
+                  {renderColumnSelectorContent()}
+                </div>
+              </Popover>
             )}
           </div>
         </div>
@@ -2503,6 +2762,7 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
                     key={col.key}
                     className={headerCellClasses}
                     role="columnheader"
+                    data-sp-datagridex-column={col.key}
                     aria-colindex={visibleColumns.indexOf(col) + ariaColumnOffset + 1}
                     aria-sort={
                       sortItem?.direction === 'asc'
@@ -2512,6 +2772,7 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
                         : 'none'
                     }
                     draggable={reorderable && col.reorderable !== false}
+                    style={pinnedColumnStyle(col.key, pin)}
                     onDragStart={(e) => {
                       setDraggedColumnKey(col.key);
                       setDragGhostPos({ x: e.clientX, y: e.clientY });
@@ -2608,17 +2869,23 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
                     {/* Column Menu */}
                     {(columnMenu || col.menuItems) && (
                       <div className="sp-datagridex__column-menu">
-                        <button
-                          type="button"
-                          className="sp-btn sp-btn--sm sp-datagridex__column-menu-trigger"
-                          aria-label={`Column menu for ${col.header}`}
-                          onClick={(e) => {
-                            const rect = e.currentTarget.getBoundingClientRect();
-                            setActiveColumnMenu({ key: col.key, triggerRect: rect });
-                          }}
-                        >
-                          <Icon name="more-vertical" size={12} />
-                        </button>
+                        <Dropdown
+                          trigger={(
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              iconOnly
+                              iconLeft="more-vertical"
+                              className="sp-datagridex__column-menu-trigger"
+                              aria-label={`Column menu for ${col.header}`}
+                            />
+                          )}
+                          items={columnMenuItemsFor(col)}
+                          placement="bottom-end"
+                          minWidth={220}
+                          open={activeColumnMenu?.key === col.key}
+                          onOpenChange={(open) => setActiveColumnMenu(open ? { key: col.key } : null)}
+                        />
                       </div>
                     )}
 
@@ -2639,7 +2906,7 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
                             const diff = moveEvent.clientX - startX;
                             const newW = Math.min(
                               col.maxWidth ?? Number.POSITIVE_INFINITY,
-                              Math.max(col.minWidth ?? 96, initialWidth + diff),
+                              Math.max(col.minWidth ?? DEFAULT_MIN_COLUMN_WIDTH, initialWidth + diff),
                             );
                             setColumnWidths((prev) => new Map(prev).set(col.key, newW));
                             onColumnResize?.({ key: col.key, width: newW });
@@ -2668,11 +2935,11 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
                           let next: number | null = null;
                           if (event.key === 'ArrowLeft') next = current - step;
                           if (event.key === 'ArrowRight') next = current + step;
-                          if (event.key === 'Home') next = col.minWidth ?? 96;
+                          if (event.key === 'Home') next = col.minWidth ?? DEFAULT_MIN_COLUMN_WIDTH;
                           if (event.key === 'End') next = col.maxWidth ?? current;
                           if (next === null) return;
                           event.preventDefault();
-                          const bounded = Math.min(col.maxWidth ?? Number.POSITIVE_INFINITY, Math.max(col.minWidth ?? 96, next));
+                          const bounded = Math.min(col.maxWidth ?? Number.POSITIVE_INFINITY, Math.max(col.minWidth ?? DEFAULT_MIN_COLUMN_WIDTH, next));
                           setColumnWidths((prev) => new Map(prev).set(col.key, bounded));
                           onColumnResize?.({ key: col.key, width: bounded });
                         }}
@@ -3082,7 +3349,10 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
                           aria-invalid={isCellInvalid ? true : undefined}
                           data-sp-datagridex-cell={col.key}
                           tabIndex={0}
-                          style={span > 1 ? ({ '--sp-datagridex-row-span': span } as CSSProperties) : undefined}
+                          style={{
+                            ...pinnedColumnStyle(col.key, pin),
+                            ...(span > 1 ? { '--sp-datagridex-row-span': span } : {}),
+                          } as CSSProperties}
                           onDoubleClick={() => {
                             if (isEditable && !isReadonly && editMode === 'cell') {
                               startCellEdit(rowIndex, col.key, cellVal, row);
@@ -3443,14 +3713,23 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
                 {columnVirtualization && columnVirtualLayout.beforeWidth > 0 && (
                   <div className="sp-datagridex__column-virtual-spacer" aria-hidden="true" />
                 )}
-                {renderedColumns.map((col) => {
+                {renderedColumns.map((col, colIdx) => {
                   const agg = footerAggregates.get(col.key);
+                  const pin = columnPinsProp?.[col.key] ?? col.pinned;
                   return (
                     <div
                       key={col.key}
-                      className="sp-datagridex__footer-cell"
+                      className={[
+                        'sp-datagridex__footer-cell',
+                        pin ? 'sp-datagridex__pinned-cell' : '',
+                        pin === 'left' ? 'sp-datagridex__pinned-cell--left' : '',
+                        pin === 'right' ? 'sp-datagridex__pinned-cell--right' : '',
+                        colIdx === leftPinned.length - 1 ? 'sp-datagridex__pinned-cell--boundary' : '',
+                        colIdx === renderedColumns.length - rightPinned.length ? 'sp-datagridex__pinned-cell--boundary' : '',
+                      ].filter(Boolean).join(' ')}
                       role="gridcell"
                       aria-colindex={visibleColumns.indexOf(col) + ariaColumnOffset + 1}
+                      style={pinnedColumnStyle(col.key, pin)}
                     >
                       {agg && (
                         <div className="sp-datagridex__aggregate">
@@ -3734,17 +4013,27 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
               : statusbarEnd}
             {isShowColumnSelector && (
               <div className="sp-datagridex__statusbar-column-selector">
-                <button
-                  type="button"
-                  className="sp-btn sp-btn--sm sp-btn--secondary"
-                  aria-label={columnSelectorLabel ?? t('columns')}
-                  onClick={(e) => {
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    setShowColumnSelectorPopover({ triggerRect: rect });
-                  }}
+                <Popover
+                  trigger={(
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      iconOnly
+                      iconLeft="columns"
+                      aria-label={columnSelectorLabel ?? t('columns')}
+                    />
+                  )}
+                  open={showColumnSelectorPopover?.source === 'statusbar'}
+                  onOpenChange={(open) => setShowColumnSelectorPopover(open ? { source: 'statusbar' } : null)}
+                  placement="top-end"
+                  panelClassName="sp-datagridex__column-selector-popover"
+                  panelAriaLabel={columnSelectorLabel ?? t('columns')}
+                  padding="0"
                 >
-                  <Icon name="columns" size={12} />
-                </button>
+                  <div className="sp-datagridex__column-selector-panel">
+                    {renderColumnSelectorContent()}
+                  </div>
+                </Popover>
               </div>
             )}
           </div>
@@ -3983,227 +4272,6 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
         );
       })()}
 
-      {/* Column Action Menu Popover */}
-      {activeColumnMenu && (() => {
-        const col = visibleColumns.find((c) => c.key === activeColumnMenu.key);
-        if (!col) return null;
-
-        return createPortal(
-          <div
-            className="sp-datagridex__column-menu-panel"
-            style={{
-              position: 'fixed',
-              top: activeColumnMenu.triggerRect.bottom + 6,
-              left: Math.max(10, Math.min(activeColumnMenu.triggerRect.left, window.innerWidth - 200)),
-              zIndex: 10000,
-              background: 'var(--sp-surface-0)',
-              border: '1px solid var(--sp-border)',
-              borderRadius: '6px',
-              boxShadow: 'var(--sp-shadow-md)',
-              padding: '4px',
-              minWidth: '160px',
-            }}
-          >
-            {col.sortable !== false && (
-              <>
-                <button
-                  type="button"
-                  className="sp-btn sp-btn--sm"
-                  style={{ width: '100%', justifyContent: 'flex-start' }}
-                  onClick={() => {
-                    handleSortColumn(col.key);
-                    setActiveColumnMenu(null);
-                  }}
-                >
-                  <Icon name="arrow-up" size={12} /> Sort Ascending
-                </button>
-                <button
-                  type="button"
-                  className="sp-btn sp-btn--sm"
-                  style={{ width: '100%', justifyContent: 'flex-start' }}
-                  onClick={() => {
-                    const next = [{ key: col.key, direction: 'desc' as const }];
-                    setInternalSorts(next);
-                    onSortChange?.({ key: col.key, direction: 'desc' });
-                    setActiveColumnMenu(null);
-                  }}
-                >
-                  <Icon name="arrow-down" size={12} /> Sort Descending
-                </button>
-              </>
-            )}
-            <button
-              type="button"
-              className="sp-btn sp-btn--sm"
-              style={{ width: '100%', justifyContent: 'flex-start' }}
-              onClick={() => {
-                setColumnWidths((prev) => new Map(prev).set(col.key, 'auto'));
-                setActiveColumnMenu(null);
-              }}
-            >
-              Auto-size Column
-            </button>
-            <button
-              type="button"
-              className="sp-btn sp-btn--sm"
-              style={{ width: '100%', justifyContent: 'flex-start' }}
-              onClick={() => {
-                if (!activeGroupBy.includes(col.key)) {
-                  const next = [...activeGroupBy, col.key];
-                  setInternalGroupBy(next);
-                  onGroupByChange?.(next);
-                }
-                setActiveColumnMenu(null);
-              }}
-            >
-              Group by {col.header}
-            </button>
-            <button
-              type="button"
-              className="sp-btn sp-btn--sm"
-              style={{ width: '100%', justifyContent: 'flex-start' }}
-              onClick={() => {
-                setInternalHiddenColumns((prev) => {
-                  const next = new Set(prev);
-                  next.add(col.key);
-                  return next;
-                });
-                setActiveColumnMenu(null);
-              }}
-            >
-              Hide Column
-            </button>
-            {col.menuItems?.map((m, idx) => (
-              <Fragment key={`${m.label}-${idx}`}>
-                {m.separator && <div role="separator" className="sp-datagridex__column-menu-separator" />}
-                <button
-                  type="button"
-                  className="sp-btn sp-btn--sm"
-                  style={{ width: '100%', justifyContent: 'flex-start' }}
-                  disabled={m.disabled}
-                  onClick={() => {
-                    m.command?.();
-                    setActiveColumnMenu(null);
-                  }}
-                >
-                  {m.icon && <Icon name={m.icon} size={12} />} {m.label}
-                </button>
-                {m.children?.map((child, childIndex) => (
-                  <button
-                    key={`${child.label}-${childIndex}`}
-                    type="button"
-                    className="sp-btn sp-btn--sm sp-datagridex__column-menu-child"
-                    style={{ width: '100%', justifyContent: 'flex-start' }}
-                    disabled={child.disabled}
-                    onClick={() => {
-                      child.command?.();
-                      setActiveColumnMenu(null);
-                    }}
-                  >
-                    {child.icon && <Icon name={child.icon} size={12} />} {child.label}
-                  </button>
-                ))}
-              </Fragment>
-            ))}
-          </div>,
-          document.body,
-        );
-      })()}
-
-      {/* Column Selector Popover */}
-      {showColumnSelectorPopover && createPortal(
-        <div
-          className="sp-datagridex__column-selector-popover"
-          style={{
-            position: 'fixed',
-            top: showColumnSelectorPopover.triggerRect.bottom + 6,
-            left: Math.max(10, Math.min(showColumnSelectorPopover.triggerRect.left, window.innerWidth - 320)),
-            zIndex: 10000,
-            background: 'var(--sp-surface-0)',
-            border: '1px solid var(--sp-border)',
-            borderRadius: '8px',
-            boxShadow: 'var(--sp-shadow-lg)',
-          }}
-        >
-          <div className="sp-datagridex__column-selector-panel">
-            <div className="sp-datagridex__column-selector-header">
-              <h3>{columnSelectorLabel ?? t('columns')}</h3>
-              <p>Show, hide, and reorder columns</p>
-            </div>
-            <div className="sp-datagridex__column-selector-list">
-              {selectorColumns.map((c) => {
-                const isVis = !internalHiddenColumns.has(c.key);
-                return (
-                  <div
-                    key={c.key}
-                    className={[
-                      'sp-datagridex__column-selector-item',
-                      draggedSelectorColumnKey === c.key ? 'sp-datagridex__column-selector-item--dragging' : '',
-                      selectorDropTarget?.key === c.key && selectorDropTarget.position === 'before' ? 'sp-datagridex__column-selector-item--drop-before' : '',
-                      selectorDropTarget?.key === c.key && selectorDropTarget.position === 'after' ? 'sp-datagridex__column-selector-item--drop-after' : '',
-                    ].filter(Boolean).join(' ')}
-                    draggable={reorderable && c.reorderable !== false}
-                    onDragStart={() => setDraggedSelectorColumnKey(c.key)}
-                    onDragEnd={() => {
-                      setDraggedSelectorColumnKey(null);
-                      setSelectorDropTarget(null);
-                    }}
-                    onDragOver={(event) => {
-                      if (!draggedSelectorColumnKey || draggedSelectorColumnKey === c.key) return;
-                      event.preventDefault();
-                      const rect = event.currentTarget.getBoundingClientRect();
-                      setSelectorDropTarget({ key: c.key, position: event.clientY < rect.top + rect.height / 2 ? 'before' : 'after' });
-                    }}
-                    onDrop={(event) => {
-                      event.preventDefault();
-                      if (draggedSelectorColumnKey && selectorDropTarget) {
-                        const next = activeColumnOrder.filter((key) => key !== draggedSelectorColumnKey);
-                        const target = next.indexOf(selectorDropTarget.key);
-                        next.splice(selectorDropTarget.position === 'after' ? target + 1 : target, 0, draggedSelectorColumnKey);
-                        setInternalColumnOrder(next);
-                        onColumnOrderChange?.(next);
-                      }
-                      setDraggedSelectorColumnKey(null);
-                      setSelectorDropTarget(null);
-                    }}
-                  >
-                    <span className="sp-datagridex__column-selector-handle">
-                      <Icon name="grip-vertical" size={14} />
-                    </span>
-                    <Checkbox
-                      checked={isVis}
-                      onChange={(checked) => {
-                        setInternalHiddenColumns((prev) => {
-                          const next = new Set(prev);
-                          if (checked) next.delete(c.key);
-                          else next.add(c.key);
-                          onColumnVisibilityChange?.({
-                            visibleKeys: columnsProp.filter((column) => !next.has(column.key)).map((column) => column.key),
-                            hiddenKeys: [...next],
-                          });
-                          return next;
-                        });
-                      }}
-                    >
-                      {c.header}
-                    </Checkbox>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="sp-datagridex__filter-actions">
-              <button
-                type="button"
-                className="sp-btn sp-btn--sm sp-btn--primary"
-                onClick={() => setShowColumnSelectorPopover(null)}
-              >
-                Done
-              </button>
-            </div>
-          </div>
-        </div>,
-        document.body,
-      )}
     </div>
   );
 }
