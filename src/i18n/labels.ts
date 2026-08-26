@@ -552,33 +552,42 @@ export interface SpI18nLabels {
   annotations: string;
   arrowAnnotation: string;
   aspectRatio: string;
+  blur: string;
+  brightness: string;
   circleSelection: string;
+  contrast: string;
   crop: string;
   cropSelection: string;
   dragToCreateSelection: string;
   draw: string;
   ellipseAnnotation: string;
+  exposure: string;
   file: string;
   flipHorizontally: string;
   flipVertically: string;
   history: string;
+  hue: string;
   imageAdjustments: string;
   imageEditorTools: string;
   imageOptions: string;
   lineAnnotation: string;
   loadImageToStart: string;
+  moveAnnotation: string;
   output: string;
   outputQuality: string;
   quality: string;
   rectangleAnnotation: string;
   resetEdits: string;
+  resizeSelection: string;
   resetZoomFit: string;
   rotateAnnotation: string;
   rotateLeft: string;
   scaleAnnotation: string;
+  saturation: string;
   selection: string;
   square: string;
   squareSelection: string;
+  textAnnotation: string;
   transform: string;
   uploadImage: string;
   zoom: string;
@@ -2760,33 +2769,42 @@ export const SP_I18N_DEFAULT_LABELS: SpI18nLabels = {
   annotations: 'Annotations',
   arrowAnnotation: 'Arrow annotation',
   aspectRatio: 'Aspect ratio',
+  blur: 'Blur',
+  brightness: 'Brightness',
   circleSelection: 'Circle selection',
+  contrast: 'Contrast',
   crop: 'Crop',
   cropSelection: 'Crop selection',
   dragToCreateSelection: 'Drag on the image to create a selection.',
   draw: 'Draw',
   ellipseAnnotation: 'Ellipse annotation',
+  exposure: 'Exposure',
   file: 'File',
   flipHorizontally: 'Flip horizontally',
   flipVertically: 'Flip vertically',
   history: 'History',
+  hue: 'Hue',
   imageAdjustments: 'Image adjustments',
   imageEditorTools: 'Image editor tools',
   imageOptions: 'Image options',
   lineAnnotation: 'Line annotation',
   loadImageToStart: 'Load an image to start editing.',
+  moveAnnotation: 'Move annotation',
   output: 'Output',
   outputQuality: 'Output quality',
   quality: 'Quality',
   rectangleAnnotation: 'Rectangle annotation',
   resetEdits: 'Reset edits',
+  resizeSelection: 'Resize selection',
   resetZoomFit: 'Reset zoom/fit',
   rotateAnnotation: 'Rotate annotation',
   rotateLeft: 'Rotate left',
   scaleAnnotation: 'Scale annotation',
+  saturation: 'Saturation',
   selection: 'Selection',
   square: 'Square',
   squareSelection: 'Square selection',
+  textAnnotation: 'Text annotation',
   transform: 'Transform',
   uploadImage: 'Upload image',
   zoom: 'Zoom',

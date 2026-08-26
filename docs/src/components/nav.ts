@@ -74,6 +74,7 @@ export const NAV_SECTIONS: NavSection[] = [
       { icon: 'columns', label: 'Carousel',          route: '#/components/carousel'       },
       { icon: 'maximize',           label: 'Lightbox',          route: '#/components/lightbox'       },
       { icon: 'columns',            label: 'Image Compare',     route: '#/components/image-compare'  },
+      { icon: 'image',              label: 'Image Editor',      route: '#/components/image-editor'   },
       { icon: 'ratio',              label: 'Aspect Ratio',      route: '#/components/aspect-ratio'   },
       { icon: 'list',               label: 'List',              route: '#/components/list'           },
       { icon: 'table',              label: 'Table',              route: '#/components/table'          },

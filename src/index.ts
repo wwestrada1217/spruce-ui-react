@@ -825,6 +825,23 @@ export type { LightboxProps, LightboxImage } from './components/lightbox/Lightbo
 export { ImageCompare } from './components/image-compare/ImageCompare.js';
 export type { ImageCompareProps, ImageCompareOrientation } from './components/image-compare/ImageCompare.js';
 
+// ─── ImageEditor ─────────────────────────────────────────────────────────────
+export { ImageEditor } from './components/image-editor/ImageEditor.js';
+export type {
+  ImageEditorProps,
+  ImageEditorTool,
+  ImageEditorAspect,
+  ImageEditorOutputFormat,
+  ImageEditorSelectionShape,
+  ImageEditorAnnotationKind,
+  ImageEditorAdjustmentId,
+  ImageEditorPoint,
+  ImageEditorAdjustments,
+  ImageEditorSelection,
+  ImageEditorAnnotation,
+  ImageEditorChange,
+} from './components/image-editor/ImageEditor.js';
+
 // ─── AspectRatio ─────────────────────────────────────────────────────────────
 export { AspectRatio } from './components/aspect-ratio/AspectRatio.js';
 export type { AspectRatioProps } from './components/aspect-ratio/AspectRatio.js';

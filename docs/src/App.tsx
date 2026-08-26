@@ -108,6 +108,7 @@ import { RatingPage } from './pages/components/RatingPage'
 import { CarouselPage } from './pages/components/CarouselPage'
 import { LightboxPage } from './pages/components/LightboxPage'
 import { ImageComparePage } from './pages/components/ImageComparePage'
+import { ImageEditorPage } from './pages/components/ImageEditorPage'
 import { AspectRatioPage } from './pages/components/AspectRatioPage'
 import { CreditCardPage } from './pages/components/CreditCardPage'
 import { BarcodeQrPage } from './pages/components/BarcodeQrPage'
@@ -325,6 +326,7 @@ function renderPage(hash: string): React.ReactElement {
     case '#/components/carousel':           return <CarouselPage />
     case '#/components/lightbox':           return <LightboxPage />
     case '#/components/image-compare':      return <ImageComparePage />
+    case '#/components/image-editor':       return <ImageEditorPage />
     case '#/components/aspect-ratio':       return <AspectRatioPage />
     case '#/components/credit-card':        return <CreditCardPage />
     case '#/components/barcode-qr':         return <BarcodeQrPage />
