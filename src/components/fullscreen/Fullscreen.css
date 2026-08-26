@@ -1,0 +1,10 @@
+.sp-fullscreen { display: block; }
+
+.sp-fullscreen--active.sp-fullscreen[data-fullscreen-mode="class"] {
+  position: fixed;
+  inset: 0;
+  z-index: var(--sp-fullscreen-z-index, 1100);
+  width: 100dvw;
+  height: 100dvh;
+  background: var(--sp-fullscreen-background, var(--sp-surface-25));
+}

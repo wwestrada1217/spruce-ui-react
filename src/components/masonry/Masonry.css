@@ -1,0 +1,21 @@
+.sp-masonry {
+  position: relative;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  transition: height var(--sp-duration-normal, 200ms) var(--sp-ease-out);
+}
+
+.sp-masonry__item {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  box-sizing: border-box;
+  padding-block-end: var(--sp-masonry-gap, var(--sp-space-4));
+  transition: transform var(--sp-duration-normal, 200ms) var(--sp-ease-out), inline-size var(--sp-duration-normal, 200ms) var(--sp-ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-masonry,
+  .sp-masonry__item { transition: none; }
+}

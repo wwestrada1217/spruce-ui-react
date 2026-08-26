@@ -73,6 +73,12 @@ import { ButtonGroupPage } from './pages/components/ButtonGroupPage'
 import { SliderRangePage } from './pages/components/SliderRangePage'
 import { ScrollbarPage } from './pages/components/ScrollbarPage'
 import { GridPage } from './pages/components/GridPage'
+import { DockManagerPage } from './pages/components/DockManagerPage'
+import { LayoutManagerPage } from './pages/components/LayoutManagerPage'
+import { MasonryPage } from './pages/components/MasonryPage'
+import { DragDropPage } from './pages/components/DragDropPage'
+import { FullscreenPage } from './pages/components/FullscreenPage'
+import { HideOnScrollPage } from './pages/components/HideOnScrollPage'
 import { SelectPage } from './pages/components/SelectPage'
 import { ComboboxPage } from './pages/components/ComboboxPage'
 import { GridComboboxPage } from './pages/components/GridComboboxPage'
@@ -268,6 +274,18 @@ function renderPage(hash: string): React.ReactElement {
     case '#/utils/scrollbar':                return <ScrollbarPage />
     case '#/components/grid':
     case '#/layout/grid':                    return <GridPage />
+    case '#/components/dock-manager':
+    case '#/layout/dock-manager':             return <DockManagerPage />
+    case '#/components/layout-manager':
+    case '#/layout/layout-manager':           return <LayoutManagerPage />
+    case '#/components/masonry':
+    case '#/layout/masonry':                  return <MasonryPage />
+    case '#/components/drag-drop':
+    case '#/utils/drag-drop':                 return <DragDropPage />
+    case '#/components/fullscreen':
+    case '#/utils/fullscreen':                return <FullscreenPage />
+    case '#/components/hide-on-scroll':
+    case '#/utils/hide-on-scroll':            return <HideOnScrollPage />
     case '#/components/select':              return <SelectPage />
     case '#/components/combobox':            return <ComboboxPage />
     case '#/components/grid-combobox':       return <GridComboboxPage />

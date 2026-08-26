@@ -21,6 +21,18 @@ const OFFSET_CODE = `<Row cols={12} gap={4}>
   <Col span={4}>span 4</Col>
 </Row>`
 
+const COMMON_CODE = `<Row cols={12} gap={4}>
+  <Col span={4}>Sidebar</Col>
+  <Col span={8}>Content</Col>
+</Row>`
+
+const CUSTOM_CODE = `<Row cols={5} gap={3}>
+  <Col span={2}>Two of five</Col>
+  <Col span={3}>Three of five</Col>
+</Row>`
+
+const CONTAINER_CODE = `<Container fluid>Full-width content</Container>`
+
 const cellStyle: React.CSSProperties = {
   padding: '12px 16px',
   background: 'var(--sp-primary-subtle, rgba(37,99,235,0.08))',
@@ -36,6 +48,9 @@ const SECTIONS: Section[] = [
   { id: 'basic',  label: 'Basic' },
   { id: 'span',   label: 'Column Spans' },
   { id: 'offset', label: 'Offsets' },
+  { id: 'common',  label: 'Common Layouts' },
+  { id: 'custom',  label: 'Custom Columns' },
+  { id: 'container', label: 'Container' },
   { id: 'api',    label: 'API' },
 ]
 
@@ -88,6 +103,24 @@ export function GridPage() {
               <Col span={4}><div style={cellStyle}>span 4</div></Col>
             </Row>
           </CodePreview>
+        </section>
+
+        <section id="common" className="demo-section" aria-labelledby="common-heading">
+          <h2 id="common-heading">Common Layouts</h2>
+          <p className="section-desc">Compose the grid for equal columns, a sidebar/content split, or a three-column dashboard.</p>
+          <CodePreview code={COMMON_CODE}><Row cols={12} gap={4}><Col span={4}><div style={cellStyle}>Sidebar</div></Col><Col span={8}><div style={cellStyle}>Content</div></Col></Row></CodePreview>
+        </section>
+
+        <section id="custom" className="demo-section" aria-labelledby="custom-heading">
+          <h2 id="custom-heading">Custom Column Count</h2>
+          <p className="section-desc">Set <code>cols</code> to model a five-column or any other grid.</p>
+          <CodePreview code={CUSTOM_CODE}><Row cols={5} gap={3}><Col span={2}><div style={cellStyle}>Two of five</div></Col><Col span={3}><div style={cellStyle}>Three of five</div></Col></Row></CodePreview>
+        </section>
+
+        <section id="container" className="demo-section" aria-labelledby="container-heading">
+          <h2 id="container-heading">Container</h2>
+          <p className="section-desc">The default container is centered with a token-based max width. Use <code>fluid</code> for full-width content.</p>
+          <CodePreview code={CONTAINER_CODE}><Container fluid><div style={cellStyle}>Fluid container</div></Container></CodePreview>
         </section>
 
         <section id="api" className="demo-section">

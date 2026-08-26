@@ -457,6 +457,18 @@ export type { ScrollbarProps, ScrollbarThickness } from './components/scrollbar/
 // ─── Grid (Layout) ───────────────────────────────────────────────────────────
 export { Container, Row, Col } from './components/grid/Grid.js';
 export type { ContainerProps, RowProps, ColProps } from './components/grid/Grid.js';
+export { LayoutManager, LayoutDragHandle } from './components/layout-manager/LayoutManager.js';
+export type { LayoutManagerProps, LayoutManagerHandle, LayoutDragHandleProps, LayoutItem, LayoutBreakpoint, LayoutChangeEvent, LayoutDragEvent, LayoutResizeEvent, LayoutCompactType, LayoutResizeHandle } from './components/layout-manager/LayoutManager.js';
+export { Masonry, MasonryItem } from './components/masonry/Masonry.js';
+export type { MasonryProps, MasonryItemProps, MasonryItemLayout } from './components/masonry/Masonry.js';
+export { DockManager, DockPanel, DockPanelTools, AutoHideStrip } from './components/dock-manager/DockManager.js';
+export type { DockManagerProps, DockManagerHandle, DockPanelProps, DockPanelToolsProps, AutoHideStripProps, AutoHideStripTab, DockLayout, DockNode, DockLeafNode, DockTabNode, DockDocumentNode, DockSplitNode, DockFloat, DockAutoHide, DockSplitDirection, DropZone, AutoHideStripPosition } from './components/dock-manager/DockManager.js';
+export { DragDrop } from './components/drag-drop/DragDrop.js';
+export type { DragDropProps, DragDropEvent, DragDropEffect, DragDropEffectAllowed, DragDropPosition, DragDropAxis } from './components/drag-drop/DragDrop.js';
+export { Fullscreen } from './components/fullscreen/Fullscreen.js';
+export type { FullscreenProps, FullscreenHandle, FullscreenMode } from './components/fullscreen/Fullscreen.js';
+export { HideOnScroll, useHideOnScroll } from './components/hide-on-scroll/HideOnScroll.js';
+export type { HideOnScrollProps, HideOnScrollOptions, HideOnScrollResult } from './components/hide-on-scroll/HideOnScroll.js';
 
 // ─── Combobox ────────────────────────────────────────────────────────────────
 export { Combobox } from './components/combobox/Combobox.js';

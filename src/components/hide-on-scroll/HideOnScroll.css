@@ -1,0 +1,11 @@
+.sp-hide-on-scroll {
+  display: block;
+  transition: transform var(--sp-duration-normal, 200ms) var(--sp-ease-out);
+  will-change: transform;
+}
+
+.sp-hide-on-scroll--hidden { transform: translateY(-100%); }
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-hide-on-scroll { transition: none; }
+}

@@ -1,0 +1,14 @@
+.sp-drag-drop {
+  position: relative;
+  box-sizing: border-box;
+  touch-action: manipulation;
+}
+
+.sp-drag-drop:not(.sp-drag-drop--disabled) { cursor: grab; }
+.sp-drag-drop--dragging { z-index: 1; opacity: var(--sp-drag-drop-dragging-opacity, 0.72); cursor: grabbing; }
+.sp-drag-drop--drag-over { outline: 2px solid var(--sp-drag-drop-primary, var(--sp-focus-ring)); outline-offset: -2px; }
+.sp-drag-drop--drop-before { border-block-start: 2px solid var(--sp-drag-drop-primary, var(--sp-focus-ring)); }
+.sp-drag-drop--drop-after { border-block-end: 2px solid var(--sp-drag-drop-primary, var(--sp-focus-ring)); }
+.sp-drag-drop--drop-inside { background: var(--sp-drag-drop-hover-bg, var(--sp-surface-2)); }
+.sp-drag-drop--disabled { cursor: not-allowed; opacity: var(--sp-drag-drop-disabled-opacity, 0.6); }
+.sp-drag-drop:focus-visible { outline: 2px solid var(--sp-drag-drop-primary, var(--sp-focus-ring)); outline-offset: 2px; }
