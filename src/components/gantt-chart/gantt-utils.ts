@@ -13,7 +13,7 @@ import type {
   GanttTimeSlot,
   GanttPrimarySlot,
   GanttFlatRow,
-} from './gantt-types';
+} from './gantt-types.js';
 
 // ── Date Helpers ────────────────────────────────────────────
 

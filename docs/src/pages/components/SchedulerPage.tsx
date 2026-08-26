@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Scheduler, type SchedulerEvent, type SchedulerResource, type SchedulerView } from 'spruce-react'
+import { Scheduler, type SchedulerEvent, type SchedulerResource } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
 
 // ── Sample data ──────────────────────────────────────────────────────────────
@@ -79,6 +79,25 @@ const CALLBACKS_CODE = `<Scheduler
   onDateChange={(date) => console.log('Date:', date)}
 />`
 
+const ADVANCED_CODE = `const calendars = [
+  { id: 'work', name: 'Work', color: '#3b82f6' },
+  { id: 'leave', name: 'Leave', color: '#10b981' },
+]
+
+<Scheduler
+  events={events}
+  calendars={calendars}
+  visibleCalendarIds={visibleCalendarIds}
+  onVisibleCalendarIdsChange={setVisibleCalendarIds}
+  showMonthWeekNumbers
+  weekNumberRule="locale"
+  unavailableRanges={[{ startHour: 12, endHour: 13, label: 'Lunch' }]}
+  detectConflict
+  onEventCreate={(event) => saveEvent(event)}
+  onEventUpdate={(event) => saveEvent(event)}
+  onEventDelete={(event) => removeEvent(event)}
+/>`
+
 // ── Sections ─────────────────────────────────────────────────────────────────
 
 interface Section { id: string; label: string }
@@ -90,6 +109,7 @@ const SECTIONS: Section[] = [
   { id: 'agenda-view', label: 'Agenda View' },
   { id: 'resources', label: 'Resources' },
   { id: 'callbacks', label: 'Callbacks' },
+  { id: 'advanced', label: 'Advanced Scheduling' },
   { id: 'api', label: 'API Reference' },
 ]
 
@@ -228,6 +248,31 @@ export function SchedulerPage() {
           </CodePreview>
         </section>
 
+        <section id="advanced" className="demo-section">
+          <h2>Advanced Scheduling</h2>
+          <p className="section-desc">
+            Calendar visibility, locale-aware week numbers, unavailable hours, conflict detection,
+            and controlled event CRUD are available together. The component keeps ownership of the
+            event array with the application.
+          </p>
+          <CodePreview code={ADVANCED_CODE}>
+            <div style={{ height: 500 }}>
+              <Scheduler
+                events={EVENTS}
+                calendars={[
+                  { id: 'work', name: 'Work', color: '#3b82f6' },
+                  { id: 'personal', name: 'Personal', color: '#10b981' },
+                ]}
+                calendarControls="sidebar"
+                showMonthWeekNumbers
+                weekNumberRule="locale"
+                unavailableRanges={[{ startHour: 12, endHour: 13, label: 'Lunch' }]}
+                detectConflict
+              />
+            </div>
+          </CodePreview>
+        </section>
+
         <section id="api" className="demo-section">
           <h2>API Reference</h2>
 
@@ -245,10 +290,22 @@ export function SchedulerPage() {
                 <tr><td><code>agendaDays</code></td><td><code>number</code></td><td>7</td><td>Agenda view days</td></tr>
                 <tr><td><code>timelineDays</code></td><td><code>number</code></td><td>1</td><td>Timeline view days</td></tr>
                 <tr><td><code>views</code></td><td><code>SchedulerView[]</code></td><td>all 7 views</td><td>Enabled views</td></tr>
+                <tr><td><code>calendars</code></td><td><code>SchedulerCalendar[]</code></td><td><code>[]</code></td><td>Calendar definitions for visibility controls</td></tr>
+                <tr><td><code>visibleCalendarIds</code></td><td><code>SchedulerCalendarId[] | null</code></td><td><code>null</code></td><td>Controlled visible calendar selection</td></tr>
+                <tr><td><code>calendarControls</code></td><td><code>'popover' | 'sidebar' | 'none'</code></td><td>'popover'</td><td>Calendar filter chrome</td></tr>
+                <tr><td><code>timeScale</code></td><td><code>SchedulerTimeScale</code></td><td>15</td><td>Minute snapping interval</td></tr>
+                <tr><td><code>disabledDates</code></td><td><code>SchedulerDateRestriction[]</code></td><td><code>[]</code></td><td>Dates that reject slot creation and edits</td></tr>
+                <tr><td><code>unavailableRanges</code></td><td><code>SchedulerUnavailableHourRange[]</code></td><td><code>[]</code></td><td>Unavailable hour ranges</td></tr>
+                <tr><td><code>showMonthWeekNumbers</code></td><td><code>boolean</code></td><td>false</td><td>Show week labels in month view</td></tr>
+                <tr><td><code>weekNumberRule</code></td><td><code>'iso' | 'locale'</code></td><td>'iso'</td><td>Week-number calculation rule</td></tr>
                 <tr><td><code>onEventClick</code></td><td><code>(e) =&gt; void</code></td><td>--</td><td>Event click handler</td></tr>
                 <tr><td><code>onSlotClick</code></td><td><code>(e) =&gt; void</code></td><td>--</td><td>Empty slot click handler</td></tr>
                 <tr><td><code>onEventMove</code></td><td><code>(e) =&gt; void</code></td><td>--</td><td>Event drag-move handler</td></tr>
                 <tr><td><code>onEventResize</code></td><td><code>(e) =&gt; void</code></td><td>--</td><td>Event resize handler</td></tr>
+                <tr><td><code>onEventCreate</code></td><td><code>(event) =&gt; void</code></td><td>--</td><td>Controlled create callback</td></tr>
+                <tr><td><code>onEventUpdate</code></td><td><code>(event) =&gt; void</code></td><td>--</td><td>Controlled update callback</td></tr>
+                <tr><td><code>onEventDelete</code></td><td><code>(event) =&gt; void</code></td><td>--</td><td>Controlled delete callback</td></tr>
+                <tr><td><code>onVisibleCalendarIdsChange</code></td><td><code>(ids) =&gt; void</code></td><td>--</td><td>Calendar visibility callback</td></tr>
                 <tr><td><code>onViewChange</code></td><td><code>(view) =&gt; void</code></td><td>--</td><td>View change handler</td></tr>
                 <tr><td><code>onDateChange</code></td><td><code>(date) =&gt; void</code></td><td>--</td><td>Date navigation handler</td></tr>
               </tbody>
@@ -268,6 +325,9 @@ export function SchedulerPage() {
                 <tr><td><code>resourceId</code></td><td><code>string | number</code></td><td>Assigned resource</td></tr>
                 <tr><td><code>color</code></td><td><code>string</code></td><td>Event color</td></tr>
                 <tr><td><code>description</code></td><td><code>string</code></td><td>Event description</td></tr>
+                <tr><td><code>calendarId</code></td><td><code>SchedulerCalendarId</code></td><td>--</td><td>Owning calendar</td></tr>
+                <tr><td><code>recurrence</code></td><td><code>SchedulerRecurrence | SchedulerRecurrenceRule</code></td><td>--</td><td>Recurrence metadata</td></tr>
+                <tr><td><code>availability</code></td><td><code>'busy' | 'free' | 'tentative' | 'outOfOffice'</code></td><td>--</td><td>Availability state</td></tr>
               </tbody>
             </table>
           </div>

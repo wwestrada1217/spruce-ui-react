@@ -108,6 +108,21 @@ const FULL_CODE = `<GanttChart
   onTaskClick={(e) => console.log('Clicked:', e.task.title)}
 />`
 
+const ADVANCED_CODE = `<GanttChart
+  tasks={tasks}
+  dependencies={dependencies}
+  config={{
+    editable: true,
+    showCriticalPath: true,
+    enableVirtualScroll: true,
+    virtualScrollOverscan: 8,
+    maxUndoSteps: 100,
+  }}
+  onTaskDblClick={(e) => openTask(e.task)}
+  onDependencyClick={(e) => inspectDependency(e.dependency)}
+  onTimeScaleChange={setTimeScale}
+/>`
+
 // ── Sections ─────────────────────────────────────────────────────────────────
 
 interface Section { id: string; label: string }
@@ -118,6 +133,7 @@ const SECTIONS: Section[] = [
   { id: 'resources', label: 'Resources' },
   { id: 'editable', label: 'Editable' },
   { id: 'scales', label: 'Time Scales' },
+  { id: 'advanced', label: 'Advanced Editing' },
   { id: 'full', label: 'Full Example' },
   { id: 'api', label: 'API Reference' },
 ]
@@ -239,6 +255,26 @@ export function GanttPage() {
           </CodePreview>
         </section>
 
+        <section id="advanced" className="demo-section">
+          <h2>Advanced Editing</h2>
+          <p className="section-desc">
+            Critical-path highlighting, controlled scale changes, dependency activation,
+            bounded undo/redo history, and virtual-scroll range math are available through
+            the Gantt configuration and callbacks.
+          </p>
+          <CodePreview code={ADVANCED_CODE}>
+            <div style={{ height: 450 }}>
+              <GanttChart
+                tasks={TASKS}
+                dependencies={DEPS}
+                config={{ editable: true, showCriticalPath: true, enableVirtualScroll: true, virtualScrollOverscan: 8 }}
+                onTaskDblClick={(e) => console.log('Double-clicked:', e.task.title)}
+                onDependencyClick={(e) => console.log('Dependency:', e.dependency.id)}
+              />
+            </div>
+          </CodePreview>
+        </section>
+
         <section id="full" className="demo-section">
           <h2>Full Example</h2>
           <p className="section-desc">
@@ -270,11 +306,16 @@ export function GanttPage() {
                 <tr><td><code>milestones</code></td><td><code>GanttMilestone[]</code></td><td><code>[]</code></td><td>Milestone markers</td></tr>
                 <tr><td><code>dependencies</code></td><td><code>GanttDependency[]</code></td><td><code>[]</code></td><td>Task dependency arrows</td></tr>
                 <tr><td><code>resources</code></td><td><code>GanttResource[]</code></td><td><code>[]</code></td><td>Resource definitions</td></tr>
-                <tr><td><code>config</code></td><td><code>GanttConfig</code></td><td><code>{'{}'}</code></td><td>Configuration options</td></tr>
+                <tr><td><code>config</code></td><td><code>Partial&lt;GanttConfig&gt;</code></td><td><code>{'{}'}</code></td><td>Configuration options</td></tr>
+                <tr><td><code>timeScale</code></td><td><code>GanttTimeScale</code></td><td>--</td><td>Controlled toolbar scale override</td></tr>
+                <tr><td><code>selectedTaskId</code></td><td><code>string | number | null</code></td><td>--</td><td>Controlled task selection</td></tr>
+                <tr><td><code>expandedIds</code></td><td><code>Iterable&lt;string | number&gt;</code></td><td>--</td><td>Controlled expanded task IDs</td></tr>
                 <tr><td><code>onTaskClick</code></td><td><code>(e) =&gt; void</code></td><td>--</td><td>Task click handler</td></tr>
                 <tr><td><code>onTaskMove</code></td><td><code>(e) =&gt; void</code></td><td>--</td><td>Task drag-move handler</td></tr>
                 <tr><td><code>onTaskResize</code></td><td><code>(e) =&gt; void</code></td><td>--</td><td>Task edge-resize handler</td></tr>
+                <tr><td><code>onTaskDblClick</code></td><td><code>(e) =&gt; void</code></td><td>--</td><td>Task double-click handler</td></tr>
                 <tr><td><code>onMilestoneClick</code></td><td><code>(e) =&gt; void</code></td><td>--</td><td>Milestone click handler</td></tr>
+                <tr><td><code>onDependencyClick</code></td><td><code>(e) =&gt; void</code></td><td>--</td><td>Dependency activation handler</td></tr>
                 <tr><td><code>onSlotClick</code></td><td><code>(e) =&gt; void</code></td><td>--</td><td>Empty slot click handler</td></tr>
               </tbody>
             </table>
@@ -309,6 +350,11 @@ export function GanttPage() {
                 <tr><td><code>showProgress</code></td><td><code>boolean</code></td><td>true</td><td>Show progress bars</td></tr>
                 <tr><td><code>showResources</code></td><td><code>boolean</code></td><td>true</td><td>Show resource column</td></tr>
                 <tr><td><code>editable</code></td><td><code>boolean</code></td><td>false</td><td>Enable drag/resize editing</td></tr>
+                <tr><td><code>showCriticalPath</code></td><td><code>boolean</code></td><td>false</td><td>Highlight the longest dependency chain</td></tr>
+                <tr><td><code>enableVirtualScroll</code></td><td><code>boolean</code></td><td>false</td><td>Render only the overscanned visible row window</td></tr>
+                <tr><td><code>virtualScrollOverscan</code></td><td><code>number</code></td><td>5</td><td>Rows rendered beyond the viewport</td></tr>
+                <tr><td><code>maxUndoSteps</code></td><td><code>number</code></td><td>50</td><td>Bounded move/resize undo history</td></tr>
+                <tr><td><code>theme</code></td><td><code>'light' | 'dark' | 'auto'</code></td><td>'auto'</td><td>Chart theme preference</td></tr>
               </tbody>
             </table>
           </div>

@@ -5,7 +5,17 @@
  * The full license information can be found in LICENSE in the root directory of this project.
  */
 
-import type { SchedulerEvent, DateRange, PositionedEvent } from './scheduler-types';
+import type {
+  SchedulerDateRestriction,
+  SchedulerDayGlyph,
+  SchedulerDayGlyphResolver,
+  SchedulerEvent,
+  SchedulerRecurrenceRule,
+  SchedulerRecurrenceWeekday,
+  SchedulerUnavailableHourRange,
+  DateRange,
+  PositionedEvent,
+} from './scheduler-types.js';
 
 /* ── Date arithmetic ── */
 
@@ -130,31 +140,153 @@ export function getHoursOfDay(startHour = 0, endHour = 24): number[] {
 
 /* ── Formatters ── */
 
-export function formatHour(hour: number): string {
-  if (hour === 0) return '12 AM';
-  if (hour === 12) return '12 PM';
-  if (hour < 12) return `${hour} AM`;
-  return `${hour - 12} PM`;
+export function formatHour(hour: number, locale = 'en-US'): string {
+  const value = new Date(2024, 0, 1, hour, 0, 0, 0);
+  return value.toLocaleTimeString(locale, { hour: 'numeric' });
 }
 
-export function formatDate(date: Date): string {
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+export function formatDate(date: Date, locale = 'en-US'): string {
+  return date.toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-export function formatDayHeader(date: Date): string {
-  return date.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' });
+export function formatDayHeader(date: Date, locale = 'en-US'): string {
+  return date.toLocaleDateString(locale, { weekday: 'short', day: 'numeric' });
 }
 
-export function formatMonthYear(date: Date): string {
-  return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+export function formatMonthYear(date: Date, locale = 'en-US'): string {
+  return date.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
 }
 
 export function formatWeekdayShort(date: Date): string {
   return date.toLocaleDateString('en-US', { weekday: 'short' });
 }
 
-export function formatTime(date: Date): string {
-  return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+export function formatTime(date: Date, locale = 'en-US'): string {
+  return date.toLocaleTimeString(locale, { hour: 'numeric', minute: '2-digit' });
+}
+
+export function getWeekNumber(date: Date, rule: 'iso' | 'locale' = 'iso', weekStartsOn = 0): number {
+  const day = startOfDay(date);
+  if (rule === 'locale') {
+    const first = new Date(day.getFullYear(), 0, 1);
+    const firstDay = (first.getDay() - weekStartsOn + 7) % 7;
+    return Math.floor((day.getTime() - first.getTime()) / 86_400_000 / 7) + (firstDay < 1 ? 1 : 0) + 1;
+  }
+  const isoDay = day.getDay() || 7;
+  day.setDate(day.getDate() + 4 - isoDay);
+  const yearStart = new Date(day.getFullYear(), 0, 1);
+  return Math.ceil(((day.getTime() - yearStart.getTime()) / 86_400_000 + 1) / 7);
+}
+
+export function isDateRestricted(date: Date, restrictions: SchedulerDateRestriction[]): boolean {
+  const target = startOfDay(date).getTime();
+  return restrictions.some((restriction) => {
+    if (restriction instanceof Date) return startOfDay(restriction).getTime() === target;
+    return startOfDay(restriction.start).getTime() <= target && startOfDay(restriction.end).getTime() >= target;
+  });
+}
+
+export function schedulerEventKey(event: SchedulerEvent): string {
+  return event.occurrenceId ?? String(event.id);
+}
+
+export function isAllDayOrLongDuration(event: SchedulerEvent, thresholdHours = 24): boolean {
+  return Boolean(event.allDay) || event.end.getTime() - event.start.getTime() >= thresholdHours * 3_600_000;
+}
+
+export function hasEventConflict(
+  target: Pick<SchedulerEvent, 'id' | 'start' | 'end' | 'resourceId'>,
+  events: SchedulerEvent[],
+): boolean {
+  return events.some((event) => {
+    if (event.id === target.id || event.occurrenceId === target.id) return false;
+    if (target.resourceId !== undefined && event.resourceId !== target.resourceId) return false;
+    return event.start < target.end && event.end > target.start;
+  });
+}
+
+export function isHourUnavailable(
+  date: Date,
+  hour: number,
+  ranges: SchedulerUnavailableHourRange[],
+): SchedulerUnavailableHourRange | undefined {
+  const weekdays: SchedulerRecurrenceWeekday[] = [
+    'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday',
+  ];
+  return ranges.find((range) =>
+    hour >= range.startHour && hour < range.endHour &&
+    (!range.daysOfWeek || range.daysOfWeek.includes(weekdays[date.getDay()])),
+  );
+}
+
+export function resolveDayGlyphs(
+  resolver: SchedulerDayGlyphResolver | null | undefined,
+  date: Date,
+): SchedulerDayGlyph[] {
+  if (!resolver) return [];
+  const key = startOfDay(date).toISOString().slice(0, 10);
+  const value = typeof resolver === 'function'
+    ? resolver(date)
+    : resolver instanceof Map
+      ? resolver.get(key)
+      : resolver[key];
+  return value ? (Array.isArray(value) ? value : [value]) : [];
+}
+
+/** Expand recurrence metadata into immutable occurrence objects for a display window. */
+export function expandRecurringEvents(
+  events: SchedulerEvent[],
+  range: DateRange,
+): SchedulerEvent[] {
+  const weekdays: SchedulerRecurrenceWeekday[] = [
+    'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday',
+  ];
+  const result: SchedulerEvent[] = [];
+  for (const event of events) {
+    const recurrence = event.recurrence;
+    if (!recurrence || recurrence === 'none') {
+      result.push(event);
+      continue;
+    }
+    const rule: SchedulerRecurrenceRule = typeof recurrence === 'string'
+      ? { frequency: recurrence, interval: 1 }
+      : { ...recurrence, interval: recurrence.interval ?? 1 };
+    const duration = event.end.getTime() - event.start.getTime();
+    const anchor = new Date(event.start);
+    let cursor = new Date(anchor);
+    let generated = 0;
+    let occurrenceIndex = 0;
+    const maxOccurrences = rule.count ?? 500;
+    while (cursor < range.end && generated < maxOccurrences && occurrenceIndex < 500) {
+      const isAllowedWeekday = !rule.daysOfWeek || rule.daysOfWeek.includes(weekdays[cursor.getDay()]);
+      const weekDistance = Math.floor((startOfDay(cursor).getTime() - startOfWeek(anchor).getTime()) / 86_400_000 / 7);
+      const isAllowedWeek = rule.frequency !== 'weekly' || !rule.daysOfWeek || weekDistance % (rule.interval ?? 1) === 0;
+      const isExcluded = rule.excludedDates?.some((excluded) => isSameDay(excluded, cursor)) ?? false;
+      const isBeforeEnd = !rule.endDate || cursor <= rule.endDate;
+      if (isBeforeEnd && isAllowedWeekday && isAllowedWeek && !isExcluded) {
+        const occurrenceEnd = new Date(cursor.getTime() + duration);
+        if (occurrenceEnd > range.start && cursor < range.end) {
+          result.push({
+            ...event,
+            id: occurrenceIndex === 0 ? event.id : `${String(event.id)}:${occurrenceIndex}`,
+            start: new Date(cursor),
+            end: occurrenceEnd,
+            occurrenceId: occurrenceIndex === 0 ? `${String(event.id)}:0` : `${String(event.id)}:${occurrenceIndex}`,
+            recurringEventId: event.recurringEventId ?? event.id,
+            recurrence: event.recurrence,
+          });
+        }
+        generated += 1;
+      }
+      occurrenceIndex += 1;
+      if (rule.frequency === 'daily') cursor = addDays(cursor, rule.interval ?? 1);
+      else if (rule.frequency === 'weekly' && !rule.daysOfWeek) cursor = addDays(cursor, 7 * (rule.interval ?? 1));
+      else if (rule.frequency === 'monthly') cursor = addMonths(cursor, rule.interval ?? 1);
+      else if (rule.frequency === 'yearly') cursor = new Date(cursor.getFullYear() + (rule.interval ?? 1), cursor.getMonth(), cursor.getDate(), cursor.getHours(), cursor.getMinutes(), cursor.getSeconds(), cursor.getMilliseconds());
+      else cursor = addDays(cursor, 1);
+    }
+  }
+  return result;
 }
 
 /* ── Event helpers ── */

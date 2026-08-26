@@ -349,6 +349,7 @@ export interface SpI18nLabels {
   repeats: string;
   repeatsEvery: string;
   resource: string;
+  schedulerConflict: string;
   scheduleDayView: string;
   schedulerToolbar: string;
   series: string;
@@ -2580,6 +2581,7 @@ export const SP_I18N_DEFAULT_LABELS: SpI18nLabels = {
   repeats: 'Repeats',
   repeatsEvery: 'Repeats every',
   resource: 'Resource',
+  schedulerConflict: 'This event overlaps with another event at this time.',
   scheduleDayView: 'Schedule day view',
   schedulerToolbar: 'Scheduler toolbar',
   series: 'Series',

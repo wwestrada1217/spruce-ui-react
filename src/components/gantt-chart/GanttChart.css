@@ -26,6 +26,12 @@
   background: var(--sp-chrome-background, var(--sp-surface-0));
   box-shadow: var(--sp-chrome-shadow, none);
   font-family: var(--sp-font-sans, system-ui, -apple-system, sans-serif);
+  direction: inherit;
+}
+
+.sp-gantt[data-virtual-scroll='true'] .sp-gantt__task-list-body,
+.sp-gantt[data-virtual-scroll='true'] .sp-gantt__timeline-body {
+  contain: layout paint;
 }
 
 /* ── Toolbar ──────────────────────────────────────────────── */

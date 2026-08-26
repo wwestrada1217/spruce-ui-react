@@ -626,17 +626,22 @@ export type {
   GanttDependency,
   GanttResource,
   GanttConfig,
+  GanttCommand,
+  OverlapPeriod,
   GanttTimeScale,
   GanttDependencyType,
   TaskClickEvent,
   TaskMoveEvent,
   TaskResizeEvent,
   MilestoneClickEvent,
+  DependencyClickEvent,
   SlotClickEvent as GanttSlotClickEvent,
   GanttFlatRow,
   GanttTimeSlot,
   GanttPrimarySlot,
 } from './components/gantt-chart/gantt-types.js';
+export { GANTT_DEFAULT_CONFIG } from './components/gantt-chart/gantt-types.js';
+export { GanttUndoRedo, GanttVirtualScroll, computeCriticalPath, detectOverallocations } from './components/gantt-chart/gantt-services.js';
 
 // ─── Scheduler ───────────────────────────────────────────────────────────────
 export { Scheduler } from './components/scheduler/Scheduler.js';
@@ -644,14 +649,39 @@ export type { SchedulerProps } from './components/scheduler/Scheduler.js';
 export type {
   SchedulerEvent,
   SchedulerResource,
+  SchedulerCalendar,
+  SchedulerCalendarId,
+  SchedulerCalendarControls,
+  SchedulerDayGlyph,
+  SchedulerDayGlyphConfig,
+  SchedulerDayGlyphResolver,
+  SchedulerDateRestriction,
+  SchedulerUnavailableHourRange,
+  SchedulerRecurrence,
+  SchedulerRecurrenceRule,
+  SchedulerRecurrenceFrequency,
+  SchedulerRecurrenceWeekday,
+  SchedulerTimeScale,
+  SchedulerTimelineScale,
+  SchedulerWeekNumberRule,
   SchedulerView,
   SchedulerSlot,
   EventClickEvent,
   SlotClickEvent as SchedulerSlotClickEvent,
   EventMoveEvent,
   EventResizeEvent,
+  PositionedEvent,
   DateRange as SchedulerDateRange,
 } from './components/scheduler/scheduler-types.js';
+export {
+  getWeekNumber,
+  hasEventConflict,
+  isAllDayOrLongDuration,
+  isDateRestricted,
+  isHourUnavailable,
+  resolveDayGlyphs,
+  expandRecurringEvents,
+} from './components/scheduler/scheduler-utils.js';
 
 // ─── Kanban ──────────────────────────────────────────────────────────────────
 export { Kanban } from './components/kanban/Kanban.js';

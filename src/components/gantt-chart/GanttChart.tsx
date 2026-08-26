@@ -6,7 +6,7 @@
  */
 
 import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
-import { Icon } from '../../icons/Icon';
+import { Icon } from '../../icons/Icon.js';
 import { useI18n } from '../../i18n/i18n-context.js';
 import type {
   GanttTask,
@@ -23,7 +23,8 @@ import type {
   TaskResizeEvent,
   MilestoneClickEvent,
   SlotClickEvent,
-} from './gantt-types';
+  DependencyClickEvent,
+} from './gantt-types.js';
 import {
   computeTimeRange,
   getTimeSlots,
@@ -36,25 +37,21 @@ import {
   taskWidth,
   milestoneLeft,
   buildDependencyPath,
-} from './gantt-utils';
+} from './gantt-utils.js';
 import './GanttChart.css';
 import type { Border, Chrome, Radius } from '../../chrome/chrome.js';
+import { GANTT_DEFAULT_CONFIG } from './gantt-types.js';
+import { computeCriticalPath, GanttUndoRedo, GanttVirtualScroll } from './gantt-services.js';
 
 const SCALE_ORDER: GanttTimeScale[] = ['hour', 'day', 'week', 'month'];
-
-const DEFAULT_CONFIG: Required<GanttConfig> = {
-  timeScale: 'day',
-  startDate: undefined as unknown as Date,
-  endDate: undefined as unknown as Date,
-  rowHeight: 36,
-  headerHeight: 32,
-  taskListWidth: 300,
-  showDependencies: true,
-  showProgress: true,
-  showResources: true,
-  editable: false,
-  theme: 'light',
+const SCALE_LABEL_KEYS: Record<GanttTimeScale, 'hourScale' | 'dayScale' | 'weekScale' | 'monthScale'> = {
+  hour: 'hourScale',
+  day: 'dayScale',
+  week: 'weekScale',
+  month: 'monthScale',
 };
+
+const DEFAULT_CONFIG: GanttConfig = GANTT_DEFAULT_CONFIG;
 
 export interface GanttChartProps {
   /** Array of tasks to display in the Gantt chart. */
@@ -69,17 +66,29 @@ export interface GanttChartProps {
   radius?: Radius;
   border?: Border;
   /** Configuration overrides for the chart. */
-  config?: GanttConfig;
+  config?: Partial<GanttConfig>;
   /** Fired when a task bar or task row is clicked. */
   onTaskClick?: (event: TaskClickEvent) => void;
   /** Fired when a task bar is moved via drag. */
   onTaskMove?: (event: TaskMoveEvent) => void;
+  /** Fired when a task is activated twice. */
+  onTaskDblClick?: (event: TaskClickEvent) => void;
   /** Fired when a task bar is resized via edge drag. */
   onTaskResize?: (event: TaskResizeEvent) => void;
   /** Fired when a milestone diamond is clicked. */
   onMilestoneClick?: (event: MilestoneClickEvent) => void;
+  /** Fired when a dependency arrow is activated. */
+  onDependencyClick?: (event: DependencyClickEvent) => void;
   /** Fired when a timeline slot cell is clicked. */
   onSlotClick?: (event: SlotClickEvent) => void;
+  /** Controlled scale override for the toolbar selection. */
+  timeScale?: GanttTimeScale;
+  onTimeScaleChange?: (scale: GanttTimeScale) => void;
+  /** Optional controlled selection and expansion state. */
+  selectedTaskId?: string | number | null;
+  onSelectedTaskIdChange?: (id: string | number | null) => void;
+  expandedIds?: Iterable<string | number>;
+  onExpandedIdsChange?: (ids: Set<string | number>) => void;
   /** Additional CSS class name(s). */
   className?: string;
 }
@@ -94,7 +103,9 @@ interface TaskBarProps {
   rowHeight: number;
   containerWidth: number;
   editable: boolean;
+  critical?: boolean;
   onTaskClick?: (event: TaskClickEvent) => void;
+  onTaskDblClick?: (event: TaskClickEvent) => void;
   onTaskMove?: (event: TaskMoveEvent) => void;
   onTaskResize?: (event: TaskResizeEvent) => void;
 }
@@ -107,7 +118,9 @@ function TaskBar({
   rowHeight,
   containerWidth,
   editable,
+  critical = false,
   onTaskClick,
+  onTaskDblClick,
   onTaskMove,
   onTaskResize,
 }: TaskBarProps) {
@@ -137,7 +150,7 @@ function TaskBar({
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
       if (!editable) {
-        onTaskClick?.({ task });
+        onTaskClick?.({ task, originalEvent: e.nativeEvent });
         return;
       }
       const target = e.target as HTMLElement;
@@ -170,7 +183,7 @@ function TaskBar({
         setDragging(false);
 
         if (!didDrag) {
-          onTaskClick?.({ task });
+          onTaskClick?.({ task, originalEvent: me });
           return;
         }
 
@@ -180,6 +193,7 @@ function TaskBar({
 
         onTaskMove?.({
           task,
+          originalEvent: me,
           oldStart: origStart,
           oldEnd: origEnd,
           newStart,
@@ -256,6 +270,7 @@ function TaskBar({
 
         onTaskResize?.({
           task,
+          originalEvent: me,
           oldStart: origStart,
           oldEnd: origEnd,
           newStart,
@@ -274,7 +289,7 @@ function TaskBar({
 
   return (
     <div
-      className={`sp-gantt__bar${dragging ? ' sp-gantt__bar--dragging' : ''}`}
+      className={`sp-gantt__bar${dragging ? ' sp-gantt__bar--dragging' : ''}${critical ? ' sp-gantt__bar--critical' : ''}`}
       style={{
         left: `${visualLeft}%`,
         width: `${visualWidth}%`,
@@ -285,10 +300,11 @@ function TaskBar({
       tabIndex={0}
       aria-label={ariaLabel}
       onMouseDown={handleMouseDown}
+      onDoubleClick={(e) => onTaskDblClick?.({ task, originalEvent: e.nativeEvent })}
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
       onKeyDown={(e) => {
-        if (e.key === 'Enter') onTaskClick?.({ task });
+        if (e.key === 'Enter') onTaskClick?.({ task, originalEvent: e.nativeEvent });
       }}
     >
       {editable && (
@@ -359,9 +375,9 @@ function MilestoneMarker({
       role="img"
       aria-label={ariaLabel}
       tabIndex={0}
-      onClick={() => onMilestoneClick?.({ milestone })}
+      onClick={(e) => onMilestoneClick?.({ milestone, originalEvent: e.nativeEvent })}
       onKeyDown={(e) => {
-        if (e.key === 'Enter') onMilestoneClick?.({ milestone });
+        if (e.key === 'Enter') onMilestoneClick?.({ milestone, originalEvent: e.nativeEvent });
       }}
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
@@ -386,6 +402,7 @@ interface DependencyOverlayProps {
   totalMs: number;
   rowHeight: number;
   containerWidth: number;
+  onDependencyClick?: (event: DependencyClickEvent) => void;
 }
 
 function DependencyOverlay({
@@ -395,6 +412,7 @@ function DependencyOverlay({
   totalMs,
   rowHeight,
   containerWidth,
+  onDependencyClick,
 }: DependencyOverlayProps) {
   const { t } = useI18n();
   const totalHeight = rows.length * rowHeight;
@@ -477,8 +495,15 @@ function DependencyOverlay({
             markerEnd="url(#sp-gantt-arrow)"
             className="sp-gantt__dep-line"
             aria-label={`Dependency: ${dep.fromId} to ${dep.toId} (${dep.type})`}
-            role="img"
+            role="button"
             tabIndex={0}
+            onClick={(e) => onDependencyClick?.({ dependency: dep, originalEvent: e.nativeEvent })}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onDependencyClick?.({ dependency: dep, originalEvent: e.nativeEvent });
+              }
+            }}
           />
         ))}
       </svg>
@@ -523,10 +548,18 @@ export function GanttChart({
   border = 'default',
   config = {},
   onTaskClick,
+  onTaskDblClick,
   onTaskMove,
   onTaskResize,
   onMilestoneClick,
+  onDependencyClick,
   onSlotClick,
+  timeScale: timeScaleProp,
+  onTimeScaleChange,
+  selectedTaskId: selectedTaskIdProp,
+  onSelectedTaskIdChange,
+  expandedIds: expandedIdsProp,
+  onExpandedIdsChange,
   className = '',
 }: GanttChartProps) {
   const { t } = useI18n();
@@ -544,6 +577,26 @@ export function GanttChart({
 
   const timelineRef = useRef<HTMLDivElement>(null);
   const taskListBodyRef = useRef<HTMLDivElement>(null);
+  const undoRedoRef = useRef<GanttUndoRedo | null>(null);
+  if (!undoRedoRef.current) undoRedoRef.current = new GanttUndoRedo(cfg.maxUndoSteps);
+  const virtualScrollRef = useRef<GanttVirtualScroll | null>(null);
+  if (!virtualScrollRef.current) virtualScrollRef.current = new GanttVirtualScroll();
+  const [, setHistoryVersion] = useState(0);
+  const [scrollTop, setScrollTop] = useState(0);
+
+  const effectiveSelectedTaskId = selectedTaskIdProp === undefined ? selectedTaskId : selectedTaskIdProp;
+  const effectiveExpandedIds = useMemo(
+    () => expandedIdsProp === undefined ? expandedIds : new Set(expandedIdsProp),
+    [expandedIds, expandedIdsProp],
+  );
+
+  useEffect(() => {
+    if (timeScaleProp) setCurrentScale(timeScaleProp);
+  }, [timeScaleProp]);
+
+  useEffect(() => {
+    undoRedoRef.current?.setMaxSteps(cfg.maxUndoSteps);
+  }, [cfg.maxUndoSteps]);
 
   // Auto-detect scale on mount
   useEffect(() => {
@@ -560,8 +613,8 @@ export function GanttChart({
   // ── Tree -> flat rows ────────────────────────────────────
   const tree = useMemo(() => buildTaskTree(tasks), [tasks]);
   const flatRows = useMemo(
-    () => flattenTree(tree, expandedIds),
-    [tree, expandedIds],
+    () => flattenTree(tree, effectiveExpandedIds),
+    [tree, effectiveExpandedIds],
   );
 
   // ── Time range ───────────────────────────────────────────
@@ -587,6 +640,23 @@ export function GanttChart({
   const rowHeight = cfg.rowHeight ?? 36;
   const headerHeight = cfg.headerHeight ?? 32;
   const totalHeight = flatRows.length * rowHeight;
+  const virtualRange = useMemo(
+    () => cfg.enableVirtualScroll
+      ? virtualScrollRef.current?.getRange(flatRows.length, rowHeight, 600, scrollTop, cfg.virtualScrollOverscan) ?? { start: 0, end: flatRows.length, offset: 0 }
+      : { start: 0, end: flatRows.length, offset: 0 },
+    [cfg.enableVirtualScroll, cfg.virtualScrollOverscan, flatRows.length, rowHeight, scrollTop],
+  );
+  const visibleRows = useMemo(
+    () => flatRows.slice(virtualRange.start, virtualRange.end).map((row, index) => ({ row, index: virtualRange.start + index })),
+    [flatRows, virtualRange.end, virtualRange.start],
+  );
+  const milestoneRows = useMemo(
+    () => milestones.map((milestone) => ({
+      milestone,
+      rowIndex: Math.max(0, flatRows.findIndex(({ task }) => milestone.date >= task.start && milestone.date <= task.end)),
+    })),
+    [flatRows, milestones],
+  );
 
   // ── Resource map ─────────────────────────────────────────
   const resourceMap = useMemo(() => {
@@ -604,6 +674,11 @@ export function GanttChart({
     return pos >= 0 && pos <= 100 ? pos : null;
   }, [rangeStartMs, totalMs]);
 
+  const criticalIds = useMemo(
+    () => cfg.showCriticalPath ? computeCriticalPath(tasks, dependencies) : new Set<string | number>(),
+    [cfg.showCriticalPath, dependencies, tasks],
+  );
+
   // ── Callbacks ────────────────────────────────────────────
   const toggleExpand = useCallback((taskId: string | number) => {
     setExpandedIds((prev) => {
@@ -613,33 +688,92 @@ export function GanttChart({
       } else {
         next.add(taskId);
       }
+      onExpandedIdsChange?.(next);
       return next;
     });
-  }, []);
+  }, [onExpandedIdsChange]);
 
   const handleTaskClick = useCallback(
     (event: TaskClickEvent) => {
       setSelectedTaskId(event.task.id);
+      onSelectedTaskIdChange?.(event.task.id);
       onTaskClick?.(event);
     },
-    [onTaskClick],
+    [onSelectedTaskIdChange, onTaskClick],
   );
 
   const handleSlotClick = useCallback(
-    (date: Date) => {
-      onSlotClick?.({ date });
+    (date: Date, taskId?: string | number, originalEvent?: Event) => {
+      onSlotClick?.({ date, taskId, originalEvent: originalEvent ?? new Event('slotclick') });
     },
     [onSlotClick],
   );
+
+  const handleTaskMove = useCallback((event: TaskMoveEvent) => {
+    if (!onTaskMove) return;
+    const inverse: TaskMoveEvent = {
+      ...event,
+      oldStart: event.newStart,
+      oldEnd: event.newEnd,
+      newStart: event.oldStart,
+      newEnd: event.oldEnd,
+    };
+    undoRedoRef.current?.execute({
+      description: `Move ${event.task.title}`,
+      execute: () => onTaskMove(event),
+      undo: () => onTaskMove(inverse),
+    });
+    setHistoryVersion((version) => version + 1);
+  }, [onTaskMove]);
+
+  const handleTaskResize = useCallback((event: TaskResizeEvent) => {
+    if (!onTaskResize) return;
+    const inverse: TaskResizeEvent = {
+      ...event,
+      oldStart: event.newStart,
+      oldEnd: event.newEnd,
+      newStart: event.oldStart,
+      newEnd: event.oldEnd,
+    };
+    undoRedoRef.current?.execute({
+      description: `Resize ${event.task.title}`,
+      execute: () => onTaskResize(event),
+      undo: () => onTaskResize(inverse),
+    });
+    setHistoryVersion((version) => version + 1);
+  }, [onTaskResize]);
+
+  const handleUndo = useCallback(() => {
+    undoRedoRef.current?.undo();
+    setHistoryVersion((version) => version + 1);
+  }, []);
+
+  const handleRedo = useCallback(() => {
+    undoRedoRef.current?.redo();
+    setHistoryVersion((version) => version + 1);
+  }, []);
+
+  const handleRootKeyDown = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (!(event.ctrlKey || event.metaKey)) return;
+    if (event.key.toLowerCase() === 'z') {
+      event.preventDefault();
+      if (event.shiftKey) handleRedo();
+      else handleUndo();
+    } else if (event.key.toLowerCase() === 'y') {
+      event.preventDefault();
+      handleRedo();
+    }
+  }, [handleRedo, handleUndo]);
 
   // ── Scroll sync ──────────────────────────────────────────
   const handleTimelineScroll = useCallback(() => {
     const timeline = timelineRef.current;
     const taskListBody = taskListBodyRef.current;
     if (timeline && taskListBody) {
-      taskListBody.style.transform = `translateY(${-timeline.scrollTop}px)`;
+      setScrollTop(timeline.scrollTop);
+      if (!cfg.enableVirtualScroll) taskListBody.style.transform = `translateY(${-timeline.scrollTop}px)`;
     }
-  }, []);
+  }, [cfg.enableVirtualScroll]);
 
   const handleTaskListWheel = useCallback((e: React.WheelEvent) => {
     if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
@@ -652,18 +786,22 @@ export function GanttChart({
 
   // ── Zoom controls ────────────────────────────────────────
   const zoomIn = useCallback(() => {
-    setCurrentScale((prev) => {
-      const idx = SCALE_ORDER.indexOf(prev);
-      return idx > 0 ? SCALE_ORDER[idx - 1] : prev;
-    });
-  }, []);
+      setCurrentScale((prev) => {
+        const idx = SCALE_ORDER.indexOf(prev);
+        const next = idx > 0 ? SCALE_ORDER[idx - 1] : prev;
+        onTimeScaleChange?.(next);
+        return next;
+      });
+  }, [onTimeScaleChange]);
 
   const zoomOut = useCallback(() => {
-    setCurrentScale((prev) => {
-      const idx = SCALE_ORDER.indexOf(prev);
-      return idx < SCALE_ORDER.length - 1 ? SCALE_ORDER[idx + 1] : prev;
-    });
-  }, []);
+      setCurrentScale((prev) => {
+        const idx = SCALE_ORDER.indexOf(prev);
+        const next = idx < SCALE_ORDER.length - 1 ? SCALE_ORDER[idx + 1] : prev;
+        onTimeScaleChange?.(next);
+        return next;
+      });
+  }, [onTimeScaleChange]);
 
   const scrollToToday = useCallback(() => {
     const now = new Date();
@@ -723,7 +861,12 @@ export function GanttChart({
   ].filter(Boolean).join(' ');
 
   return (
-    <div className={rootClasses}>
+    <div
+      className={rootClasses}
+      data-theme={cfg.theme === 'auto' ? undefined : cfg.theme}
+      data-virtual-scroll={cfg.enableVirtualScroll || undefined}
+      onKeyDown={handleRootKeyDown}
+    >
       {/* ── Toolbar ─────────────────────────────────────── */}
       <div className="sp-gantt__toolbar" role="toolbar" aria-label={t('ganttChartControls')}>
         <div className="sp-gantt__toolbar-group">
@@ -731,13 +874,39 @@ export function GanttChart({
             <button
               key={scale}
               className={`sp-gantt__toolbar-btn${currentScale === scale ? ' sp-gantt__toolbar-btn--active' : ''}`}
-              onClick={() => setCurrentScale(scale)}
-              aria-label={`${scale.charAt(0).toUpperCase() + scale.slice(1)} scale`}
+              onClick={() => {
+                setCurrentScale(scale);
+                onTimeScaleChange?.(scale);
+              }}
+              aria-label={t(SCALE_LABEL_KEYS[scale])}
             >
-              {scale.charAt(0).toUpperCase() + scale.slice(1)}
+              {t(SCALE_LABEL_KEYS[scale])}
             </button>
           ))}
         </div>
+
+        {cfg.editable && (
+          <div className="sp-gantt__toolbar-group" aria-label={`${t('undo')} / ${t('redo')}`}>
+            <button
+              className="sp-gantt__toolbar-btn"
+              onClick={handleUndo}
+              disabled={!undoRedoRef.current?.canUndo()}
+              aria-label={t('undo')}
+              title={undoRedoRef.current?.undoDescription()}
+            >
+              {t('undo')}
+            </button>
+            <button
+              className="sp-gantt__toolbar-btn"
+              onClick={handleRedo}
+              disabled={!undoRedoRef.current?.canRedo()}
+              aria-label={t('redo')}
+              title={undoRedoRef.current?.redoDescription()}
+            >
+              {t('redo')}
+            </button>
+          </div>
+        )}
 
         <div className="sp-gantt__toolbar-group">
           <button className="sp-gantt__toolbar-btn" onClick={zoomIn} aria-label={t('zoomIn')}>
@@ -787,8 +956,12 @@ export function GanttChart({
             </div>
 
             {/* Task list rows */}
-            <div className="sp-gantt__task-list-body" ref={taskListBodyRef}>
-              {flatRows.map((row, idx) => {
+            <div
+              className="sp-gantt__task-list-body"
+              ref={taskListBodyRef}
+              style={cfg.enableVirtualScroll ? { transform: `translateY(${virtualRange.offset}px)` } : undefined}
+            >
+              {visibleRows.map(({ row, index: idx }) => {
                 const resource = row.task.resourceId != null
                   ? resourceMap.get(row.task.resourceId)
                   : undefined;
@@ -798,7 +971,7 @@ export function GanttChart({
                     key={String(row.task.id)}
                     className={[
                       'sp-gantt__task-list-row',
-                      selectedTaskId === row.task.id && 'sp-gantt__task-list-row--selected',
+                      effectiveSelectedTaskId === row.task.id && 'sp-gantt__task-list-row--selected',
                       idx % 2 === 0 && 'sp-gantt__task-list-row--even',
                     ]
                       .filter(Boolean)
@@ -807,11 +980,15 @@ export function GanttChart({
                     role="row"
                     aria-level={row.depth + 1}
                     aria-expanded={row.hasChildren ? row.expanded : undefined}
-                    aria-selected={selectedTaskId === row.task.id}
+                    aria-selected={effectiveSelectedTaskId === row.task.id}
                     tabIndex={0}
-                    onClick={() => handleTaskClick({ task: row.task })}
+                onClick={(e) => handleTaskClick({ task: row.task, originalEvent: e.nativeEvent })}
+                onDoubleClick={(e) => onTaskDblClick?.({ task: row.task, originalEvent: e.nativeEvent })}
                     onKeyDown={(e) => {
-                      if (e.key === 'ArrowRight' && row.hasChildren && !row.expanded) {
+                      if ((e.key === 'Enter' || e.key === ' ') && !e.currentTarget.querySelector('button:focus')) {
+                        e.preventDefault();
+                        handleTaskClick({ task: row.task, originalEvent: e.nativeEvent });
+                      } else if (e.key === 'ArrowRight' && row.hasChildren && !row.expanded) {
                         e.preventDefault();
                         toggleExpand(row.task.id);
                       } else if (e.key === 'ArrowLeft' && row.hasChildren && row.expanded) {
@@ -957,7 +1134,7 @@ export function GanttChart({
             style={{ width: `${totalWidth}px`, height: `${totalHeight}px` }}
           >
             {/* Row backgrounds with slot grid cells */}
-            {flatRows.map((row, idx) => (
+            {visibleRows.map(({ row, index: idx }) => (
               <div
                 key={`row-bg-${String(row.task.id)}`}
                 className={`sp-gantt__timeline-row${idx % 2 === 0 ? ' sp-gantt__timeline-row--even' : ''}`}
@@ -978,7 +1155,15 @@ export function GanttChart({
                       .filter(Boolean)
                       .join(' ')}
                     style={{ width: `${slotWidth}px` }}
-                    onClick={() => handleSlotClick(slot.start)}
+                    role="gridcell"
+                    tabIndex={0}
+                    onClick={(e) => handleSlotClick(slot.start, row.task.id, e.nativeEvent)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleSlotClick(slot.start, row.task.id, e.nativeEvent);
+                      }
+                    }}
                   />
                 ))}
               </div>
@@ -1002,11 +1187,12 @@ export function GanttChart({
                 totalMs={totalMs}
                 rowHeight={rowHeight}
                 containerWidth={totalWidth}
+                onDependencyClick={onDependencyClick}
               />
             )}
 
             {/* Task bars */}
-            {flatRows.map((row, idx) => (
+            {visibleRows.map(({ row, index: idx }) => (
               <TaskBar
                 key={`bar-${String(row.task.id)}`}
                 task={row.task}
@@ -1016,21 +1202,23 @@ export function GanttChart({
                 rowHeight={rowHeight}
                 containerWidth={totalWidth}
                 editable={cfg.editable ?? false}
+                critical={criticalIds.has(row.task.id)}
                 onTaskClick={handleTaskClick}
-                onTaskMove={onTaskMove}
-                onTaskResize={onTaskResize}
+                onTaskDblClick={onTaskDblClick}
+                onTaskMove={handleTaskMove}
+                onTaskResize={handleTaskResize}
               />
             ))}
 
             {/* Milestones */}
-            {milestones.map((ms) => (
+            {milestoneRows.map(({ milestone: ms, rowIndex }) => (
               <MilestoneMarker
                 key={`ms-${String(ms.id)}`}
                 milestone={ms}
                 rangeStartMs={rangeStartMs}
                 totalMs={totalMs}
                 rowHeight={rowHeight}
-                rowIndex={0}
+                rowIndex={rowIndex}
                 onMilestoneClick={onMilestoneClick}
               />
             ))}
