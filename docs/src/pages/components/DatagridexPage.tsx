@@ -190,7 +190,8 @@ const ROW_SPAN_CODE = `const columns = [
 const GROUPING_CODE = `<Datagridex
   rows={projects}
   columns={columns}
-  groupBy={['region', 'owner']}
+  groupBy={groupBy}
+  onGroupByChange={setGroupBy}
   groupSorting
   groupsExpandedByDefault
   groupSelection
@@ -354,6 +355,7 @@ export function DatagridexPage() {
   const [projects, setProjects] = useState<readonly Project[]>(PROJECTS)
   const [selectedRows, setSelectedRows] = useState<readonly Project[]>([])
   const [expandedRows, setExpandedRows] = useState<readonly Project[]>([])
+  const [groupBy, setGroupBy] = useState<readonly string[]>(['region', 'owner'])
   const [reorderRows, setReorderRows] = useState<readonly Project[]>(PROJECTS.slice(0, 4))
   const [lastAction, setLastAction] = useState('Interact with the grid to see emitted state changes.')
   const [activeSection, setActiveSection] = useState('import')
@@ -505,7 +507,8 @@ export function DatagridexPage() {
   rowDetails
   rowDetail={({ row }) => <p>{row.description}</p>}
   detailPane
-  detailPaneRow={selectedProject}
+  detailPaneRow={detailPaneRow}
+  onDetailPaneRowChange={setDetailPaneRow}
   detailPaneRenderer={({ row, close }) => (
     <><h3>{row.name}</h3><p>{row.description}</p><button onClick={close}>Close</button></>
   )}
@@ -524,6 +527,7 @@ export function DatagridexPage() {
               selectionMode="single"
               selectedRows={selectedRows}
               onSelectedRowsChange={setSelectedRows}
+              onDetailPaneRowChange={(row) => setSelectedRows(row ? [row] : [])}
               ariaLabel="Projects with details"
             />
           </CodePreview>
@@ -531,9 +535,9 @@ export function DatagridexPage() {
 
         <section id="grouping" className="demo-section">
           <h2>Multi-column row grouping</h2>
-          <p className="section-desc">Pass ordered keys to <code>groupBy</code> for nested groups. <code>groupSorts</code>, <code>groupsExpandedByDefault</code>, <code>stickyGroupHeaders</code>, <code>indentGroupedRows</code>, and <code>groupSelection</code> control the grouped view.</p>
+          <p className="section-desc">Pass ordered keys to <code>groupBy</code> for nested groups. Keep controlled grouping state in sync with <code>onGroupByChange</code> so the toolbar remove and drag/drop actions update the view. <code>groupSorts</code>, <code>groupsExpandedByDefault</code>, <code>stickyGroupHeaders</code>, <code>indentGroupedRows</code>, and <code>groupSelection</code> control the grouped view.</p>
           <CodePreview code={GROUPING_CODE} language="typescript">
-            <Datagridex<Project> rows={projects} columns={PROJECT_COLUMNS} groupBy={['region', 'owner']} groupSorting groupsExpandedByDefault groupSelection selectionMode="multiple" ariaLabel="Grouped projects" />
+            <Datagridex<Project> rows={projects} columns={PROJECT_COLUMNS} groupBy={groupBy} onGroupByChange={setGroupBy} groupSorting groupsExpandedByDefault groupSelection selectionMode="multiple" ariaLabel="Grouped projects" />
           </CodePreview>
         </section>
 
@@ -675,11 +679,12 @@ export function DatagridexPage() {
                 <tr><td>Data</td><td><code>rows</code>, <code>data</code>, <code>dataContext</code></td><td>Local rows or tracked DataContext records.</td></tr>
                 <tr><td>Columns</td><td><code>columns</code>, <code>columnGroups</code>, <code>columnPins</code></td><td>Typed columns, grouped headers, and pinned columns.</td></tr>
                 <tr><td>Sorting/filtering</td><td><code>sortMode</code>, <code>sorts</code>, <code>filterMode</code>, <code>columnFilters</code>, <code>searchTerm</code></td><td>Client or manual state.</td></tr>
+                <tr><td>Grouping</td><td><code>groupBy</code>, <code>groupSorts</code>, <code>onGroupByChange</code>, <code>onGroupSortsChange</code></td><td>Controlled nested grouping and group sorting.</td></tr>
                 <tr><td>Selection</td><td><code>selectionMode</code>, <code>selectedRows</code>, <code>onSelectedRowsChange</code>, <code>onSelectionChange</code></td><td>Single or multiple controlled selection.</td></tr>
                 <tr><td>Pagination</td><td><code>pagination</code>, <code>pageSize</code>, <code>paginationType</code>, <code>onPageChange</code></td><td>Compact or full client pagination.</td></tr>
                 <tr><td>Virtual data</td><td><code>virtualScroll</code>, <code>columnVirtualization</code>, <code>virtualPaging</code></td><td>Large local and remote datasets.</td></tr>
                 <tr><td>Editing</td><td><code>editMode</code>, <code>editOnClick</code>, <code>editOnType</code>, <code>cellEditors</code></td><td>Cell/row editors and custom controls.</td></tr>
-                <tr><td>Details</td><td><code>rowDetails</code>, <code>rowDetail</code>, <code>detailPaneRenderer</code></td><td>Expandable rows and side panels.</td></tr>
+                <tr><td>Details</td><td><code>rowDetails</code>, <code>rowDetail</code>, <code>detailPaneRenderer</code>, <code>onDetailPaneRowChange</code></td><td>Expandable rows and controlled side panels.</td></tr>
                 <tr><td>Callbacks</td><td><code>onSortChange</code>, <code>onFilterChange</code>, <code>onCellEditCommit</code>, <code>onRowOrderChange</code>, <code>onDataContextSaveComplete</code></td><td>Immutable state and lifecycle events.</td></tr>
                 <tr><td>Ref methods</td><td><code>DatagridexHandle&lt;T&gt;</code></td><td>Sorting, filtering, paging, selection, grouping, sizing, and editing commands.</td></tr>
               </tbody>

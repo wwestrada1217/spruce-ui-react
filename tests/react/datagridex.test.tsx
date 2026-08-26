@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
+import { fireEvent } from '@testing-library/react';
 import { Datagridex, type DatagridexColumn } from '../../src/index.js';
 import {
   expectFocused,
@@ -24,6 +26,51 @@ const columns: readonly DatagridexColumn<Person>[] = [
   { key: 'name', header: 'Name', resizable: false, sortable: false, editable: true },
   { key: 'age', header: 'Age', resizable: false, sortable: false, editable: true },
 ];
+
+function ControlledRowDetailsGrid() {
+  const [expandedRows, setExpandedRows] = useState<readonly Person[]>([]);
+
+  return (
+    <Datagridex<Person>
+      rows={rows}
+      columns={columns}
+      rowDetails
+      expandedRows={expandedRows}
+      onExpandedRowsChange={setExpandedRows}
+      rowDetail={({ row }) => <span>{row.name} details</span>}
+    />
+  );
+}
+
+function ControlledDetailPaneGrid() {
+  const [detailPaneRow, setDetailPaneRow] = useState<Person | null>(rows[0]!);
+
+  return (
+    <Datagridex<Person>
+      rows={rows}
+      columns={columns}
+      detailPane
+      detailPaneRow={detailPaneRow}
+      onDetailPaneRowChange={setDetailPaneRow}
+      detailPaneRenderer={({ row }) => <span>{row.name} pane</span>}
+    />
+  );
+}
+
+function ControlledGroupingGrid({ initialGroupBy = ['age'] }: { initialGroupBy?: readonly string[] }) {
+  const [groupBy, setGroupBy] = useState<readonly string[]>(initialGroupBy);
+
+  return (
+    <Datagridex<Person>
+      rows={rows}
+      columns={columns}
+      groupBy={groupBy}
+      onGroupByChange={setGroupBy}
+      groupSorting
+      showGroupToolbar
+    />
+  );
+}
 
 describe('Datagridex', () => {
   it('renders the typed grid contract and supports keyboard cell navigation', async () => {
@@ -68,6 +115,111 @@ describe('Datagridex', () => {
       expect(headerCheckbox.closest('.sp-checkbox')).toHaveClass('sp-checkbox--checked');
       expect(container.querySelectorAll('.sp-checkbox--checked .sp-icon')).toHaveLength(3);
     });
+  });
+
+  it('keeps grouped-row expansion controls separate from group selection', async () => {
+    const { container, user } = renderWithSpruce(
+      <Datagridex<Person>
+        rows={rows}
+        columns={columns}
+        groupBy={['age']}
+        groupsExpandedByDefault
+        groupSelection
+        selectionMode="multiple"
+      />,
+    );
+    const groupCell = container.querySelector<HTMLElement>('.sp-datagridex__group-cell--with-selection');
+    const groupToggle = groupCell?.querySelector<HTMLButtonElement>('.sp-datagridex__group-toggle');
+    const groupCheckbox = groupCell?.querySelector<HTMLInputElement>('input[type="checkbox"]');
+
+    expect(groupCell).toBeInTheDocument();
+    expect(groupToggle).toBeInTheDocument();
+    expect(groupCheckbox).toBeInTheDocument();
+
+    await user.click(groupToggle!);
+    expect(groupCell?.closest('[role="row"]')).toHaveAttribute('aria-expanded', 'false');
+    expect(groupCheckbox).not.toBeChecked();
+  });
+
+  it('removes a controlled grouping when its toolbar button is clicked', async () => {
+    const { getByRole, queryByRole, getByText, user } = renderWithSpruce(<ControlledGroupingGrid />);
+    const removeButton = getByRole('button', { name: 'Remove grouping by Age' });
+
+    await user.click(removeButton);
+    await waitFor(() => {
+      expect(queryByRole('button', { name: 'Remove grouping by Age' })).not.toBeInTheDocument();
+      expect(getByText('Drag column headers here to group')).toBeInTheDocument();
+    });
+  });
+
+  it('adds a controlled grouping when a column header is dropped on the toolbar', async () => {
+    const { container, getByRole } = renderWithSpruce(
+      <ControlledGroupingGrid initialGroupBy={[]} />,
+    );
+    const header = getByRole('columnheader', { name: 'Name' });
+    const toolbar = container.querySelector<HTMLElement>('.sp-datagridex__group-toolbar');
+    const dataTransfer = {
+      effectAllowed: '',
+      getData: vi.fn().mockReturnValue('name'),
+      setData: vi.fn(),
+    };
+
+    expect(toolbar).toBeInTheDocument();
+    fireEvent.dragStart(header, { dataTransfer });
+    fireEvent.dragOver(toolbar!, { dataTransfer });
+    fireEvent.drop(toolbar!, { dataTransfer });
+
+    await waitFor(() => expect(getByRole('button', { name: 'Remove grouping by Name' })).toBeInTheDocument());
+  });
+
+  it('reorders controlled grouping when a toolbar group button is dragged', async () => {
+    const { container } = renderWithSpruce(
+      <ControlledGroupingGrid initialGroupBy={['name', 'age']} />,
+    );
+    const groupButtons = () => Array.from(
+      container.querySelectorAll<HTMLButtonElement>('.sp-datagridex__toolbar-group-button'),
+    );
+    const dataTransfer = {
+      dropEffect: '',
+      effectAllowed: '',
+      getData: vi.fn().mockReturnValue('age'),
+      setData: vi.fn(),
+    };
+    const source = groupButtons()[1]!;
+    const target = groupButtons()[0]!.closest<HTMLElement>('.sp-datagridex__toolbar-group')!;
+
+    fireEvent.dragStart(source, { dataTransfer });
+    expect(source.closest('.sp-datagridex__toolbar-group')).toHaveClass('sp-datagridex__toolbar-group--dragging');
+    fireEvent.dragOver(target, { dataTransfer });
+    expect(target).toHaveClass('sp-datagridex__toolbar-group--drop-before');
+    fireEvent.drop(target, { dataTransfer });
+
+    await waitFor(() => {
+      expect(groupButtons().map((button) => button.getAttribute('aria-label')?.split(' grouping')[0])).toEqual(['Age', 'Name']);
+    });
+  });
+
+  it('expands and collapses controlled row details when expanded rows are row objects', async () => {
+    const { getAllByRole, getByText, queryByText, user } = renderWithSpruce(<ControlledRowDetailsGrid />);
+    const toggle = getAllByRole('button', { name: 'Toggle row details' })[0]!;
+
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await user.click(toggle);
+    await waitFor(() => {
+      expect(toggle).toHaveAttribute('aria-expanded', 'true');
+      expect(getByText('Ada details')).toBeInTheDocument();
+    });
+
+    await user.click(toggle);
+    await waitFor(() => expect(queryByText('Ada details')).not.toBeInTheDocument());
+  });
+
+  it('closes a controlled detail pane through its close button', async () => {
+    const { getAllByRole, queryByText, user } = renderWithSpruce(<ControlledDetailPaneGrid />);
+
+    expect(queryByText('Ada pane')).toBeInTheDocument();
+    await user.click(getAllByRole('button', { name: 'Close' })[0]!);
+    await waitFor(() => expect(queryByText('Ada pane')).not.toBeInTheDocument());
   });
 
   it('shows validation feedback when an edited required cell is committed empty', async () => {
@@ -176,6 +328,19 @@ describe('Datagridex', () => {
     expect(dataRows).toHaveLength(2);
     expect(container.querySelector('[aria-rowspan="2"]')).toBeInTheDocument();
     expect(nameCells.filter((cell) => cell.textContent?.includes('Grace'))).toHaveLength(0);
+  });
+
+  it('keeps cells after a covered row-span column in their declared grid tracks', () => {
+    const spanColumns: readonly DatagridexColumn<Person>[] = [
+      { key: 'name', header: 'Name', resizable: false, sortable: false },
+      { key: 'age', header: 'Age', resizable: false, sortable: false, rowSpan: 2 },
+      { key: 'id', header: 'ID', resizable: false, sortable: false },
+    ];
+    const { container } = renderWithSpruce(<Datagridex<Person> rows={rows} columns={spanColumns} />);
+    const dataRows = container.querySelectorAll('.sp-datagridex__body-row:not(.sp-datagridex__body-row--new)');
+    const secondRowIdCell = dataRows[1]?.querySelector<HTMLElement>('[data-sp-datagridex-cell="id"]');
+
+    expect(secondRowIdCell).toHaveStyle({ gridColumn: '3' });
   });
 
   it('requests virtual pages through the controlled paging callback', async () => {

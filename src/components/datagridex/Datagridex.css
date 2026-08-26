@@ -1751,8 +1751,13 @@
   padding: 0;
 }
 
-.sp-datagridex__column-menu-trigger:hover {
-  background: transparent;
+.sp-datagridex__column-menu-trigger.sp-btn--ghost:hover {
+  background: var(--sp-content-hover-bg);
+  color: var(--sp-text-color);
+}
+
+.sp-datagridex__column-menu-trigger.sp-btn--ghost:active {
+  background: var(--sp-content-active-bg);
 }
 
 .sp-datagridex__column-group-resize-handle,
@@ -1903,6 +1908,19 @@
 
 .sp-datagridex__group-toggle:hover {
   background: var(--sp-content-hover-bg);
+}
+
+.sp-datagridex__group-cell--with-selection .sp-datagridex__group-selection {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  margin-inline-end: var(--sp-space-1, 4px);
+}
+
+.sp-datagridex__group-cell--with-selection .sp-datagridex__group-toggle {
+  inline-size: auto;
+  margin-inline: 0;
+  padding-inline: 0;
 }
 
 .sp-datagridex__group-label {
@@ -2090,8 +2108,39 @@
 .sp-datagridex__pagination-actions {
   display: flex;
   align-items: center;
-  gap: var(--sp-density-inline-gap, var(--sp-space-2, 8px));
+  gap: var(--sp-space-1, 4px);
   font-variant-numeric: tabular-nums;
+}
+
+.sp-datagridex__pagination-select {
+  flex: 0 0 auto;
+  inline-size: 58px;
+  block-size: var(--sp-btn-height-sm, 28px);
+  padding-inline: var(--sp-space-2, 8px);
+  border: 1px solid var(--sp-border-strong, rgba(0, 0, 0, 0.14));
+  border-radius: var(--sp-radius-md, 6px);
+  background: var(--sp-surface-0, #fff);
+  color: var(--sp-text-color);
+  font-family: inherit;
+  font-size: var(--sp-text-xs, 11px);
+  cursor: pointer;
+}
+
+.sp-datagridex__pagination-select:hover {
+  border-color: var(--sp-surface-400, #94a3b8);
+}
+
+.sp-datagridex__pagination-select:focus-visible {
+  outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color, #2563eb);
+  outline-offset: var(--sp-focus-ring-offset, 2px);
+}
+
+.sp-datagridex__pagination-page-label {
+  min-inline-size: 40px;
+  padding-inline: var(--sp-space-1, 4px);
+  color: var(--sp-text-color);
+  text-align: center;
+  white-space: nowrap;
 }
 
 .sp-datagridex__pagination--full {
