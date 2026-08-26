@@ -294,7 +294,31 @@ describe('Datagridex', () => {
     );
 
     expect(container.querySelector<HTMLElement>('.sp-datagridex__grid')?.style.gridTemplateColumns)
-      .toBe('minmax(min-content, max-content) minmax(min-content, max-content)');
+      .toBe('minmax(min-content, max-content) minmax(min-content, max-content) minmax(0, 1fr)');
+    expect(container.querySelector('.sp-datagridex__header-cell--filler')).toBeInTheDocument();
+  });
+
+  it('does not add a filler track when columns already fit the grid width', () => {
+    const { container } = renderWithSpruce(
+      <Datagridex<Person> rows={rows} columns={columns} fitColumnsToWidth />,
+    );
+
+    expect(container.querySelector<HTMLElement>('.sp-datagridex__grid')?.style.gridTemplateColumns)
+      .toBe('minmax(min-content, 1fr) minmax(min-content, 1fr)');
+    expect(container.querySelector('.sp-datagridex__header-cell--filler')).not.toBeInTheDocument();
+  });
+
+  it('preserves explicit column widths while filling remaining grid space', () => {
+    const fixedColumns: readonly DatagridexColumn<Person>[] = [
+      { key: 'name', header: 'Name', width: 120, resizable: false, sortable: false },
+      { key: 'age', header: 'Age', width: 160, resizable: false, sortable: false },
+    ];
+    const { container } = renderWithSpruce(
+      <Datagridex<Person> rows={rows} columns={fixedColumns} />,
+    );
+
+    expect(container.querySelector<HTMLElement>('.sp-datagridex__grid')?.style.gridTemplateColumns)
+      .toBe('120px 160px minmax(0, 1fr)');
   });
 
   it('uses shared dropdown and popover overlays for column controls', async () => {

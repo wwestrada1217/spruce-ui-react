@@ -1541,6 +1541,10 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
       parts.push('max-content');
     }
 
+    if (!fitColumnsToWidth) {
+      parts.push('minmax(0, 1fr)');
+    }
+
     return parts.join(' ');
   }, [
     rowDetail,
@@ -3044,6 +3048,13 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
                 <div className="sp-datagridex__header-cell sp-datagridex__actions-header" role="columnheader">
                   {resolvedEditLabels.actions}
                 </div>
+              )}
+              {!fitColumnsToWidth && (
+                <div
+                  className="sp-datagridex__header-cell sp-datagridex__header-cell--filler"
+                  role="columnheader"
+                  aria-hidden="true"
+                />
               )}
             </div>
 
