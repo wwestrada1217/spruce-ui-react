@@ -113,6 +113,38 @@ describe('Datagridex', () => {
     expect(document.documentElement).toHaveAttribute('dir', 'rtl');
   });
 
+  it('applies sticky offsets to pinned headers and cells', async () => {
+    const { container } = renderWithSpruce(
+      <Datagridex<Person>
+        rows={rows}
+        columns={columns}
+        selectionMode="multiple"
+        columnPins={{ name: 'left', age: 'right' }}
+      />,
+    );
+
+    const nameHeader = container.querySelector<HTMLElement>('[data-sp-datagridex-column="name"]');
+    const ageHeader = container.querySelector<HTMLElement>('[data-sp-datagridex-column="age"]');
+    const nameCell = container.querySelector<HTMLElement>('[data-sp-datagridex-cell="name"]');
+    const ageCell = container.querySelector<HTMLElement>('[data-sp-datagridex-cell="age"]');
+
+    await waitFor(() => {
+      expect(nameHeader?.style.insetInlineStart).toBe('40px');
+      expect(ageHeader?.style.insetInlineEnd).toBe('0px');
+      expect(nameCell?.style.insetInlineStart).toBe('40px');
+      expect(ageCell?.style.insetInlineEnd).toBe('0px');
+    });
+  });
+
+  it('sizes default columns to intrinsic content', () => {
+    const { container } = renderWithSpruce(
+      <Datagridex<Person> rows={rows} columns={columns} />,
+    );
+
+    expect(container.querySelector<HTMLElement>('.sp-datagridex__grid')?.style.gridTemplateColumns)
+      .toBe('minmax(min-content, max-content) minmax(min-content, max-content)');
+  });
+
   it('renders row spans with accessible span metadata and omits covered cells', () => {
     const spanColumns: readonly DatagridexColumn<Person>[] = [
       { key: 'name', header: 'Name', resizable: false, sortable: false, rowSpan: 2 },

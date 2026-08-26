@@ -32,7 +32,7 @@ const ROW_SPAN_PROJECTS: readonly Project[] = [
 ]
 
 const PROJECT_COLUMNS: readonly DatagridexColumn<Project>[] = [
-  { key: 'name', header: 'Project', editable: true, filterable: true, pinned: 'left' },
+  { key: 'name', header: 'Project', editable: true, filterable: true },
   { key: 'owner', header: 'Owner', filterable: true, filterVariant: 'dynamic' },
   {
     key: 'status',

@@ -312,13 +312,19 @@ export interface DatagridexProps<T extends object = Record<string, unknown>> {
 }
 
 const DEFAULT_COLUMN_WIDTH = 160;
-const DEFAULT_MIN_COLUMN_WIDTH = 96;
+const DEFAULT_MIN_COLUMN_WIDTH = 72;
 const DEFAULT_MAX_COLUMN_WIDTH = 480;
 const DEFAULT_VIRTUAL_OVERSCAN = 6;
 const DEFAULT_COLUMN_VIRTUALIZATION_OVERSCAN = 320;
 const DEFAULT_ROW_DETAIL_HEIGHT = 112;
 const DEFAULT_ROW_NUMBER_WIDTH = 52;
+const DEFAULT_ROW_ACTIONS_WIDTH = 156;
 const DEFAULT_PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
+
+interface DatagridexPinnedColumnOffset {
+  readonly left?: number;
+  readonly right?: number;
+}
 
 const DEFAULT_EDIT_LABELS: DatagridexEditLabels = {
   actions: 'Actions',
@@ -1146,6 +1152,7 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
 
   const gridContainerRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
+  const [pinnedColumnOffsets, setPinnedColumnOffsets] = useState<ReadonlyMap<string, DatagridexPinnedColumnOffset>>(new Map());
 
   const effectiveSelectionMode: DatagridexSelectionMode =
     selectionMode === 'none' && dataContextAdapter?.synchronizeSelection ? 'single' : selectionMode;
@@ -1255,7 +1262,7 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
         : typeof configured === 'string' && configured.endsWith('%')
           ? defaultColumnWidth
           : defaultColumnWidth;
-      return Math.min(column.maxWidth ?? Number.POSITIVE_INFINITY, Math.max(column.minWidth ?? 96, width));
+      return Math.min(column.maxWidth ?? Number.POSITIVE_INFINITY, Math.max(column.minWidth ?? DEFAULT_MIN_COLUMN_WIDTH, width));
     };
     if (!columnVirtualization || centerColumns.length === 0 || horizontalViewportWidth <= 0) {
       return { columns: visibleColumns, beforeWidth: 0, afterWidth: 0 };
@@ -1473,9 +1480,13 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
         const minW = col.minWidth ? `${col.minWidth}px` : 'min-content';
         parts.push(`minmax(${minW}, ${col.flex}fr)`);
       } else {
-        const minW = `${col.minWidth ?? (autoColumnWidth ? DEFAULT_MIN_COLUMN_WIDTH : defaultColumnWidth)}px`;
+        const minW = col.minWidth !== undefined
+          ? `${col.minWidth}px`
+          : autoColumnWidth
+            ? 'min-content'
+            : `${defaultColumnWidth}px`;
         if (autoColumnWidth) {
-          parts.push(`minmax(${minW}, ${col.maxWidth ? `${col.maxWidth}px` : `${DEFAULT_MAX_COLUMN_WIDTH}px`})`);
+          parts.push(`minmax(${minW}, ${fitColumnsToWidth ? '1fr' : col.maxWidth ? `${col.maxWidth}px` : 'max-content'})`);
         } else {
           const width = Math.min(col.maxWidth ?? defaultColumnWidth, Math.max(col.minWidth ?? DEFAULT_MIN_COLUMN_WIDTH, defaultColumnWidth));
           parts.push(`${width}px`);
@@ -1505,8 +1516,110 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
     columnVirtualization,
     columnVirtualLayout,
     columnWidths,
+    fitColumnsToWidth,
     showRowEditActions,
   ]);
+
+  // Measure the rendered tracks so sticky columns remain anchored when column widths,
+  // responsive layout, or row actions change.
+  useEffect(() => {
+    const grid = gridContainerRef.current;
+    if (!grid || !hasPinnedColumns) {
+      return;
+    }
+
+    const measure = () => {
+      const headerCells = new Map(
+        Array.from(
+          grid.querySelectorAll<HTMLElement>('.sp-datagridex__header-row [data-sp-datagridex-column]'),
+        ).flatMap((cell) => {
+          const key = cell.dataset.spDatagridexColumn;
+          return key ? [[key, cell] as const] : [];
+        }),
+      );
+      const widthFor = (column: DatagridexColumn<T>) => {
+        const renderedWidth = headerCells.get(column.key)?.getBoundingClientRect().width ?? 0;
+        if (renderedWidth > 0) return renderedWidth;
+
+        const configured = columnWidths.get(column.key) ?? column.width;
+        const width = typeof configured === 'number' ? configured : defaultColumnWidth;
+        return Math.min(
+          column.maxWidth ?? DEFAULT_MAX_COLUMN_WIDTH,
+          Math.max(column.minWidth ?? DEFAULT_MIN_COLUMN_WIDTH, width),
+        );
+      };
+
+      const next = new Map<string, DatagridexPinnedColumnOffset>();
+      let left =
+        (rowDetail ? 40 : 0) +
+        (hasLeadingRowActions ? Math.max(32, leadingRowActionsWidth) : 0) +
+        (isRowReorder ? 32 : 0) +
+        (effectiveSelectionMode !== 'none' ? 40 : 0) +
+        (showRowNumbers ? DEFAULT_ROW_NUMBER_WIDTH : 0);
+
+      for (const column of visibleColumns) {
+        const pin = columnPinsProp?.[column.key] ?? column.pinned;
+        if (pin === 'left') {
+          next.set(column.key, { left });
+          left += widthFor(column);
+        }
+      }
+
+      const actionsHeader = grid.querySelector<HTMLElement>('.sp-datagridex__actions-header');
+      let right = showRowEditActions
+        ? actionsHeader?.getBoundingClientRect().width || DEFAULT_ROW_ACTIONS_WIDTH
+        : 0;
+      for (const column of [...visibleColumns].reverse()) {
+        const pin = columnPinsProp?.[column.key] ?? column.pinned;
+        if (pin === 'right') {
+          next.set(column.key, { right });
+          right += widthFor(column);
+        }
+      }
+
+      setPinnedColumnOffsets((previous) => {
+        const unchanged =
+          previous.size === next.size &&
+          [...next].every(([key, offset]) => {
+            const current = previous.get(key);
+            return current?.left === offset.left && current?.right === offset.right;
+          });
+        return unchanged ? previous : next;
+      });
+    };
+
+    measure();
+    if (typeof ResizeObserver === 'undefined') return;
+
+    const observer = new ResizeObserver(measure);
+    observer.observe(grid);
+    grid.querySelectorAll<HTMLElement>('.sp-datagridex__header-row [data-sp-datagridex-column]').forEach((cell) => {
+      observer.observe(cell);
+    });
+    const actionsHeader = grid.querySelector<HTMLElement>('.sp-datagridex__actions-header');
+    if (actionsHeader) observer.observe(actionsHeader);
+    return () => observer.disconnect();
+  }, [
+    columnPinsProp,
+    columnWidths,
+    defaultColumnWidth,
+    effectiveSelectionMode,
+    hasLeadingRowActions,
+    hasPinnedColumns,
+    isRowReorder,
+    leadingRowActionsWidth,
+    rowDetail,
+    showRowEditActions,
+    showRowNumbers,
+    visibleColumns,
+  ]);
+
+  const pinnedColumnStyle = (key: string, pin: DatagridexColumnPin | undefined): CSSProperties | undefined => {
+    const offset = pinnedColumnOffsets.get(key);
+    if (pin === 'left' && offset?.left !== undefined) return { insetInlineStart: offset.left };
+    if (pin === 'right' && offset?.right !== undefined) return { insetInlineEnd: offset.right };
+    return undefined;
+  };
 
   const ariaColumnOffset =
     (rowDetail ? 1 : 0) +
@@ -2503,6 +2616,7 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
                     key={col.key}
                     className={headerCellClasses}
                     role="columnheader"
+                    data-sp-datagridex-column={col.key}
                     aria-colindex={visibleColumns.indexOf(col) + ariaColumnOffset + 1}
                     aria-sort={
                       sortItem?.direction === 'asc'
@@ -2512,6 +2626,7 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
                         : 'none'
                     }
                     draggable={reorderable && col.reorderable !== false}
+                    style={pinnedColumnStyle(col.key, pin)}
                     onDragStart={(e) => {
                       setDraggedColumnKey(col.key);
                       setDragGhostPos({ x: e.clientX, y: e.clientY });
@@ -2639,7 +2754,7 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
                             const diff = moveEvent.clientX - startX;
                             const newW = Math.min(
                               col.maxWidth ?? Number.POSITIVE_INFINITY,
-                              Math.max(col.minWidth ?? 96, initialWidth + diff),
+                              Math.max(col.minWidth ?? DEFAULT_MIN_COLUMN_WIDTH, initialWidth + diff),
                             );
                             setColumnWidths((prev) => new Map(prev).set(col.key, newW));
                             onColumnResize?.({ key: col.key, width: newW });
@@ -2668,11 +2783,11 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
                           let next: number | null = null;
                           if (event.key === 'ArrowLeft') next = current - step;
                           if (event.key === 'ArrowRight') next = current + step;
-                          if (event.key === 'Home') next = col.minWidth ?? 96;
+                          if (event.key === 'Home') next = col.minWidth ?? DEFAULT_MIN_COLUMN_WIDTH;
                           if (event.key === 'End') next = col.maxWidth ?? current;
                           if (next === null) return;
                           event.preventDefault();
-                          const bounded = Math.min(col.maxWidth ?? Number.POSITIVE_INFINITY, Math.max(col.minWidth ?? 96, next));
+                          const bounded = Math.min(col.maxWidth ?? Number.POSITIVE_INFINITY, Math.max(col.minWidth ?? DEFAULT_MIN_COLUMN_WIDTH, next));
                           setColumnWidths((prev) => new Map(prev).set(col.key, bounded));
                           onColumnResize?.({ key: col.key, width: bounded });
                         }}
@@ -3082,7 +3197,10 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
                           aria-invalid={isCellInvalid ? true : undefined}
                           data-sp-datagridex-cell={col.key}
                           tabIndex={0}
-                          style={span > 1 ? ({ '--sp-datagridex-row-span': span } as CSSProperties) : undefined}
+                          style={{
+                            ...pinnedColumnStyle(col.key, pin),
+                            ...(span > 1 ? { '--sp-datagridex-row-span': span } : {}),
+                          } as CSSProperties}
                           onDoubleClick={() => {
                             if (isEditable && !isReadonly && editMode === 'cell') {
                               startCellEdit(rowIndex, col.key, cellVal, row);
@@ -3443,14 +3561,23 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
                 {columnVirtualization && columnVirtualLayout.beforeWidth > 0 && (
                   <div className="sp-datagridex__column-virtual-spacer" aria-hidden="true" />
                 )}
-                {renderedColumns.map((col) => {
+                {renderedColumns.map((col, colIdx) => {
                   const agg = footerAggregates.get(col.key);
+                  const pin = columnPinsProp?.[col.key] ?? col.pinned;
                   return (
                     <div
                       key={col.key}
-                      className="sp-datagridex__footer-cell"
+                      className={[
+                        'sp-datagridex__footer-cell',
+                        pin ? 'sp-datagridex__pinned-cell' : '',
+                        pin === 'left' ? 'sp-datagridex__pinned-cell--left' : '',
+                        pin === 'right' ? 'sp-datagridex__pinned-cell--right' : '',
+                        colIdx === leftPinned.length - 1 ? 'sp-datagridex__pinned-cell--boundary' : '',
+                        colIdx === renderedColumns.length - rightPinned.length ? 'sp-datagridex__pinned-cell--boundary' : '',
+                      ].filter(Boolean).join(' ')}
                       role="gridcell"
                       aria-colindex={visibleColumns.indexOf(col) + ariaColumnOffset + 1}
+                      style={pinnedColumnStyle(col.key, pin)}
                     >
                       {agg && (
                         <div className="sp-datagridex__aggregate">
