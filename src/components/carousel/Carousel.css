@@ -68,11 +68,11 @@
 }
 
 .sp-carousel__arrow--prev {
-  left: var(--sp-space-3, 12px);
+  inset-inline-start: var(--sp-space-3, 12px);
 }
 
 .sp-carousel__arrow--next {
-  right: var(--sp-space-3, 12px);
+  inset-inline-end: var(--sp-space-3, 12px);
 }
 
 .sp-carousel:hover .sp-carousel__arrow:not(:disabled),
@@ -90,7 +90,7 @@
   gap: var(--sp-space-1-5, 6px);
   padding: var(--sp-space-1, 4px) var(--sp-space-2, 8px);
   border-radius: var(--sp-radius-full, 9999px);
-  background: rgba(0, 0, 0, 0.35);
+  background: var(--sp-carousel-indicator-bg, color-mix(in srgb, var(--sp-surface-900, #000) 35%, transparent));
 }
 
 .sp-carousel__dot {
@@ -99,7 +99,7 @@
   border-radius: var(--sp-radius-full, 9999px);
   border: none;
   padding: 0;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--sp-carousel-indicator-dot, color-mix(in srgb, var(--sp-surface-0, #fff) 50%, transparent));
   cursor: pointer;
   transition:
     background var(--sp-duration-normal) var(--sp-ease-default),
@@ -107,7 +107,7 @@
 }
 
 .sp-carousel__dot--active {
-  background: #fff;
+  background: var(--sp-carousel-indicator-active, var(--sp-surface-0, #fff));
 }
 
 .sp-carousel__dot--bar {

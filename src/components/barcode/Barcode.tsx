@@ -23,8 +23,12 @@ export interface BarcodeProps {
   height?: number;
   /** Display the value text below barcode. */
   showText?: boolean;
+  /** Angular-parity alias for showText. */
+  showValue?: boolean;
   /** Bar color. Defaults to the current theme text color when empty. */
   color?: string;
+  /** Angular-parity alias for color. */
+  barColor?: string;
   /** Background color (unused — kept for API parity). */
   background?: string;
   /** Show border around barcode. */
@@ -33,17 +37,27 @@ export interface BarcodeProps {
   className?: string;
 }
 
+export type QrCodeEcLevel = 'L' | 'M' | 'Q' | 'H';
+
 export interface QrCodeProps {
   /** Data to encode. */
-  value: string;
+  value?: string;
   /** QR code size in pixels. */
   size?: number;
   /** Foreground color. Defaults to the current theme text color when empty. */
   color?: string;
+  /** Foreground color, aligned with the Angular API. */
+  fgColor?: string;
   /** Background color. Defaults to the current theme surface color when empty. */
   background?: string;
-  /** Error correction level (only M is used internally). */
-  errorCorrection?: 'L' | 'M' | 'Q' | 'H';
+  /** Background color, aligned with the Angular API. */
+  bgColor?: string;
+  /** Error correction level. */
+  errorCorrection?: QrCodeEcLevel;
+  /** Error correction level, aligned with the Angular API. */
+  ecLevel?: QrCodeEcLevel;
+  /** Enable versions 1–40 instead of the compact 1–6 range. */
+  highCapacity?: boolean;
   /** Additional CSS class name(s). */
   className?: string;
 }
@@ -270,30 +284,29 @@ function rsEncode(data: Uint8Array, nsym: number): Uint8Array {
 }
 
 // ── QR version/EC tables ────────────────────────────────────────────────────
-// [totalDataCodewords, ecCodewordsPerBlock, numBlocks] for EC level M, versions 1-6
-const VERSION_TABLE: [number, number, number][] = [
-  [16, 10, 1],   // v1-M
-  [28, 16, 1],   // v2-M
-  [44, 26, 1],   // v3-M
-  [64, 18, 2],   // v4-M
-  [86, 24, 2],   // v5-M
-  [108, 16, 4],  // v6-M
+// Each entry is [ecPerBlock, group1Blocks, group1Data, group2Blocks, group2Data].
+// The table is the ISO/IEC 18004 byte-mode capacity table used by Angular.
+type QrEcEntry = readonly [number, number, number, number, number];
+
+const QR_EC_TABLE: Record<QrCodeEcLevel, readonly QrEcEntry[]> = {
+  L: [[7,1,19,0,0],[10,1,34,0,0],[15,1,55,0,0],[20,1,80,0,0],[26,1,108,0,0],[18,2,68,0,0],[20,2,78,0,0],[24,2,97,0,0],[30,2,116,0,0],[18,2,68,2,69],[20,4,81,0,0],[24,2,92,2,93],[26,4,107,0,0],[30,3,115,1,116],[22,5,87,1,88],[24,5,98,1,99],[28,1,107,5,108],[30,5,120,1,121],[28,3,113,4,114],[28,3,107,5,108],[28,4,116,4,117],[28,2,111,7,112],[30,4,121,5,122],[30,6,117,4,118],[26,8,106,4,107],[28,10,114,2,115],[30,8,122,4,123],[30,3,117,10,118],[30,7,116,7,117],[30,5,115,10,116],[30,13,115,3,116],[30,17,115,0,0],[30,17,115,1,116],[30,13,115,6,116],[30,12,121,7,122],[30,6,121,14,122],[30,17,122,4,123],[30,4,122,18,123],[30,20,117,4,118],[30,19,118,6,119]],
+  M: [[10,1,16,0,0],[16,1,28,0,0],[26,1,44,0,0],[18,2,32,0,0],[24,2,43,0,0],[16,4,27,0,0],[18,4,31,0,0],[22,2,38,2,39],[22,3,36,2,37],[26,4,43,1,44],[30,1,50,4,51],[22,6,36,2,37],[22,8,37,1,38],[24,4,40,5,41],[24,5,41,5,42],[28,7,45,3,46],[28,10,46,1,47],[26,9,43,4,44],[26,3,44,11,45],[26,3,41,13,42],[26,17,42,0,0],[28,17,46,0,0],[28,4,47,14,48],[28,6,45,14,46],[28,8,47,13,48],[28,19,46,4,47],[28,22,45,3,46],[28,3,45,23,46],[28,21,45,7,46],[28,19,47,10,48],[28,2,46,29,47],[28,10,46,23,47],[28,14,46,21,47],[28,14,46,23,47],[28,12,47,26,48],[28,6,47,34,48],[28,29,46,14,47],[28,13,46,32,47],[28,40,47,7,48],[28,18,47,31,48]],
+  Q: [[13,1,13,0,0],[22,1,22,0,0],[18,2,17,0,0],[26,2,24,0,0],[18,2,15,2,16],[24,4,19,0,0],[18,2,14,4,15],[22,4,18,2,19],[20,4,16,4,17],[24,6,19,2,20],[28,4,22,4,23],[26,4,20,6,21],[24,8,20,4,21],[20,11,16,5,17],[30,5,24,7,25],[24,15,19,2,20],[28,1,22,15,23],[28,17,22,1,23],[26,17,21,4,22],[30,15,24,5,25],[28,17,22,6,23],[30,7,24,16,25],[30,11,24,14,25],[30,11,24,16,25],[30,7,24,22,25],[28,28,22,6,23],[30,8,23,26,24],[30,4,24,31,25],[30,1,23,37,24],[30,15,24,25,25],[30,42,24,1,25],[30,10,24,35,25],[30,29,24,19,25],[30,44,24,7,25],[30,39,24,14,25],[30,46,24,10,25],[30,49,24,10,25],[30,48,24,14,25],[30,43,24,22,25],[30,34,24,34,25]],
+  H: [[17,1,9,0,0],[28,1,16,0,0],[22,2,13,0,0],[16,4,9,0,0],[22,2,11,2,12],[28,4,15,0,0],[26,4,13,1,14],[26,4,14,2,15],[24,4,12,4,13],[28,6,15,2,16],[24,3,12,8,13],[28,7,14,4,15],[22,12,11,4,12],[24,11,12,5,13],[24,11,12,7,13],[30,3,15,13,16],[28,2,14,17,15],[28,2,14,19,15],[26,9,13,16,14],[28,15,15,10,16],[30,19,16,6,17],[24,34,13,0,0],[30,16,15,14,16],[30,30,16,2,17],[30,22,15,13,16],[30,33,16,4,17],[30,12,15,28,16],[30,11,15,31,16],[30,19,15,26,16],[30,23,15,25,16],[30,23,15,28,16],[30,19,15,35,16],[30,11,15,46,16],[30,59,16,1,17],[30,22,15,41,16],[30,2,15,64,16],[30,24,15,46,16],[30,42,15,32,16],[30,10,15,67,16],[30,20,15,61,16]],
+};
+
+const ALIGNMENT_POSITIONS: readonly number[][] = [
+  [],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170],
 ];
 
-const ALIGNMENT_POSITIONS: number[][] = [
-  [],       // v1
-  [6, 18],  // v2
-  [6, 22],  // v3
-  [6, 26],  // v4
-  [6, 30],  // v5
-  [6, 34],  // v6
-];
+const FORMAT_BITS: Record<QrCodeEcLevel, readonly number[]> = {
+  L: [0x77c4,0x72f3,0x7daa,0x789d,0x662f,0x6318,0x6c41,0x6976],
+  M: [0x5412,0x5125,0x5e7c,0x5b4b,0x45f9,0x40ce,0x4f97,0x4aa0],
+  Q: [0x355f,0x3068,0x3f31,0x3a06,0x24b4,0x2183,0x2eda,0x2bed],
+  H: [0x1689,0x13be,0x1ce7,0x19d0,0x0762,0x0255,0x0d0c,0x083b],
+};
 
-// Format info bits for EC level M (00) with mask patterns 0-7
-const FORMAT_BITS: number[] = [
-  0x5412, 0x5125, 0x5E7C, 0x5B4B,
-  0x45F9, 0x40CE, 0x4F97, 0x4AA0,
-];
+const VERSION_BITS: readonly number[] = [0x07c94,0x085bc,0x09a99,0x0a4d3,0x0bbf6,0x0c762,0x0d847,0x0e60d,0x0f928,0x10b78,0x1145d,0x12a17,0x13532,0x149a6,0x15683,0x168c9,0x177ec,0x18ec4,0x191e1,0x1afab,0x1b08e,0x1cc1a,0x1d33f,0x1ed75,0x1f250,0x209d5,0x216f0,0x228ba,0x2379f,0x24b0b,0x2542e,0x26a64,0x27541,0x28c69];
 
 function qrMatrixSize(version: number): number {
   return 17 + version * 4;
@@ -301,18 +314,23 @@ function qrMatrixSize(version: number): number {
 
 // ── Data encoding (byte mode) ───────────────────────────────────────────────
 
-function encodeQrData(text: string, version: number): Uint8Array {
-  const vInfo = VERSION_TABLE[version - 1];
-  const totalData = vInfo[0];
+function totalDataCodewords(version: number, ecLevel: QrCodeEcLevel): number {
+  const [, group1Blocks, group1Data, group2Blocks, group2Data] = QR_EC_TABLE[ecLevel][version - 1];
+  return group1Blocks * group1Data + group2Blocks * group2Data;
+}
+
+function encodeQrData(text: string, version: number, ecLevel: QrCodeEcLevel): Uint8Array {
+  const totalData = totalDataCodewords(version, ecLevel);
   const bytes = new TextEncoder().encode(text);
   const bits: number[] = [];
 
   // Mode indicator: byte mode = 0100
   bits.push(0, 1, 0, 0);
 
-  // Character count (8 bits for v1-9)
+  // Character count (8 bits for v1-9, 16 bits for v10-40)
   const count = bytes.length;
-  for (let i = 7; i >= 0; i--) bits.push((count >> i) & 1);
+  const countBits = version <= 9 ? 8 : 16;
+  for (let i = countBits - 1; i >= 0; i--) bits.push((count >> i) & 1);
 
   // Data
   for (const b of bytes) {
@@ -347,20 +365,21 @@ function encodeQrData(text: string, version: number): Uint8Array {
 
 // ── Interleave blocks + EC ──────────────────────────────────────────────────
 
-function addErrorCorrection(data: Uint8Array, version: number): Uint8Array {
-  const vInfo = VERSION_TABLE[version - 1];
-  const [totalData, ecPerBlock, numBlocks] = vInfo;
-  const dataPerBlock = Math.floor(totalData / numBlocks);
-  const extraBlocks = totalData - dataPerBlock * numBlocks;
-
+function addErrorCorrection(data: Uint8Array, version: number, ecLevel: QrCodeEcLevel): Uint8Array {
+  const [ecPerBlock, group1Blocks, group1Data, group2Blocks, group2Data] = QR_EC_TABLE[ecLevel][version - 1];
   const dataBlocks: Uint8Array[] = [];
   const ecBlocks: Uint8Array[] = [];
   let offset = 0;
 
-  for (let i = 0; i < numBlocks; i++) {
-    const blockLen = dataPerBlock + (i >= numBlocks - extraBlocks ? 1 : 0);
-    const block = data.subarray(offset, offset + blockLen);
-    offset += blockLen;
+  for (let i = 0; i < group1Blocks; i++) {
+    const block = data.subarray(offset, offset + group1Data);
+    offset += group1Data;
+    dataBlocks.push(block);
+    ecBlocks.push(rsEncode(block, ecPerBlock));
+  }
+  for (let i = 0; i < group2Blocks; i++) {
+    const block = data.subarray(offset, offset + group2Data);
+    offset += group2Data;
     dataBlocks.push(block);
     ecBlocks.push(rsEncode(block, ecPerBlock));
   }
@@ -375,9 +394,7 @@ function addErrorCorrection(data: Uint8Array, version: number): Uint8Array {
   }
   // Interleave EC
   for (let i = 0; i < ecPerBlock; i++) {
-    for (const block of ecBlocks) {
-      if (i < block.length) result.push(block[i]);
-    }
+    for (const block of ecBlocks) result.push(block[i]);
   }
 
   return new Uint8Array(result);
@@ -435,6 +452,30 @@ function reserveFormatArea(m: Matrix): void {
   if (m[8][8] === null) m[8][8] = false;
   // Dark module
   m[size - 8][8] = true;
+}
+
+function reserveVersionArea(m: Matrix, version: number): void {
+  if (version < 7) return;
+  const size = m.length;
+  for (let i = 0; i < 6; i++) {
+    for (let j = 0; j < 3; j++) {
+      if (m[i][size - 11 + j] === null) m[i][size - 11 + j] = false;
+      if (m[size - 11 + j][i] === null) m[size - 11 + j][i] = false;
+    }
+  }
+}
+
+function writeVersionInfo(m: Matrix, version: number): void {
+  if (version < 7) return;
+  const size = m.length;
+  const bits = VERSION_BITS[version - 7];
+  for (let k = 0; k < 18; k++) {
+    const bit = ((bits >> k) & 1) === 1;
+    const r = Math.floor(k / 3);
+    const c = k % 3;
+    m[size - 11 + c][r] = bit;
+    m[r][size - 11 + c] = bit;
+  }
 }
 
 function placeQrData(m: Matrix, data: Uint8Array): void {
@@ -515,6 +556,15 @@ function getReservedMask(m: Matrix, version: number): boolean[][] {
     }
   }
 
+  if (version >= 7) {
+    for (let i = 0; i < 6; i++) {
+      for (let j = 0; j < 3; j++) {
+        reserved[i][size - 11 + j] = true;
+        reserved[size - 11 + j][i] = true;
+      }
+    }
+  }
+
   // Dark module
   reserved[size - 8][8] = true;
 
@@ -536,9 +586,9 @@ function applyMask(m: Matrix, reserved: boolean[][], maskIdx: number): Matrix {
   return masked;
 }
 
-function writeFormatInfo(m: Matrix, maskIdx: number): void {
+function writeFormatInfo(m: Matrix, ecLevel: QrCodeEcLevel, maskIdx: number): void {
   const size = m.length;
-  const bits = FORMAT_BITS[maskIdx];
+  const bits = FORMAT_BITS[ecLevel][maskIdx];
 
   // Horizontal: left of top-right finder
   for (let i = 0; i < 8; i++) {
@@ -628,16 +678,20 @@ function penaltyScore(m: Matrix): number {
 
 // ── Main QR generation ──────────────────────────────────────────────────────
 
-function generateQR(text: string): boolean[][] | null {
+function qrByteCapacity(version: number, ecLevel: QrCodeEcLevel): number {
+  const totalData = totalDataCodewords(version, ecLevel);
+  return totalData - Math.ceil((4 + (version <= 9 ? 8 : 16)) / 8);
+}
+
+function generateQR(text: string, ecLevel: QrCodeEcLevel, maxVersion: number): boolean[][] | null {
   if (!text) return null;
 
   const byteLen = new TextEncoder().encode(text).length;
 
-  // Find smallest version that fits
+  // Find the smallest version that fits at the requested EC level.
   let version = 0;
-  for (let v = 1; v <= 6; v++) {
-    const capacity = VERSION_TABLE[v - 1][0] - 3; // minus mode + count overhead
-    if (byteLen <= capacity) { version = v; break; }
+  for (let v = 1; v <= maxVersion; v++) {
+    if (byteLen <= qrByteCapacity(v, ecLevel)) { version = v; break; }
   }
   if (version === 0) return null; // too long
 
@@ -662,10 +716,11 @@ function generateQR(text: string): boolean[][] | null {
 
   placeTimingPatterns(m);
   reserveFormatArea(m);
+  reserveVersionArea(m, version);
 
   // Encode & place data
-  const encodedData = encodeQrData(text, version);
-  const finalData = addErrorCorrection(encodedData, version);
+  const encodedData = encodeQrData(text, version, ecLevel);
+  const finalData = addErrorCorrection(encodedData, version, ecLevel);
   placeQrData(m, finalData);
 
   // Try all masks, pick lowest penalty
@@ -675,13 +730,15 @@ function generateQR(text: string): boolean[][] | null {
 
   for (let maskIdx = 0; maskIdx < 8; maskIdx++) {
     const masked = applyMask(m, reserved, maskIdx);
-    writeFormatInfo(masked, maskIdx);
+    writeFormatInfo(masked, ecLevel, maskIdx);
+    writeVersionInfo(masked, version);
     const s = penaltyScore(masked);
     if (s < bestScore) { bestScore = s; bestMask = maskIdx; }
   }
 
   const final = applyMask(m, reserved, bestMask);
-  writeFormatInfo(final, bestMask);
+  writeFormatInfo(final, ecLevel, bestMask);
+  writeVersionInfo(final, version);
 
   return final.map(row => row.map(cell => cell === true));
 }
@@ -694,12 +751,16 @@ export function Barcode({
   width = 200,
   height = 60,
   showText = true,
+  showValue,
   color = '',
+  barColor,
   bordered = false,
   className = '',
 }: BarcodeProps) {
   const encoded = useMemo(() => encodeByFormat(format, value), [format, value]);
   const displayValue = encoded?.displayValue ?? value;
+  const resolvedShowValue = showValue ?? showText;
+  const resolvedBarColor = barColor || color;
 
   const svgData = useMemo(() => {
     if (!encoded) return { modules: [] as { x: number; w: number }[], viewBox: '0 0 0 0', barHeight: 0 };
@@ -756,11 +817,11 @@ export function Barcode({
             y={0}
             width={bar.w}
             height={svgData.barHeight}
-            style={color ? { fill: color } : undefined}
+            style={resolvedBarColor ? { fill: resolvedBarColor } : undefined}
           />
         ))}
       </svg>
-      {showText && (
+      {resolvedShowValue && (
         <figcaption className="sp-barcode__label">{displayValue}</figcaption>
       )}
     </figure>
@@ -772,13 +833,24 @@ export function Barcode({
 const QR_QUIET_ZONE = 4;
 
 export function QrCode({
-  value,
+  value = '',
   size = 200,
   color = '',
+  fgColor,
   background = '',
+  bgColor,
+  errorCorrection = 'M',
+  ecLevel,
+  highCapacity = false,
   className = '',
 }: QrCodeProps) {
-  const modules = useMemo(() => generateQR(value), [value]);
+  const resolvedEcLevel = ecLevel ?? errorCorrection;
+  const resolvedFgColor = fgColor || color;
+  const resolvedBgColor = bgColor || background;
+  const modules = useMemo(
+    () => generateQR(value, resolvedEcLevel, highCapacity ? 40 : 6),
+    [highCapacity, resolvedEcLevel, value],
+  );
 
   const svgSize = useMemo(() => {
     if (!modules) return 0;
@@ -807,7 +879,7 @@ export function QrCode({
           y={0}
           width={svgSize}
           height={svgSize}
-          style={background ? { fill: background } : undefined}
+          style={resolvedBgColor ? { fill: resolvedBgColor } : undefined}
         />
         {modules.map((row, r) =>
           row.map(
@@ -820,7 +892,7 @@ export function QrCode({
                   y={r + QR_QUIET_ZONE}
                   width={1}
                   height={1}
-                  style={color ? { fill: color } : undefined}
+                  style={resolvedFgColor ? { fill: resolvedFgColor } : undefined}
                 />
               ),
           ),

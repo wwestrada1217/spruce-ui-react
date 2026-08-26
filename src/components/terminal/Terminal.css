@@ -8,6 +8,7 @@
 /* ── Shell ───────────────────────────────────────────────────────── */
 
 .sp-terminal {
+  direction: ltr;
   background: var(--sp-chrome-background, var(--sp-terminal-bg, #0d1117));
   border-radius: var(--sp-chrome-radius, var(--sp-radius-lg));
   border: 1px solid var(--sp-chrome-border, transparent);
@@ -29,6 +30,22 @@
   --sp-chrome-background: var(--sp-terminal-bg, #0d1117);
   --sp-chrome-border: var(--sp-terminal-border, #30363d);
   --sp-chrome-shadow: var(--sp-shadow-md);
+}
+
+.sp-terminal--light {
+  --sp-terminal-bg: var(--sp-surface-0, #fff);
+  --sp-terminal-bar-bg: var(--sp-surface-100, #f1f3f6);
+  --sp-terminal-border: var(--sp-border, #d8dee4);
+  --sp-terminal-title-color: var(--sp-text-muted, #57606a);
+  --sp-terminal-clear-hover: var(--sp-text-color, #24292f);
+  --sp-terminal-ts-color: var(--sp-text-subtle, #6e7781);
+  --sp-terminal-log: var(--sp-text-color, #24292f);
+  --sp-terminal-cursor: var(--sp-text-color, #24292f);
+  --sp-terminal-info: var(--sp-info, #0969da);
+  --sp-terminal-warn: var(--sp-warning, #9a6700);
+  --sp-terminal-error: var(--sp-danger, #cf222e);
+  --sp-terminal-success: var(--sp-success, #1a7f37);
+  --sp-terminal-debug: var(--sp-secondary, #8250df);
 }
 
 /* ── Titlebar ─────────────────────────────────────────────────── */

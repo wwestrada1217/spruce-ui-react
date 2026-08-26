@@ -38,28 +38,28 @@
   padding: var(--sp-space-1, 4px) var(--sp-space-2-5, 10px);
   font-size: var(--sp-text-xs, 12px);
   font-weight: var(--sp-font-semibold, 600);
-  color: #fff;
-  background: rgba(0, 0, 0, 0.5);
+  color: var(--sp-image-compare-label-text, var(--sp-surface-0, #fff));
+  background: var(--sp-image-compare-label-bg, color-mix(in srgb, var(--sp-surface-900, #000) 50%, transparent));
   border-radius: var(--sp-radius-sm, 4px);
   pointer-events: none;
   z-index: 1;
 }
 .sp-image-compare__label--before {
   top: var(--sp-space-3, 12px);
-  left: var(--sp-space-3, 12px);
+  inset-inline-start: var(--sp-space-3, 12px);
 }
 .sp-image-compare__label--after {
   bottom: var(--sp-space-3, 12px);
-  right: var(--sp-space-3, 12px);
+  inset-inline-end: var(--sp-space-3, 12px);
 }
 
 .sp-image-compare--vertical .sp-image-compare__label--before {
   top: var(--sp-space-3, 12px);
-  left: var(--sp-space-3, 12px);
+  inset-inline-start: var(--sp-space-3, 12px);
 }
 .sp-image-compare--vertical .sp-image-compare__label--after {
   bottom: var(--sp-space-3, 12px);
-  left: var(--sp-space-3, 12px);
+  inset-inline-start: var(--sp-space-3, 12px);
 }
 
 /* -- Slider line ---------------------------------------------------- */
@@ -76,14 +76,13 @@
   width: 3px;
   transform: translateX(-50%);
   cursor: ew-resize;
-  background: #fff;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+  background: var(--sp-image-compare-divider, var(--sp-surface-0, #fff));
+  box-shadow: var(--sp-image-compare-divider-shadow, 0 0 4px color-mix(in srgb, var(--sp-surface-900, #000) 30%, transparent));
 }
 
 /* Vertical: horizontal line */
 .sp-image-compare--vertical .sp-image-compare__slider {
-  left: 0;
-  right: 0;
+  inset-inline: 0;
   height: 3px;
   transform: translateY(-50%);
   cursor: ns-resize;
@@ -106,8 +105,8 @@
   width: 36px;
   height: 36px;
   border-radius: var(--sp-radius-full, 9999px);
-  background: #fff;
-  border: 2px solid rgba(0, 0, 0, 0.12);
+  background: var(--sp-image-compare-handle-bg, var(--sp-surface-0, #fff));
+  border: 2px solid var(--sp-image-compare-handle-border, var(--sp-border, rgba(0, 0, 0, 0.12)));
   box-shadow: var(--sp-shadow-md);
   color: var(--sp-text-muted, #4a5568);
   transition: box-shadow var(--sp-duration-normal) var(--sp-ease-default);

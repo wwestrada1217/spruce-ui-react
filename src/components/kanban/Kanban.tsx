@@ -17,6 +17,7 @@ export interface KanbanCard {
   id: string;
   title: string;
   description?: string;
+  draggable?: boolean;
   [key: string]: unknown;
 }
 
@@ -25,6 +26,10 @@ export interface KanbanColumn {
   title: string;
   cards: KanbanCard[];
   color?: string;
+  emptyMessage?: string;
+  acceptsFrom?: string[];
+  allowedTransitions?: string[];
+  canDrop?: (card: KanbanCard, fromColumn: KanbanColumn) => boolean;
 }
 
 export interface KanbanCardMoveEvent {
@@ -49,6 +54,10 @@ export interface KanbanProps {
   radius?: Radius;
   border?: Border;
   columnDraggable?: boolean;
+  cardDraggable?: boolean | ((card: KanbanCard, column: KanbanColumn) => boolean);
+  canMoveCard?: (args: { card: KanbanCard; fromColumn: KanbanColumn; toColumn: KanbanColumn }) => boolean;
+  canDropCard?: (card: KanbanCard, fromColumn: KanbanColumn, toColumn: KanbanColumn) => boolean;
+  emptyMessage?: string;
   ariaLabel?: string;
   cardRenderer?: (card: KanbanCard, column: KanbanColumn) => ReactNode;
   columnHeaderRenderer?: (column: KanbanColumn, count: number) => ReactNode;
@@ -65,6 +74,10 @@ export function Kanban({
   radius,
   border = 'default',
   columnDraggable = true,
+  cardDraggable = true,
+  canMoveCard,
+  canDropCard,
+  emptyMessage,
   ariaLabel,
   cardRenderer,
   columnHeaderRenderer,
@@ -73,7 +86,7 @@ export function Kanban({
   onCardClicked,
 }: KanbanProps) {
   const { t } = useI18n();
-  const resolvedAriaLabel = ariaLabel ?? 'Kanban board';
+  const resolvedAriaLabel = ariaLabel ?? t('kanbanBoard');
   /* ── Internal drag state ──────────────────────────────────────────────── */
 
   const [dragType, setDragType] = useState<'card' | 'column' | null>(null);
@@ -96,6 +109,26 @@ export function Kanban({
   const dropTargetCardIdRef = useRef<string | null>(null);
   const dropPositionRef = useRef<'above' | 'below' | null>(null);
   const dragTypeRef = useRef<'card' | 'column' | null>(null);
+
+  const mayMoveCard = useCallback(
+    (card: KanbanCard, fromColumn: KanbanColumn, toColumn: KanbanColumn): boolean => {
+      if (fromColumn.id !== toColumn.id) {
+        if (fromColumn.allowedTransitions && !fromColumn.allowedTransitions.includes(toColumn.id)) return false;
+        if (toColumn.acceptsFrom && !toColumn.acceptsFrom.includes(fromColumn.id)) return false;
+      }
+      if (toColumn.canDrop && !toColumn.canDrop(card, fromColumn)) return false;
+      if (canMoveCard && !canMoveCard({ card, fromColumn, toColumn })) return false;
+      if (canDropCard && !canDropCard(card, fromColumn, toColumn)) return false;
+      return true;
+    },
+    [canDropCard, canMoveCard],
+  );
+
+  const isCardDraggable = useCallback(
+    (card: KanbanCard, column: KanbanColumn) =>
+      card.draggable !== false && (typeof cardDraggable === 'function' ? cardDraggable(card, column) : cardDraggable),
+    [cardDraggable],
+  );
 
   /* ── Helpers ──────────────────────────────────────────────────────────── */
 
@@ -144,12 +177,14 @@ export function Kanban({
   }, [resetCardDragState]);
 
   const onCardDragOver = useCallback(
-    (event: DragEvent<HTMLDivElement>, card: KanbanCard, _cardIdx: number, currentDraggingCardId: string | null) => {
+    (event: DragEvent<HTMLDivElement>, card: KanbanCard, targetCol: KanbanColumn, currentDraggingCardId: string | null) => {
       if (dragTypeRef.current !== 'card') return;
+      if (card.id === currentDraggingCardId) return;
+      const sourceCol = columns.find((column) => column.id === dragSourceColumnId);
+      const sourceCard = sourceCol?.cards.find((candidate) => candidate.id === currentDraggingCardId);
+      if (!sourceCol || !sourceCard || !mayMoveCard(sourceCard, sourceCol, targetCol)) return;
       event.preventDefault();
       event.stopPropagation();
-
-      if (card.id === currentDraggingCardId) return;
 
       const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
       const midY = rect.top + rect.height / 2;
@@ -160,16 +195,19 @@ export function Kanban({
       setDropPosition(pos);
       dropPositionRef.current = pos;
     },
-    [],
+    [columns, dragSourceColumnId, mayMoveCard],
   );
 
   const onCardListDragOver = useCallback(
     (event: DragEvent<HTMLDivElement>, col: KanbanColumn) => {
       if (dragTypeRef.current !== 'card') return;
+      const sourceCol = columns.find((column) => column.id === dragSourceColumnId);
+      const card = sourceCol?.cards.find((candidate) => candidate.id === draggingCardId);
+      if (!sourceCol || !card || !mayMoveCard(card, sourceCol, col)) return;
       event.preventDefault();
       setDragOverColumnId(col.id);
     },
-    [],
+    [columns, dragSourceColumnId, draggingCardId, mayMoveCard],
   );
 
   const onCardListDragLeave = useCallback((event: DragEvent<HTMLDivElement>) => {
@@ -205,7 +243,7 @@ export function Kanban({
 
       const fromCol = columns.find((c) => c.id === fromColId);
       const card = fromCol?.cards.find((c) => c.id === cardId);
-      if (!fromCol || !card) {
+      if (!fromCol || !card || !mayMoveCard(card, fromCol, targetCol)) {
         resetCardDragState();
         return;
       }
@@ -238,7 +276,7 @@ export function Kanban({
 
       resetCardDragState();
     },
-    [columns, onCardMoved, resetCardDragState],
+    [columns, mayMoveCard, onCardMoved, resetCardDragState],
   );
 
   /* ── Column drag & drop ───────────────────────────────────────────────── */
@@ -319,7 +357,7 @@ export function Kanban({
       // Move card up within column
       if (event.key === 'ArrowUp' && event.altKey) {
         event.preventDefault();
-        if (cardIdx > 0) {
+        if (cardIdx > 0 && mayMoveCard(card, col, col)) {
           onCardMoved?.({
             card,
             fromColumnId: col.id,
@@ -334,7 +372,7 @@ export function Kanban({
       // Move card down within column
       if (event.key === 'ArrowDown' && event.altKey) {
         event.preventDefault();
-        if (cardIdx < col.cards.length - 1) {
+        if (cardIdx < col.cards.length - 1 && mayMoveCard(card, col, col)) {
           onCardMoved?.({
             card,
             fromColumnId: col.id,
@@ -351,6 +389,7 @@ export function Kanban({
         event.preventDefault();
         if (colIdx > 0) {
           const prevCol = columns[colIdx - 1];
+          if (!mayMoveCard(card, col, prevCol)) return;
           onCardMoved?.({
             card,
             fromColumnId: col.id,
@@ -367,6 +406,7 @@ export function Kanban({
         event.preventDefault();
         if (colIdx < columns.length - 1) {
           const nextCol = columns[colIdx + 1];
+          if (!mayMoveCard(card, col, nextCol)) return;
           onCardMoved?.({
             card,
             fromColumnId: col.id,
@@ -378,7 +418,7 @@ export function Kanban({
         return;
       }
     },
-    [columns, onCardMoved, onCardClicked],
+    [columns, mayMoveCard, onCardMoved, onCardClicked],
   );
 
   /* ── Render ──────────────────────────────────────────────────────────── */
@@ -458,13 +498,13 @@ export function Kanban({
                     key={card.id}
                     className={cardClasses}
                     role="listitem"
-                    draggable
+                    draggable={isCardDraggable(card, col)}
                     aria-label={card.title}
                     aria-roledescription="Draggable card"
                     tabIndex={0}
                     onDragStart={(e) => onCardDragStart(e, card, col, cardIdx)}
                     onDragEnd={onCardDragEnd}
-                    onDragOver={(e) => onCardDragOver(e, card, cardIdx, draggingCardId)}
+                    onDragOver={(e) => onCardDragOver(e, card, col, draggingCardId)}
                     onKeyDown={(e) => onCardKeydown(e, card, col, cardIdx)}
                   >
                     {cardRenderer ? (
@@ -483,7 +523,9 @@ export function Kanban({
 
               {/* Empty column drop zone */}
               {col.cards.length === 0 && (
-                <div className="sp-kanban__empty-zone">{t('dropCardsHere')}</div>
+                <div className="sp-kanban__empty-zone">
+                  {col.emptyMessage ?? emptyMessage ?? t('dropCardsHere')}
+                </div>
               )}
             </div>
           </div>

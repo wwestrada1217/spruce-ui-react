@@ -99,6 +99,8 @@ export interface TerminalProps {
   title?: string;
   /** Show timestamp column before each entry. */
   showTimestamp?: boolean;
+  /** Angular-parity plural form for timestamp visibility. */
+  showTimestamps?: boolean;
   /** Show level badge labels. */
   showLevelBadge?: boolean;
   /** Show a "clear" button in the titlebar. */
@@ -112,6 +114,14 @@ export interface TerminalProps {
   maxEntries?: number;
   /** Max height CSS value (e.g. '260px'). */
   maxHeight?: string;
+  /** Terminal palette. */
+  theme?: 'dark' | 'light';
+  /** Render only the visible entry window for large logs. */
+  virtualScroll?: boolean;
+  /** Fixed virtual row height in pixels. */
+  virtualItemHeight?: number;
+  /** Extra rows rendered above and below the viewport. */
+  virtualOverscan?: number;
   /** Accessible label for the log region. */
   ariaLabel?: string;
   /** Emitted when the user clicks the clear button. */
@@ -123,7 +133,8 @@ export interface TerminalProps {
 export function Terminal({
   entries = [],
   title = 'terminal',
-  showTimestamp = true,
+  showTimestamp,
+  showTimestamps = true,
   showLevelBadge = true,
   clearable = true,
   bordered = true,
@@ -132,18 +143,38 @@ export function Terminal({
   border,
   maxEntries = 500,
   maxHeight,
+  theme = 'dark',
+  virtualScroll = true,
+  virtualItemHeight = 24,
+  virtualOverscan = 8,
   ariaLabel = 'Terminal output',
   onClear,
 }: TerminalProps) {
   const { t } = useI18n();
   const resolvedAriaLabel = ariaLabel === 'Terminal output' ? t('terminalOutput') : ariaLabel;
   const bodyRef = useRef<HTMLDivElement>(null);
+  const [scrollTop, setScrollTop] = useState(0);
+  const [viewportHeight, setViewportHeight] = useState(240);
+  const resolvedShowTimestamps = showTimestamp ?? showTimestamps;
 
   /* Resolve entries with max cap */
   const resolvedEntries =
     maxEntries > 0 && entries.length > maxEntries
       ? entries.slice(entries.length - maxEntries)
       : entries;
+
+  const virtualStart = virtualScroll
+    ? Math.max(0, Math.floor(scrollTop / virtualItemHeight) - virtualOverscan)
+    : 0;
+  const virtualEnd = virtualScroll
+    ? Math.min(
+        resolvedEntries.length,
+        Math.ceil((scrollTop + viewportHeight) / virtualItemHeight) + virtualOverscan,
+      )
+    : resolvedEntries.length;
+  const renderedEntries = virtualScroll
+    ? resolvedEntries.slice(virtualStart, virtualEnd)
+    : resolvedEntries;
 
   /* Auto-scroll to bottom */
   useEffect(() => {
@@ -161,6 +192,7 @@ export function Terminal({
 
   const shellCls = [
     'sp-terminal',
+    `sp-terminal--${theme}`,
     bordered ? 'sp-terminal--bordered' : '',
     `sp-chrome--${chrome}`,
     radius && `sp-radius--${radius}`,
@@ -196,13 +228,24 @@ export function Terminal({
       </div>
 
       {/* Output */}
-      <div className="sp-terminal__body" ref={bodyRef}>
-        {resolvedEntries.map((entry) => (
+      <div
+        className="sp-terminal__body"
+        ref={bodyRef}
+        onScroll={(event) => {
+          setScrollTop(event.currentTarget.scrollTop);
+          setViewportHeight(event.currentTarget.clientHeight || 240);
+        }}
+      >
+        {virtualScroll && virtualStart > 0 && (
+          <div aria-hidden="true" style={{ height: virtualStart * virtualItemHeight }} />
+        )}
+        {renderedEntries.map((entry) => (
           <div
             key={entry.id}
             className={`sp-terminal__line sp-terminal__line--${entry.level}`}
+            style={virtualScroll ? { minHeight: virtualItemHeight } : undefined}
           >
-            {showTimestamp && (
+            {resolvedShowTimestamps && (
               <span className="sp-terminal__ts">
                 {formatTimestamp(entry.timestamp)}
               </span>
@@ -218,6 +261,9 @@ export function Terminal({
             <span className="sp-terminal__msg">{entry.message}</span>
           </div>
         ))}
+        {virtualScroll && virtualEnd < resolvedEntries.length && (
+          <div aria-hidden="true" style={{ height: (resolvedEntries.length - virtualEnd) * virtualItemHeight }} />
+        )}
         {resolvedEntries.length === 0 && (
           <div className="sp-terminal__empty">{t('noOutputYet')}</div>
         )}

@@ -166,6 +166,8 @@ export function ImageComparePage() {
                 <tr><td><code>showLabels</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show before/after labels</td></tr>
                 <tr><td><code>orientation</code></td><td><code>'horizontal' | 'vertical'</code></td><td><code>'horizontal'</code></td><td>Slider orientation</td></tr>
                 <tr><td><code>initialPosition</code></td><td><code>number</code></td><td><code>50</code></td><td>Initial slider position (0-100)</td></tr>
+                <tr><td><code>position</code></td><td><code>number</code></td><td>-</td><td>Controlled slider position (0-100)</td></tr>
+                <tr><td><code>onPositionChange</code></td><td><code>(position: number) =&gt; void</code></td><td>-</td><td>Called after pointer or keyboard changes</td></tr>
                 <tr><td><code>ariaLabel</code></td><td><code>string</code></td><td><code>'Image comparison'</code></td><td>Accessible label for the component</td></tr>
               </tbody>
             </table>

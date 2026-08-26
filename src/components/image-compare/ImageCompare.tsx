@@ -27,6 +27,10 @@ export interface ImageCompareProps {
   orientation?: ImageCompareOrientation;
   /** Initial slider position (0-100) */
   initialPosition?: number;
+  /** Controlled slider position (0-100). */
+  position?: number;
+  /** Called after the slider position changes. */
+  onPositionChange?: (position: number) => void;
   /** Accessible label */
   ariaLabel?: string;
   /** Additional CSS class */
@@ -43,6 +47,8 @@ export function ImageCompare({
   showLabels = true,
   orientation = 'horizontal',
   initialPosition = 50,
+  position: controlledPosition,
+  onPositionChange,
   ariaLabel,
   className = '',
   style,
@@ -51,7 +57,17 @@ export function ImageCompare({
   const resolvedBeforeLabel = beforeLabel ?? t('before');
   const resolvedAfterLabel = afterLabel ?? t('after');
   const resolvedAriaLabel = ariaLabel ?? t('imageComparisonSlider');
-  const [position, setPosition] = useState(initialPosition);
+  const [internalPosition, setInternalPosition] = useState(() => Math.max(0, Math.min(100, initialPosition)));
+  const isControlled = controlledPosition !== undefined;
+  const position = Math.max(0, Math.min(100, isControlled ? controlledPosition : internalPosition));
+  const updatePosition = useCallback(
+    (nextPosition: number | ((current: number) => number)) => {
+      const next = Math.max(0, Math.min(100, typeof nextPosition === 'function' ? nextPosition(position) : nextPosition));
+      if (!isControlled) setInternalPosition(next);
+      onPositionChange?.(next);
+    },
+    [isControlled, onPositionChange, position],
+  );
   const containerRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
 
@@ -72,15 +88,14 @@ export function ImageCompare({
       } else {
         pct = ((event.clientX - rect.left) / rect.width) * 100;
       }
-      setPosition(Math.max(0, Math.min(100, pct)));
+      updatePosition(pct);
     },
-    [orientation],
+    [orientation, updatePosition],
   );
 
   const onPointerUp = useCallback(() => {
     draggingRef.current = false;
     document.removeEventListener('pointermove', onPointerMove);
-    document.removeEventListener('pointerup', onPointerUp);
   }, [onPointerMove]);
 
   const onPointerDown = useCallback(
@@ -110,22 +125,22 @@ export function ImageCompare({
         (!isHorizontal && event.key === 'ArrowUp')
       ) {
         event.preventDefault();
-        setPosition((p) => Math.max(0, p - step));
+        updatePosition((p) => Math.max(0, p - step));
       } else if (
         (isHorizontal && event.key === 'ArrowRight') ||
         (!isHorizontal && event.key === 'ArrowDown')
       ) {
         event.preventDefault();
-        setPosition((p) => Math.min(100, p + step));
+        updatePosition((p) => Math.min(100, p + step));
       } else if (event.key === 'Home') {
         event.preventDefault();
-        setPosition(0);
+        updatePosition(0);
       } else if (event.key === 'End') {
         event.preventDefault();
-        setPosition(100);
+        updatePosition(100);
       }
     },
-    [orientation],
+    [orientation, updatePosition],
   );
 
   const isVertical = orientation === 'vertical';

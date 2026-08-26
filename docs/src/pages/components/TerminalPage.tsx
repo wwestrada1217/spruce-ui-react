@@ -321,11 +321,14 @@ export function TerminalPage() {
                 <tr><td><code>entries</code></td><td><code>TerminalEntry[]</code></td><td><code>[]</code></td><td>Entries to display.</td></tr>
                 <tr><td><code>title</code></td><td><code>string</code></td><td><code>'terminal'</code></td><td>Text shown in the titlebar.</td></tr>
                 <tr><td><code>showTimestamp</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show <code>HH:mm:ss.SSS</code> timestamp prefix.</td></tr>
+                <tr><td><code>showTimestamps</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Angular-parity plural alias for timestamp visibility.</td></tr>
                 <tr><td><code>showLevelBadge</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show badge labels on entries.</td></tr>
                 <tr><td><code>clearable</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show the clear button in the titlebar.</td></tr>
                 <tr><td><code>bordered</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Render border and box-shadow.</td></tr>
                 <tr><td><code>maxEntries</code></td><td><code>number</code></td><td><code>500</code></td><td>Oldest entries are discarded when the limit is reached. <code>0</code> = unlimited.</td></tr>
                 <tr><td><code>maxHeight</code></td><td><code>string</code></td><td>-</td><td>Max height CSS value (e.g. '260px').</td></tr>
+                <tr><td><code>theme</code></td><td><code>'dark' | 'light'</code></td><td><code>'dark'</code></td><td>Terminal palette.</td></tr>
+                <tr><td><code>virtualScroll</code>, <code>virtualItemHeight</code>, <code>virtualOverscan</code></td><td><code>boolean | number</code></td><td><code>true</code>, <code>24</code>, <code>8</code></td><td>Bounded virtual rendering for large logs.</td></tr>
                 <tr><td><code>ariaLabel</code></td><td><code>string</code></td><td><code>'Terminal output'</code></td><td>Accessible label for the log region.</td></tr>
                 <tr><td><code>onClear</code></td><td><code>() =&gt; void</code></td><td>-</td><td>Emitted when the user clicks the clear button.</td></tr>
               </tbody>

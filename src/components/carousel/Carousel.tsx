@@ -51,11 +51,13 @@ export function Carousel({
 
   const [internalIndex, setInternalIndex] = useState(0);
   const isControlled = controlledIndex !== undefined;
-  const currentIndex = isControlled ? controlledIndex : internalIndex;
+  const currentIndex = Math.max(
+    0,
+    Math.min(slideCount > 0 ? slideCount - 1 : 0, isControlled ? controlledIndex : internalIndex),
+  );
 
   const [dragging, setDragging] = useState(false);
   const pausedRef = useRef(false);
-  const autoplayTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Pointer/touch swipe state
   const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
@@ -77,52 +79,22 @@ export function Carousel({
   const next = useCallback(() => goTo(currentIndex + 1), [goTo, currentIndex]);
   const prev = useCallback(() => goTo(currentIndex - 1), [goTo, currentIndex]);
 
-  // Autoplay
-  const stopAutoplay = useCallback(() => {
-    if (autoplayTimerRef.current !== null) {
-      clearInterval(autoplayTimerRef.current);
-      autoplayTimerRef.current = null;
-    }
-  }, []);
-
-  const startAutoplay = useCallback(() => {
-    stopAutoplay();
-    if (autoplay > 0 && !pausedRef.current) {
-      autoplayTimerRef.current = setInterval(() => {
-        goTo(
-          ((isControlled ? controlledIndex! : internalIndex) + 1 + slideCount) %
-            slideCount || 0,
-        );
-      }, autoplay);
-    }
-  }, [autoplay, stopAutoplay, goTo, slideCount, isControlled, controlledIndex, internalIndex]);
-
-  // We need a stable "next" for autoplay that always reads current index
-  const indexRef = useRef(currentIndex);
-  indexRef.current = currentIndex;
-  const goToRef = useRef(goTo);
-  goToRef.current = goTo;
-
   useEffect(() => {
     if (autoplay <= 0 || pausedRef.current) return;
     const timer = setInterval(() => {
-      goToRef.current(indexRef.current + 1);
+      if (!pausedRef.current) goTo(currentIndex + 1);
     }, autoplay);
     return () => clearInterval(timer);
-  }, [autoplay]);
+  }, [autoplay, currentIndex, goTo]);
 
   const pauseAutoplay = useCallback(() => {
     pausedRef.current = true;
-    stopAutoplay();
-  }, [stopAutoplay]);
+  }, []);
 
   const resumeAutoplay = useCallback(() => {
     pausedRef.current = false;
     // autoplay effect will handle restart
   }, []);
-
-  // Cleanup on unmount
-  useEffect(() => () => stopAutoplay(), [stopAutoplay]);
 
   const onKeydown = useCallback(
     (event: React.KeyboardEvent) => {
@@ -206,7 +178,15 @@ export function Carousel({
           }}
         >
           {slides.map((slide, i) => (
-            <div key={i} className="sp-carousel__slide">
+            <div
+              key={i}
+              id={`sp-carousel-slide-${i}`}
+              className="sp-carousel__slide"
+              role="group"
+              aria-roledescription="slide"
+              aria-label={`${i + 1} of ${slideCount}`}
+              aria-hidden={currentIndex !== i}
+            >
               {slide}
             </div>
           ))}
@@ -252,7 +232,8 @@ export function Carousel({
                 .join(' ')}
               role="tab"
               aria-selected={currentIndex === i}
-              aria-label={`Go to slide ${i + 1}`}
+              aria-controls={`sp-carousel-slide-${i}`}
+              aria-label={`${t('slideControls')}: ${i + 1}`}
               onClick={() => goTo(i)}
             />
           ))}
