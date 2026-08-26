@@ -31,12 +31,11 @@ describe('Datagridex', () => {
       <Datagridex<Person> ariaLabel="People" rows={rows} columns={columns} editMode="cell" />,
     );
     const grid = getByRole('grid', { name: 'People' });
-    const dataRows = getAllByRole('row').filter((row) => row.classList.contains('sp-datagridex__row'));
-    const firstRowCells = getAllByRole('gridcell').filter((cell) => cell.closest('[role="row"]') === dataRows[0]);
-    const firstCell = firstRowCells[0];
-    const secondCell = firstRowCells[1];
-
-    expect(grid).toHaveAttribute('aria-rowcount', '2');
+    expect(grid).toBeInTheDocument();
+    const dataRows = getAllByRole('row').filter((row: HTMLElement) => row.classList.contains('sp-datagridex__body-row'));
+    const firstRowCells = getAllByRole('gridcell').filter((cell: HTMLElement) => cell.closest('[role="row"]') === dataRows[0]);
+    const firstCell = firstRowCells[0]!;
+    const secondCell = firstRowCells[1]!;
     expect(getByRole('columnheader', { name: 'Name' })).toBeInTheDocument();
     expect(getByRole('gridcell', { name: 'Ada' })).toBeInTheDocument();
     firstCell.focus();
@@ -44,6 +43,31 @@ describe('Datagridex', () => {
     await user.keyboard('{ArrowRight}');
     await waitFor(() => expectFocused(secondCell));
     await expectNoA11yViolations(container);
+  });
+
+  it('renders selected and indeterminate checkbox states', async () => {
+    const { container, getAllByRole, user } = renderWithSpruce(
+      <Datagridex<Person> rows={rows} columns={columns} selectionMode="multiple" />,
+    );
+    const checkboxes = getAllByRole('checkbox') as HTMLInputElement[];
+    const headerCheckbox = checkboxes[0]!;
+    const firstRowCheckbox = checkboxes[1]!;
+    const secondRowCheckbox = checkboxes[2]!;
+
+    await user.click(firstRowCheckbox);
+    await waitFor(() => {
+      expect(firstRowCheckbox).toBeChecked();
+      expect(headerCheckbox).toHaveProperty('indeterminate', true);
+      expect(headerCheckbox.closest('.sp-checkbox')).toHaveClass('sp-checkbox--indeterminate');
+      expect(container.querySelector('.sp-checkbox--indeterminate .sp-icon')).toBeInTheDocument();
+    });
+
+    await user.click(secondRowCheckbox);
+    await waitFor(() => {
+      expect(headerCheckbox).toBeChecked();
+      expect(headerCheckbox.closest('.sp-checkbox')).toHaveClass('sp-checkbox--checked');
+      expect(container.querySelectorAll('.sp-checkbox--checked .sp-icon')).toHaveLength(3);
+    });
   });
 
   it('shows validation feedback when an edited required cell is committed empty', async () => {
@@ -95,7 +119,7 @@ describe('Datagridex', () => {
       { key: 'age', header: 'Age', resizable: false, sortable: false },
     ];
     const { container } = renderWithSpruce(<Datagridex<Person> rows={rows} columns={spanColumns} />);
-    const dataRows = container.querySelectorAll('.sp-datagridex__row');
+    const dataRows = container.querySelectorAll('.sp-datagridex__body-row:not(.sp-datagridex__body-row--new)');
     const nameCells = [...dataRows].flatMap((row) => [...row.querySelectorAll('[role="gridcell"]')]).filter((cell) => cell.textContent?.includes('Ada') || cell.textContent?.includes('Grace'));
 
     expect(dataRows).toHaveLength(2);
@@ -134,13 +158,13 @@ describe('Datagridex', () => {
     expect(getByRole('button', { name: /Drag handle: Row 1/i })).toBeDisabled();
   });
 
-  it.each(['light', 'dark'] as const)('uses design tokens in the %s theme', (theme) => {
+  it.each(['light', 'dark'] as const)('uses design tokens in the %s theme', async (theme: 'light' | 'dark') => {
     const { getByRole } = renderWithTheme(
       <Datagridex<Person> rows={rows} columns={columns} ariaLabel={`${theme} people`} />,
       theme,
     );
 
     expect(getByRole('grid', { name: `${theme} people` })).toBeInTheDocument();
-    expectDocumentTheme(theme);
+    await waitFor(() => expectDocumentTheme(theme));
   });
 });

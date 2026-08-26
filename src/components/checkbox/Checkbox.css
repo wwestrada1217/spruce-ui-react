@@ -51,7 +51,8 @@
   border-color: var(--sp-checkbox-checked-bg, #2563eb);
 }
 
-.sp-checkbox--checked .sp-checkbox__box {
+.sp-checkbox--checked .sp-checkbox__box,
+.sp-checkbox--indeterminate .sp-checkbox__box {
   background: var(--sp-checkbox-checked-bg, #2563eb);
   border-color: var(--sp-checkbox-checked-bg, #2563eb);
 }
