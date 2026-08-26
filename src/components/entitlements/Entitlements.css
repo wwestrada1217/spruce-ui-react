@@ -1,0 +1,6 @@
+.sp-feature-locked { display: flex; flex-direction: column; align-items: center; gap: var(--sp-space-2, 8px); padding: var(--sp-space-8, 32px); color: var(--sp-text-color, #1d2939); text-align: center; background: var(--sp-surface-50, #f9fafb); border: var(--sp-border-width-hairline, 1px) dashed var(--sp-border-strong, #d0d5dd); border-radius: var(--sp-radius-lg, 12px); }
+.sp-feature-locked__icon { color: var(--sp-text-muted, #667085); }
+.sp-feature-locked__title { margin: 0; font-size: var(--sp-text-base, 16px); font-weight: var(--sp-font-semibold, 600); }
+.sp-feature-locked__message { max-width: 36ch; margin: 0; color: var(--sp-text-muted, #667085); font-size: var(--sp-text-sm, 14px); }
+.sp-feature-locked__actions:empty { display: none; }
+.sp-feature-locked__actions { margin-block-start: var(--sp-space-2, 8px); }

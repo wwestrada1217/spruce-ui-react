@@ -44,6 +44,8 @@ export interface MentionProps {
   trigger?: MentionTrigger;
   /** Textarea placeholder text. */
   placeholder?: string;
+  /** Accessible name for the textarea. */
+  ariaLabel?: string;
   /** Disable the input. */
   disabled?: boolean;
   /** Number of visible text rows. */
@@ -118,6 +120,7 @@ export function Mention({
   items = [],
   trigger = '@',
   placeholder = 'Type @ to mention someone...',
+  ariaLabel,
   disabled = false,
   rows = 3,
   size = 'md',
@@ -392,6 +395,7 @@ export function Mention({
           ref={inputRef}
           className={inputCls}
           placeholder={placeholder}
+          aria-label={ariaLabel}
           disabled={disabled}
           rows={rows}
           value={currentValue}

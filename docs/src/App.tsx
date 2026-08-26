@@ -159,6 +159,14 @@ import { CodePreviewUtilPage } from './pages/utils/CodePreviewUtilPage'
 import { ChangelogPage } from './pages/ChangelogPage'
 import { DevelopmentPage } from './pages/DevelopmentPage'
 import { ComingSoonPage } from './pages/ComingSoonPage'
+import { TablePage } from './pages/components/TablePage'
+import { ComposeBarPage } from './pages/components/ComposeBarPage'
+import { CommentThreadPage } from './pages/components/CommentThreadPage'
+import { PropertyPanelPage } from './pages/components/PropertyPanelPage'
+import { PdfViewerPage } from './pages/components/PdfViewerPage'
+import { TextDiffPage } from './pages/components/TextDiffPage'
+import { PlanCardsPage } from './pages/components/PlanCardsPage'
+import { FeatureGatePage } from './pages/components/FeatureGatePage'
 
 function useHash(): string {
   const [hash, setHash] = useState(() => window.location.hash || '#/')
@@ -282,6 +290,16 @@ function renderPage(hash: string): React.ReactElement {
     case '#/components/coachmark':          return <CoachmarkPage />
     case '#/components/message-bar':        return <MessageBarPage />
     case '#/components/mention':            return <MentionPage />
+    case '#/components/table':               return <TablePage />
+    case '#/components/compose-bar':         return <ComposeBarPage />
+    case '#/components/comment-thread':
+    case '#/components/comments':            return <CommentThreadPage />
+    case '#/components/property-panel':      return <PropertyPanelPage />
+    case '#/components/pdf-viewer':          return <PdfViewerPage />
+    case '#/components/text-diff':           return <TextDiffPage />
+    case '#/components/plan-cards':          return <PlanCardsPage />
+    case '#/components/feature-gate':
+    case '#/components/entitlements':        return <FeatureGatePage />
     case '#/components/filter-expression':  return <FilterExpressionPage />
     case '#/components/list':               return <ListPage />
     case '#/components/terminal':           return <TerminalPage />
