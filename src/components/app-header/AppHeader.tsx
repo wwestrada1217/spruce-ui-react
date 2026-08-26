@@ -7,6 +7,9 @@
 
 import './AppHeader.css';
 import type { ReactNode } from 'react';
+import { useI18n } from '../../i18n/i18n-context.js';
+import { useSidebar } from '../sidebar/SidebarContext.js';
+import { Icon } from '../../icons/Icon.js';
 
 export interface AppHeaderProps {
   logo?: ReactNode;
@@ -14,9 +17,18 @@ export interface AppHeaderProps {
   subtitle?: string;
   children?: ReactNode;
   actions?: ReactNode;
+  /** Angular-compatible end slot; `actions` remains an alias. */
+  headerEnd?: ReactNode;
   variant?: 'default' | 'filled' | 'transparent';
   sticky?: boolean;
-  height?: number;
+  /** Height in pixels or CSS length. Defaults to the shared shell-bar token. */
+  height?: number | string;
+  /** Show the bottom border. */
+  showBorders?: boolean;
+  /** Show the sidebar toggle when a SidebarProvider is available. */
+  showToggle?: boolean;
+  ariaLabel?: string;
+  onToggle?: () => void;
   className?: string;
 }
 
@@ -26,15 +38,26 @@ export function AppHeader({
   subtitle,
   children,
   actions,
+  headerEnd,
   variant = 'default',
-  sticky = false,
-  height = 56,
+  sticky = true,
+  height,
+  showBorders = true,
+  showToggle = true,
+  ariaLabel,
+  onToggle,
   className = '',
 }: AppHeaderProps) {
+  const { t } = useI18n();
+  const sidebar = useSidebar();
+  const toggleLabel = sidebar.isSmallScreen
+    ? (sidebar.isMobileOpen ? t('closeSidebar') : t('navigation'))
+    : (sidebar.collapsed ? t('expand') : t('collapse'));
   const classes = [
     'sp-app-header',
     `sp-app-header--${variant}`,
     sticky && 'sp-app-header--sticky',
+    showBorders && 'sp-app-header--bordered',
     className,
   ]
     .filter(Boolean)
@@ -43,10 +66,27 @@ export function AppHeader({
   return (
     <header
       className={classes}
-      style={{ height }}
+      style={height !== undefined ? { height } : undefined}
       role="banner"
+      aria-label={ariaLabel}
     >
-      <div className="sp-app-header__left">
+      <div className="sp-app-header__start">
+        {showToggle && sidebar.isProvider && (
+          <button
+            type="button"
+            className="sp-app-header__toggle"
+            aria-expanded={sidebar.isSmallScreen ? sidebar.isMobileOpen : !sidebar.collapsed}
+            aria-label={toggleLabel}
+            onClick={() => {
+              onToggle?.();
+              if (sidebar.isSmallScreen) sidebar.toggleMobile();
+              else sidebar.toggle();
+            }}
+          >
+            <Icon name="panel-left" size={18} />
+          </button>
+        )}
+        <div className="sp-app-header__left">
         {logo && <div className="sp-app-header__logo">{logo}</div>}
         {(title || subtitle) && (
           <div className="sp-app-header__titles">
@@ -54,14 +94,13 @@ export function AppHeader({
             {subtitle && <span className="sp-app-header__subtitle">{subtitle}</span>}
           </div>
         )}
+        </div>
+
+        {children && <div className="sp-app-header__content">{children}</div>}
       </div>
 
-      {children && (
-        <div className="sp-app-header__center">{children}</div>
-      )}
-
-      {actions && (
-        <div className="sp-app-header__right">{actions}</div>
+      {(headerEnd || actions) && (
+        <div className="sp-app-header__right">{headerEnd ?? actions}</div>
       )}
     </header>
   );

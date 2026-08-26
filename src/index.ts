@@ -1,7 +1,22 @@
 // ─── Design Tokens ───────────────────────────────────────────────────────────
 import './tokens/tokens.css';
 import './tokens/motion-patterns.css';
+import './chrome/chrome.css';
 export * from './tokens/index.js';
+
+// ─── Shared surface chrome ─────────────────────────────────────────────────
+export type {
+  Border,
+  Chrome,
+  Elevation,
+  Radius,
+  SpBorder,
+  SpChrome,
+  SpElevation,
+  SpRadius,
+  SurfaceChromeProps,
+} from './chrome/chrome.js';
+export { surfaceChromeClasses } from './chrome/chrome.js';
 
 // ─── Root Provider ────────────────────────────────────────────────────────────
 export { SpruceProvider } from './SpruceProvider.js';
@@ -30,7 +45,27 @@ export type {
   SpMotifAppearanceOption,
   SpMotifPosition,
 } from './components/motif/Motif.js';
+export { MotifProvider, useMotifRegistry } from './components/motif/Motif.js';
+export type { MotifProviderProps } from './components/motif/Motif.js';
 export { resolveDecorativeBackground } from './components/motif/motif-utils.js';
+export {
+  CIRCLE_MOTIFS,
+  DOT_MOTIFS,
+  FRAME_MOTIFS,
+  GEOMETRIC_MOTIFS,
+  GRID_MOTIFS,
+  LINE_MOTIFS,
+  ORGANIC_MOTIFS,
+  SP_BUILT_IN_MOTIFS,
+  SP_BUILT_IN_MOTIF_NAMES,
+} from './components/motif/motif-definitions.js';
+export type {
+  SpBuiltInMotif,
+  SpBuiltInMotifDefinition,
+  SpMotifAppearance,
+  SpMotifDefinition,
+  SpMotifName,
+} from './components/motif/motif-definitions.js';
 
 export { Card, CardHeader, CardMedia, CardFooter } from './components/card/Card.js';
 export type { CardProps, CardVariant, CardPadding, CardHeaderProps, CardMediaProps, CardFooterProps } from './components/card/Card.js';
@@ -104,7 +139,25 @@ export type { AccordionProps, AccordionItemProps, AccordionVariant, AccordionSiz
 
 // ─── Code Editor ──────────────────────────────────────────────────────────────
 export { CodeEditor } from './components/code-editor/CodeEditor.js';
-export type { CodeEditorProps, CodeLanguage } from './components/code-editor/CodeEditor.js';
+export type {
+  CodeEditorProps,
+  CodeLanguage,
+  CodeEditorHandle,
+  CodeEditorStatus,
+  CodeEditorTheme,
+  CompletionContext,
+  CompletionItem,
+  HoverContext,
+  HoverInfo,
+  InlineSuggestion,
+  InlineSuggestionContext,
+  SignatureContext,
+  SignatureHelp,
+  SpCodeEditorDecoration,
+  SpCodeEditorDiagnostic,
+  SpCodeEditorToolbarAction,
+  SpCodeEditorViewZone,
+} from './components/code-editor/CodeEditor.js';
 
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
 export { Sidebar } from './components/sidebar/Sidebar.js';
@@ -120,6 +173,16 @@ export { SidebarItem } from './components/sidebar/SidebarItem.js';
 export type { SidebarItemProps } from './components/sidebar/SidebarItem.js';
 export { SidebarMenu, SidebarMenuGroup } from './components/sidebar/SidebarMenu.js';
 export { SidebarSeparator } from './components/sidebar/SidebarSeparator.js';
+export { SidebarPopoverItem } from './components/sidebar/SidebarPopoverItem.js';
+export type { SidebarPopoverItemProps } from './components/sidebar/SidebarPopoverItem.js';
+export { SidebarAccountSwitcher } from './components/sidebar/SidebarAccountSwitcher.js';
+export type { SidebarAccountSwitcherProps, SidebarMenuItem } from './components/sidebar/SidebarAccountSwitcher.js';
+export { SidebarWorkspaceSwitcher } from './components/sidebar/SidebarWorkspaceSwitcher.js';
+export type { SidebarWorkspaceSwitcherProps, WorkspaceOption } from './components/sidebar/SidebarWorkspaceSwitcher.js';
+export { SidebarNewsletterSubscribeForm } from './components/sidebar/SidebarNewsletterSubscribeForm.js';
+export type { SidebarNewsletterSubscribeFormProps } from './components/sidebar/SidebarNewsletterSubscribeForm.js';
+export { CompanySwitcher } from './components/sidebar/CompanySwitcher.js';
+export type { CompanySwitcherProps, CompanyOption } from './components/sidebar/CompanySwitcher.js';
 
 // ─── AppShell ─────────────────────────────────────────────────────────────────
 export { AppShell, AppShellHamburger } from './components/app-shell/AppShell.js';
@@ -594,7 +657,7 @@ export type { TreeProps, TreeNode } from './components/tree/Tree.js';
 
 // ─── InplaceEditor ───────────────────────────────────────────────────────────
 export { InplaceEditor } from './components/inplace-editor/InplaceEditor.js';
-export type { InplaceEditorProps, InplaceEditorSize } from './components/inplace-editor/InplaceEditor.js';
+export type { InplaceEditorProps, InplaceEditorSize, InplaceEditorType, InplaceEditorValue } from './components/inplace-editor/InplaceEditor.js';
 
 // ─── Panel ───────────────────────────────────────────────────────────────────
 export { Panel } from './components/panel/Panel.js';
@@ -686,7 +749,13 @@ export type { FileUploadProps, FileUploadSize, UploadedFileItem } from './compon
 
 // ─── Editor ──────────────────────────────────────────────────────────────────
 export { Editor } from './components/editor/Editor.js';
-export type { EditorProps, EditorSize } from './components/editor/Editor.js';
+export type {
+  EditorProps,
+  EditorSize,
+  MentionItem as EditorMentionItem,
+  MentionTrigger as EditorMentionTrigger,
+  MentionInsertEvent as EditorMentionInsertEvent,
+} from './components/editor/Editor.js';
 
 // ─── MarkdownEditor ──────────────────────────────────────────────────────────
 export { MarkdownEditor } from './components/markdown-editor/MarkdownEditor.js';
@@ -694,11 +763,31 @@ export type { MarkdownEditorProps, MarkdownEditorMode, MarkdownEditorSize } from
 
 // ─── BlockEditor ─────────────────────────────────────────────────────────────
 export { BlockEditor } from './components/block-editor/BlockEditor.js';
-export type { BlockEditorProps, BlockItem, BlockType, BlockEditorSize } from './components/block-editor/BlockEditor.js';
+export type {
+  BlockEditorProps,
+  BlockItem,
+  Block,
+  BlockType,
+  BlockEditorSize,
+  BlockEditorDocument,
+  BlockSelection,
+  EditorUndoStrategy,
+  EditorDecorations,
+  RemoteCaret,
+  BlockPresenceMarker,
+  BlockMenuItem,
+  BlockPlugin,
+  BlockEditorContext,
+  BlockEditorHandle,
+  LinkSuggestion,
+  LinkSuggestionProvider,
+  MentionSuggestion,
+  MentionSuggestionProvider,
+} from './components/block-editor/BlockEditor.js';
 
 // ─── DiffEditor ──────────────────────────────────────────────────────────────
 export { DiffEditor } from './components/diff-editor/DiffEditor.js';
-export type { DiffEditorProps } from './components/diff-editor/DiffEditor.js';
+export type { DiffEditorProps, DiffEditorHandle, DiffMode } from './components/diff-editor/DiffEditor.js';
 
 // ─── SignaturePad ────────────────────────────────────────────────────────────
 export { SignaturePad } from './components/signature-pad/SignaturePad.js';

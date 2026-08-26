@@ -15,6 +15,7 @@ import {
   type SpMotifAppearanceOption,
   type SpMotifPosition,
 } from '../motif/Motif.js';
+import type { SpMotifName } from '../motif/motif-definitions.js';
 
 export type AlertVariant = 'info' | 'success' | 'warning' | 'danger';
 export type AlertSize = 'sm' | 'md';
@@ -27,7 +28,7 @@ export interface AlertProps {
   onClose?: () => void;
   className?: string;
   style?: CSSProperties;
-  backgroundMotif?: string;
+  backgroundMotif?: SpMotifName;
   motifIcon?: string;
   motifSvg?: string;
   motifPosition?: SpMotifPosition;

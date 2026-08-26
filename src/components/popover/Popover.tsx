@@ -51,6 +51,7 @@ export interface PopoverProps {
   dismissOnClickOutside?: boolean;
   panelClassName?: string;
   padding?: string;
+  panelAriaLabel?: string;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   hoverDelay?: number;
@@ -78,6 +79,7 @@ export function Popover({
   dismissOnClickOutside = true,
   panelClassName = '',
   padding,
+  panelAriaLabel = 'Popover',
   open: controlledOpen,
   onOpenChange,
   hoverDelay = 200,
@@ -275,7 +277,7 @@ export function Popover({
             className={['sp-popover-panel', hasArrow && 'sp-popover-panel--has-arrow', panelClassName].filter(Boolean).join(' ')}
             style={padding != null ? { padding } : undefined}
             role="dialog"
-            aria-label="Popover"
+            aria-label={panelAriaLabel}
           >
             {children}
           </div>

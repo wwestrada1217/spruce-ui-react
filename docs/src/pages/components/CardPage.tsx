@@ -26,6 +26,16 @@ const VARIANTS_CODE = `<Card variant="default">
   <p>Subtle background fill.</p>
 </Card>`;
 
+const CHROME_CODE = `<Card
+  chrome="elevated"
+  radius="xl"
+  border="subtle"
+  elevation="md"
+  backgroundMotif="concentric-circles"
+>
+  Surface chrome and motifs share the same token contract.
+</Card>`;
+
 const HEADER_FOOTER_CODE = `<Card style={{ maxWidth: 360 }}
   header={
     <CardHeader>
@@ -73,6 +83,7 @@ interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
   { id: 'basic',         label: 'Basic' },
   { id: 'variants',      label: 'Variants' },
+  { id: 'chrome',        label: 'Chrome & Motifs' },
   { id: 'header-footer', label: 'Header & Footer' },
   { id: 'media',         label: 'Media' },
   { id: 'padding',       label: 'Padding' },
@@ -120,6 +131,27 @@ export function CardPage() {
               <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--sp-text-muted)' }}>
                 A brief description of the project and its current status.
               </p>
+            </Card>
+          </CodePreview>
+        </section>
+
+        <section id="chrome" className="demo-section" aria-labelledby="chrome-heading">
+          <h2 id="chrome-heading">Chrome &amp; Motifs</h2>
+          <p className="section-desc">
+            Prefer the shared <code>chrome</code> prop for new code. <code>variant</code> remains
+            as a compatibility alias; radius, border, elevation, and decorative motif inputs use tokens.
+          </p>
+          <CodePreview code={CHROME_CODE}>
+            <Card
+              chrome="elevated"
+              radius="xl"
+              border="subtle"
+              elevation="md"
+              backgroundMotif="concentric-circles"
+              style={{ maxWidth: 360, minHeight: 120 }}
+            >
+              <strong>Shared surface chrome</strong>
+              <p style={{ marginBottom: 0 }}>Motifs are decorative and clipped to the surface.</p>
             </Card>
           </CodePreview>
         </section>
@@ -304,7 +336,12 @@ export function CardPage() {
                 <tr><th>Name</th><th>Type</th><th>Default</th><th>Description</th></tr>
               </thead>
               <tbody>
-                <tr><td><code>variant</code></td><td><code>'default' | 'outlined' | 'elevated' | 'filled'</code></td><td><code>'default'</code></td><td>Visual style</td></tr>
+                <tr><td><code>variant</code></td><td><code>'default' | 'outlined' | 'elevated' | 'filled' | 'ghost' | 'flush'</code></td><td><code>'default'</code></td><td>Legacy visual style; maps to <code>chrome</code></td></tr>
+                <tr><td><code>chrome</code></td><td><code>Chrome</code></td><td>variant</td><td>Shared surface treatment</td></tr>
+                <tr><td><code>radius</code></td><td><code>Radius</code></td><td>token default</td><td>Shared corner radius</td></tr>
+                <tr><td><code>border</code></td><td><code>Border</code></td><td>token default</td><td>Shared border strength</td></tr>
+                <tr><td><code>elevation</code></td><td><code>Elevation</code></td><td>token default</td><td>Shared shadow treatment</td></tr>
+                <tr><td><code>backgroundMotif</code></td><td><code>SpMotifName</code></td><td>—</td><td>Decorative motif name; use the motif inputs for placement and appearance</td></tr>
                 <tr><td><code>padding</code></td><td><code>'none' | 'sm' | 'md' | 'lg'</code></td><td><code>'md'</code></td><td>Body content padding</td></tr>
                 <tr><td><code>interactive</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Enable hover effects for clickable cards</td></tr>
                 <tr><td><code>header</code></td><td><code>ReactNode</code></td><td>—</td><td>Header slot content (use with <code>CardHeader</code>)</td></tr>

@@ -1,0 +1,12 @@
+.sp-account__btn { display: flex; align-items: center; gap: var(--sp-density-inline-gap, var(--sp-space-2, 8px)); width: 100%; min-height: var(--sp-density-list-item-min-height, 32px); padding: var(--sp-density-control-padding-y, 6px) var(--sp-density-control-padding-x, 8px); border: 0; border-radius: var(--sp-radius-md, 6px); background: transparent; color: inherit; font: inherit; text-align: start; cursor: pointer; }
+.sp-account__btn:hover, .sp-account__menu-item:hover { background: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04)); }
+.sp-account__btn:focus-visible, .sp-account__menu-item:focus-visible { outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color, var(--sp-primary)); outline-offset: 2px; }
+.sp-account__btn--centered { justify-content: center; gap: 0; }
+.sp-account__info { display: flex; flex-direction: column; flex: 1; min-width: 0; overflow: hidden; }
+.sp-account__info--collapsed { width: 0; flex: 0 0 0; opacity: 0; pointer-events: none; }
+.sp-account__name, .sp-account__email { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sp-account__name { color: var(--sp-primary, #2563eb); font-size: var(--sp-text-sm, 13px); font-weight: var(--sp-font-bold, 700); }
+.sp-account__email { color: var(--sp-text-subtle, #718096); font-size: var(--sp-text-xs, 11px); }
+.sp-account__chevron--collapsed { width: 0; opacity: 0; }
+.sp-account__menu { min-width: 180px; display: flex; flex-direction: column; padding: var(--sp-space-1, 4px) 0; }
+.sp-account__menu-item { display: flex; align-items: center; gap: var(--sp-density-inline-gap, var(--sp-space-2, 8px)); width: 100%; min-height: var(--sp-density-list-item-min-height, 32px); padding: var(--sp-density-control-padding-y, 6px) var(--sp-density-control-padding-x, 12px); border: 0; background: transparent; color: var(--sp-text-color, #1a202c); font: inherit; font-size: var(--sp-text-sm, 13px); text-align: start; cursor: pointer; }

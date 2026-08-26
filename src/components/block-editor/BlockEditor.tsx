@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/refs -- callback refs register DOM nodes after React commits. */
 /*
  * Copyright (c) 2026-2027 Sprucestack. All Rights Reserved.
  * The term "Sprucestack" refers to Sprucestack Inc. and/or its subsidiaries.
@@ -11,8 +12,12 @@ import {
   useRef,
   useEffect,
   useLayoutEffect,
+  useImperativeHandle,
+  useCallback,
   type ChangeEvent,
   type KeyboardEvent,
+  type ReactNode,
+  type Ref,
 } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
@@ -36,14 +41,62 @@ export type BlockType =
 
 export interface BlockItem {
   id: string;
-  type: BlockType;
+  type: BlockType | string;
   content: string;
+  meta?: Record<string, unknown>;
   metadata?: {
     calloutType?: 'info' | 'warning' | 'success' | 'danger';
     language?: string;
     imageWidth?: number; // 25, 50, 75, 100
     tableData?: string[][];
   };
+}
+
+export type Block = BlockItem;
+
+export interface BlockEditorDocument { version: 1; blocks: Block[]; }
+export interface BlockSelection { blockId: string | null; cell?: string | null; anchor: number; focus: number; }
+export interface EditorUndoStrategy { undo(): void; redo(): void; canUndo(): boolean; canRedo(): boolean; }
+export interface RemoteCaret { id: string; blockId: string; cell?: string | null; offset: number; anchor?: number; color: string; label: string; }
+export interface BlockPresenceMarker { blockId: string; color: string; label?: string; }
+export interface EditorDecorations { carets: RemoteCaret[]; blockMarkers: BlockPresenceMarker[]; }
+export interface BlockMenuItem { label: string; icon?: string; active?: boolean; run(block: Block, context: BlockEditorContext): void; }
+export interface BlockEditorContext {
+  readonly readOnly: boolean;
+  updateContent(blockId: string, content: string): void;
+  updateMeta(blockId: string, meta: Record<string, unknown>): void;
+  insertAfter(blockId: string, type?: string, content?: string): string;
+  deleteBlock(blockId: string): void;
+  mergeWithPrevious(blockId: string): void;
+  mergeWithNext(blockId: string): void;
+  focusAdjacentBlock(blockId: string, direction: 'up' | 'down'): void;
+}
+export interface BlockPlugin {
+  type: string;
+  label: string;
+  icon: string;
+  category?: string;
+  defaultContent?: string;
+  defaultMeta?: Record<string, unknown>;
+  menuItems?: (block: Block) => BlockMenuItem[];
+  render?: (block: Block, context: BlockEditorContext) => ReactNode;
+}
+export interface LinkSuggestion { label: string; href: string; icon?: string; description?: string; }
+export interface LinkSuggestionProvider { trigger: string; search(query: string): LinkSuggestion[] | Promise<LinkSuggestion[]>; }
+export interface MentionSuggestion { id: string; label: string; avatar?: string; icon?: string; description?: string; }
+export interface MentionSuggestionProvider { trigger: string; search(query: string): MentionSuggestion[] | Promise<MentionSuggestion[]>; }
+
+export interface BlockEditorHandle {
+  scrollToTop(): void;
+  scrollToBlock(blockId: string): void;
+  save(): BlockEditorDocument;
+  saveJSON(space?: number): string;
+  exportDocument(): BlockEditorDocument;
+  load(document: BlockEditorDocument | Block[]): void;
+  loadDocument(document: BlockEditorDocument | Block[]): void;
+  loadJSON(json: string): void;
+  undo(): void;
+  redo(): void;
 }
 
 export type BlockEditorSize = 'sm' | 'md' | 'lg';
@@ -59,6 +112,8 @@ export interface BlockEditorProps {
   disabled?: boolean;
   /** Make content read-only */
   readOnly?: boolean;
+  /** Angular parity alias for readOnly. */
+  readonly?: boolean;
   /** Field label displayed above editor */
   label?: string;
   /** Required field indicator */
@@ -73,6 +128,17 @@ export interface BlockEditorProps {
   className?: string;
   /** Inline styles applied to root element */
   style?: React.CSSProperties;
+  decorations?: EditorDecorations;
+  virtualize?: boolean | 'auto';
+  virtualizeThreshold?: number;
+  renderAll?: boolean;
+  scrollParent?: HTMLElement | null;
+  undoStrategy?: EditorUndoStrategy | null;
+  plugins?: readonly BlockPlugin[];
+  linkSuggestionProvider?: LinkSuggestionProvider | null;
+  mentionSuggestionProvider?: MentionSuggestionProvider | null;
+  onSelectionChange?: (selection: BlockSelection) => void;
+  ref?: Ref<BlockEditorHandle>;
 }
 
 const CODE_LANGUAGES: SelectOption[] = [
@@ -96,7 +162,7 @@ const CALLOUT_VARIANTS: SelectOption[] = [
 ];
 
 interface SlashCommandOption {
-  type: BlockType;
+  type: string;
   label: string;
   desc: string;
   iconName: string;
@@ -176,7 +242,8 @@ export function BlockEditor({
   onChange,
   placeholder = "Type '/' for commands...",
   disabled = false,
-  readOnly = false,
+  readOnly: readOnlyProp = false,
+  readonly = false,
   label,
   required = false,
   hint,
@@ -184,8 +251,20 @@ export function BlockEditor({
   size = 'md',
   className,
   style,
+  decorations = { carets: [], blockMarkers: [] },
+  virtualize = 'auto',
+  virtualizeThreshold = 200,
+  renderAll = false,
+  scrollParent = null,
+  undoStrategy = null,
+  plugins = [],
+  linkSuggestionProvider = null,
+  mentionSuggestionProvider = null,
+  onSelectionChange,
+  ref,
 }: BlockEditorProps) {
   const { t } = useI18n();
+  const readOnly = readOnlyProp || readonly;
   const [internalBlocks, setInternalBlocks] = useState<BlockItem[]>(
     propBlocks ?? NOTION_DEFAULT_BLOCKS,
   );
@@ -197,11 +276,19 @@ export function BlockEditor({
   const [activeContextMenuBlockId, setActiveContextMenuBlockId] = useState<string | null>(null);
   const [contextPos, setContextPos] = useState({ top: 0, left: 0 });
   const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
+  const undoStackRef = useRef<BlockItem[][]>([]);
+  const redoStackRef = useRef<BlockItem[][]>([]);
 
   const inputRefs = useRef<Record<string, HTMLInputElement | HTMLTextAreaElement | null>>({});
   const gripRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const slashMenuRef = useRef<HTMLDivElement>(null);
   const contextMenuRef = useRef<HTMLDivElement>(null);
+  const registerInputRef = useCallback((id: string) => (element: HTMLInputElement | HTMLTextAreaElement | null) => {
+    inputRefs.current[id] = element;
+  }, []);
+  const registerGripRef = useCallback((id: string) => (element: HTMLButtonElement | null) => {
+    gripRefs.current[id] = element;
+  }, []);
 
   // Sync propBlocks
   const [prevPropBlocks, setPrevPropBlocks] = useState(propBlocks);
@@ -214,10 +301,14 @@ export function BlockEditor({
 
   const currentBlocks = propBlocks !== undefined ? propBlocks : internalBlocks;
 
-  function updateBlocks(nextBlocks: BlockItem[]) {
+  const updateBlocks = useCallback((nextBlocks: BlockItem[]) => {
+    if (JSON.stringify(nextBlocks) !== JSON.stringify(currentBlocks)) {
+      undoStackRef.current.push(currentBlocks.map((block) => ({ ...block, metadata: block.metadata ? { ...block.metadata, tableData: block.metadata.tableData?.map((row) => [...row]) } : undefined })));
+      redoStackRef.current = [];
+    }
     setInternalBlocks(nextBlocks);
     onChange?.(nextBlocks);
-  }
+  }, [currentBlocks, onChange]);
 
   function focusBlock(id: string) {
     requestAnimationFrame(() => {
@@ -414,7 +505,9 @@ export function BlockEditor({
 
   /* ── Slash Menu Filtering & Smart Positioning ────────────────────────────── */
 
-  const filteredSlashCommands = SLASH_COMMANDS.filter(
+  const pluginCommands: SlashCommandOption[] = plugins.map((plugin) => ({ type: plugin.type, label: plugin.label, desc: plugin.category ?? 'Custom block', iconName: plugin.icon }));
+  const availableSlashCommands = [...SLASH_COMMANDS, ...pluginCommands];
+  const filteredSlashCommands = availableSlashCommands.filter(
     (cmd) =>
       cmd.label.toLowerCase().includes(slashQuery.toLowerCase()) ||
       cmd.type.toLowerCase().includes(slashQuery.toLowerCase()),
@@ -440,9 +533,11 @@ export function BlockEditor({
     }
   }, [activeContextMenuBlockId]);
 
-  function applySlashCommand(blockId: string, type: BlockType) {
+  function applySlashCommand(blockId: string, type: string) {
     const block = currentBlocks.find((b) => b.id === blockId);
     if (!block) return;
+
+    const plugin = plugins.find((entry) => entry.type === type);
 
     let cleanContent = block.content;
     const slashIdx = cleanContent.indexOf('/');
@@ -453,6 +548,8 @@ export function BlockEditor({
     handleUpdateBlock(blockId, {
       type,
       content: cleanContent,
+      ...(plugin?.defaultContent !== undefined ? { content: plugin.defaultContent } : {}),
+      ...(plugin?.defaultMeta ? { meta: plugin.defaultMeta } : {}),
       ...(type === 'code' ? { metadata: { language: 'typescript' } } : {}),
       ...(type === 'callout' ? { metadata: { calloutType: 'info' } } : {}),
       ...(type === 'image' ? { metadata: { imageWidth: 100 } } : {}),
@@ -491,6 +588,16 @@ export function BlockEditor({
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>, block: BlockItem, index: number) {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+      e.preventDefault();
+      if (e.shiftKey) redo(); else undo();
+      return;
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
+      e.preventDefault();
+      redo();
+      return;
+    }
     // Handling Slash Menu Keyboard Navigation
     if (activeSlashBlockId === block.id && filteredSlashCommands.length > 0) {
       if (e.key === 'ArrowDown') {
@@ -556,6 +663,73 @@ export function BlockEditor({
     }
   }
 
+  const undo = useCallback(() => {
+    if (undoStrategy) { undoStrategy.undo(); return; }
+    const previous = undoStackRef.current.pop();
+    if (!previous) return;
+    redoStackRef.current.push(currentBlocks);
+    setInternalBlocks(previous);
+    onChange?.(previous);
+  }, [currentBlocks, onChange, undoStrategy]);
+
+  const redo = useCallback(() => {
+    if (undoStrategy) { undoStrategy.redo(); return; }
+    const next = redoStackRef.current.pop();
+    if (!next) return;
+    undoStackRef.current.push(currentBlocks);
+    setInternalBlocks(next);
+    onChange?.(next);
+  }, [currentBlocks, onChange, undoStrategy]);
+
+  const save = useCallback((): BlockEditorDocument => {
+    return { version: 1, blocks: currentBlocks.map((block) => ({ ...block })) };
+  }, [currentBlocks]);
+
+  const load = useCallback((document: BlockEditorDocument | Block[]) => {
+    const next = Array.isArray(document) ? document : document.blocks;
+    updateBlocks(next.map((block) => ({ ...block })));
+  }, [updateBlocks]);
+
+  const saveJSON = useCallback((space = 2): string => JSON.stringify(save(), null, space), [save]);
+  const loadJSON = useCallback((json: string) => {
+    try { load(JSON.parse(json) as BlockEditorDocument | Block[]); } catch { /* Invalid persisted input is ignored. */ }
+  }, [load]);
+
+  const context: BlockEditorContext = {
+    readOnly,
+    updateContent: (blockId, content) => handleUpdateBlock(blockId, { content }),
+    updateMeta: (blockId, meta) => {
+      const block = currentBlocks.find((entry) => entry.id === blockId);
+      if (block) handleUpdateBlock(blockId, { meta: { ...block.meta, ...meta } });
+    },
+    insertAfter: (blockId, type = 'paragraph', content = '') => {
+      const index = currentBlocks.findIndex((block) => block.id === blockId);
+      const id = generateId();
+      if (index >= 0) updateBlocks([...currentBlocks.slice(0, index + 1), { id, type, content }, ...currentBlocks.slice(index + 1)]);
+      return id;
+    },
+    deleteBlock: handleDeleteBlock,
+    mergeWithPrevious: (blockId) => {
+      const index = currentBlocks.findIndex((block) => block.id === blockId);
+      if (index > 0) { const previous = currentBlocks[index - 1]; const block = currentBlocks[index]; if (previous && block) updateBlocks(currentBlocks.map((entry, entryIndex) => entryIndex === index - 1 ? { ...entry, content: `${entry.content}${block.content}` } : entry).filter((entry) => entry.id !== blockId)); }
+    },
+    mergeWithNext: (blockId) => {
+      const index = currentBlocks.findIndex((block) => block.id === blockId);
+      if (index >= 0 && index < currentBlocks.length - 1) { const block = currentBlocks[index]; const next = currentBlocks[index + 1]; if (block && next) updateBlocks(currentBlocks.map((entry, entryIndex) => entryIndex === index ? { ...entry, content: `${block.content}${next.content}` } : entry).filter((entry) => entry.id !== next.id)); }
+    },
+    focusAdjacentBlock: (blockId, direction) => {
+      const index = currentBlocks.findIndex((block) => block.id === blockId);
+      const next = currentBlocks[index + (direction === 'up' ? -1 : 1)];
+      if (next) focusBlock(next.id);
+    },
+  };
+
+  useImperativeHandle(ref, () => ({
+    scrollToTop: () => scrollParent?.scrollTo({ top: 0 }),
+    scrollToBlock: (blockId) => inputRefs.current[blockId]?.scrollIntoView({ block: 'center' }),
+    save, saveJSON, exportDocument: save, load, loadDocument: load, loadJSON, undo, redo,
+  }), [load, loadJSON, redo, save, saveJSON, scrollParent, undo]);
+
   const isInteractive = !disabled && !readOnly;
   const sizeCls = size === 'sm' ? 'sp-block-editor--sm' : size === 'lg' ? 'sp-block-editor--lg' : '';
 
@@ -571,7 +745,7 @@ export function BlockEditor({
     .join(' ');
 
   return (
-    <div className={rootCls} style={style}>
+    <div className={rootCls} style={style} data-render-all={renderAll ? 'true' : 'false'} data-scroll-parent={scrollParent ? 'explicit' : 'nearest'} data-link-trigger={linkSuggestionProvider?.trigger} data-mention-trigger={mentionSuggestionProvider?.trigger}>
       {label && (
         <label className="sp-block-editor__label">
           {label}
@@ -587,6 +761,7 @@ export function BlockEditor({
         ) : (
           currentBlocks.map((block, index) => {
             const inputCls = `sp-block-editor__input sp-block-editor__input--${block.type}`;
+            const customPlugin = plugins.find((plugin) => plugin.type === block.type);
 
             // Calculate contiguous sequence number for numbered list items starting at 1
             let orderedListIndex = 1;
@@ -603,7 +778,8 @@ export function BlockEditor({
             }
 
             return (
-              <div key={block.id} className="sp-block-editor__line">
+              <div key={block.id} className="sp-block-editor__line" data-virtualized={virtualize === true || (virtualize === 'auto' && currentBlocks.length >= virtualizeThreshold) ? 'true' : 'false'} onFocusCapture={() => onSelectionChange?.({ blockId: block.id, cell: null, anchor: 0, focus: 0 })}>
+                {decorations.blockMarkers.filter((marker) => marker.blockId === block.id).map((marker) => <span key={`${marker.blockId}-${marker.color}`} className="sp-block-editor__presence-marker" style={{ '--sp-presence-color': marker.color } as React.CSSProperties} aria-label={marker.label} />)}
                 {/* Notion Side Handle in clear left gutter */}
                 {isInteractive && (
                   <div className="sp-block-editor__side-handle">
@@ -617,7 +793,7 @@ export function BlockEditor({
                       <Icon name="plus" size={14} />
                     </button>
                     <button
-                      ref={(el) => { gripRefs.current[block.id] = el; }}
+                      ref={registerGripRef(block.id)}
                       type="button"
                       className="sp-block-editor__handle-btn"
                       onClick={() =>
@@ -635,13 +811,15 @@ export function BlockEditor({
 
                 {/* Content Node */}
                 <div className="sp-block-editor__node">
-                  {block.type === 'divider' ? (
+                  {customPlugin?.render ? (
+                    <div className="sp-block-editor__custom-plugin">{customPlugin.render(block, context)}</div>
+                  ) : block.type === 'divider' ? (
                     <div className="sp-block-editor__divider-bar" />
                   ) : block.type === 'list' ? (
                     <>
                       <span className="sp-block-editor__list-bullet">•</span>
                       <input
-                        ref={(el) => { inputRefs.current[block.id] = el; }}
+                        ref={registerInputRef(block.id)}
                         type="text"
                         className={inputCls}
                         value={block.content}
@@ -657,7 +835,7 @@ export function BlockEditor({
                     <>
                       <span className="sp-block-editor__list-bullet">{orderedListIndex}.</span>
                       <input
-                        ref={(el) => { inputRefs.current[block.id] = el; }}
+                        ref={registerInputRef(block.id)}
                         type="text"
                         className={inputCls}
                         value={block.content}
@@ -672,7 +850,7 @@ export function BlockEditor({
                   ) : block.type === 'quote' ? (
                     <div className="sp-block-editor__quote-wrap">
                       <input
-                        ref={(el) => { inputRefs.current[block.id] = el; }}
+                        ref={registerInputRef(block.id)}
                         type="text"
                         className={inputCls}
                         value={block.content}
@@ -695,7 +873,7 @@ export function BlockEditor({
                         <div className="sp-block-editor__callout-main">
                           <Icon name="info" size={18} className="sp-block-editor__callout-icon" />
                           <input
-                            ref={(el) => { inputRefs.current[block.id] = el; }}
+                            ref={registerInputRef(block.id)}
                             type="text"
                             className="sp-block-editor__input sp-block-editor__input--paragraph"
                             value={block.content}
@@ -757,7 +935,7 @@ export function BlockEditor({
                           dangerouslySetInnerHTML={{ __html: highlightCode(block.content) }}
                         />
                         <textarea
-                          ref={(el) => { inputRefs.current[block.id] = el; }}
+                          ref={registerInputRef(block.id)}
                           className="sp-block-editor__code-textarea"
                           value={block.content}
                           onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -786,7 +964,7 @@ export function BlockEditor({
                         </div>
                       ) : null}
                       <input
-                        ref={(el) => { inputRefs.current[block.id] = el; }}
+                        ref={registerInputRef(block.id)}
                         type="text"
                         className="sp-block-editor__input sp-block-editor__input--paragraph"
                         value={block.content}
@@ -907,7 +1085,7 @@ export function BlockEditor({
                     </div>
                   ) : (
                     <input
-                      ref={(el) => { inputRefs.current[block.id] = el; }}
+                      ref={registerInputRef(block.id)}
                       type="text"
                       className={inputCls}
                       value={block.content}
@@ -920,6 +1098,7 @@ export function BlockEditor({
                     />
                   )}
                 </div>
+                {decorations.carets.filter((caret) => caret.blockId === block.id).map((caret) => <span key={caret.id} className="sp-block-editor__remote-caret" style={{ '--sp-caret-color': caret.color } as React.CSSProperties} aria-label={caret.label} />)}
               </div>
             );
           })

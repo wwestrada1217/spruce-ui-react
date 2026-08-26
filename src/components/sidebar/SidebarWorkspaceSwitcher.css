@@ -1,0 +1,14 @@
+.sp-workspace__btn { display: flex; align-items: center; gap: var(--sp-density-inline-gap, var(--sp-space-2, 8px)); width: 100%; min-height: var(--sp-density-list-item-min-height, 32px); padding: var(--sp-density-control-padding-y, 6px) var(--sp-density-control-padding-x, 8px); border: 0; border-radius: var(--sp-radius-md, 6px); background: transparent; color: inherit; font: inherit; text-align: start; cursor: pointer; }
+.sp-workspace__btn:hover, .sp-workspace__option:hover { background: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04)); }
+.sp-workspace__btn:focus-visible, .sp-workspace__option:focus-visible { outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color, var(--sp-primary)); outline-offset: 2px; }
+.sp-workspace__btn--centered { justify-content: center; gap: 0; }
+.sp-workspace__icon { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; color: var(--sp-text-muted, #4a5568); }
+.sp-workspace__info { display: flex; flex-direction: column; flex: 1; min-width: 0; overflow: hidden; }
+.sp-workspace__info--collapsed { width: 0; flex: 0 0 0; opacity: 0; pointer-events: none; }
+.sp-workspace__name, .sp-workspace__sub, .sp-workspace__option-label, .sp-workspace__option-sub { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sp-workspace__name { color: var(--sp-primary, #2563eb); font-weight: var(--sp-font-medium, 500); }
+.sp-workspace__sub, .sp-workspace__option-sub { color: var(--sp-text-subtle, #718096); font-size: var(--sp-text-xs, 11px); }
+.sp-workspace__chevron--collapsed { width: 0; opacity: 0; }
+.sp-workspace__menu { min-width: 200px; display: flex; flex-direction: column; padding: var(--sp-space-1, 4px) 0; }
+.sp-workspace__option { display: flex; flex-direction: column; align-items: flex-start; width: 100%; min-height: var(--sp-density-list-item-min-height, 32px); padding: var(--sp-density-control-padding-y, 6px) var(--sp-density-control-padding-x, 12px); border: 0; background: transparent; color: var(--sp-text-color, #1a202c); font: inherit; text-align: start; cursor: pointer; }
+.sp-workspace__option--active { background: var(--sp-primary-subtle, color-mix(in srgb, var(--sp-primary, #2563eb) 8%, transparent)); }

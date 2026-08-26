@@ -6,6 +6,14 @@
  */
 
 /* -- Rule row ------------------------------------------------------- */
+.sp-filter-expr {
+  border: 1px solid var(--sp-chrome-border, var(--sp-border));
+  border-radius: var(--sp-chrome-radius, var(--sp-radius-lg));
+  background: var(--sp-chrome-background, var(--sp-surface-0));
+  box-shadow: var(--sp-chrome-shadow, none);
+  padding: var(--sp-space-3);
+}
+
 .sp-filter-expr__rule {
   display: flex;
   align-items: flex-start;

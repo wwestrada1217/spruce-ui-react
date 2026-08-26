@@ -9,6 +9,7 @@ import { useState, useCallback, useRef } from 'react';
 import type { ReactNode, DragEvent, KeyboardEvent } from 'react';
 import './Kanban.css';
 import { useI18n } from '../../i18n/i18n-context.js';
+import type { Border, Chrome, Radius } from '../../chrome/chrome.js';
 
 /* ── Public types ──────────────────────────────────────────────────────── */
 
@@ -44,6 +45,9 @@ export interface KanbanColumnMoveEvent {
 
 export interface KanbanProps {
   columns: KanbanColumn[];
+  chrome?: Chrome;
+  radius?: Radius;
+  border?: Border;
   columnDraggable?: boolean;
   ariaLabel?: string;
   cardRenderer?: (card: KanbanCard, column: KanbanColumn) => ReactNode;
@@ -57,6 +61,9 @@ export interface KanbanProps {
 
 export function Kanban({
   columns,
+  chrome = 'default',
+  radius,
+  border = 'default',
   columnDraggable = true,
   ariaLabel,
   cardRenderer,
@@ -377,7 +384,16 @@ export function Kanban({
   /* ── Render ──────────────────────────────────────────────────────────── */
 
   return (
-    <div className="sp-kanban" role="region" aria-label={resolvedAriaLabel}>
+    <div
+      className={[
+        'sp-kanban',
+        `sp-chrome--${chrome}`,
+        radius && `sp-radius--${radius}`,
+        `sp-border--${border}`,
+      ].filter(Boolean).join(' ')}
+      role="region"
+      aria-label={resolvedAriaLabel}
+    >
       {columns.map((col, colIdx) => {
         const columnClasses = [
           'sp-kanban__column',

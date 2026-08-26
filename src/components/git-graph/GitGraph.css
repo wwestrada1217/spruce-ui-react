@@ -13,9 +13,10 @@
   display: flex;
   overflow: auto;
   font-family: var(--sp-font-sans, system-ui, -apple-system, sans-serif);
-  border: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08));
-  border-radius: var(--sp-radius-md, 6px);
-  background: var(--sp-surface-0, #fff);
+  border: 1px solid var(--sp-chrome-border, var(--sp-border));
+  border-radius: var(--sp-chrome-radius, var(--sp-radius-md));
+  background: var(--sp-chrome-background, var(--sp-surface-0));
+  box-shadow: var(--sp-chrome-shadow, none);
 }
 
 .sp-git-graph__svg {

@@ -9,6 +9,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { Icon } from '../../icons/Icon';
 import { useI18n } from '../../i18n/i18n-context.js';
 import './Tree.css';
+import type { Border, Chrome, Radius } from '../../chrome/chrome.js';
 
 // ---------------------------------------------------------------------------
 // Data model
@@ -31,6 +32,9 @@ export interface TreeNode {
 
 export interface TreeProps {
   nodes: TreeNode[];
+  chrome?: Chrome;
+  radius?: Radius;
+  border?: Border;
   selectable?: boolean;
   draggable?: boolean;
   expandAll?: boolean;
@@ -350,6 +354,9 @@ function TreeNodeRow({
 
 export function Tree({
   nodes,
+  chrome = 'default',
+  radius,
+  border = 'default',
   selectable = false,
   draggable: isDraggable = false,
   expandAll = false,
@@ -581,7 +588,17 @@ export function Tree({
   // ── Render ─────────────────────────────────────────────────────────────
 
   return (
-    <div className="sp-tree" role="tree" aria-label={t('treeView')} ref={treeRef}>
+    <div
+      className={[
+        'sp-tree',
+        `sp-chrome--${chrome}`,
+        radius && `sp-radius--${radius}`,
+        `sp-border--${border}`,
+      ].filter(Boolean).join(' ')}
+      role="tree"
+      aria-label={t('treeView')}
+      ref={treeRef}
+    >
       {internalNodes.map(node => (
         <TreeNodeRow
           key={node.id}

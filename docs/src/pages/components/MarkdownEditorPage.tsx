@@ -259,7 +259,7 @@ export function MarkdownEditorPage() {
                 </tr>
                 <tr>
                   <td><code>mode</code></td>
-                  <td><code>'write' | 'preview' | 'split'</code></td>
+                  <td><code>'write' | 'edit' | 'preview' | 'split'</code></td>
                   <td><code>'write'</code></td>
                   <td>Active editing view mode</td>
                 </tr>
@@ -322,6 +322,18 @@ export function MarkdownEditorPage() {
                   <td><code>number | string</code></td>
                   <td>—</td>
                   <td>Maximum height of content area</td>
+                </tr>
+                <tr>
+                  <td><code>rows</code>, <code>maxLength</code>, <code>showCount</code></td>
+                  <td><code>number</code>, <code>number</code>, <code>boolean</code></td>
+                  <td><code>10</code>, —, <code>true</code></td>
+                  <td>Control the textarea height, enforce a maximum, and expose a live character count</td>
+                </tr>
+                <tr>
+                  <td><code>invalid</code>, <code>errors</code>, <code>onTouched</code></td>
+                  <td><code>boolean</code>, <code>FormValidationError[]</code>, <code>() =&gt; void</code></td>
+                  <td><code>false</code>, <code>[]</code>, —</td>
+                  <td>Integrate controlled form validation with <code>aria-invalid</code>, described-by, and blur state</td>
                 </tr>
               </tbody>
             </table>

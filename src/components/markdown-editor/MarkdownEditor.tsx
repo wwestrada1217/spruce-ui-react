@@ -10,13 +10,16 @@ import {
   useState,
   useRef,
   useMemo,
+  useId,
   type ChangeEvent,
   type MouseEvent,
 } from 'react';
 import { Icon } from '../../icons/Icon.js';
 import { useI18n } from '../../i18n/i18n-context.js';
+import type { Border, Chrome, Radius } from '../../chrome/chrome.js';
+import type { FormValidationError } from '../field/form-types.js';
 
-export type MarkdownEditorMode = 'write' | 'preview' | 'split';
+export type MarkdownEditorMode = 'write' | 'edit' | 'preview' | 'split';
 export type MarkdownEditorSize = 'sm' | 'md' | 'lg';
 
 export interface MarkdownEditorProps {
@@ -48,6 +51,24 @@ export interface MarkdownEditorProps {
   minHeight?: number | string;
   /** Maximum height of the editable area */
   maxHeight?: number | string;
+  /** Number of visible textarea rows. */
+  rows?: number;
+  /** Maximum character count. */
+  maxLength?: number;
+  /** Show the character count when maxLength is set. */
+  showCount?: boolean;
+  /** Signal validation state independently from the error collection. */
+  invalid?: boolean;
+  /** Structured validation errors from a form model. */
+  errors?: readonly FormValidationError[];
+  /** Accessible label for the editing surface. */
+  ariaLabel?: string;
+  /** Called when the field is blurred. */
+  onTouched?: () => void;
+  /** Surface chrome shared with cards, panels, and data surfaces. */
+  chrome?: Chrome;
+  radius?: Radius;
+  border?: Border;
   /** Custom class name applied to root element */
   className?: string;
   /** Inline styles applied to root element */
@@ -148,10 +169,21 @@ export function MarkdownEditor({
   size = 'md',
   minHeight,
   maxHeight,
+  rows = 10,
+  maxLength,
+  showCount = true,
+  invalid = false,
+  errors = [],
+  ariaLabel,
+  onTouched,
+  chrome = 'default',
+  radius,
+  border = 'default',
   className,
   style,
 }: MarkdownEditorProps) {
   const { t } = useI18n();
+  const instanceId = useId().replace(/:/g, '');
   const [internalText, setInternalText] = useState<string>(value ?? '');
   const [internalMode, setInternalMode] = useState<MarkdownEditorMode>('write');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -166,7 +198,8 @@ export function MarkdownEditor({
   }
 
   const currentText = value !== undefined ? (value ?? '') : internalText;
-  const currentMode = propMode !== undefined ? propMode : internalMode;
+  const currentMode = propMode === 'edit' ? 'write' : propMode !== undefined ? propMode : internalMode;
+  const errorMessage = propError ?? errors[0]?.message;
 
   const renderedHtml = useMemo(() => parseMarkdownToHtml(currentText), [currentText]);
 
@@ -176,7 +209,7 @@ export function MarkdownEditor({
   }
 
   function handleTextChange(e: ChangeEvent<HTMLTextAreaElement>) {
-    const nextVal = e.target.value;
+    const nextVal = maxLength === undefined ? e.target.value : e.target.value.slice(0, maxLength);
     setInternalText(nextVal);
     onChange?.(nextVal);
   }
@@ -232,7 +265,7 @@ export function MarkdownEditor({
     sizeCls,
     disabled ? 'sp-markdown-editor--disabled' : '',
     readOnly ? 'sp-markdown-editor--readonly' : '',
-    propError ? 'sp-markdown-editor--error' : '',
+    (propError || invalid || errors.length > 0) ? 'sp-markdown-editor--error' : '',
     className,
   ]
     .filter(Boolean)
@@ -247,7 +280,14 @@ export function MarkdownEditor({
         </label>
       )}
 
-      <div className="sp-markdown-editor__container">
+      <div
+        className={[
+          'sp-markdown-editor__container',
+          `sp-chrome--${chrome}`,
+          radius && `sp-radius--${radius}`,
+          `sp-border--${border}`,
+        ].filter(Boolean).join(' ')}
+      >
         {/* Header & Mode Switcher */}
         <div className="sp-markdown-editor__header">
           {/* Formatting Toolbar */}
@@ -524,12 +564,18 @@ export function MarkdownEditor({
                 ref={textareaRef}
                 className="sp-markdown-editor__textarea"
                 style={paneStyle}
+                rows={rows}
                 value={currentText}
                 onChange={handleTextChange}
                 placeholder={placeholder}
                 disabled={disabled}
                 readOnly={readOnly}
-            aria-label={t('editorContent')}
+                maxLength={maxLength}
+                aria-label={ariaLabel ?? t('editorContent')}
+                aria-invalid={Boolean(errorMessage || invalid) || undefined}
+                aria-required={required || undefined}
+                aria-describedby={errorMessage ? `${instanceId}-error` : undefined}
+                onBlur={onTouched}
               />
             </div>
           )}
@@ -549,16 +595,17 @@ export function MarkdownEditor({
       </div>
 
       {/* Error message */}
-      {propError && (
-        <div className="sp-markdown-editor__error-msg" role="alert">
-          {propError}
+      {errorMessage && (
+        <div id={`${instanceId}-error`} className="sp-markdown-editor__error-msg" role="alert">
+          {errorMessage}
         </div>
       )}
 
       {/* Hint message */}
-      {!propError && hint && (
+      {!errorMessage && hint && (
         <div className="sp-markdown-editor__hint-msg">{hint}</div>
       )}
+      {maxLength !== undefined && showCount && <div className="sp-markdown-editor__count" aria-live="polite">{currentText.length}/{maxLength}</div>}
     </div>
   );
 }

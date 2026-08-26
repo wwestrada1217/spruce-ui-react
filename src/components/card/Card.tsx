@@ -6,18 +6,42 @@
  */
 
 import './Card.css';
-import type { ReactNode, HTMLAttributes } from 'react';
+import type { KeyboardEvent, MouseEvent, ReactNode, HTMLAttributes } from 'react';
+import type { Border, Chrome, Elevation, Radius } from '../../chrome/chrome.js';
+import {
+  Motif,
+  type SpDecorativeBackground,
+  type SpMotifAppearanceOption,
+  type SpMotifPosition,
+} from '../motif/Motif.js';
 
-export type CardVariant = 'default' | 'outlined' | 'elevated' | 'filled';
+export type CardVariant = 'default' | 'outlined' | 'elevated' | 'filled' | 'ghost' | 'flush';
 export type CardPadding = 'none' | 'sm' | 'md' | 'lg';
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   variant?: CardVariant;
+  /** Preferred surface treatment. Defaults to the legacy variant value. */
+  chrome?: Chrome;
+  radius?: Radius;
+  border?: Border;
+  elevation?: Elevation;
   padding?: CardPadding;
   interactive?: boolean;
   header?: ReactNode;
   media?: ReactNode;
   footer?: ReactNode;
+  backgroundMotif?: SpDecorativeBackground['motif'];
+  motifIcon?: string;
+  motifSvg?: string;
+  motifPosition?: SpMotifPosition;
+  motifSize?: number | string;
+  motifOpacity?: number;
+  motifRotation?: number;
+  motifOffsetX?: number | string;
+  motifOffsetY?: number | string;
+  motifAppearance?: SpMotifAppearanceOption;
+  motifColor?: string;
+  decorativeBackground?: SpDecorativeBackground;
   children?: ReactNode;
 }
 
@@ -50,27 +74,87 @@ export function CardFooter({ children, className = '' }: CardFooterProps) {
 
 export function Card({
   variant = 'default',
+  chrome,
+  radius,
+  border,
+  elevation,
   padding = 'md',
   interactive = false,
   header,
   media,
   footer,
+  backgroundMotif,
+  motifIcon,
+  motifSvg,
+  motifPosition,
+  motifSize,
+  motifOpacity,
+  motifRotation,
+  motifOffsetX,
+  motifOffsetY,
+  motifAppearance,
+  motifColor,
+  decorativeBackground,
   children,
   className = '',
+  onClick,
+  onKeyDown,
+  role,
+  tabIndex,
   ...props
 }: CardProps) {
+  const effectiveChrome = chrome ?? variant;
+  const hasMotif = Boolean(
+    backgroundMotif || motifIcon || motifSvg || decorativeBackground?.motif ||
+      decorativeBackground?.icon || decorativeBackground?.svg,
+  );
   const classes = [
     'sp-card',
     variant !== 'default' && `sp-card--${variant}`,
+    `sp-chrome--${effectiveChrome}`,
+    radius && `sp-radius--${radius}`,
+    border && `sp-border--${border}`,
+    elevation && `sp-elevation--${elevation}`,
     padding !== 'md' && `sp-card--pad-${padding}`,
     interactive && 'sp-card--interactive',
+    hasMotif && 'sp-card--has-motif',
     className,
   ]
     .filter(Boolean)
     .join(' ');
 
   return (
-    <div className={classes} {...props}>
+    <div
+      className={classes}
+      {...props}
+      onClick={onClick}
+      onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
+        onKeyDown?.(event);
+        if (event.defaultPrevented || !interactive) return;
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onClick?.(event as unknown as MouseEvent<HTMLDivElement>);
+        }
+      }}
+      role={role ?? (interactive ? 'button' : undefined)}
+      tabIndex={tabIndex ?? (interactive ? 0 : undefined)}
+    >
+      {hasMotif && (
+        <Motif
+          config={decorativeBackground}
+          motif={backgroundMotif}
+          icon={motifIcon}
+          svg={motifSvg}
+          position={motifPosition}
+          size={motifSize}
+          opacity={motifOpacity}
+          rotation={motifRotation}
+          offsetX={motifOffsetX}
+          offsetY={motifOffsetY}
+          appearance={motifAppearance}
+          color={motifColor}
+        />
+      )}
       {header && <div className="sp-card__header">{header}</div>}
       {media && <div className="sp-card__media">{media}</div>}
       {children !== undefined && <div className="sp-card__body">{children}</div>}

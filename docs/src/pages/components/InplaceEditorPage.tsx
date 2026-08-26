@@ -186,6 +186,9 @@ export function InplaceEditorPage() {
                 <tr><td><code>showIndicator</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Shows a pencil icon and dashed underline at rest to signal the value is editable. Automatically hidden when <code>disabled</code> is true.</td></tr>
                 <tr><td><code>size</code></td><td><code>'sm' | 'md' | 'lg'</code></td><td><code>'md'</code></td><td>Controls the height, padding, and font size to match the standard input fields</td></tr>
                 <tr><td><code>editLabel</code></td><td><code>string</code></td><td><code>'Edit value'</code></td><td>ARIA label for the edit trigger button</td></tr>
+                <tr><td><code>type</code></td><td><code>InplaceEditorType</code></td><td><code>'text'</code></td><td>Choose text, number, masked, combobox, grid-combobox, date/time, emoji, or color editing</td></tr>
+                <tr><td><code>showActions</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Use explicit localized accept/discard buttons instead of blur commit</td></tr>
+                <tr><td><code>options</code>, <code>gridOptions</code>, <code>mask</code>, <code>min</code>, <code>max</code></td><td><code>source</code>, <code>source</code>, <code>string</code>, <code>number</code>, <code>number</code></td><td>—</td><td>Pass the type-specific lookup, mask, and number constraints to the controlled editor</td></tr>
               </tbody>
             </table>
           </div>
@@ -195,6 +198,7 @@ export function InplaceEditorPage() {
               <thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead>
               <tbody>
                 <tr><td><code>onValueChange</code></td><td><code>(value: string) =&gt; void</code></td><td>Called with the new value when editing is committed via Enter or blur. Does not fire if the value is unchanged.</td></tr>
+                <tr><td><code>onSelectedItem</code>, <code>onEmojiSelected</code></td><td><code>callback</code></td><td>—</td><td>Receive lookup selections or the selected emoji while the editor remains controlled</td></tr>
               </tbody>
             </table>
           </div>

@@ -5,9 +5,11 @@
  * The full license information can be found in LICENSE in the root directory of this project.
  */
 
+/* eslint-disable react-refresh/only-export-components */
 import './Terminal.css';
 import { useRef, useEffect, useCallback, useState } from 'react';
 import { useI18n } from '../../i18n/i18n-context.js';
+import type { Border, Chrome, Radius } from '../../chrome/chrome.js';
 
 /* ── Public types ──────────────────────────────────────────────────────── */
 
@@ -103,6 +105,9 @@ export interface TerminalProps {
   clearable?: boolean;
   /** Draw a border and box-shadow around the terminal shell. */
   bordered?: boolean;
+  chrome?: Chrome;
+  radius?: Radius;
+  border?: Border;
   /** Max number of entries before oldest are discarded (0 = unlimited). */
   maxEntries?: number;
   /** Max height CSS value (e.g. '260px'). */
@@ -122,6 +127,9 @@ export function Terminal({
   showLevelBadge = true,
   clearable = true,
   bordered = true,
+  chrome = 'default',
+  radius,
+  border,
   maxEntries = 500,
   maxHeight,
   ariaLabel = 'Terminal output',
@@ -154,6 +162,9 @@ export function Terminal({
   const shellCls = [
     'sp-terminal',
     bordered ? 'sp-terminal--bordered' : '',
+    `sp-chrome--${chrome}`,
+    radius && `sp-radius--${radius}`,
+    `sp-border--${border ?? (bordered ? 'default' : 'none')}`,
   ].filter(Boolean).join(' ');
 
   return (

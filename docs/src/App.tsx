@@ -87,6 +87,7 @@ import { KanbanPage } from './pages/components/KanbanPage'
 import { TreePage } from './pages/components/TreePage'
 import { InplaceEditorPage } from './pages/components/InplaceEditorPage'
 import { AppHeaderPage } from './pages/components/AppHeaderPage'
+import { CompanySwitcherPage } from './pages/components/CompanySwitcherPage'
 import { NavMenuPage } from './pages/components/NavMenuPage'
 import { PagerPage } from './pages/components/PagerPage'
 import { FabPage } from './pages/components/FabPage'
@@ -273,6 +274,7 @@ function renderPage(hash: string): React.ReactElement {
     case '#/components/tree':               return <TreePage />
     case '#/components/inplace-editor':     return <InplaceEditorPage />
     case '#/components/app-header':         return <AppHeaderPage />
+    case '#/components/company-switcher':   return <CompanySwitcherPage />
     case '#/components/nav-menu':           return <NavMenuPage />
     case '#/components/pager':              return <PagerPage />
     case '#/components/fab':                return <FabPage />

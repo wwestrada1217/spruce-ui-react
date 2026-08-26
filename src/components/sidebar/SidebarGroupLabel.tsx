@@ -7,6 +7,7 @@
 
 import { useId, type ReactNode } from 'react';
 import { useSidebar } from './SidebarContext.js';
+import { useSidebarGroup } from './SidebarGroup.js';
 
 export interface SidebarGroupLabelProps {
   children?: ReactNode;
@@ -16,15 +17,30 @@ export interface SidebarGroupLabelProps {
 
 export function SidebarGroupLabel({ children, actions }: SidebarGroupLabelProps) {
   const { collapsed, isMobileOpen } = useSidebar();
+  const group = useSidebarGroup();
   const isCollapsedView = collapsed && !isMobileOpen;
-  const labelId = useId();
+  const fallbackLabelId = useId();
+  const labelId = group?.labelId ?? fallbackLabelId;
+  const toggleLabel = () => {
+    group?.toggle();
+  };
 
   return (
-    <div
-      id={labelId}
-      className={`sp-sidebar-group-label${isCollapsedView ? ' sp-sidebar-group-label--collapsed' : ''}`}
-    >
-      <span className="sp-sidebar-group-label__text">{children}</span>
+    <div className={`sp-sidebar-group-label${isCollapsedView ? ' sp-sidebar-group-label--collapsed' : ''}`}>
+      {group?.collapsible ? (
+        <button
+          id={labelId}
+          type="button"
+          className="sp-sidebar-group-label__toggle"
+          aria-expanded={group.expanded}
+          aria-controls={group.itemsId}
+          onClick={toggleLabel}
+        >
+          <span className="sp-sidebar-group-label__text">{children}</span>
+        </button>
+      ) : (
+        <span id={labelId} className="sp-sidebar-group-label__text">{children}</span>
+      )}
       {actions && (
         <span className="sp-sidebar-group-label__actions">{actions}</span>
       )}

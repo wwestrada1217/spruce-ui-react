@@ -627,3 +627,7 @@
   font-size: var(--sp-text-xs, 11px);
   color: var(--sp-text-subtle, #64748b);
 }
+.sp-block-editor__line { position: relative; }
+.sp-block-editor__presence-marker { position: absolute; inset-block: 0; inset-inline-start: 0; width: var(--sp-space-1); background: var(--sp-presence-color, var(--sp-primary)); border-radius: var(--sp-radius-sm); pointer-events: none; }
+.sp-block-editor__remote-caret { position: absolute; inset-block: var(--sp-space-2); inset-inline-end: 0; width: 2px; background: var(--sp-caret-color, var(--sp-primary)); pointer-events: none; }
+.sp-block-editor__custom-plugin { min-width: 0; }

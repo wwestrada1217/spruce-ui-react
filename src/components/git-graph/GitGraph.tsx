@@ -8,6 +8,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { Icon } from '../../icons/Icon';
 import './GitGraph.css';
+import type { Border, Chrome, Radius } from '../../chrome/chrome.js';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -44,6 +45,9 @@ export interface GitGraphBranch {
 export interface GitGraphProps {
   /** Commits in display order (newest first). */
   commits: GitGraphCommit[];
+  chrome?: Chrome;
+  radius?: Radius;
+  border?: Border;
   /** Optional branch color overrides. */
   branches?: GitGraphBranch[];
   /** Height of each commit row in pixels. */
@@ -90,6 +94,9 @@ interface LayoutEdge {
 
 export function GitGraph({
   commits,
+  chrome = 'default',
+  radius,
+  border = 'default',
   branches = [],
   rowHeight = 48,
   laneWidth = 28,
@@ -187,7 +194,13 @@ export function GitGraph({
     }
   };
 
-  const classes = ['sp-git-graph', className].filter(Boolean).join(' ');
+  const classes = [
+    'sp-git-graph',
+    `sp-chrome--${chrome}`,
+    radius && `sp-radius--${radius}`,
+    `sp-border--${border}`,
+    className,
+  ].filter(Boolean).join(' ');
 
   return (
     <div

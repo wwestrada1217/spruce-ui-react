@@ -239,6 +239,12 @@ export function EditorPage() {
                   <td>HTML content string value</td>
                 </tr>
                 <tr>
+                  <td><code>content</code></td>
+                  <td><code>string</code></td>
+                  <td>—</td>
+                  <td>Angular-parity alias for the controlled HTML content value</td>
+                </tr>
+                <tr>
                   <td><code>onChange</code></td>
                   <td><code>(value: string) =&gt; void</code></td>
                   <td>—</td>
@@ -303,6 +309,18 @@ export function EditorPage() {
                   <td><code>boolean</code></td>
                   <td><code>false</code></td>
                   <td>Hide top formatting toolbar</td>
+                </tr>
+                <tr>
+                  <td><code>mentionItems</code>, <code>mentionTrigger</code></td>
+                  <td><code>MentionItem[]</code>, <code>string</code></td>
+                  <td><code>[]</code>, <code>'@'</code></td>
+                  <td>Show keyboard-navigable mention suggestions when the trigger is typed</td>
+                </tr>
+                <tr>
+                  <td><code>onMention</code>, <code>onMentionSearch</code></td>
+                  <td><code>callback</code></td>
+                  <td>—</td>
+                  <td>Receive the selected item/range and the current query for async filtering</td>
                 </tr>
               </tbody>
             </table>

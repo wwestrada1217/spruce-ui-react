@@ -4,11 +4,12 @@ import { Icon } from '../../icons/Icon.js';
 import { Dropdown } from '../dropdown/Dropdown.js';
 import type { DropdownItem } from '../dropdown/Dropdown.js';
 import { useI18n } from '../../i18n/i18n-context.js';
+import type { Border, Chrome, Radius } from '../../chrome/chrome.js';
 
 export type ToolbarSize = 'sm' | 'md' | 'lg';
 export type ToolbarButtonPresentation = 'auto' | 'icon-text' | 'icon-only';
-export type ToolbarChrome = 'default' | 'subtle' | 'none';
-export type ToolbarRadius = 'none' | 'sm' | 'md' | 'lg';
+export type ToolbarChrome = Chrome | 'subtle' | 'none';
+export type ToolbarRadius = Radius;
 
 export interface ToolbarButtonItem {
   icon?: string;
@@ -36,7 +37,7 @@ export interface ToolbarProps {
   size?: ToolbarSize;
   chrome?: ToolbarChrome;
   radius?: ToolbarRadius;
-  border?: boolean;
+  border?: Border | boolean;
   ariaLabel?: string;
   tooltipGroupDelay?: number;
   tooltipGracePeriod?: number;
@@ -101,7 +102,19 @@ export function Toolbar({ items = [], children, size = 'md', chrome = 'default',
 
   const dividerSet = new Set(dividerAfter);
   const iconSize = iconSizeForToolbar(size);
-  const rootClasses = ['sp-toolbar', size !== 'md' && `sp-toolbar--${size}`, `sp-toolbar--chrome-${chrome}`, `sp-toolbar--radius-${radius}`, !border && 'sp-toolbar--borderless', className].filter(Boolean).join(' ');
+  const surfaceChrome: Chrome = chrome === 'subtle' ? 'filled' : chrome === 'none' ? 'ghost' : chrome;
+  const borderToken: Border = typeof border === 'boolean' ? (border ? 'default' : 'none') : border;
+  const rootClasses = [
+    'sp-toolbar',
+    size !== 'md' && `sp-toolbar--${size}`,
+    `sp-toolbar--chrome-${chrome}`,
+    `sp-chrome--${surfaceChrome}`,
+    radius && `sp-toolbar--radius-${radius}`,
+    radius && `sp-radius--${radius}`,
+    `sp-border--${borderToken}`,
+    borderToken === 'none' && 'sp-toolbar--borderless',
+    className,
+  ].filter(Boolean).join(' ');
   const overflowItems: DropdownItem[] = items.filter((_, index) => hiddenIndices.has(index)).map((item) => ({ label: item.label, icon: item.icon, disabled: item.disabled, command: item.onClick }));
   const itemContent = items.map((item, index) => {
     const iconText = item.presentation !== 'icon-only' && !item.iconOnly;

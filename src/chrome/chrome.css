@@ -1,0 +1,56 @@
+/* Shared chrome utilities. Components own layout and padding; these classes
+ * only apply the token-backed surface treatment requested by the caller. */
+.sp-chrome--default {
+  --sp-chrome-background: var(--sp-surface-0);
+  --sp-chrome-border: var(--sp-border);
+  --sp-chrome-shadow: var(--sp-shadow-none, none);
+}
+
+.sp-chrome--outlined {
+  --sp-chrome-background: var(--sp-surface-0);
+  --sp-chrome-border: var(--sp-border-strong);
+  --sp-chrome-shadow: var(--sp-shadow-none, none);
+}
+
+.sp-chrome--filled {
+  --sp-chrome-background: var(--sp-surface-raised);
+  --sp-chrome-border: var(--sp-border);
+  --sp-chrome-shadow: var(--sp-shadow-none, none);
+}
+
+.sp-chrome--elevated {
+  --sp-chrome-background: var(--sp-surface-0);
+  --sp-chrome-border: transparent;
+  --sp-chrome-shadow: var(--sp-shadow-md);
+}
+
+.sp-chrome--ghost,
+.sp-chrome--flush {
+  --sp-chrome-background: transparent;
+  --sp-chrome-border: transparent;
+  --sp-chrome-shadow: var(--sp-shadow-none, none);
+}
+
+.sp-chrome--flush {
+  --sp-chrome-radius: var(--sp-radius-none);
+}
+
+.sp-radius--none { --sp-chrome-radius: var(--sp-radius-none); }
+.sp-radius--sm { --sp-chrome-radius: var(--sp-radius-sm); }
+.sp-radius--md { --sp-chrome-radius: var(--sp-radius-md); }
+.sp-radius--lg { --sp-chrome-radius: var(--sp-radius-lg); }
+.sp-radius--xl { --sp-chrome-radius: var(--sp-radius-xl); }
+.sp-radius--full { --sp-chrome-radius: var(--sp-radius-full); }
+
+.sp-border--default { --sp-chrome-border: var(--sp-border); }
+.sp-border--none { --sp-chrome-border: transparent; }
+.sp-border--subtle { --sp-chrome-border: var(--sp-border); }
+.sp-border--strong { --sp-chrome-border: var(--sp-border-strong); }
+
+.sp-elevation--none { --sp-chrome-shadow: var(--sp-shadow-none, none); }
+.sp-elevation--xs { --sp-chrome-shadow: var(--sp-shadow-xs); }
+.sp-elevation--sm { --sp-chrome-shadow: var(--sp-shadow-sm); }
+.sp-elevation--md { --sp-chrome-shadow: var(--sp-shadow-md); }
+.sp-elevation--lg { --sp-chrome-shadow: var(--sp-shadow-lg); }
+.sp-elevation--xl { --sp-chrome-shadow: var(--sp-shadow-xl); }
+.sp-elevation--inner { --sp-chrome-shadow: var(--sp-shadow-inner, var(--sp-shadow-sm)); }

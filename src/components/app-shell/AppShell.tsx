@@ -76,10 +76,10 @@ export function AppShellHamburger({
   className,
   style,
 }: AppShellHamburgerProps) {
-  const { toggle, toggleMobile, allowResponsive, allowCollapsible } = useSidebar();
+  const { toggle, toggleMobile, allowResponsive, allowCollapsible, isSmallScreen } = useSidebar();
 
   function handleClick() {
-    if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+    if (isSmallScreen) {
       if (allowResponsive) toggleMobile();
       else if (allowCollapsible) toggle();
     } else {
@@ -112,6 +112,7 @@ function AppShellInner({
   children,
   padded = false,
   breakpoint = 768,
+  headerHeight,
   className,
   style,
 }: Omit<AppShellProps, 'sidebarCollapsible' | 'sidebarResponsive'>) {
@@ -136,7 +137,7 @@ function AppShellInner({
     .join(' ');
 
   return (
-    <div className={rootCls} style={style}>
+    <div className={rootCls} style={{ ...style, ...(headerHeight !== undefined ? { '--sp-shell-bar-height': typeof headerHeight === 'number' ? `${headerHeight}px` : headerHeight } as CSSProperties : {}) }}>
       {/* Left Sidebar slot */}
       {sidebar}
 

@@ -9,6 +9,7 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import './Scheduler.css';
 import { Icon } from '../../icons/Icon.js';
 import { useI18n } from '../../i18n/i18n-context.js';
+import type { Border, Chrome, Radius } from '../../chrome/chrome.js';
 import type {
   SchedulerView,
   SchedulerEvent,
@@ -65,6 +66,9 @@ const ALL_VIEWS: SchedulerView[] = ['day', 'week', 'workWeek', 'month', 'agenda'
 export interface SchedulerProps {
   events?: SchedulerEvent[];
   resources?: SchedulerResource[];
+  chrome?: Chrome;
+  radius?: Radius;
+  border?: Border;
   view?: SchedulerView;
   currentDate?: Date;
   startHour?: number;
@@ -87,6 +91,9 @@ export interface SchedulerProps {
 export function Scheduler({
   events = [],
   resources = [],
+  chrome = 'default',
+  radius,
+  border = 'default',
   view = 'week',
   currentDate: currentDateProp,
   startHour = 0,
@@ -196,7 +203,15 @@ export function Scheduler({
   /* ── Render ── */
 
   return (
-    <div className={`sp-sch sp-sch--${activeView}`}>
+    <div
+      className={[
+        'sp-sch',
+        `sp-sch--${activeView}`,
+        `sp-chrome--${chrome}`,
+        radius && `sp-radius--${radius}`,
+        `sp-border--${border}`,
+      ].filter(Boolean).join(' ')}
+    >
       {/* Toolbar */}
       <div className="sp-sch__toolbar" role="toolbar" aria-label={t('schedulerToolbar')}>
         <div className="sp-sch__toolbar-nav">

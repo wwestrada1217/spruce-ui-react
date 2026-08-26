@@ -99,6 +99,11 @@ export function Example() {
                 <tr><td><code>oldCode</code></td><td><code>string</code></td><td><code>''</code></td><td>Previous code snippet string</td></tr>
                 <tr><td><code>newCode</code></td><td><code>string</code></td><td><code>''</code></td><td>Updated code snippet string</td></tr>
                 <tr><td><code>height</code></td><td><code>number | string</code></td><td><code>300</code></td><td>Editor container height</td></tr>
+                <tr><td><code>original</code>, <code>modified</code></td><td><code>string</code></td><td>—</td><td>Angular-parity aliases for the controlled before/after values</td></tr>
+                <tr><td><code>mode</code></td><td><code>'side-by-side' | 'inline'</code></td><td><code>'side-by-side'</code></td><td>Choose split panes or a unified diff; the toolbar and <code>onModeChange</code> keep it controlled</td></tr>
+                <tr><td><code>editable</code>, <code>showSplitter</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Enable modified-pane editing and the keyboard-resizable splitter</td></tr>
+                <tr><td><code>changeNavigation</code>, <code>collapseUnchanged</code>, <code>contextLines</code></td><td><code>boolean</code>, <code>boolean</code>, <code>number</code></td><td><code>false</code>, <code>false</code>, <code>3</code></td><td>Navigate changes and reduce unchanged context around them</td></tr>
+                <tr><td><code>onOriginalChange</code>, <code>onModifiedChange</code></td><td><code>(value: string) =&gt; void</code></td><td>—</td><td>Controlled pane callbacks, emitted only for editable panes</td></tr>
               </tbody>
             </table>
           </div>

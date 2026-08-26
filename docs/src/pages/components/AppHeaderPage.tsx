@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { AppHeader } from 'spruce-react'
+import { AppHeader, SidebarProvider, Sidebar, SidebarContent, SidebarItem } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
 
 const BASIC_CODE = `<AppHeader title="My App" subtitle="Dashboard" />`
@@ -21,12 +21,22 @@ const ACTIONS_CODE = `<AppHeader
   }
 />`
 
+const SIDEBAR_TOGGLE_CODE = `function ShellHeader() {
+  return <AppHeader>Dashboard</AppHeader>
+}
+
+<SidebarProvider>
+  <Sidebar><SidebarContent><SidebarItem icon="home">Home</SidebarItem></SidebarContent></Sidebar>
+  <ShellHeader />
+</SidebarProvider>`
+
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
   { id: 'basic',    label: 'Basic Usage' },
   { id: 'variants', label: 'Variants' },
   { id: 'sticky',   label: 'Sticky' },
   { id: 'actions',  label: 'With Actions' },
+  { id: 'sidebar-toggle', label: 'Sidebar Toggle' },
   { id: 'api',      label: 'API Reference' },
 ]
 
@@ -70,6 +80,19 @@ export function AppHeaderPage() {
             <div style={{ width: '100%' }}>
               <AppHeader title="My App" subtitle="Dashboard" />
             </div>
+          </CodePreview>
+        </section>
+
+        <section id="sidebar-toggle" className="demo-section" aria-labelledby="sidebar-toggle-heading">
+          <h2 id="sidebar-toggle-heading">Sidebar Toggle</h2>
+          <p className="section-desc">When a <code>SidebarProvider</code> is in scope, the header renders a localized toggle that collapses on desktop and opens the mobile overlay on small screens. Set <code>showToggle={false}</code> to opt out.</p>
+          <CodePreview code={SIDEBAR_TOGGLE_CODE} language="typescript">
+            <SidebarProvider>
+              <div style={{ display: 'flex', height: 160, border: '1px solid var(--sp-border)', overflow: 'hidden' }}>
+                <Sidebar allowResponsive={false}><SidebarContent><SidebarItem icon="home">Home</SidebarItem></SidebarContent></Sidebar>
+                <div style={{ flex: 1 }}><AppHeader>Dashboard</AppHeader></div>
+              </div>
+            </SidebarProvider>
           </CodePreview>
         </section>
 
@@ -134,9 +157,12 @@ export function AppHeaderPage() {
                 <tr><td><code>subtitle</code></td><td><code>string</code></td><td>—</td><td>Secondary descriptor text</td></tr>
                 <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>—</td><td>Center content slot</td></tr>
                 <tr><td><code>actions</code></td><td><code>ReactNode</code></td><td>—</td><td>Right-aligned actions slot</td></tr>
+                <tr><td><code>headerEnd</code></td><td><code>ReactNode</code></td><td>—</td><td>Angular-compatible end slot; takes precedence over <code>actions</code></td></tr>
                 <tr><td><code>variant</code></td><td><code>'default' | 'filled' | 'transparent'</code></td><td><code>'default'</code></td><td>Visual style variant</td></tr>
-                <tr><td><code>sticky</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Pin header to top on scroll</td></tr>
-                <tr><td><code>height</code></td><td><code>string | number</code></td><td><code>56</code></td><td>Header height in pixels or CSS value</td></tr>
+                <tr><td><code>sticky</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Pin header to top on scroll</td></tr>
+                <tr><td><code>height</code></td><td><code>string | number</code></td><td>shell token</td><td>Header height in pixels or CSS value</td></tr>
+                <tr><td><code>showBorders</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show the bottom border</td></tr>
+                <tr><td><code>showToggle</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show the provider-backed sidebar toggle</td></tr>
               </tbody>
             </table>
           </div>

@@ -29,9 +29,10 @@
 .sp-markdown-editor__container {
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--sp-border-strong, rgba(15, 23, 42, 0.14));
-  border-radius: var(--sp-radius-xl, 12px);
-  background: var(--sp-surface-0, #ffffff);
+  border: 1px solid var(--sp-chrome-border, var(--sp-border-strong));
+  border-radius: var(--sp-chrome-radius, var(--sp-radius-xl));
+  background: var(--sp-chrome-background, var(--sp-surface-0));
+  box-shadow: var(--sp-chrome-shadow, none);
   overflow: hidden;
   transition:
     border-color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease),
@@ -353,4 +354,11 @@
 .sp-markdown-editor__hint-msg {
   font-size: var(--sp-text-xs, 11px);
   color: var(--sp-text-subtle, #64748b);
+}
+
+.sp-markdown-editor__count {
+  padding: var(--sp-space-1) var(--sp-space-3);
+  color: var(--sp-text-subtle);
+  font-size: var(--sp-text-xs);
+  text-align: end;
 }

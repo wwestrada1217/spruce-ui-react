@@ -631,6 +631,12 @@ export interface SpI18nLabels {
   selectCompany: string;
   switchCompany: string;
   workspace: string;
+  accountMenu: string;
+  email: string;
+  myWorkspace: string;
+  newsletterDescription: string;
+  newsletterTitle: string;
+  subscribe: string;
 
   // ---------------------------------------------------------------------------
   // Data display
@@ -2829,6 +2835,12 @@ export const SP_I18N_DEFAULT_LABELS: SpI18nLabels = {
   selectCompany: 'Select company',
   switchCompany: 'Switch company',
   workspace: 'Workspace',
+  accountMenu: 'Account menu',
+  email: 'Email',
+  myWorkspace: 'My Workspace',
+  newsletterDescription: 'Opt-in to receive updates and news about the sidebar.',
+  newsletterTitle: 'Subscribe to our newsletter',
+  subscribe: 'Subscribe',
 
   // Data display
   addReaction: 'Add reaction',
@@ -4460,5 +4472,3 @@ export const SP_I18N_DEFAULT_LABELS: SpI18nLabels = {
   forbiddenGoToDashboard: 'Go to dashboard',
   forbiddenSignOut: 'Sign out',
 };
-
-

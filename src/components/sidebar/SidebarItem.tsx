@@ -53,7 +53,7 @@ export function SidebarItem<T extends ElementType = 'button'>({
     >
       {hasIcon ? (
         <Icon name={icon!} size={16} />
-      ) : collapsed ? (
+      ) : isCollapsedView ? (
         <span className="sp-sidebar-item__placeholder" />
       ) : null}
       <span className={`sp-sidebar-item__label${isCollapsedView ? ' sp-sidebar-item__label--collapsed' : ''}`}>

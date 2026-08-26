@@ -231,6 +231,24 @@ export function BlockEditorPage() {
                   <td><code>'md'</code></td>
                   <td>Visual size variant</td>
                 </tr>
+                <tr>
+                  <td><code>decorations</code>, <code>virtualize</code></td>
+                  <td><code>EditorDecorations</code>, <code>boolean | 'auto'</code></td>
+                  <td><code>{'{}'}</code>, <code>'auto'</code></td>
+                  <td>Render remote carets/markers and opt into threshold-based block virtualization metadata</td>
+                </tr>
+                <tr>
+                  <td><code>plugins</code>, <code>linkSuggestionProvider</code>, <code>mentionSuggestionProvider</code></td>
+                  <td><code>array</code>, <code>provider</code>, <code>provider</code></td>
+                  <td><code>[]</code>, —, —</td>
+                  <td>Extend slash commands and suggestion lookup through explicit functions/context</td>
+                </tr>
+                <tr>
+                  <td><code>ref</code></td>
+                  <td><code>BlockEditorHandle</code></td>
+                  <td>—</td>
+                  <td>Save/load JSON or documents, scroll to blocks, and invoke undo/redo</td>
+                </tr>
               </tbody>
             </table>
           </div>

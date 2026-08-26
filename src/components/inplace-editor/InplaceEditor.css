@@ -113,3 +113,26 @@
   height: 44px;
   font-size: var(--sp-text-base, 14px);
 }
+
+.sp-inplace-editor__editing {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-space-1);
+  min-width: 12rem;
+  max-width: 100%;
+}
+.sp-inplace-editor__native-input {
+  min-width: 10rem;
+  height: var(--sp-density-control-height, 32px);
+  padding-inline: var(--sp-space-2);
+  border: 1px solid var(--sp-input-border-focus, var(--sp-border-focus));
+  border-radius: var(--sp-input-radius, var(--sp-radius-md));
+  background: var(--sp-input-bg, var(--sp-surface-0));
+  color: var(--sp-input-text, var(--sp-text-color));
+  font: inherit;
+  outline: 2px solid var(--sp-border-focus);
+  outline-offset: -1px;
+}
+.sp-inplace-editor__actions { display: inline-flex; align-items: center; gap: var(--sp-space-1); }
+.sp-inplace-editor--sm .sp-inplace-editor__native-input { height: var(--sp-density-control-height-sm, 28px); font-size: var(--sp-text-xs); }
+.sp-inplace-editor--lg .sp-inplace-editor__native-input { height: var(--sp-density-control-height-lg, 44px); font-size: var(--sp-text-base); }

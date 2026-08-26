@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { CodeEditor } from 'spruce-react';
 import type { CodeLanguage } from 'spruce-react';
 import { CodePreview } from '../../components/CodePreview';
@@ -529,10 +529,14 @@ export function CodeEditorPage() {
                 <tr><td><code>showLineNumbers</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Toggle line number gutter visibility</td></tr>
                 <tr><td><code>tabSize</code></td><td><code>number</code></td><td><code>2</code></td><td>Number of spaces inserted on Tab key press</td></tr>
                 <tr><td><code>placeholder</code></td><td><code>string</code></td><td><code>''</code></td><td>Placeholder text shown when the editor is empty</td></tr>
-                <tr><td><code>minHeight</code></td><td><code>string</code></td><td><code>'200px'</code></td><td>Minimum height of the editor area</td></tr>
-                <tr><td><code>maxHeight</code></td><td><code>string</code></td><td><code>'none'</code></td><td>Maximum height; enables vertical scrolling</td></tr>
+                <tr><td><code>minHeight</code></td><td><code>string | number</code></td><td><code>'200px'</code></td><td>Minimum height of the editor area</td></tr>
+                <tr><td><code>maxHeight</code></td><td><code>string | number</code></td><td><code>'none'</code></td><td>Maximum height; enables vertical scrolling</td></tr>
                 <tr><td><code>ariaLabel</code></td><td><code>string</code></td><td><code>'Code editor'</code></td><td>Accessible label for the textarea</td></tr>
                 <tr><td><code>onCodeChange</code></td><td><code>(code: string) =&gt; void</code></td><td>—</td><td>Callback fired on every code change</td></tr>
+                <tr><td><code>showMinimap</code>, <code>diagnostics</code></td><td><code>boolean</code>, <code>SpCodeEditorDiagnostic[]</code></td><td><code>true</code>, <code>[]</code></td><td>Configure the minimap and accessible diagnostic status messages</td></tr>
+                <tr><td><code>completionItems</code>, <code>hoverInfo</code>, <code>signatureHelp</code></td><td><code>CompletionItem[]</code>, <code>HoverInfo</code>, <code>SignatureHelp</code></td><td>—</td><td>Controlled language-service surfaces; request callbacks provide async integration points</td></tr>
+                <tr><td><code>decorations</code>, <code>viewZones</code>, <code>collapsibleRanges</code></td><td><code>array</code></td><td><code>[]</code></td><td>Render line decorations, reserved view-zone space, and folding metadata</td></tr>
+                <tr><td><code>onStatusChange</code>, <code>onScrollChange</code></td><td><code>callback</code></td><td>—</td><td>Receive cursor/status and scroll updates without subscribing to Angular services</td></tr>
               </tbody>
             </table>
           </div>

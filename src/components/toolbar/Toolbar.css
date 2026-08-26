@@ -14,16 +14,20 @@
   gap: 2px;
   overflow: hidden;
   padding: 4px;
-  background: var(--sp-surface-0, #fff);
-  border: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08));
-  border-radius: var(--sp-radius-md, 6px);
+  background: var(--sp-chrome-background, var(--sp-surface-0));
+  border: 1px solid var(--sp-chrome-border, var(--sp-border));
+  border-radius: var(--sp-chrome-radius, var(--sp-radius-md));
+  box-shadow: var(--sp-chrome-shadow, none);
 }
-.sp-toolbar--chrome-subtle { background: var(--sp-surface-50, rgba(0, 0, 0, .02)); }
-.sp-toolbar--chrome-none { background: transparent; }
-.sp-toolbar--borderless { border: 0; }
-.sp-toolbar--radius-none { border-radius: 0; }
-.sp-toolbar--radius-sm { border-radius: var(--sp-radius-sm, 4px); }
-.sp-toolbar--radius-lg { border-radius: var(--sp-radius-lg, 8px); }
+.sp-toolbar--chrome-subtle { --sp-chrome-background: var(--sp-surface-raised); }
+.sp-toolbar--chrome-none { --sp-chrome-background: transparent; }
+.sp-toolbar--borderless { --sp-chrome-border: transparent; }
+.sp-toolbar--radius-none,
+.sp-toolbar--radius-sm,
+.sp-toolbar--radius-md,
+.sp-toolbar--radius-lg,
+.sp-toolbar--radius-xl,
+.sp-toolbar--radius-full { border-radius: var(--sp-chrome-radius); }
 
 /* ─── Button ──────────────────────────────────────────────────────── */
 

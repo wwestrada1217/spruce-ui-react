@@ -24,8 +24,10 @@
   padding: var(--sp-space-4, 16px);
   overflow-x: auto;
   min-height: 200px;
-  background: var(--sp-kanban-bg);
-  border-radius: var(--sp-radius-lg, 10px);
+  background: var(--sp-chrome-background, var(--sp-kanban-bg));
+  border: 1px solid var(--sp-chrome-border, transparent);
+  border-radius: var(--sp-chrome-radius, var(--sp-radius-lg));
+  box-shadow: var(--sp-chrome-shadow, none);
 }
 
 /* ── Column ───────────────────────────────────────────────────────────── */

@@ -3,8 +3,8 @@ import { Panel } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
 
 const items = Array.from({ length: 20 }, (_, i) => i + 1)
-const variants: ('default' | 'outlined' | 'elevated' | 'filled' | 'ghost')[] = [
-  'default', 'outlined', 'elevated', 'filled', 'ghost',
+const variants: ('default' | 'outlined' | 'elevated' | 'filled' | 'ghost' | 'flush')[] = [
+  'default', 'outlined', 'elevated', 'filled', 'ghost', 'flush',
 ]
 const paddings: ('none' | 'sm' | 'md' | 'lg')[] = ['none', 'sm', 'md', 'lg']
 
@@ -29,7 +29,7 @@ const HEADER_FOOTER_CODE = `<Panel maxHeight="300px">
   </Panel.Footer>
 </Panel>`
 
-const VARIANTS_CODE = `{/* default | outlined | elevated | filled | ghost */}
+const VARIANTS_CODE = `{/* default | outlined | elevated | filled | ghost | flush */}
 <Panel variant="outlined">
   <Panel.Header>Header</Panel.Header>
   <p>Content</p>
@@ -233,7 +233,12 @@ export function PanelPage() {
             <table className="api-table">
               <thead><tr><th>Name</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
               <tbody>
-                <tr><td><code>variant</code></td><td><code>'default' | 'outlined' | 'elevated' | 'filled' | 'ghost'</code></td><td><code>'default'</code></td><td>Visual style of the panel</td></tr>
+                <tr><td><code>variant</code></td><td><code>'default' | 'outlined' | 'elevated' | 'filled' | 'ghost' | 'flush'</code></td><td><code>'default'</code></td><td>Legacy visual style; maps to <code>chrome</code></td></tr>
+                <tr><td><code>chrome</code></td><td><code>Chrome</code></td><td>variant</td><td>Shared surface treatment</td></tr>
+                <tr><td><code>radius</code></td><td><code>Radius</code></td><td>token default</td><td>Shared corner radius</td></tr>
+                <tr><td><code>border</code></td><td><code>Border</code></td><td>token default</td><td>Shared border strength</td></tr>
+                <tr><td><code>elevation</code></td><td><code>Elevation</code></td><td>token default</td><td>Shared shadow treatment</td></tr>
+                <tr><td><code>backgroundMotif</code></td><td><code>SpMotifName</code></td><td>—</td><td>Decorative motif name and placement inputs</td></tr>
                 <tr><td><code>padding</code></td><td><code>'none' | 'sm' | 'md' | 'lg'</code></td><td><code>'md'</code></td><td>Inner spacing for header, body, and footer</td></tr>
                 <tr><td><code>height</code></td><td><code>string | undefined</code></td><td><code>undefined</code></td><td>Fixed height (e.g. <code>'300px'</code>)</td></tr>
                 <tr><td><code>maxHeight</code></td><td><code>string | undefined</code></td><td><code>undefined</code></td><td>Maximum height before the body scrolls</td></tr>

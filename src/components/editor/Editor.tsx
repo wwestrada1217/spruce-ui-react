@@ -15,8 +15,24 @@ import {
 import { Icon } from '../../icons/Icon.js';
 import { Select, type SelectOption } from '../select/Select.js';
 import { useI18n } from '../../i18n/i18n-context.js';
+import type { Border, Chrome, Radius } from '../../chrome/chrome.js';
 
 export type EditorSize = 'sm' | 'md' | 'lg';
+
+export type MentionTrigger = string;
+
+export interface MentionItem {
+  id: string;
+  label: string;
+  description?: string;
+  icon?: string;
+}
+
+export interface MentionInsertEvent {
+  item: MentionItem;
+  start: number;
+  end: number;
+}
 
 const FORMAT_BLOCK_OPTIONS: SelectOption[] = [
   { label: 'Paragraph', value: 'p' },
@@ -30,6 +46,8 @@ const FORMAT_BLOCK_OPTIONS: SelectOption[] = [
 export interface EditorProps {
   /** HTML string content value */
   value?: string;
+  /** Angular-parity alias for the controlled HTML value. */
+  content?: string;
   /** Emits HTML content changes */
   onChange?: (value: string) => void;
   /** Placeholder text shown when content is empty */
@@ -54,6 +72,20 @@ export interface EditorProps {
   maxHeight?: number | string;
   /** Hide the formatting toolbar */
   hideToolbar?: boolean;
+  /** Items shown when the mention trigger is typed in the editor. */
+  mentionItems?: readonly MentionItem[];
+  /** Character or string that opens mention suggestions. */
+  mentionTrigger?: MentionTrigger;
+  /** Formats the inserted mention text. */
+  mentionInsertTemplate?: (item: MentionItem) => string;
+  /** Surface chrome shared with cards, panels, and data surfaces. */
+  chrome?: Chrome;
+  radius?: Radius;
+  border?: Border;
+  /** Emits when a mention is inserted. */
+  onMention?: (event: MentionInsertEvent) => void;
+  /** Emits the current mention query for async lookup integrations. */
+  onMentionSearch?: (query: string) => void;
   /** Custom class name applied to root element */
   className?: string;
   /** Inline styles applied to root element */
@@ -62,6 +94,7 @@ export interface EditorProps {
 
 export function Editor({
   value,
+  content,
   onChange,
   placeholder = 'Write content here...',
   disabled = false,
@@ -74,26 +107,44 @@ export function Editor({
   minHeight,
   maxHeight,
   hideToolbar = false,
+  chrome = 'default',
+  radius,
+  border = 'default',
+  mentionItems = [],
+  mentionTrigger = '@',
+  mentionInsertTemplate,
+  onMention,
+  onMentionSearch,
   className,
   style,
 }: EditorProps) {
   const { t } = useI18n();
-  const [internalHtml, setInternalHtml] = useState<string>(value ?? '');
+  const controlledHtml = value !== undefined ? value : content;
+  const [internalHtml, setInternalHtml] = useState<string>(controlledHtml ?? '');
   const [isSourceView, setIsSourceView] = useState(false);
   const [blockFormat, setBlockFormat] = useState<string>('p');
   const [activeFormats, setActiveFormats] = useState<Record<string, boolean>>({});
+  const [mentionOpen, setMentionOpen] = useState(false);
+  const [mentionQuery, setMentionQuery] = useState('');
+  const [mentionIndex, setMentionIndex] = useState(0);
+  const mentionRangeRef = useRef<Range | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
 
+  const filteredMentionItems = mentionItems.filter((item) => {
+    const query = mentionQuery.toLowerCase();
+    return !query || item.label.toLowerCase().includes(query) || item.description?.toLowerCase().includes(query);
+  });
+
   // Sync internal state when value prop changes externally
-  const [prevValue, setPrevValue] = useState(value);
-  if (value !== prevValue) {
-    setPrevValue(value);
-    if (value !== undefined) {
-      setInternalHtml(value);
+  const [prevValue, setPrevValue] = useState(controlledHtml);
+  if (controlledHtml !== prevValue) {
+    setPrevValue(controlledHtml);
+    if (controlledHtml !== undefined) {
+      setInternalHtml(controlledHtml);
     }
   }
 
-  const currentHtml = value !== undefined ? (value ?? '') : internalHtml;
+  const currentHtml = controlledHtml !== undefined ? controlledHtml : internalHtml;
 
   // DOM content synchronization
   useEffect(() => {
@@ -145,6 +196,89 @@ export function Editor({
     const cleanHtml = html === '<br>' ? '' : html;
     setInternalHtml(cleanHtml);
     onChange?.(cleanHtml);
+    detectMention();
+  }
+
+  function detectMention() {
+    if (!isInteractive || mentionItems.length === 0 || isSourceView) {
+      setMentionOpen(false);
+      return;
+    }
+    const editor = editorRef.current;
+    const selection = window.getSelection();
+    if (!editor || !selection?.rangeCount || !selection.isCollapsed || !editor.contains(selection.anchorNode)) return;
+    const range = selection.getRangeAt(0).cloneRange();
+    const before = range.cloneRange();
+    before.selectNodeContents(editor);
+    before.setEnd(range.endContainer, range.endOffset);
+    const text = before.toString();
+    const triggerIndex = text.lastIndexOf(mentionTrigger);
+    if (triggerIndex < 0) { setMentionOpen(false); return; }
+    const query = text.slice(triggerIndex + mentionTrigger.length);
+    if (/\s/.test(query)) { setMentionOpen(false); return; }
+    const mentionRange = createTextRange(editor, triggerIndex, text.length);
+    if (!mentionRange) return;
+    mentionRangeRef.current = mentionRange;
+    setMentionQuery(query);
+    setMentionIndex(0);
+    setMentionOpen(true);
+    onMentionSearch?.(query);
+  }
+
+  function createTextRange(root: HTMLElement, start: number, end: number): Range | null {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const range = document.createRange();
+    let offset = 0;
+    let node = walker.nextNode();
+    let startSet = false;
+    while (node) {
+      const length = node.textContent?.length ?? 0;
+      if (!startSet && start >= offset && start <= offset + length) {
+        range.setStart(node, start - offset);
+        startSet = true;
+      }
+      if (startSet && end >= offset && end <= offset + length) {
+        range.setEnd(node, end - offset);
+        return range;
+      }
+      offset += length;
+      node = walker.nextNode();
+    }
+    return null;
+  }
+
+  function insertMention(item: MentionItem) {
+    const range = mentionRangeRef.current;
+    const editor = editorRef.current;
+    if (!range || !editor) return;
+    const text = mentionInsertTemplate?.(item) ?? `${mentionTrigger}${item.label}`;
+    const mention = document.createElement('span');
+    mention.className = 'sp-editor__mention';
+    mention.contentEditable = 'false';
+    mention.dataset.mentionId = item.id;
+    mention.textContent = text;
+    const trailingSpace = document.createTextNode('\u00a0');
+    range.deleteContents();
+    range.insertNode(trailingSpace);
+    range.insertNode(mention);
+    const next = document.createRange();
+    next.setStartAfter(trailingSpace);
+    next.collapse(true);
+    window.getSelection()?.removeAllRanges();
+    window.getSelection()?.addRange(next);
+    setMentionOpen(false);
+    setMentionQuery('');
+    handleContentChange();
+    editor.focus();
+    onMention?.({ item, start: 0, end: text.length });
+  }
+
+  function handleMentionKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (!mentionOpen) return;
+    if (event.key === 'ArrowDown') { event.preventDefault(); setMentionIndex((index) => (index + 1) % Math.max(1, filteredMentionItems.length)); }
+    else if (event.key === 'ArrowUp') { event.preventDefault(); setMentionIndex((index) => (index - 1 + Math.max(1, filteredMentionItems.length)) % Math.max(1, filteredMentionItems.length)); }
+    else if ((event.key === 'Enter' || event.key === 'Tab') && filteredMentionItems[mentionIndex]) { event.preventDefault(); insertMention(filteredMentionItems[mentionIndex]); }
+    else if (event.key === 'Escape') { event.preventDefault(); setMentionOpen(false); }
   }
 
   function handleSourceChange(newHtml: string) {
@@ -207,7 +341,14 @@ export function Editor({
         </label>
       )}
 
-      <div className="sp-editor__container">
+      <div
+        className={[
+          'sp-editor__container',
+          `sp-chrome--${chrome}`,
+          radius && `sp-radius--${radius}`,
+          `sp-border--${border}`,
+        ].filter(Boolean).join(' ')}
+      >
         {/* Toolbar */}
         {!hideToolbar && (
           <div className="sp-editor__toolbar" role="toolbar" aria-label={t('formattingOptions')}>
@@ -552,12 +693,32 @@ export function Editor({
             onBlur={handleContentChange}
             onKeyUp={updateActiveFormats}
             onClick={updateActiveFormats}
+            onKeyDown={handleMentionKeyDown}
             role="textbox"
             aria-multiline="true"
             aria-readonly={readOnly}
             aria-disabled={disabled}
+            aria-invalid={Boolean(propError) || undefined}
             aria-label={label || t('editorContent')}
           />
+        )}
+        {mentionOpen && filteredMentionItems.length > 0 && (
+          <div className="sp-editor__mention-panel" role="listbox" aria-label={t('mentionSuggestions')}>
+            {filteredMentionItems.map((item, index) => (
+              <button
+                key={item.id}
+                type="button"
+                role="option"
+                aria-selected={index === mentionIndex}
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => insertMention(item)}
+              >
+                {item.icon && <Icon name={item.icon} size={14} aria-hidden="true" />}
+                <span>{item.label}</span>
+                {item.description && <small>{item.description}</small>}
+              </button>
+            ))}
+          </div>
         )}
       </div>
 

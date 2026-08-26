@@ -10,6 +10,11 @@
 .sp-tree {
   display: flex;
   flex-direction: column;
+  border: 1px solid var(--sp-chrome-border, var(--sp-border));
+  border-radius: var(--sp-chrome-radius, var(--sp-radius-lg));
+  background: var(--sp-chrome-background, var(--sp-surface-0));
+  box-shadow: var(--sp-chrome-shadow, none);
+  overflow: hidden;
 }
 
 /* ── Node row ─────────────────────────────────────────────────────────────── */

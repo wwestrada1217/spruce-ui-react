@@ -7,9 +7,12 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarItem,
-  SidebarMenu,
   SidebarMenuGroup,
   SidebarSeparator,
+  SidebarWorkspaceSwitcher,
+  SidebarAccountSwitcher,
+  SidebarPopoverItem,
+  SidebarNewsletterSubscribeForm,
 } from 'spruce-react';
 import { CodePreview } from '../../components/CodePreview';
 
@@ -153,6 +156,35 @@ const SEPARATOR_CODE = `import {
   </SidebarContent>
 </Sidebar>`;
 
+const SHELL_SWITCHERS_CODE = `import {
+  Sidebar,
+  SidebarHeader,
+  SidebarContent,
+  SidebarFooter,
+  SidebarWorkspaceSwitcher,
+  SidebarAccountSwitcher,
+  SidebarPopoverItem,
+  SidebarNewsletterSubscribeForm,
+} from 'spruce-react';
+
+<Sidebar>
+  <SidebarHeader showBorders>
+    <SidebarWorkspaceSwitcher
+      workspaces={workspaces}
+      value={workspaceId}
+      onValueChange={setWorkspace}
+    />
+  </SidebarHeader>
+  <SidebarContent>{/* navigation */}</SidebarContent>
+  <SidebarFooter showBorders>
+    <SidebarAccountSwitcher username="Wendell Estrada" email="wendell@example.com" />
+    <SidebarPopoverItem icon="help-circle" label="Help & Support">
+      <button type="button">Documentation</button>
+    </SidebarPopoverItem>
+    <SidebarNewsletterSubscribeForm onSubmit={subscribe} />
+  </SidebarFooter>
+</Sidebar>`;
+
 // ── Sections ─────────────────────────────────────────────────────────────────
 
 const SECTIONS = [
@@ -160,6 +192,7 @@ const SECTIONS = [
   { id: 'icons',         label: 'With Icons' },
   { id: 'groups',        label: 'Groups' },
   { id: 'header-footer', label: 'Header & Footer' },
+  { id: 'shell-switchers', label: 'Shell Switchers' },
   { id: 'menus',         label: 'Expandable Menus' },
   { id: 'separator',     label: 'Separators' },
   { id: 'api',           label: 'API' },
@@ -254,6 +287,32 @@ export function SidebarPage() {
                   <SidebarItem>Search</SidebarItem>
                   <SidebarItem>Settings</SidebarItem>
                 </SidebarContent>
+              </Sidebar>
+            </DemoCard>
+          </CodePreview>
+        </section>
+
+        {/* Shell switchers and custom sidebar content */}
+        <section id="shell-switchers" className="demo-section" aria-labelledby="shell-switchers-heading">
+          <h2 id="shell-switchers-heading">Shell Switchers &amp; Custom Content</h2>
+          <p className="section-desc">Workspace and account switchers are controlled React components. Popover items and the newsletter form compose in the same header/footer slots and disappear from the accessibility tree when the sidebar is collapsed.</p>
+          <CodePreview code={SHELL_SWITCHERS_CODE} language="typescript">
+            <DemoCard>
+              <Sidebar allowResponsive={false} allowCollapsible={false}>
+                <SidebarHeader showBorders>
+                  <SidebarWorkspaceSwitcher workspaces={[{ label: 'Acme Inc', sublabel: 'Enterprise', value: 'acme' }, { label: 'Personal', sublabel: 'Free', value: 'personal' }]} />
+                </SidebarHeader>
+                <SidebarContent>
+                  <SidebarItem icon="layout-dashboard" active>Dashboard</SidebarItem>
+                  <SidebarItem icon="inbox">Inbox</SidebarItem>
+                  <SidebarPopoverItem icon="help-circle" label="Help & Support" sublabel="Docs, shortcuts">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}><button type="button">Documentation</button><button type="button">Keyboard shortcuts</button></div>
+                  </SidebarPopoverItem>
+                  <SidebarNewsletterSubscribeForm />
+                </SidebarContent>
+                <SidebarFooter showBorders>
+                  <SidebarAccountSwitcher username="Wendell Estrada" email="wendell@example.com" userMenuItems={[{ label: 'Account', icon: 'settings' }, { label: 'Sign out', icon: 'log-out' }]} />
+                </SidebarFooter>
               </Sidebar>
             </DemoCard>
           </CodePreview>
@@ -439,6 +498,8 @@ export function SidebarPage() {
                 <tr><td><code>breakpoint</code></td><td><code>number</code></td><td><code>768</code></td><td>Pixel width at which responsive mode activates</td></tr>
                 <tr><td><code>label</code></td><td><code>string</code></td><td><code>'Navigation'</code></td><td>Accessible label for the navigation landmark</td></tr>
                 <tr><td><code>onCollapsedChange</code></td><td><code>(v: boolean) =&gt; void</code></td><td>—</td><td>Callback fired when collapsed state changes</td></tr>
+                <tr><td><code>resizable</code>, <code>minWidth</code>, <code>maxWidth</code></td><td><code>boolean</code>, <code>number</code>, <code>number</code></td><td><code>false</code>, <code>200</code>, <code>480</code></td><td>Enable pointer/keyboard resize with bounded width.</td></tr>
+                <tr><td><code>onMobileOpenChange</code>, <code>onExpandedWidthChange</code></td><td>callbacks</td><td>—</td><td>Controlled mobile and resize lifecycle callbacks.</td></tr>
               </tbody>
             </table>
           </div>
@@ -489,6 +550,15 @@ export function SidebarPage() {
               </tbody>
             </table>
           </div>
+
+          <h3>SidebarWorkspaceSwitcher</h3>
+          <p className="section-desc"><code>workspaces</code>, controlled <code>value</code>, <code>defaultValue</code>, <code>showSubLabel</code>, and <code>onValueChange</code> / <code>onWorkspaceChange</code>.</p>
+          <h3>SidebarAccountSwitcher</h3>
+          <p className="section-desc"><code>username</code>, <code>email</code>, <code>avatar</code>, <code>userMenuItems</code>, projected <code>children</code>, and controlled popover visibility.</p>
+          <h3>SidebarPopoverItem</h3>
+          <p className="section-desc"><code>icon</code>, <code>label</code>, <code>sublabel</code>, <code>avatar</code>, <code>placement</code>, dismissal flags, controlled <code>open</code>, and labelled panel <code>children</code>.</p>
+          <h3>SidebarNewsletterSubscribeForm</h3>
+          <p className="section-desc">Controlled <code>email</code> / <code>onEmailChange</code>, native <code>onSubmit</code>, and overridable title, description, and labels.</p>
         </section>
       </div>
 

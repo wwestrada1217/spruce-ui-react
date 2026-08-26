@@ -11,9 +11,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--sp-space-5, 20px);
+  min-height: var(--sp-shell-bar-height, 52px);
+  padding: 0 var(--sp-density-panel-padding, var(--sp-space-4, 16px));
+  gap: var(--sp-density-inline-gap, var(--sp-space-2, 8px));
   font-family: inherit;
   color: var(--sp-text-color, #1a202c);
+  background: var(--sp-surface-0, #fff);
+  backdrop-filter: var(--sp-backdrop-filter, none);
   box-sizing: border-box;
 }
 
@@ -34,6 +38,13 @@
   border-bottom: none;
 }
 
+.sp-app-header--default:not(.sp-app-header--bordered),
+.sp-app-header--filled:not(.sp-app-header--bordered) { border-bottom: none; }
+
+.sp-app-header--bordered {
+  border-bottom: var(--sp-border-width-hairline, 1px) solid var(--sp-border, rgba(0, 0, 0, 0.08));
+}
+
 /* ── Sticky ───────────────────────────────────────────────────────────────── */
 
 .sp-app-header--sticky {
@@ -49,6 +60,46 @@
   align-items: center;
   gap: var(--sp-space-3, 12px);
   flex-shrink: 0;
+}
+
+.sp-app-header__start {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-density-inline-gap, var(--sp-space-2, 8px));
+  flex: 1;
+  min-width: 0;
+}
+
+.sp-app-header__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--sp-density-control-height, 32px);
+  height: var(--sp-density-control-height, 32px);
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  border-radius: var(--sp-radius-md, 6px);
+  background: transparent;
+  color: var(--sp-text-subtle, #718096);
+  cursor: pointer;
+}
+
+.sp-app-header__toggle:hover {
+  background: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04));
+  color: var(--sp-text-color, #1a202c);
+}
+
+.sp-app-header__toggle:focus-visible {
+  outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color, var(--sp-primary));
+  outline-offset: var(--sp-focus-ring-offset, 2px);
+}
+
+.sp-app-header__content {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  flex: 1;
 }
 
 .sp-app-header__logo {

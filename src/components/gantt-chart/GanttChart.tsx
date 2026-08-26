@@ -38,6 +38,7 @@ import {
   buildDependencyPath,
 } from './gantt-utils';
 import './GanttChart.css';
+import type { Border, Chrome, Radius } from '../../chrome/chrome.js';
 
 const SCALE_ORDER: GanttTimeScale[] = ['hour', 'day', 'week', 'month'];
 
@@ -64,6 +65,9 @@ export interface GanttChartProps {
   dependencies?: GanttDependency[];
   /** Optional resources (people) assigned to tasks. */
   resources?: GanttResource[];
+  chrome?: Chrome;
+  radius?: Radius;
+  border?: Border;
   /** Configuration overrides for the chart. */
   config?: GanttConfig;
   /** Fired when a task bar or task row is clicked. */
@@ -482,15 +486,6 @@ function DependencyOverlay({
   );
 }
 
-// ── Format Helpers ─────────────────────────────────────────
-
-function formatDate(date: Date): string {
-  const m = date.getMonth() + 1;
-  const d = date.getDate();
-  const y = date.getFullYear();
-  return `${m}/${d}/${y}`;
-}
-
 function formatProgress(p: number | undefined): string {
   if (p == null) return '';
   return `${Math.round(p * 100)}%`;
@@ -523,6 +518,9 @@ export function GanttChart({
   milestones = [],
   dependencies = [],
   resources = [],
+  chrome = 'default',
+  radius,
+  border = 'default',
   config = {},
   onTaskClick,
   onTaskMove,
@@ -716,7 +714,13 @@ export function GanttChart({
   }, []);
 
   // ── Render ───────────────────────────────────────────────
-  const rootClasses = ['sp-gantt', className].filter(Boolean).join(' ');
+  const rootClasses = [
+    'sp-gantt',
+    `sp-chrome--${chrome}`,
+    radius && `sp-radius--${radius}`,
+    `sp-border--${border}`,
+    className,
+  ].filter(Boolean).join(' ');
 
   return (
     <div className={rootClasses}>

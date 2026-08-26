@@ -10,15 +10,22 @@
 .sp-panel {
   display: flex;
   flex-direction: column;
-  border-radius: var(--sp-panel-radius, 8px);
-  border: 1px solid var(--sp-panel-border, rgba(0, 0, 0, 0.08));
-  background: var(--sp-panel-bg, var(--sp-surface-0, #fff));
+  position: relative;
+  border-radius: var(--sp-chrome-radius, var(--sp-panel-radius, var(--sp-radius-lg)));
+  border: 1px solid var(--sp-chrome-border, var(--sp-panel-border, var(--sp-border)));
+  background: var(--sp-chrome-background, var(--sp-panel-bg, var(--sp-surface-0)));
+  box-shadow: var(--sp-chrome-shadow, none);
   overflow: hidden;
 
   /* Component-level tokens */
-  --sp-panel-bg: var(--sp-surface-0, #fff);
-  --sp-panel-border: var(--sp-border, rgba(0, 0, 0, 0.08));
-  --sp-panel-radius: var(--sp-radius-lg, 8px);
+  --sp-panel-bg: var(--sp-surface-0);
+  --sp-panel-border: var(--sp-border);
+  --sp-panel-radius: var(--sp-radius-lg);
+}
+
+.sp-panel--has-motif {
+  isolation: isolate;
+  overflow: hidden;
 }
 
 /* ── Variants ─────────────────────────────────────────────────────────────── */
@@ -41,6 +48,51 @@
   border-color: transparent;
 }
 
+.sp-panel--flush {
+  background: transparent;
+  border-color: transparent;
+  border-radius: var(--sp-radius-none);
+  box-shadow: none;
+}
+
+/* Explicit shared chrome wins over the legacy variant class. */
+.sp-panel.sp-chrome--default,
+.sp-panel.sp-chrome--outlined,
+.sp-panel.sp-chrome--filled,
+.sp-panel.sp-chrome--elevated,
+.sp-panel.sp-chrome--ghost,
+.sp-panel.sp-chrome--flush {
+  background: var(--sp-chrome-background, var(--sp-panel-bg));
+  border-color: var(--sp-chrome-border, var(--sp-panel-border));
+  box-shadow: var(--sp-chrome-shadow, none);
+}
+
+.sp-panel.sp-radius--none,
+.sp-panel.sp-radius--sm,
+.sp-panel.sp-radius--md,
+.sp-panel.sp-radius--lg,
+.sp-panel.sp-radius--xl,
+.sp-panel.sp-radius--full {
+  border-radius: var(--sp-chrome-radius);
+}
+
+.sp-panel.sp-border--default,
+.sp-panel.sp-border--none,
+.sp-panel.sp-border--subtle,
+.sp-panel.sp-border--strong {
+  border-color: var(--sp-chrome-border);
+}
+
+.sp-panel.sp-elevation--none,
+.sp-panel.sp-elevation--xs,
+.sp-panel.sp-elevation--sm,
+.sp-panel.sp-elevation--md,
+.sp-panel.sp-elevation--lg,
+.sp-panel.sp-elevation--xl,
+.sp-panel.sp-elevation--inner {
+  box-shadow: var(--sp-chrome-shadow);
+}
+
 /* ── Header ───────────────────────────────────────────────────────────────── */
 
 .sp-panel__header {
@@ -48,7 +100,7 @@
   align-items: center;
   gap: var(--sp-space-3, 12px);
   padding: var(--sp-space-3, 12px) var(--sp-space-4, 16px);
-  border-bottom: 1px solid var(--sp-panel-border, rgba(0, 0, 0, 0.08));
+  border-bottom: 1px solid var(--sp-chrome-border, var(--sp-panel-border));
   flex-shrink: 0;
 }
 
@@ -99,6 +151,6 @@
   align-items: center;
   gap: var(--sp-space-2, 8px);
   padding: var(--sp-space-3, 12px) var(--sp-space-4, 16px);
-  border-top: 1px solid var(--sp-panel-border, rgba(0, 0, 0, 0.08));
+  border-top: 1px solid var(--sp-chrome-border, var(--sp-panel-border));
   flex-shrink: 0;
 }

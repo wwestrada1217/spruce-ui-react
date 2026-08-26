@@ -11,6 +11,7 @@ import { useMemo, useCallback } from 'react';
 import { Icon } from '../../icons/Icon';
 import { useI18n } from '../../i18n/i18n-context.js';
 import './FilterExpression.css';
+import type { Border, Chrome, Radius } from '../../chrome/chrome.js';
 
 // -- Types ------------------------------------------------------------------
 
@@ -427,6 +428,9 @@ export interface FilterExpressionProps {
   fields: FilterField[];
   /** The filter expression tree */
   expression: FilterGroup;
+  chrome?: Chrome;
+  radius?: Radius;
+  border?: Border;
   /** Called when the expression changes */
   onChange: (expression: FilterGroup) => void;
   /** Maximum nesting depth for groups */
@@ -436,18 +440,30 @@ export interface FilterExpressionProps {
 export function FilterExpression({
   fields,
   expression,
+  chrome = 'default',
+  radius,
+  border = 'default',
   onChange,
   maxDepth = 5,
 }: FilterExpressionProps) {
   return (
-    <FilterGroupBlock
-      fields={fields}
-      group={expression}
-      depth={0}
-      maxDepth={maxDepth}
-      removable={false}
-      onChanged={onChange}
-      onRemoved={() => {}}
-    />
+    <div
+      className={[
+        'sp-filter-expr',
+        `sp-chrome--${chrome}`,
+        radius && `sp-radius--${radius}`,
+        `sp-border--${border}`,
+      ].filter(Boolean).join(' ')}
+    >
+      <FilterGroupBlock
+        fields={fields}
+        group={expression}
+        depth={0}
+        maxDepth={maxDepth}
+        removable={false}
+        onChanged={onChange}
+        onRemoved={() => {}}
+      />
+    </div>
   );
 }

@@ -8,8 +8,10 @@
 /* ── Shell ───────────────────────────────────────────────────────── */
 
 .sp-terminal {
-  background: var(--sp-terminal-bg, #0d1117);
-  border-radius: var(--sp-radius-lg, 8px);
+  background: var(--sp-chrome-background, var(--sp-terminal-bg, #0d1117));
+  border-radius: var(--sp-chrome-radius, var(--sp-radius-lg));
+  border: 1px solid var(--sp-chrome-border, transparent);
+  box-shadow: var(--sp-chrome-shadow, none);
   overflow: hidden;
   font-family: var(--sp-font-mono, 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace);
   font-size: var(--sp-terminal-font-size, 13px);
@@ -19,8 +21,14 @@
 }
 
 .sp-terminal--bordered {
-  border: 1px solid var(--sp-terminal-border, #30363d);
-  box-shadow: var(--sp-shadow-md, 0 4px 12px rgba(0,0,0,.35));
+  border-color: var(--sp-chrome-border, var(--sp-terminal-border, #30363d));
+  box-shadow: var(--sp-chrome-shadow, var(--sp-shadow-md));
+}
+
+.sp-terminal.sp-chrome--default {
+  --sp-chrome-background: var(--sp-terminal-bg, #0d1117);
+  --sp-chrome-border: var(--sp-terminal-border, #30363d);
+  --sp-chrome-shadow: var(--sp-shadow-md);
 }
 
 /* ── Titlebar ─────────────────────────────────────────────────── */

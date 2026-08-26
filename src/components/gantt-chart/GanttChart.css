@@ -20,10 +20,11 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  border: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08));
-  border-radius: 8px;
+  border: 1px solid var(--sp-chrome-border, var(--sp-border));
+  border-radius: var(--sp-chrome-radius, var(--sp-radius-lg));
   overflow: hidden;
-  background: var(--sp-surface-0, #ffffff);
+  background: var(--sp-chrome-background, var(--sp-surface-0));
+  box-shadow: var(--sp-chrome-shadow, none);
   font-family: var(--sp-font-sans, system-ui, -apple-system, sans-serif);
 }
 
