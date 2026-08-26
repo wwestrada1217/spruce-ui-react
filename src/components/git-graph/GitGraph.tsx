@@ -58,6 +58,14 @@ export interface GitGraphProps {
   nodeRadius?: number;
   /** Called when a commit row is clicked. */
   onCommitClick?: (commit: GitGraphCommit) => void;
+  /** Controlled selected commit hash. */
+  selectedHash?: string | null;
+  /** Called when the selected commit changes. */
+  onCommitSelect?: (commit: GitGraphCommit) => void;
+  /** Called for a commit context-menu request. */
+  onCommitContextMenu?: (payload: { commit: GitGraphCommit; event: React.MouseEvent<HTMLDivElement> }) => void;
+  /** Accessible label for the history log. */
+  ariaLabel?: string;
   /** Additional CSS class name(s). */
   className?: string;
 }
@@ -102,9 +110,14 @@ export function GitGraph({
   laneWidth = 28,
   nodeRadius = 5,
   onCommitClick,
+  selectedHash: controlledSelectedHash,
+  onCommitSelect,
+  onCommitContextMenu,
+  ariaLabel = 'Git commit history',
   className = '',
 }: GitGraphProps) {
-  const [selected, setSelected] = useState<string | null>(null);
+  const [internalSelected, setInternalSelected] = useState<string | null>(null);
+  const selected = controlledSelectedHash !== undefined ? controlledSelectedHash : internalSelected;
 
   const layout = useMemo(() => {
     if (commits.length === 0) {
@@ -174,10 +187,11 @@ export function GitGraph({
 
   const selectRow = useCallback(
     (commit: GitGraphCommit) => {
-      setSelected(commit.hash);
+      if (controlledSelectedHash === undefined) setInternalSelected(commit.hash);
       onCommitClick?.(commit);
+      onCommitSelect?.(commit);
     },
-    [onCommitClick],
+    [controlledSelectedHash, onCommitClick, onCommitSelect],
   );
 
   const commitLabel = (c: GitGraphCommit): string => {
@@ -206,7 +220,7 @@ export function GitGraph({
     <div
       className={classes}
       role="log"
-      aria-label={`Git commit history with ${commits.length} commits`}
+      aria-label={`${ariaLabel} with ${commits.length} commits`}
     >
       <svg
         className="sp-git-graph__svg"
@@ -259,21 +273,31 @@ export function GitGraph({
             className={`sp-git-graph__row${selected === node.commit.hash ? ' sp-git-graph__row--selected' : ''}`}
             style={{ height: rowHeight }}
             onClick={() => selectRow(node.commit)}
+            onContextMenu={(event) => {
+              event.preventDefault();
+              onCommitContextMenu?.({ commit: node.commit, event });
+            }}
             onKeyDown={(e) => handleRowKeyDown(e, node.commit)}
             tabIndex={0}
+            role="button"
+            aria-current={selected === node.commit.hash ? 'true' : undefined}
             aria-label={commitLabel(node.commit)}
           >
             <div className="sp-git-graph__top-line">
-              {(node.commit.refs ?? []).map((ref) => (
-                <span
-                  key={ref}
-                  className="sp-git-graph__ref"
-                  style={{ '--_ref': node.color } as React.CSSProperties}
-                >
-                  <Icon name="git-branch" size={11} />
-                  {ref}
-                </span>
-              ))}
+              {(node.commit.refs ?? []).map((ref) => {
+                const isTag = ref.startsWith('tag:');
+                const label = isTag ? ref.slice(4) : ref;
+                return (
+                  <span
+                    key={ref}
+                    className={isTag ? 'sp-git-graph__tag' : 'sp-git-graph__ref'}
+                    style={!isTag ? { '--_ref': node.color } as React.CSSProperties : undefined}
+                  >
+                    <Icon name={isTag ? 'tag' : 'git-branch'} size={11} />
+                    {label}
+                  </span>
+                );
+              })}
               {(node.commit.tags ?? []).map((tag) => (
                 <span key={tag} className="sp-git-graph__tag">
                   <Icon name="tag" size={11} />

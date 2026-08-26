@@ -25,6 +25,10 @@
   --sp-badge-default-border: var(--sp-border, rgba(0, 0, 0, 0.08));
   --sp-badge-primary-bg: var(--sp-primary-subtle, rgba(37, 99, 235, 0.1));
   --sp-badge-primary-text: var(--sp-primary, #2563eb);
+  --sp-badge-secondary-bg: var(--sp-secondary-subtle, var(--sp-primary-subtle, rgba(37, 99, 235, 0.1)));
+  --sp-badge-secondary-text: var(--sp-secondary, var(--sp-primary, #2563eb));
+  --sp-badge-tertiary-bg: var(--sp-tertiary-subtle, var(--sp-primary-subtle, rgba(37, 99, 235, 0.1)));
+  --sp-badge-tertiary-text: var(--sp-tertiary, var(--sp-primary, #2563eb));
   --sp-badge-success-bg: var(--sp-success-subtle, rgba(22, 163, 74, 0.1));
   --sp-badge-success-text: var(--sp-success, #16a34a);
   --sp-badge-warning-bg: var(--sp-warning-subtle, rgba(217, 119, 6, 0.1));
@@ -35,12 +39,45 @@
   --sp-badge-info-text: var(--sp-info, #0891b2);
 }
 
+button.sp-badge {
+  appearance: none;
+  margin: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.sp-badge--clickable:hover {
+  background: color-mix(in srgb, currentColor 8%, var(--sp-badge-default-bg, #f1f3f6));
+  border-color: color-mix(in srgb, currentColor 30%, transparent);
+}
+
+.sp-badge--clickable:active {
+  transform: scale(0.98);
+}
+
+.sp-badge--clickable:focus-visible {
+  outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color, currentColor);
+  outline-offset: var(--sp-focus-ring-offset, 2px);
+}
+
 /* ── Variants ──────────────────────────────────────────────────────────────── */
 
 .sp-badge--primary {
   background: var(--sp-badge-primary-bg, rgba(37, 99, 235, 0.1));
   color: var(--sp-badge-primary-text, #2563eb);
   border-color: color-mix(in srgb, var(--sp-badge-primary-text, #2563eb) 25%, transparent);
+}
+
+.sp-badge--secondary {
+  background: var(--sp-badge-secondary-bg);
+  color: var(--sp-badge-secondary-text);
+  border-color: color-mix(in srgb, var(--sp-badge-secondary-text) 25%, transparent);
+}
+
+.sp-badge--tertiary {
+  background: var(--sp-badge-tertiary-bg);
+  color: var(--sp-badge-tertiary-text);
+  border-color: color-mix(in srgb, var(--sp-badge-tertiary-text) 25%, transparent);
 }
 
 .sp-badge--success {
@@ -74,6 +111,15 @@
   font-size: var(--sp-text-2xs, 10px);
 }
 
+.sp-badge--xs {
+  padding: 1px 3px;
+  font-size: 9px;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  border-radius: var(--sp-radius-xs, 2px);
+  gap: 2px;
+}
+
 .sp-badge--lg {
   padding: var(--sp-space-1, 4px) var(--sp-space-2_5, 10px);
   font-size: var(--sp-text-sm, 13px);
@@ -93,4 +139,20 @@
   border-radius: 9999px;
   background: currentColor;
   flex-shrink: 0;
+}
+
+.sp-badge--borderless {
+  border-color: transparent;
+}
+
+.sp-badge__icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-badge--clickable:active {
+    transform: none;
+  }
 }

@@ -77,8 +77,8 @@
   gap: 2px;
 }
 .sp-credit-card__info--right {
-  text-align: right;
-  margin-left: 24px;
+  text-align: end;
+  margin-inline-start: 24px;
 }
 
 .sp-credit-card__label {
@@ -96,7 +96,7 @@
 
 /* -- Network logo --------------------------------------------------- */
 .sp-credit-card__network {
-  margin-left: auto;
+  margin-inline-start: auto;
   display: flex;
   align-items: flex-end;
 }

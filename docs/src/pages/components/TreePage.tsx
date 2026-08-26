@@ -277,6 +277,10 @@ export function TreePage() {
                 <tr><td><code>expandAll</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Expand all nodes initially</td></tr>
                 <tr><td><code>showLines</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Show connecting tree lines between parent and child nodes</td></tr>
                 <tr><td><code>expandOnClick</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Toggle expand/collapse when clicking anywhere on a node row</td></tr>
+                <tr><td><code>density</code></td><td><code>'default' | 'dense'</code></td><td><code>'default'</code></td><td>Row density</td></tr>
+                <tr><td><code>virtualScroll</code>, <code>virtualItemHeight</code>, <code>virtualOverscan</code></td><td><code>boolean | number</code></td><td><code>false</code>, <code>32</code>, <code>6</code></td><td>Virtualize visible expanded rows</td></tr>
+                <tr><td><code>expandedIds</code>, <code>checkedIds</code>, <code>selectedId</code></td><td><code>controlled ids</code></td><td>-</td><td>Controlled expansion, checkbox, and selection state</td></tr>
+                <tr><td><code>rowActions</code></td><td><code>(node) =&gt; ReactNode</code></td><td>-</td><td>Trailing row actions</td></tr>
               </tbody>
             </table>
           </div>
@@ -290,6 +294,7 @@ export function TreePage() {
                 <tr><td><code>onNodeCheck</code></td><td><code>NodeCheckEvent</code></td><td>Emits node and checked state on checkbox change</td></tr>
                 <tr><td><code>onNodeDrop</code></td><td><code>NodeDropEvent</code></td><td>Emits node, parent, and index after drag-drop</td></tr>
                 <tr><td><code>onNodeToggle</code></td><td><code>TreeNode</code></td><td>Emits when node is expanded/collapsed</td></tr>
+                <tr><td><code>onNodeDblClick</code>, <code>onNodeDragStart</code>, <code>onNodeDragEnd</code></td><td><code>callbacks</code></td><td>Double-click and native drag lifecycle callbacks</td></tr>
               </tbody>
             </table>
           </div>

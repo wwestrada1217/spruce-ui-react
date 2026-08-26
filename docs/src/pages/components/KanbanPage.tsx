@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Kanban, Badge, Avatar, Icon, type KanbanColumn, type KanbanCard, type KanbanCardMoveEvent, type KanbanColumnMoveEvent } from 'spruce-react'
+import { Kanban, Badge, Avatar, Icon, type KanbanColumn, type KanbanCardMoveEvent, type KanbanColumnMoveEvent } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
 
 // ── Basic demo data ─────────────────────────────────────────────────────────
@@ -238,7 +238,7 @@ export function KanbanPage() {
             <Kanban
               columns={customColumns}
               onCardMoved={handleCustomCardMoved}
-              cardRenderer={(card, col) => (
+              cardRenderer={(card) => (
                 <div className="custom-card">
                   <div className="custom-card__header">
                     <span className="custom-card__id">{card['tag'] as string}</span>
@@ -310,6 +310,9 @@ export function KanbanPage() {
               <tbody>
                 <tr><td><code>columns</code></td><td><code>KanbanColumn[]</code></td><td>required</td><td>Array of columns, each with an array of cards</td></tr>
                 <tr><td><code>columnDraggable</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Whether columns can be reordered via drag</td></tr>
+                <tr><td><code>cardDraggable</code></td><td><code>boolean | predicate</code></td><td><code>true</code></td><td>Enable or selectively enable card dragging</td></tr>
+                <tr><td><code>canMoveCard</code>, <code>canDropCard</code></td><td><code>callbacks</code></td><td>-</td><td>Guard drag and keyboard movement</td></tr>
+                <tr><td><code>emptyMessage</code></td><td><code>string</code></td><td>localized</td><td>Empty-column drop text</td></tr>
                 <tr><td><code>ariaLabel</code></td><td><code>string</code></td><td><code>'Kanban board'</code></td><td>ARIA label for the board region</td></tr>
               </tbody>
             </table>

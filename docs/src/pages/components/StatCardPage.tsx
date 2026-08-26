@@ -294,6 +294,7 @@ export function StatCardPage() {
                 <tr><td><code>variant</code></td><td><code>'flat' | 'icon' | 'trend'</code></td><td><code>'flat'</code></td><td>Visual layout variant</td></tr>
                 <tr><td><code>icon</code></td><td><code>string | null</code></td><td><code>null</code></td><td>Lucide icon name — used by <code>icon</code> variant</td></tr>
                 <tr><td><code>iconColor</code></td><td><code>'blue' | 'green' | 'amber' | 'red' | 'purple'</code></td><td><code>'blue'</code></td><td>Icon tile colour</td></tr>
+                <tr><td><code>chartFit</code></td><td><code>'bleed' | 'inset'</code></td><td><code>'bleed'</code></td><td>Whether trend charts bleed to the card edges</td></tr>
                 <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>—</td><td>Chart area rendered below the value when <code>variant="trend"</code></td></tr>
               </tbody>
             </table>

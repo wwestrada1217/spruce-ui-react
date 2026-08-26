@@ -59,6 +59,10 @@
   margin: var(--sp-space-2, 8px) calc(var(--sp-space-4, 16px) * -1) 0;
 }
 
+.sp-stat-card__chart--inset {
+  margin-inline: 0;
+}
+
 /* ── Shared body ───────────────────────────────────────────────────────── */
 
 .sp-stat-card__body {

@@ -41,7 +41,7 @@ export interface CreditCardProps {
 
 export function CreditCard({
   number = '**** **** **** ****',
-  holderName = 'CARD HOLDER',
+  holderName,
   expiry = 'MM/YY',
   color = 'dark',
   network = '',
@@ -50,6 +50,7 @@ export function CreditCard({
   style,
 }: CreditCardProps) {
   const { t } = useI18n();
+  const resolvedHolderName = holderName ?? t('cardHolder');
   const gradient = COLOR_GRADIENTS[color] ?? COLOR_GRADIENTS['dark'];
 
   const numberGroups = useMemo(() => {
@@ -109,7 +110,7 @@ export function CreditCard({
       <div className="sp-credit-card__bottom">
         <div className="sp-credit-card__info">
           <span className="sp-credit-card__label">{t('cardHolder')}</span>
-          <span className="sp-credit-card__value">{holderName}</span>
+          <span className="sp-credit-card__value">{resolvedHolderName}</span>
         </div>
         <div className="sp-credit-card__info sp-credit-card__info--right">
           <span className="sp-credit-card__label">{t('expires')}</span>

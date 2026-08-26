@@ -12,13 +12,14 @@ import { Icon } from '../../icons/Icon.js'
 export type StatCardVariant = 'flat' | 'icon' | 'trend'
 export type StatCardTrend = 'up' | 'down' | 'neutral'
 export type StatCardIconColor = 'blue' | 'green' | 'amber' | 'red' | 'purple'
+export type StatCardChartFit = 'bleed' | 'inset'
 
 const ICON_COLORS: Record<StatCardIconColor, [string, string]> = {
   blue:   ['var(--sp-primary-subtle, rgba(37,99,235,.1))',   'var(--sp-primary, #2563eb)'],
-  green:  ['rgba(16,185,129,.1)',  '#10b981'],
-  amber:  ['rgba(245,158,11,.1)',  '#f59e0b'],
-  red:    ['rgba(239,68,68,.1)',   '#ef4444'],
-  purple: ['rgba(139,92,246,.1)', '#8b5cf6'],
+  green:  ['var(--sp-success-subtle, rgba(16,185,129,.1))', 'var(--sp-success, #10b981)'],
+  amber:  ['var(--sp-warning-subtle, rgba(245,158,11,.1))', 'var(--sp-warning, #f59e0b)'],
+  red:    ['var(--sp-danger-subtle, rgba(239,68,68,.1))', 'var(--sp-danger, #ef4444)'],
+  purple: ['var(--sp-secondary-subtle, rgba(139,92,246,.1))', 'var(--sp-secondary, #8b5cf6)'],
 }
 
 function trendIcon(trend: StatCardTrend): string {
@@ -37,6 +38,7 @@ export interface StatCardProps {
   variant?: StatCardVariant
   icon?: string | null
   iconColor?: StatCardIconColor
+  chartFit?: StatCardChartFit
   children?: ReactNode
   className?: string
 }
@@ -49,6 +51,7 @@ export function StatCard({
   variant = 'flat',
   icon = null,
   iconColor = 'blue',
+  chartFit = 'bleed',
   children,
   className = '',
 }: StatCardProps) {
@@ -106,7 +109,7 @@ export function StatCard({
       </div>
 
       {variant === 'trend' && (
-        <div className="sp-stat-card__chart">{children}</div>
+        <div className={`sp-stat-card__chart sp-stat-card__chart--${chartFit}`}>{children}</div>
       )}
     </div>
   )

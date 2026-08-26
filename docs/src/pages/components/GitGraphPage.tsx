@@ -209,6 +209,8 @@ export function GitGraphPage() {
                 <tr><td><code>rowHeight</code></td><td><code>number</code></td><td><code>48</code></td><td>Height of each commit row in pixels</td></tr>
                 <tr><td><code>laneWidth</code></td><td><code>number</code></td><td><code>28</code></td><td>Width of each branch lane in pixels</td></tr>
                 <tr><td><code>nodeRadius</code></td><td><code>number</code></td><td><code>5</code></td><td>Radius of commit dot in pixels</td></tr>
+                <tr><td><code>selectedHash</code></td><td><code>string | null</code></td><td>-</td><td>Controlled selected commit hash</td></tr>
+                <tr><td><code>ariaLabel</code></td><td><code>string</code></td><td><code>'Git commit history'</code></td><td>Accessible history label</td></tr>
               </tbody>
             </table>
           </div>
@@ -221,10 +223,11 @@ export function GitGraphPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td><code>onCommitClick</code></td>
+                  <td><code>onCommitClick</code>, <code>onCommitSelect</code></td>
                   <td><code>{'(commit: GitGraphCommit) => void'}</code></td>
-                  <td>Called when a commit row is clicked</td>
+                  <td>Called when a commit row is activated</td>
                 </tr>
+                <tr><td><code>onCommitContextMenu</code></td><td><code>&#123; commit, event &#125;</code></td><td>Called for a commit context-menu request</td></tr>
               </tbody>
             </table>
           </div>

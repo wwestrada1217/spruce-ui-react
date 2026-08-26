@@ -429,9 +429,9 @@ export function BarcodeQrPage() {
                 <tr><td><code>value</code></td><td><code>string</code></td><td><code>{"''"}</code></td><td>Data to encode</td></tr>
                 <tr><td><code>width</code></td><td><code>number</code></td><td><code>200</code></td><td>Barcode width in pixels</td></tr>
                 <tr><td><code>height</code></td><td><code>number</code></td><td><code>60</code></td><td>Barcode height in pixels</td></tr>
-                <tr><td><code>color</code></td><td><code>string</code></td><td><code>{"''"}</code></td><td>Bar color. Defaults to the current theme text color when empty.</td></tr>
+                <tr><td><code>barColor</code></td><td><code>string</code></td><td><code>{"''"}</code></td><td>Bar color. Defaults to the current theme text color when empty.</td></tr>
                 <tr><td><code>bordered</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Show border around barcode</td></tr>
-                <tr><td><code>showText</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Display the value text below barcode</td></tr>
+                <tr><td><code>showValue</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Display the value text below barcode</td></tr>
               </tbody>
             </table>
           </div>
@@ -446,8 +446,10 @@ export function BarcodeQrPage() {
               <tbody>
                 <tr><td><code>value</code></td><td><code>string</code></td><td><code>{"''"}</code></td><td>Data to encode</td></tr>
                 <tr><td><code>size</code></td><td><code>number</code></td><td><code>200</code></td><td>QR code size in pixels</td></tr>
-                <tr><td><code>color</code></td><td><code>string</code></td><td><code>{"''"}</code></td><td>Foreground color. Defaults to the current theme text color when empty.</td></tr>
-                <tr><td><code>background</code></td><td><code>string</code></td><td><code>{"''"}</code></td><td>Background color. Defaults to the current theme surface color when empty.</td></tr>
+                <tr><td><code>fgColor</code></td><td><code>string</code></td><td><code>{"''"}</code></td><td>Foreground color. Defaults to the current theme text color when empty.</td></tr>
+                <tr><td><code>bgColor</code></td><td><code>string</code></td><td><code>{"''"}</code></td><td>Background color. Defaults to the current theme surface color when empty.</td></tr>
+                <tr><td><code>ecLevel</code></td><td><code>'L' | 'M' | 'Q' | 'H'</code></td><td><code>'M'</code></td><td>Reed-Solomon error correction level</td></tr>
+                <tr><td><code>highCapacity</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Allow QR versions 1–40 instead of 1–6</td></tr>
               </tbody>
             </table>
           </div>

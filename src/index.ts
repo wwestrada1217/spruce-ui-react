@@ -239,7 +239,7 @@ export type {
 
 // ─── StatCard ─────────────────────────────────────────────────────────────────
 export { StatCard } from './components/stat-card/StatCard.js';
-export type { StatCardProps, StatCardVariant, StatCardTrend, StatCardIconColor } from './components/stat-card/StatCard.js';
+export type { StatCardProps, StatCardVariant, StatCardTrend, StatCardIconColor, StatCardChartFit } from './components/stat-card/StatCard.js';
 
 // ─── Empty ────────────────────────────────────────────────────────────────────
 export { Empty } from './components/empty/Empty.js';
@@ -725,7 +725,7 @@ export type { CreditCardProps, CardColor } from './components/credit-card/Credit
 
 // ─── Barcode & QR Code ──────────────────────────────────────────────────────
 export { Barcode, QrCode } from './components/barcode/Barcode.js';
-export type { BarcodeProps, QrCodeProps, BarcodeFormat } from './components/barcode/Barcode.js';
+export type { BarcodeProps, QrCodeProps, BarcodeFormat, QrCodeEcLevel } from './components/barcode/Barcode.js';
 
 // ─── GitGraph ────────────────────────────────────────────────────────────────
 export { GitGraph } from './components/git-graph/GitGraph.js';

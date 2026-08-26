@@ -17,6 +17,11 @@
   overflow: hidden;
 }
 
+.sp-tree--virtual {
+  max-height: 320px;
+  overflow-y: auto;
+}
+
 /* ── Node row ─────────────────────────────────────────────────────────────── */
 
 .sp-tree-node__row {
@@ -30,8 +35,22 @@
   border: 2px solid transparent;
 }
 
+.sp-tree-node--dense > .sp-tree-node__row {
+  padding-block: 2px;
+  min-height: 24px;
+}
+
+.sp-tree-node + .sp-tree-node {
+  margin-block-start: var(--sp-tree-group-spacing, 0px);
+}
+
 .sp-tree-node__row:hover {
   background: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04));
+}
+
+.sp-tree-node--selected > .sp-tree-node__row {
+  background: var(--sp-primary-subtle, rgba(37, 99, 235, 0.08));
+  color: var(--sp-primary, #2563eb);
 }
 
 .sp-tree-node__row:focus-visible {
@@ -129,6 +148,31 @@
   flex: 1;
 }
 
+.sp-tree-node__badge {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--sp-text-muted, #6b7280);
+}
+
+.sp-tree-node__badge--end {
+  margin-inline-start: auto;
+}
+
+.sp-tree-node__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-space-1, 4px);
+  margin-inline-start: var(--sp-space-2, 8px);
+  opacity: 0;
+  transition: opacity var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
+}
+
+.sp-tree-node__row:hover .sp-tree-node__actions,
+.sp-tree-node__row:focus-within .sp-tree-node__actions {
+  opacity: 1;
+}
+
 .sp-tree-node__label--disabled {
   opacity: 0.5;
 }
@@ -170,9 +214,9 @@
 
 .sp-tree-node__children--lines {
   position: relative;
-  margin-left: 9px;
-  padding-left: 11px;
-  border-left: 1px solid var(--sp-border-strong, rgba(0, 0, 0, 0.14));
+  margin-inline-start: 9px;
+  padding-inline-start: 11px;
+  border-inline-start: 1px solid var(--sp-border-strong, rgba(0, 0, 0, 0.14));
 }
 
 .sp-tree-node__children--lines > .sp-tree-node--line-connector {
@@ -182,7 +226,7 @@
 .sp-tree-node__children--lines > .sp-tree-node--line-connector::before {
   content: '';
   position: absolute;
-  left: -11px;
+  inset-inline-start: -11px;
   top: 14px;
   width: 11px;
   border-top: 1px solid var(--sp-border-strong, rgba(0, 0, 0, 0.14));
