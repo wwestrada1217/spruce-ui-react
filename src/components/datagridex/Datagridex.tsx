@@ -251,6 +251,7 @@ export interface DatagridexProps<T extends object = Record<string, unknown>> {
   readonly onSelectedRowsChange?: (rows: readonly T[]) => void;
   readonly expandedRows?: readonly T[] | readonly unknown[];
   readonly onExpandedRowsChange?: (rows: readonly T[]) => void;
+  readonly onDetailPaneRowChange?: (row: T | null) => void;
   readonly footer?: boolean;
   readonly footerLabel?: string;
   readonly columnMenu?: boolean;
@@ -965,6 +966,7 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
     onSelectedRowsChange,
     expandedRows,
     onExpandedRowsChange,
+    onDetailPaneRowChange,
     detailPaneTitle,
     cellTemplates = {},
     cellEditors = {},
@@ -1108,10 +1110,26 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
 
   const [columnWidths, setColumnWidths] = useState<Map<string, number | 'auto'>>(new Map());
   const [internalExpandedRowDetails, setInternalExpandedRowDetails] = useState<Set<unknown>>(new Set());
-  const expandedRowDetails = expandedRows !== undefined ? new Set(expandedRows) : internalExpandedRowDetails;
+  const expandedRowDetails = useMemo(() => {
+    if (expandedRows === undefined) return internalExpandedRowDetails;
+
+    const controlledRows = new Set<unknown>(expandedRows);
+    const expandedIds = new Set<unknown>();
+    rawRows.forEach((row, index) => {
+      const rowId = resolveTrackBy(trackBy, row, index);
+      if (controlledRows.has(row) || controlledRows.has(rowId)) expandedIds.add(rowId);
+    });
+    return expandedIds;
+  }, [expandedRows, internalExpandedRowDetails, rawRows, trackBy]);
   const [internalDetailPaneRow, setInternalDetailPaneRow] = useState<T | null>(null);
   const activeDetailPaneRow = detailPaneRow !== undefined ? detailPaneRow : internalDetailPaneRow;
-  const setActiveDetailPaneRow = setInternalDetailPaneRow;
+  const setActiveDetailPaneRow = useCallback(
+    (next: T | null) => {
+      setInternalDetailPaneRow(next);
+      onDetailPaneRowChange?.(next);
+    },
+    [onDetailPaneRowChange],
+  );
 
   const updateExpandedRowDetails = useCallback(
     (next: Set<unknown>) => {
@@ -1142,6 +1160,11 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
   const [draggedRowIndex, setDraggedRowIndex] = useState<number | null>(null);
   const [rowDropTarget, setRowDropTarget] = useState<{ index: number; position: 'before' | 'after' } | null>(null);
   const [isGroupToolbarDragOver, setIsGroupToolbarDragOver] = useState(false);
+  const [draggedToolbarGroupKey, setDraggedToolbarGroupKey] = useState<string | null>(null);
+  const [toolbarGroupDropTarget, setToolbarGroupDropTarget] = useState<{
+    key: string;
+    position: 'before' | 'after';
+  } | null>(null);
 
   // Popovers & menus
   const [activeFilterPopover, setActiveFilterPopover] = useState<{
@@ -1644,6 +1667,15 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
     (effectiveSelectionMode !== 'none' ? 1 : 0) +
     (showRowNumbers ? 1 : 0);
   const ariaColumnCount = ariaColumnOffset + visibleColumns.length + (showRowEditActions ? 1 : 0);
+
+  const gridColumnFor = (column: DatagridexColumn<T>): string => {
+    if (columnVirtualization) {
+      const renderedIndex = renderedColumns.indexOf(column);
+      const beforeSpacerOffset = columnVirtualLayout.beforeWidth > 0 ? 1 : 0;
+      return String(ariaColumnOffset + beforeSpacerOffset + renderedIndex + 1);
+    }
+    return String(visibleColumns.indexOf(column) + ariaColumnOffset + 1);
+  };
 
   // Aggregates calculation for footer
   const footerAggregates = useMemo(() => {
@@ -2522,7 +2554,9 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
             isGroupToolbarDragOver ? 'sp-datagridex__group-toolbar--drop-active' : ''
           }`}
           onDragOver={(e) => {
-            if (draggedColumnKey) {
+            if (draggedToolbarGroupKey) return;
+            const columnKey = draggedColumnKey ?? e.dataTransfer.getData('text/plain');
+            if (columnKey && columnsProp.some((column) => column.key === columnKey) && !activeGroupBy.includes(columnKey)) {
               e.preventDefault();
               setIsGroupToolbarDragOver(true);
             }
@@ -2530,9 +2564,11 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
           onDragLeave={() => setIsGroupToolbarDragOver(false)}
           onDrop={(e) => {
             e.preventDefault();
+            if (draggedToolbarGroupKey) return;
             setIsGroupToolbarDragOver(false);
-            if (draggedColumnKey && !activeGroupBy.includes(draggedColumnKey)) {
-              const next = [...activeGroupBy, draggedColumnKey];
+            const columnKey = draggedColumnKey ?? e.dataTransfer.getData('text/plain');
+            if (columnKey && columnsProp.some((column) => column.key === columnKey) && !activeGroupBy.includes(columnKey)) {
+              const next = [...activeGroupBy, columnKey];
               setInternalGroupBy(next);
               onGroupByChange?.(next);
             }
@@ -2549,10 +2585,60 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
                 const col = columnsProp.find((c) => c.key === gKey);
                 const sortDir = activeGroupSorts.find((gs) => gs.key === gKey)?.direction ?? 'asc';
                 return (
-                  <div key={gKey} className="sp-datagridex__toolbar-group">
+                  <div
+                    key={gKey}
+                    className={[
+                      'sp-datagridex__toolbar-group',
+                      draggedToolbarGroupKey === gKey ? 'sp-datagridex__toolbar-group--dragging' : '',
+                      toolbarGroupDropTarget?.key === gKey && toolbarGroupDropTarget.position === 'before'
+                        ? 'sp-datagridex__toolbar-group--drop-before'
+                        : '',
+                      toolbarGroupDropTarget?.key === gKey && toolbarGroupDropTarget.position === 'after'
+                        ? 'sp-datagridex__toolbar-group--drop-after'
+                        : '',
+                    ].filter(Boolean).join(' ')}
+                    onDragOver={(event) => {
+                      if (!draggedToolbarGroupKey || draggedToolbarGroupKey === gKey) {
+                        setToolbarGroupDropTarget(null);
+                        return;
+                      }
+                      event.preventDefault();
+                      event.dataTransfer.dropEffect = 'move';
+                      const rect = event.currentTarget.getBoundingClientRect();
+                      setToolbarGroupDropTarget({
+                        key: gKey,
+                        position: event.clientX > rect.left + rect.width / 2 ? 'after' : 'before',
+                      });
+                    }}
+                    onDrop={(event) => {
+                      event.preventDefault();
+                      const sourceKey = draggedToolbarGroupKey;
+                      const dropTarget = toolbarGroupDropTarget;
+                      if (sourceKey && dropTarget?.key === gKey && sourceKey !== gKey) {
+                        const next = activeGroupBy.filter((key) => key !== sourceKey);
+                        const targetIndex = next.indexOf(gKey);
+                        next.splice(targetIndex + (dropTarget.position === 'after' ? 1 : 0), 0, sourceKey);
+                        setInternalGroupBy(next);
+                        onGroupByChange?.(next);
+                      }
+                      setDraggedToolbarGroupKey(null);
+                      setToolbarGroupDropTarget(null);
+                    }}
+                  >
                     <button
                       type="button"
                       className="sp-datagridex__toolbar-group-button"
+                      draggable
+                      aria-label={`${col?.header ?? gKey} grouping. Drag to reorder.`}
+                      onDragStart={(event) => {
+                        event.dataTransfer.effectAllowed = 'move';
+                        event.dataTransfer.setData('text/plain', gKey);
+                        setDraggedToolbarGroupKey(gKey);
+                      }}
+                      onDragEnd={() => {
+                        setDraggedToolbarGroupKey(null);
+                        setToolbarGroupDropTarget(null);
+                      }}
                       onClick={() => {
                         const nextDir = sortDir === 'asc' ? 'desc' : 'asc';
                         const nextSorts = [
@@ -2571,18 +2657,18 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
                       />
                     </button>
                     <div className="sp-datagridex__toolbar-group-remove">
-                      <button
-                        type="button"
-                        className="sp-btn sp-btn--sm"
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        iconOnly
+                        iconLeft="x"
                         aria-label={`Remove grouping by ${col?.header ?? gKey}`}
                         onClick={() => {
                           const next = activeGroupBy.filter((k) => k !== gKey);
                           setInternalGroupBy(next);
                           onGroupByChange?.(next);
                         }}
-                      >
-                        <Icon name="x" size={12} />
-                      </button>
+                      />
                     </div>
                   </div>
                 );
@@ -2774,6 +2860,8 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
                     draggable={reorderable && col.reorderable !== false}
                     style={pinnedColumnStyle(col.key, pin)}
                     onDragStart={(e) => {
+                      e.dataTransfer.effectAllowed = 'move';
+                      e.dataTransfer.setData('text/plain', col.key);
                       setDraggedColumnKey(col.key);
                       setDragGhostPos({ x: e.clientX, y: e.clientY });
                     }}
@@ -2998,7 +3086,11 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
                     aria-expanded={node.expanded}
                   >
                     <div
-                      className="sp-datagridex__group-cell"
+                      className={`sp-datagridex__group-cell ${
+                        groupSelection && effectiveSelectionMode === 'multiple'
+                          ? 'sp-datagridex__group-cell--with-selection'
+                          : ''
+                      }`}
                       style={{
                         gridColumn: '1 / -1',
                         paddingInlineStart: indentGroupedRows
@@ -3187,7 +3279,7 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
                           rowIndex,
                           detailPaneOpen: activeDetailPaneRow === row,
                           toggleDetailPane: () => {
-                            setActiveDetailPaneRow((curr) => (curr === row ? null : row));
+                            setActiveDetailPaneRow(activeDetailPaneRow === row ? null : row);
                           },
                         }) : (
                           <button
@@ -3195,7 +3287,7 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
                             className="sp-btn sp-btn--sm sp-datagridex__detail-pane-toggle"
                             aria-label={`${activeDetailPaneRow === row ? 'Close' : 'Open'} details for ${String(resolveTrackBy(trackBy, row, rowIndex))}`}
                             aria-pressed={activeDetailPaneRow === row}
-                            onClick={() => setActiveDetailPaneRow((curr) => (curr === row ? null : row))}
+                            onClick={() => setActiveDetailPaneRow(activeDetailPaneRow === row ? null : row)}
                           >
                             <Icon name="info" size={14} />
                           </button>
@@ -3351,6 +3443,7 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
                           tabIndex={0}
                           style={{
                             ...pinnedColumnStyle(col.key, pin),
+                            gridColumn: gridColumnFor(col),
                             ...(span > 1 ? { '--sp-datagridex-row-span': span } : {}),
                           } as CSSProperties}
                           onDoubleClick={() => {
@@ -3934,11 +4027,11 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
               </p>
               <div className="sp-datagridex__pagination-actions">
                 <select
-                  className="sp-select sp-datagridex__pagination-select"
+                  className="sp-datagridex__pagination-select"
                   aria-label="Rows per page"
                   value={activePageSize}
-                  onChange={(e) => {
-                    const opt = Number(e.target.value);
+                  onChange={(event) => {
+                    const opt = Number(event.target.value);
                     setInternalPageSize(opt);
                     onPageSizeChange?.(opt);
                     setInternalPage(1);
@@ -3950,9 +4043,9 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
                     </option>
                   ))}
                 </select>
-                <button
-                  type="button"
-                  className="sp-btn sp-btn--sm sp-btn--secondary"
+                <Button
+                  variant="ghost"
+                  size="sm"
                   aria-label="Previous page"
                   disabled={virtualPaging ? !canVirtualPrevious : activePage <= 1}
                   onClick={() => {
@@ -3967,13 +4060,13 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
                   }}
                 >
                   Previous
-                </button>
-                <span>
+                </Button>
+                <span className="sp-datagridex__pagination-page-label">
                   {activePage} / {totalPages}
                 </span>
-                <button
-                  type="button"
-                  className="sp-btn sp-btn--sm sp-btn--secondary"
+                <Button
+                  variant="ghost"
+                  size="sm"
                   aria-label="Next page"
                   disabled={virtualPaging ? !canVirtualNext : activePage >= totalPages}
                   onClick={() => {
@@ -3988,7 +4081,7 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
                   }}
                 >
                   Next
-                </button>
+                </Button>
               </div>
             </>
           )}
