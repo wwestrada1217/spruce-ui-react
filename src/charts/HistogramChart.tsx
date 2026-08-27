@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChartContainer } from './ChartContainer.js';
-import { type ChartTooltipData } from './types.js';
+import { useChartPalette } from './ChartKernel.js';
+import { type ChartCommonProps, type ChartTooltipData } from './types.js';
 
 export interface HistogramBin {
   x0: number;
@@ -8,7 +9,7 @@ export interface HistogramBin {
   count: number;
 }
 
-export interface HistogramChartProps {
+export interface HistogramChartProps extends ChartCommonProps {
   data: HistogramBin[];
   title?: string;
   subtitle?: string;
@@ -28,12 +29,16 @@ export function HistogramChart({
   color = '#0f766e',
   className,
   style,
+  ...commonProps
 }: HistogramChartProps) {
   const [tooltip, setTooltip] = useState<ChartTooltipData | null>(null);
+  const palette = useChartPalette(commonProps.config?.colorScheme ?? [color], commonProps.config?.palette);
+  const resolvedColor = commonProps.config?.palette || commonProps.config?.colorScheme ? palette[0] : color;
+  const resolvedShowGrid = commonProps.config?.showGrid ?? showGrid;
 
   if (data.length === 0) {
     return (
-      <ChartContainer title={title} subtitle={subtitle} height={height} className={className} style={style}>
+      <ChartContainer {...commonProps} title={title} subtitle={subtitle} height={height} className={className} style={style}>
         <div style={{ color: 'var(--sp-text-subtle)', fontSize: 13, textAlign: 'center', padding: 32 }}>
           No chart data available
         </div>
@@ -54,7 +59,7 @@ export function HistogramChart({
   const yTicks = [0, Math.round(maxCount * 0.33), Math.round(maxCount * 0.66), maxCount];
 
   return (
-    <ChartContainer title={title} subtitle={subtitle} tooltip={tooltip} height={height} className={className} style={style}>
+    <ChartContainer {...commonProps} title={title} subtitle={subtitle} tooltip={tooltip} height={height} className={className} style={style}>
       <svg
         className="sp-chart-svg"
         viewBox={`0 0 ${svgWidth} ${svgHeight}`}
@@ -62,7 +67,7 @@ export function HistogramChart({
         onMouseLeave={() => setTooltip(null)}
       >
         {/* Y Axis Gridlines */}
-        {showGrid &&
+        {resolvedShowGrid &&
           yTicks.map((val, idx) => {
             const y = padding.top + graphHeight - (val / maxCount) * graphHeight;
             return (
@@ -109,13 +114,17 @@ export function HistogramChart({
           return (
             <rect
               key={idx}
+              data-chart-point
+              data-index={idx}
+              data-label={`Range [${bin.x0} - ${bin.x1}]`}
+              data-value={bin.count}
               x={x}
               y={y}
               width={actualW}
               height={Math.max(2, barH)}
-              fill={color}
+              fill={resolvedColor}
               fillOpacity={0.85}
-              stroke={color}
+              stroke={resolvedColor}
               strokeWidth={1}
               style={{ cursor: 'pointer', transition: 'fill-opacity 0.2s ease' }}
               onMouseEnter={(e) => {
@@ -126,7 +135,7 @@ export function HistogramChart({
                   setTooltip({
                     label: `Range [${bin.x0} - ${bin.x1}]`,
                     value: `Count: ${bin.count}`,
-                    color,
+                    color: resolvedColor,
                     x: relX,
                     y: relY,
                   });

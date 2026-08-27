@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { ChartContainer } from './ChartContainer.js';
-import { DEFAULT_CHART_COLORS, type ChartTooltipData } from './types.js';
+import { useChartPalette } from './ChartKernel.js';
+import { DEFAULT_CHART_COLORS, type ChartCommonProps, type ChartTooltipData } from './types.js';
 
 export interface BarRaceFrame {
   time: string;
   data: Array<{ label: string; value: number; color?: string }>;
 }
 
-export interface BarRaceChartProps {
+export interface BarRaceChartProps extends ChartCommonProps {
   frames: BarRaceFrame[];
   title?: string;
   subtitle?: string;
@@ -27,10 +28,12 @@ export function BarRaceChart({
   colorScheme = DEFAULT_CHART_COLORS,
   className,
   style,
+  ...commonProps
 }: BarRaceChartProps) {
   const [frameIdx, setFrameIdx] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [tooltip, setTooltip] = useState<ChartTooltipData | null>(null);
+  const palette = useChartPalette(commonProps.config?.colorScheme ?? colorScheme, commonProps.config?.palette);
 
   useEffect(() => {
     if (!isPlaying || frames.length <= 1) return;
@@ -42,7 +45,7 @@ export function BarRaceChart({
 
   if (frames.length === 0) {
     return (
-      <ChartContainer title={title} subtitle={subtitle} height={height} className={className} style={style}>
+      <ChartContainer {...commonProps} title={title} subtitle={subtitle} height={height} className={className} style={style}>
         <div style={{ color: 'var(--sp-text-subtle)', fontSize: 13, textAlign: 'center', padding: 32 }}>
           No chart data available
         </div>
@@ -64,7 +67,7 @@ export function BarRaceChart({
   const barHeight = graphHeight / Math.max(1, sortedBars.length);
 
   return (
-    <ChartContainer title={title} subtitle={subtitle} tooltip={tooltip} height={height} className={className} style={style}>
+    <ChartContainer {...commonProps} title={title} subtitle={subtitle} tooltip={tooltip} height={height} className={className} style={style}>
       <div style={{ position: 'relative', width: '100%', height: '100%' }}>
         {/* Controls Overlay */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
@@ -99,7 +102,7 @@ export function BarRaceChart({
             const barW = (bar.value / maxVal) * graphWidth;
             const y = padding.top + idx * barHeight;
             const actualH = barHeight * 0.7;
-            const color = bar.color || colorScheme[idx % colorScheme.length];
+            const color = bar.color || palette[idx % palette.length];
 
             return (
               <g key={bar.label} style={{ transition: 'all 0.4s ease' }}>
@@ -116,6 +119,10 @@ export function BarRaceChart({
 
                 {/* Animated Horizontal Bar */}
                 <rect
+                  data-chart-point
+                  data-index={idx}
+                  data-label={bar.label}
+                  data-value={bar.value}
                   x={padding.left}
                   y={y}
                   width={Math.max(4, barW)}

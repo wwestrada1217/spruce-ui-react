@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChartContainer, type LegendItem } from './ChartContainer.js';
-import { DEFAULT_CHART_COLORS, type ChartTooltipData } from './types.js';
+import { useChartPalette } from './ChartKernel.js';
+import { DEFAULT_CHART_COLORS, type ChartCommonProps, type ChartTooltipData } from './types.js';
 
 export interface PolarSeries {
   name: string;
@@ -8,7 +9,7 @@ export interface PolarSeries {
   color?: string;
 }
 
-export interface PolarLineChartProps {
+export interface PolarLineChartProps extends ChartCommonProps {
   series: PolarSeries[];
   categories: string[];
   title?: string;
@@ -32,14 +33,16 @@ export function PolarLineChart({
   colorScheme = DEFAULT_CHART_COLORS,
   className,
   style,
+  ...commonProps
 }: PolarLineChartProps) {
   const [tooltip, setTooltip] = useState<ChartTooltipData | null>(null);
+  const palette = useChartPalette(commonProps.config?.colorScheme ?? colorScheme, commonProps.config?.palette);
 
   const numCategories = categories.length;
 
   if (series.length === 0 || numCategories === 0) {
     return (
-      <ChartContainer title={title} subtitle={subtitle} height={height} className={className} style={style}>
+          <ChartContainer {...commonProps} title={title} subtitle={subtitle} height={height} className={className} style={style}>
         <div style={{ color: 'var(--sp-text-subtle)', fontSize: 13, textAlign: 'center', padding: 32 }}>
           No chart data available
         </div>
@@ -66,13 +69,14 @@ export function PolarLineChart({
 
   const legendItems: LegendItem[] = series.map((s, idx) => ({
     label: s.name,
-    color: s.color || colorScheme[idx % colorScheme.length],
+    color: s.color || palette[idx % palette.length],
   }));
 
   const gridLevels = [0.25, 0.5, 0.75, 1];
 
   return (
     <ChartContainer
+      {...commonProps}
       title={title}
       subtitle={subtitle}
       legend={showLegend ? legendItems : undefined}
@@ -118,17 +122,22 @@ export function PolarLineChart({
 
         {/* Polar Closed Trend Lines */}
         {series.map((s, seriesIdx) => {
-          const color = s.color || colorScheme[seriesIdx % colorScheme.length];
+          const color = s.color || palette[seriesIdx % palette.length];
           const linePoints = s.data.map((val, catIdx) => getCoordinates(catIdx, val));
 
           const pathD = linePoints.reduce((acc, p, idx) => (idx === 0 ? `M ${p.x} ${p.y}` : `${acc} L ${p.x} ${p.y}`), '') + ' Z';
 
           return (
-            <g key={seriesIdx}>
+            <g key={seriesIdx} data-chart-series-index={seriesIdx}>
               <path d={pathD} fill="none" stroke={color} strokeWidth={2.5} />
               {linePoints.map((pt, catIdx) => (
                 <circle
                   key={catIdx}
+                  data-chart-point
+                  data-index={catIdx}
+                  data-label={categories[catIdx] || `Category ${catIdx + 1}`}
+                  data-series-name={s.name}
+                  data-value={s.data[catIdx]}
                   cx={pt.x}
                   cy={pt.y}
                   r={4}

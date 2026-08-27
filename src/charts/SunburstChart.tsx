@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChartContainer, type LegendItem } from './ChartContainer.js';
-import { DEFAULT_CHART_COLORS, type ChartTooltipData } from './types.js';
+import { useChartPalette } from './ChartKernel.js';
+import { DEFAULT_CHART_COLORS, type ChartCommonProps, type ChartTooltipData } from './types.js';
 
 export interface SunburstNode {
   name: string;
@@ -9,7 +10,7 @@ export interface SunburstNode {
   color?: string;
 }
 
-export interface SunburstChartProps {
+export interface SunburstChartProps extends ChartCommonProps {
   data: SunburstNode;
   title?: string;
   subtitle?: string;
@@ -27,6 +28,7 @@ interface RenderSlice {
   endAngle: number;
   depth: number;
   color: string;
+  seriesIndex: number;
 }
 
 export function SunburstChart({
@@ -38,12 +40,14 @@ export function SunburstChart({
   colorScheme = DEFAULT_CHART_COLORS,
   className,
   style,
+  ...commonProps
 }: SunburstChartProps) {
   const [tooltip, setTooltip] = useState<ChartTooltipData | null>(null);
+  const palette = useChartPalette(commonProps.config?.colorScheme ?? colorScheme, commonProps.config?.palette);
 
   if (!data || (!data.value && (!data.children || data.children.length === 0))) {
     return (
-      <ChartContainer title={title} subtitle={subtitle} height={height} className={className} style={style}>
+      <ChartContainer {...commonProps} title={title} subtitle={subtitle} height={height} className={className} style={style}>
         <div style={{ color: 'var(--sp-text-subtle)', fontSize: 13, textAlign: 'center', padding: 32 }}>
           No chart data available
         </div>
@@ -69,7 +73,7 @@ export function SunburstChart({
     parentColorIndex: number,
   ) {
     if (depth > 0) {
-      const color = node.color || colorScheme[parentColorIndex % colorScheme.length];
+      const color = node.color || palette[parentColorIndex % palette.length];
       slices.push({
         name: node.name,
         value: getNodeValue(node),
@@ -77,6 +81,7 @@ export function SunburstChart({
         endAngle,
         depth,
         color,
+        seriesIndex: parentColorIndex,
       });
     }
 
@@ -128,11 +133,12 @@ export function SunburstChart({
 
   const legendItems: LegendItem[] = (data.children || []).map((c, idx) => ({
     label: c.name,
-    color: c.color || colorScheme[idx % colorScheme.length],
+    color: c.color || palette[idx % palette.length],
   }));
 
   return (
     <ChartContainer
+      {...commonProps}
       title={title}
       subtitle={subtitle}
       legend={showLegend ? legendItems : undefined}
@@ -156,6 +162,11 @@ export function SunburstChart({
           return (
             <path
               key={idx}
+              data-chart-series-index={slice.seriesIndex}
+              data-chart-point
+              data-index={idx}
+              data-label={slice.name}
+              data-value={slice.value}
               d={pathD}
               fill={slice.color}
               fillOpacity={0.85 - slice.depth * 0.15}

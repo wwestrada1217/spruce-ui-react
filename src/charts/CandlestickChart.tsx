@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChartContainer } from './ChartContainer.js';
-import { type ChartTooltipData } from './types.js';
+import { useChartPalette } from './ChartKernel.js';
+import { type ChartCommonProps, type ChartTooltipData } from './types.js';
 
 export interface CandlestickDataItem {
   x: string;
@@ -10,7 +11,7 @@ export interface CandlestickDataItem {
   close: number;
 }
 
-export interface CandlestickChartProps {
+export interface CandlestickChartProps extends ChartCommonProps {
   data: CandlestickDataItem[];
   title?: string;
   subtitle?: string;
@@ -32,12 +33,17 @@ export function CandlestickChart({
   downColor = '#dc2626',
   className,
   style,
+  ...commonProps
 }: CandlestickChartProps) {
   const [tooltip, setTooltip] = useState<ChartTooltipData | null>(null);
+  const palette = useChartPalette(commonProps.config?.colorScheme ?? [upColor, downColor], commonProps.config?.palette);
+  const resolvedUpColor = commonProps.config?.palette || commonProps.config?.colorScheme ? palette[0] : upColor;
+  const resolvedDownColor = commonProps.config?.palette || commonProps.config?.colorScheme ? palette[1] : downColor;
+  const resolvedShowGrid = commonProps.config?.showGrid ?? showGrid;
 
   if (data.length === 0) {
     return (
-      <ChartContainer title={title} subtitle={subtitle} height={height} className={className} style={style}>
+      <ChartContainer {...commonProps} title={title} subtitle={subtitle} height={height} className={className} style={style}>
         <div style={{ color: 'var(--sp-text-subtle)', fontSize: 13, textAlign: 'center', padding: 32 }}>
           No chart data available
         </div>
@@ -62,7 +68,7 @@ export function CandlestickChart({
   const yTicks = [minVal, minVal + range * 0.33, minVal + range * 0.66, maxVal];
 
   return (
-    <ChartContainer title={title} subtitle={subtitle} tooltip={tooltip} height={height} className={className} style={style}>
+    <ChartContainer {...commonProps} title={title} subtitle={subtitle} tooltip={tooltip} height={height} className={className} style={style}>
       <svg
         className="sp-chart-svg"
         viewBox={`0 0 ${svgWidth} ${svgHeight}`}
@@ -70,7 +76,7 @@ export function CandlestickChart({
         onMouseLeave={() => setTooltip(null)}
       >
         {/* Y Axis Gridlines */}
-        {showGrid &&
+        {resolvedShowGrid &&
           yTicks.map((val, idx) => {
             const y = padding.top + graphHeight - ((val - minVal) / range) * graphHeight;
             return (
@@ -101,7 +107,7 @@ export function CandlestickChart({
         {/* Render Candlesticks */}
         {data.map((item, idx) => {
           const isUp = item.close >= item.open;
-          const color = isUp ? upColor : downColor;
+          const color = isUp ? resolvedUpColor : resolvedDownColor;
 
           const yHigh = padding.top + graphHeight - ((item.high - minVal) / range) * graphHeight;
           const yLow = padding.top + graphHeight - ((item.low - minVal) / range) * graphHeight;
@@ -124,6 +130,10 @@ export function CandlestickChart({
 
               {/* Body Box */}
               <rect
+                data-chart-point
+                data-index={idx}
+                data-label={item.x}
+                data-value={`O: ${item.open} | H: ${item.high} | L: ${item.low} | C: ${item.close}`}
                 x={bodyX}
                 y={yTop}
                 width={actualW}

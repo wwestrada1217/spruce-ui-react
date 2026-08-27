@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { ChartContainer } from './ChartContainer.js';
-import { type ChartTooltipData } from './types.js';
+import { useChartPalette } from './ChartKernel.js';
+import { type ChartCommonProps, type ChartTooltipData } from './types.js';
 
 export interface CalendarHeatmapDay {
   date: string; // YYYY-MM-DD
   value: number;
 }
 
-export interface CalendarHeatmapChartProps {
+export interface CalendarHeatmapChartProps extends ChartCommonProps {
   data: CalendarHeatmapDay[];
   title?: string;
   subtitle?: string;
@@ -25,12 +26,15 @@ export function CalendarHeatmapChart({
   baseColor = '#16a34a',
   className,
   style,
+  ...commonProps
 }: CalendarHeatmapChartProps) {
   const [tooltip, setTooltip] = useState<ChartTooltipData | null>(null);
+  const palette = useChartPalette(commonProps.config?.colorScheme ?? [baseColor], commonProps.config?.palette);
+  const resolvedBaseColor = commonProps.config?.palette || commonProps.config?.colorScheme ? palette[0] : baseColor;
 
   if (data.length === 0) {
     return (
-      <ChartContainer title={title} subtitle={subtitle} height={height} className={className} style={style}>
+      <ChartContainer {...commonProps} title={title} subtitle={subtitle} height={height} className={className} style={style}>
         <div style={{ color: 'var(--sp-text-subtle)', fontSize: 13, textAlign: 'center', padding: 32 }}>
           No chart data available
         </div>
@@ -55,7 +59,7 @@ export function CalendarHeatmapChart({
   const daysOfWeek = ['Mon', 'Wed', 'Fri'];
 
   return (
-    <ChartContainer title={title} subtitle={subtitle} tooltip={tooltip} height={height} className={className} style={style}>
+    <ChartContainer {...commonProps} title={title} subtitle={subtitle} tooltip={tooltip} height={height} className={className} style={style}>
       <svg
         className="sp-chart-svg"
         viewBox={`0 0 ${svgWidth} ${svgHeight}`}
@@ -89,12 +93,16 @@ export function CalendarHeatmapChart({
             return (
               <rect
                 key={`${weekIdx}-${dayIdx}`}
+                data-chart-point
+                data-index={dayIdx}
+                data-label={`Activity (${dateStr})`}
+                data-value={val}
                 x={x}
                 y={y}
                 width={cellSide}
                 height={cellSide}
                 rx={2}
-                fill={baseColor}
+                fill={resolvedBaseColor}
                 fillOpacity={opacity}
                 style={{ cursor: 'pointer', transition: 'fill-opacity 0.2s ease' }}
                 onMouseEnter={(e) => {
@@ -105,7 +113,7 @@ export function CalendarHeatmapChart({
                     setTooltip({
                       label: `Activity (${dateStr})`,
                       value: `${val} contributions`,
-                      color: baseColor,
+                      color: resolvedBaseColor,
                       x: relX,
                       y: relY,
                     });

@@ -8,9 +8,10 @@
 import './StackedAreaChart.css';
 import { useState } from 'react';
 import { ChartContainer, type LegendItem } from './ChartContainer.js';
-import { DEFAULT_CHART_COLORS, type ChartSeries, type ChartTooltipData } from './types.js';
+import { useChartPalette } from './ChartKernel.js';
+import { DEFAULT_CHART_COLORS, type ChartCommonProps, type ChartSeries, type ChartTooltipData } from './types.js';
 
-export interface StackedAreaChartProps {
+export interface StackedAreaChartProps extends ChartCommonProps {
   series: ChartSeries[];
   categories: string[];
   title?: string;
@@ -38,13 +39,18 @@ export function StackedAreaChart({
   colorScheme = DEFAULT_CHART_COLORS,
   className,
   style,
+  ...commonProps
 }: StackedAreaChartProps) {
   const [tooltip, setTooltip] = useState<ChartTooltipData | null>(null);
+  const palette = useChartPalette(commonProps.config?.colorScheme ?? colorScheme, commonProps.config?.palette);
+  const resolvedShowGrid = commonProps.config?.showGrid ?? showGrid;
+  const resolvedCurved = commonProps.config?.curve ? commonProps.config.curve !== 'linear' : curved;
+  const resolvedFillOpacity = typeof commonProps.config?.fillOpacity === 'number' ? commonProps.config.fillOpacity : fillOpacity;
 
   const categoryCount = categories.length;
   if (categoryCount === 0 || series.length === 0) {
     return (
-      <ChartContainer title={title} subtitle={subtitle} height={height} className={className} style={style}>
+      <ChartContainer {...commonProps} title={title} subtitle={subtitle} height={height} className={className} style={style}>
         <div style={{ color: 'var(--sp-text-subtle)', fontSize: 13, textAlign: 'center', padding: 32 }}>
           No chart data available
         </div>
@@ -55,7 +61,7 @@ export function StackedAreaChart({
   const normalizedSeries = series.map((s, idx) => ({
     name: s.name,
     data: s.data.map((d) => (typeof d === 'number' ? d : d.value)),
-    color: s.color || colorScheme[idx % colorScheme.length],
+    color: s.color || palette[idx % palette.length],
   }));
 
   const categoryTotals = categories.map((_, catIdx) =>
@@ -103,7 +109,7 @@ export function StackedAreaChart({
 
   function getLinePath(pts: { x: number; y: number }[]): string {
     if (pts.length === 0) return '';
-    if (!curved) {
+    if (!resolvedCurved) {
       return pts.reduce(
         (acc, p, idx) => (idx === 0 ? `M ${p.x} ${p.y}` : `${acc} L ${p.x} ${p.y}`),
         '',
@@ -126,7 +132,7 @@ export function StackedAreaChart({
 
     const topPath = getLinePath(topPts);
 
-    if (!curved) {
+    if (!resolvedCurved) {
       const bottomLine = bottomPts.slice().reverse().reduce((acc, p) => `${acc} L ${p.x} ${p.y}`, '');
       return `${topPath} ${bottomLine} Z`;
     }
@@ -153,6 +159,7 @@ export function StackedAreaChart({
 
   return (
     <ChartContainer
+      {...commonProps}
       title={title}
       subtitle={subtitle}
       legend={showLegend ? legendItems : undefined}
@@ -168,7 +175,7 @@ export function StackedAreaChart({
         onMouseLeave={() => setTooltip(null)}
       >
         {/* Y Axis Gridlines */}
-        {showGrid &&
+        {resolvedShowGrid &&
           yTicks.map((val, idx) => {
             const y = padding.top + graphHeight - (val / niceMax) * graphHeight;
             return (
@@ -229,11 +236,16 @@ export function StackedAreaChart({
           const areaD = getStackedAreaPath(layer.points);
 
           return (
-            <g key={seriesIdx}>
+            <g key={seriesIdx} data-chart-series-index={seriesIdx}>
               <path
                 d={areaD}
+                data-chart-point
+                data-index={Math.floor(layer.points.length / 2)}
+                data-label={layer.points[Math.floor(layer.points.length / 2)]?.cat}
+                data-series-name={layer.name}
+                data-value={layer.points[Math.floor(layer.points.length / 2)]?.val}
                 fill={layer.color}
-                fillOpacity={fillOpacity}
+                fillOpacity={resolvedFillOpacity}
                 stroke={layer.color}
                 strokeWidth={1.5}
                 className="sp-stacked-area-layer"

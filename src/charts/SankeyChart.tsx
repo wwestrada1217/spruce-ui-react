@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChartContainer, type LegendItem } from './ChartContainer.js';
-import { DEFAULT_CHART_COLORS, type ChartTooltipData } from './types.js';
+import { useChartPalette } from './ChartKernel.js';
+import { DEFAULT_CHART_COLORS, type ChartCommonProps, type ChartTooltipData } from './types.js';
 
 export interface SankeyNode {
   id: string;
@@ -15,7 +16,7 @@ export interface SankeyLink {
   color?: string;
 }
 
-export interface SankeyChartProps {
+export interface SankeyChartProps extends ChartCommonProps {
   nodes: SankeyNode[];
   links: SankeyLink[];
   title?: string;
@@ -39,12 +40,14 @@ export function SankeyChart({
   colorScheme = DEFAULT_CHART_COLORS,
   className,
   style,
+  ...commonProps
 }: SankeyChartProps) {
   const [tooltip, setTooltip] = useState<ChartTooltipData | null>(null);
+  const palette = useChartPalette(commonProps.config?.colorScheme ?? colorScheme, commonProps.config?.palette);
 
   if (nodes.length === 0 || links.length === 0) {
     return (
-      <ChartContainer title={title} subtitle={subtitle} height={height} className={className} style={style}>
+          <ChartContainer {...commonProps} title={title} subtitle={subtitle} height={height} className={className} style={style}>
         <div style={{ color: 'var(--sp-text-subtle)', fontSize: 13, textAlign: 'center', padding: 32 }}>
           No chart data available
         </div>
@@ -65,7 +68,7 @@ export function SankeyChart({
 
   const nodeColorMap = new Map<string, string>();
   nodes.forEach((n, idx) => {
-    nodeColorMap.set(n.id, n.color || colorScheme[idx % colorScheme.length]);
+    nodeColorMap.set(n.id, n.color || palette[idx % palette.length]);
   });
 
   // Calculate node heights
@@ -96,6 +99,7 @@ export function SankeyChart({
 
   return (
     <ChartContainer
+      {...commonProps}
       title={title}
       subtitle={subtitle}
       legend={showLegend ? legendItems : undefined}
@@ -130,6 +134,11 @@ export function SankeyChart({
           return (
             <path
               key={idx}
+              data-chart-series-index={Math.max(0, nodes.findIndex((n) => n.id === link.source))}
+              data-chart-point
+              data-index={idx}
+              data-label={`${nodes.find((n) => n.id === link.source)?.name || link.source} → ${nodes.find((n) => n.id === link.target)?.name || link.target}`}
+              data-value={link.value}
               d={pathD}
               fill="none"
               stroke={color}
@@ -164,7 +173,7 @@ export function SankeyChart({
           const color = nodeColorMap.get(n.id) || '#0f766e';
 
           return (
-            <g key={n.id}>
+            <g key={n.id} data-chart-series-index={nodes.findIndex((candidate) => candidate.id === n.id)}>
               <rect x={pos.x} y={pos.y} width={nodeWidth} height={pos.height} rx={3} fill={color} />
               <text x={pos.x - 8} y={pos.y + pos.height / 2 + 4} textAnchor="end" className="sp-chart-axis-label" style={{ fontWeight: 600 }}>
                 {n.name}
@@ -180,7 +189,7 @@ export function SankeyChart({
           const color = nodeColorMap.get(n.id) || '#0f766e';
 
           return (
-            <g key={n.id}>
+            <g key={n.id} data-chart-series-index={nodes.findIndex((candidate) => candidate.id === n.id)}>
               <rect x={pos.x} y={pos.y} width={nodeWidth} height={pos.height} rx={3} fill={color} />
               <text x={pos.x + nodeWidth + 8} y={pos.y + pos.height / 2 + 4} textAnchor="start" className="sp-chart-axis-label" style={{ fontWeight: 600 }}>
                 {n.name}

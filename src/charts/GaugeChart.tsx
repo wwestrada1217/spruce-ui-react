@@ -1,6 +1,8 @@
 import { ChartContainer } from './ChartContainer.js';
+import { useChartPalette } from './ChartKernel.js';
+import type { ChartCommonProps } from './types.js';
 
-export interface GaugeChartProps {
+export interface GaugeChartProps extends ChartCommonProps {
   value: number;
   min?: number;
   max?: number;
@@ -27,7 +29,10 @@ export function GaugeChart({
   showNeedle = false,
   className,
   style,
+  ...commonProps
 }: GaugeChartProps) {
+  const palette = useChartPalette(commonProps.config?.colorScheme ?? [color], commonProps.config?.palette);
+  const resolvedColor = commonProps.config?.palette || commonProps.config?.colorScheme ? palette[0] : color;
   const clampedValue = Math.min(Math.max(value, min), max);
   const percentage = (clampedValue - min) / (max - min || 1);
 
@@ -68,7 +73,7 @@ export function GaugeChart({
   const needleTip = polarToCartesian(cx, cy, needleLength, needleAngle);
 
   return (
-    <ChartContainer title={title} subtitle={subtitle} height={height} className={className} style={style}>
+    <ChartContainer {...commonProps} title={title} subtitle={subtitle} height={height} className={className} style={style}>
       <svg className="sp-chart-svg" viewBox="0 0 300 180" preserveAspectRatio="xMidYMid meet">
         {/* Background Arc */}
         <path
@@ -83,7 +88,7 @@ export function GaugeChart({
         <path
           d={valPath}
           fill="none"
-          stroke={color}
+          stroke={resolvedColor}
           strokeWidth={strokeWidth}
           strokeLinecap="round"
           style={{ transition: 'd 0.3s ease' }}

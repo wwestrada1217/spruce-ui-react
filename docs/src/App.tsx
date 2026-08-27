@@ -152,6 +152,7 @@ import { HistogramChartPage } from './pages/charts/HistogramChartPage'
 import { CalendarHeatmapChartPage } from './pages/charts/CalendarHeatmapChartPage'
 import { ComboChartPage } from './pages/charts/ComboChartPage'
 import { OrgChartPage } from './pages/charts/OrgChartPage'
+import { ChartKernelPage } from './pages/charts/ChartKernelPage'
 import { SparklesPage } from './pages/effects/SparklesPage'
 import { ConfettiPage } from './pages/effects/ConfettiPage'
 import { ShimmerPage } from './pages/effects/ShimmerPage'
@@ -347,6 +348,7 @@ function renderPage(hash: string): React.ReactElement {
     case '#/blocks/project-workspace':       return <ProjectWorkspaceBlockPage />
     case '#/blocks/support-desk':            return <SupportDeskBlockPage />
     // Charts
+    case '#/charts/chart-kernel':           return <ChartKernelPage />
     case '#/charts/bar-chart':              return <BarChartPage />
     case '#/charts/pie-chart':              return <PieChartPage />
     case '#/charts/line-chart':             return <LineChartPage />

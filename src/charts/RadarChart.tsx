@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChartContainer, type LegendItem } from './ChartContainer.js';
-import { DEFAULT_CHART_COLORS, type ChartTooltipData } from './types.js';
+import { useChartPalette } from './ChartKernel.js';
+import { DEFAULT_CHART_COLORS, type ChartCommonProps, type ChartTooltipData } from './types.js';
 
 export interface RadarSeries {
   name: string;
@@ -8,7 +9,7 @@ export interface RadarSeries {
   color?: string;
 }
 
-export interface RadarChartProps {
+export interface RadarChartProps extends ChartCommonProps {
   series: RadarSeries[];
   categories: string[];
   title?: string;
@@ -32,14 +33,16 @@ export function RadarChart({
   colorScheme = DEFAULT_CHART_COLORS,
   className,
   style,
+  ...commonProps
 }: RadarChartProps) {
   const [tooltip, setTooltip] = useState<ChartTooltipData | null>(null);
+  const palette = useChartPalette(commonProps.config?.colorScheme ?? colorScheme, commonProps.config?.palette);
 
   const numCategories = categories.length;
 
   if (series.length === 0 || numCategories === 0) {
     return (
-      <ChartContainer title={title} subtitle={subtitle} height={height} className={className} style={style}>
+          <ChartContainer {...commonProps} title={title} subtitle={subtitle} height={height} className={className} style={style}>
         <div style={{ color: 'var(--sp-text-subtle)', fontSize: 13, textAlign: 'center', padding: 32 }}>
           No chart data available
         </div>
@@ -67,13 +70,14 @@ export function RadarChart({
 
   const legendItems: LegendItem[] = series.map((s, idx) => ({
     label: s.name,
-    color: s.color || colorScheme[idx % colorScheme.length],
+    color: s.color || palette[idx % palette.length],
   }));
 
   const gridLevels = [0.25, 0.5, 0.75, 1];
 
   return (
     <ChartContainer
+      {...commonProps}
       title={title}
       subtitle={subtitle}
       legend={showLegend ? legendItems : undefined}
@@ -132,7 +136,7 @@ export function RadarChart({
 
         {/* Radar Polygons for Series */}
         {series.map((s, seriesIdx) => {
-          const color = s.color || colorScheme[seriesIdx % colorScheme.length];
+          const color = s.color || palette[seriesIdx % palette.length];
           const polyPoints = s.data
             .map((val, catIdx) => {
               const { x, y } = getCoordinates(catIdx, val);
@@ -141,13 +145,18 @@ export function RadarChart({
             .join(' ');
 
           return (
-            <g key={seriesIdx}>
+            <g key={seriesIdx} data-chart-series-index={seriesIdx}>
               <polygon points={polyPoints} fill={color} fillOpacity={0.35} stroke={color} strokeWidth={2} />
               {s.data.map((val, catIdx) => {
                 const { x, y } = getCoordinates(catIdx, val);
                 return (
                   <circle
                     key={catIdx}
+                    data-chart-point
+                    data-index={catIdx}
+                    data-label={categories[catIdx] || `Axis ${catIdx + 1}`}
+                    data-series-name={s.name}
+                    data-value={val}
                     cx={x}
                     cy={y}
                     r={4}

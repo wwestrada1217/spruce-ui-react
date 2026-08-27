@@ -8,9 +8,10 @@
 import './PieChart.css';
 import { useState } from 'react';
 import { ChartContainer, type LegendItem } from './ChartContainer.js';
-import { DEFAULT_CHART_COLORS, type ChartDataItem, type ChartTooltipData } from './types.js';
+import { useChartPalette } from './ChartKernel.js';
+import { DEFAULT_CHART_COLORS, type ChartCommonProps, type ChartDataItem, type ChartTooltipData } from './types.js';
 
-export interface PieChartProps {
+export interface PieChartProps extends ChartCommonProps {
   /** Array of data slices */
   data: ChartDataItem[];
   title?: string;
@@ -37,14 +38,16 @@ export function PieChart({
   colorScheme = DEFAULT_CHART_COLORS,
   className,
   style,
+  ...commonProps
 }: PieChartProps) {
   const [tooltip, setTooltip] = useState<ChartTooltipData | null>(null);
+  const palette = useChartPalette(commonProps.config?.colorScheme ?? colorScheme, commonProps.config?.palette);
 
   const total = data.reduce((acc, d) => acc + d.value, 0);
 
   if (data.length === 0 || total === 0) {
     return (
-      <ChartContainer title={title} subtitle={subtitle} height={height} className={className} style={style}>
+      <ChartContainer {...commonProps} title={title} subtitle={subtitle} height={height} className={className} style={style}>
         <div style={{ color: 'var(--sp-text-subtle)', fontSize: 13, textAlign: 'center', padding: 32 }}>
           No chart data available
         </div>
@@ -65,7 +68,7 @@ export function PieChart({
 
     return {
       ...d,
-      color: d.color || colorScheme[idx % colorScheme.length],
+      color: d.color || palette[idx % palette.length],
       startAngle,
       endAngle,
       percentage: ((d.value / total) * 100).toFixed(1),
@@ -105,6 +108,7 @@ export function PieChart({
 
   return (
     <ChartContainer
+      {...commonProps}
       title={title}
       subtitle={subtitle}
       legend={showLegend ? legendItems : undefined}
@@ -131,6 +135,11 @@ export function PieChart({
           return (
             <path
               key={idx}
+              data-chart-series-index={idx}
+              data-chart-point
+              data-index={idx}
+              data-label={slice.label}
+              data-value={slice.value}
               d={path}
               fill={slice.color}
               className="sp-pie-slice"

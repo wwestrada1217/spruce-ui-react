@@ -961,6 +961,16 @@ export type { SignaturePadProps, SignaturePadHandle } from './components/signatu
 // ─── Charts Framework ────────────────────────────────────────────────────────
 export { ChartContainer } from './charts/ChartContainer.js';
 export type { ChartContainerProps, LegendItem } from './charts/ChartContainer.js';
+export {
+  CHART_PALETTES,
+  HARMONY_PALETTE,
+  readChartThemeColors,
+  resolveSeriesPalette,
+  useChartContext,
+  useChartKernel,
+  useChartPalette,
+} from './charts/ChartKernel.js';
+export type { ChartKernelOptions, ChartKernelValue, ChartPalette } from './charts/ChartKernel.js';
 export { BarChart } from './charts/BarChart.js';
 export type { BarChartProps } from './charts/BarChart.js';
 export { PieChart } from './charts/PieChart.js';
@@ -1011,7 +1021,33 @@ export { ComboChart } from './charts/ComboChart.js';
 export type { ComboChartProps, ComboSeries } from './charts/ComboChart.js';
 export { OrgChart } from './charts/OrgChart.js';
 export type { OrgChartProps, OrgNode } from './charts/OrgChart.js';
-export type { ChartDataItem, ChartSeries, ChartLegendPosition, ChartTooltipData } from './charts/types.js';
+export type {
+  ChartCallbackEvent,
+  ChartCommonProps,
+  ChartDataItem,
+  ChartLegendPosition,
+  ChartLegendEvent,
+  ChartMargin,
+  ChartPointEvent,
+  ChartSeries,
+  ChartThemeColors,
+  ChartTooltipConfig,
+  ChartTooltipData,
+  ChartTooltipEvent,
+  ChartTooltipItem,
+  ChartZoomState,
+  CoreChartConfig,
+} from './charts/types.js';
+export { DEFAULT_CHART_COLORS, DEFAULT_CHART_CONFIG } from './charts/types.js';
+export {
+  CHART_PALETTE_KEYS,
+  getPaletteColor,
+  interpolateColor,
+  resolveChartPalette,
+} from './charts/colors.js';
+export type { ChartPalette as ChartColorPalette } from './charts/colors.js';
+export { formatCompact, formatNumber, generateTicks } from './charts/axis.js';
+export { bandScale, linearScale, niceLinearDomain } from './charts/scales.js';
 
 // ─── Effects & Animations ───────────────────────────────────────────────────
 export { Sparkles } from './effects/Sparkles.js';

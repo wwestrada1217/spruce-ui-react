@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { ChartContainer } from './ChartContainer.js';
-import { DEFAULT_CHART_COLORS, type ChartDataItem, type ChartTooltipData } from './types.js';
+import { useChartPalette } from './ChartKernel.js';
+import { DEFAULT_CHART_COLORS, type ChartCommonProps, type ChartDataItem, type ChartTooltipData } from './types.js';
 
-export interface FunnelChartProps {
+export interface FunnelChartProps extends ChartCommonProps {
   data: ChartDataItem[];
   title?: string;
   subtitle?: string;
@@ -20,12 +21,14 @@ export function FunnelChart({
   colorScheme = DEFAULT_CHART_COLORS,
   className,
   style,
+  ...commonProps
 }: FunnelChartProps) {
   const [tooltip, setTooltip] = useState<ChartTooltipData | null>(null);
+  const palette = useChartPalette(commonProps.config?.colorScheme ?? colorScheme, commonProps.config?.palette);
 
   if (data.length === 0) {
     return (
-      <ChartContainer title={title} subtitle={subtitle} height={height} className={className} style={style}>
+      <ChartContainer {...commonProps} title={title} subtitle={subtitle} height={height} className={className} style={style}>
         <div style={{ color: 'var(--sp-text-subtle)', fontSize: 13, textAlign: 'center', padding: 32 }}>
           No chart data available
         </div>
@@ -44,7 +47,7 @@ export function FunnelChart({
   const stageHeight = graphHeight / data.length;
 
   return (
-    <ChartContainer title={title} subtitle={subtitle} tooltip={tooltip} height={height} className={className} style={style}>
+    <ChartContainer {...commonProps} title={title} subtitle={subtitle} tooltip={tooltip} height={height} className={className} style={style}>
       <svg
         className="sp-chart-svg"
         viewBox={`0 0 ${svgWidth} ${svgHeight}`}
@@ -68,12 +71,16 @@ export function FunnelChart({
           const xBottomRight = xBottomLeft + bottomW;
 
           const points = `${xTopLeft},${yTop} ${xTopRight},${yTop} ${xBottomRight},${yBottom} ${xBottomLeft},${yBottom}`;
-          const color = item.color || colorScheme[idx % colorScheme.length];
+          const color = item.color || palette[idx % palette.length];
           const conversionRate = idx > 0 ? ((item.value / data[0].value) * 100).toFixed(1) : '100';
 
           return (
             <g key={idx}>
               <polygon
+                data-chart-point
+                data-index={idx}
+                data-label={item.label}
+                data-value={item.value}
                 points={points}
                 fill={color}
                 fillOpacity={0.85}

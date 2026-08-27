@@ -176,6 +176,7 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     label: 'Charts',
     items: [
+      { icon: 'bar-chart-2',  label: 'Chart Kernel',       route: '#/charts/chart-kernel' },
       { icon: 'bar-chart',    label: 'Bar Chart',         route: '#/charts/bar-chart' },
       { icon: 'pie-chart',    label: 'Pie Chart',         route: '#/charts/pie-chart' },
       { icon: 'trending-up',  label: 'Line Chart',        route: '#/charts/line-chart' },

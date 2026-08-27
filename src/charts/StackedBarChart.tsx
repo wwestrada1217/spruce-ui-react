@@ -8,9 +8,10 @@
 import './StackedBarChart.css';
 import { useState } from 'react';
 import { ChartContainer, type LegendItem } from './ChartContainer.js';
-import { DEFAULT_CHART_COLORS, type ChartSeries, type ChartTooltipData } from './types.js';
+import { useChartPalette } from './ChartKernel.js';
+import { DEFAULT_CHART_COLORS, type ChartCommonProps, type ChartSeries, type ChartTooltipData } from './types.js';
 
-export interface StackedBarChartProps {
+export interface StackedBarChartProps extends ChartCommonProps {
   /** Array of series containing data for stacked bars */
   series: ChartSeries[];
   /** Categories along category axis */
@@ -20,6 +21,7 @@ export interface StackedBarChartProps {
   height?: number | string;
   /** Normalize stacked segments to 100% total height */
   percentage?: boolean;
+  orientation?: 'vertical' | 'horizontal';
   showGrid?: boolean;
   showLegend?: boolean;
   colorScheme?: string[];
@@ -34,18 +36,23 @@ export function StackedBarChart({
   subtitle,
   height = 300,
   percentage = false,
+  orientation = 'vertical',
   showGrid = true,
   showLegend = true,
   colorScheme = DEFAULT_CHART_COLORS,
   className,
   style,
+  ...commonProps
 }: StackedBarChartProps) {
   const [tooltip, setTooltip] = useState<ChartTooltipData | null>(null);
+  const palette = useChartPalette(commonProps.config?.colorScheme ?? colorScheme, commonProps.config?.palette);
+  const resolvedShowGrid = commonProps.config?.showGrid ?? showGrid;
+  const resolvedOrientation = commonProps.config?.orientation ?? orientation;
 
   const categoryCount = categories.length;
   if (categoryCount === 0 || series.length === 0) {
     return (
-      <ChartContainer title={title} subtitle={subtitle} height={height} className={className} style={style}>
+      <ChartContainer {...commonProps} title={title} subtitle={subtitle} height={height} className={className} style={style}>
         <div style={{ color: 'var(--sp-text-subtle)', fontSize: 13, textAlign: 'center', padding: 32 }}>
           No chart data available
         </div>
@@ -56,7 +63,7 @@ export function StackedBarChart({
   const normalizedSeries = series.map((s, idx) => ({
     name: s.name,
     data: s.data.map((d) => (typeof d === 'number' ? d : d.value)),
-    color: s.color || colorScheme[idx % colorScheme.length],
+    color: s.color || palette[idx % palette.length],
   }));
 
   // Calculate cumulative category totals for stacked max
@@ -82,6 +89,7 @@ export function StackedBarChart({
 
   return (
     <ChartContainer
+      {...commonProps}
       title={title}
       subtitle={subtitle}
       legend={showLegend ? legendItems : undefined}
@@ -92,12 +100,13 @@ export function StackedBarChart({
     >
       <svg
         className="sp-chart-svg"
+        data-chart-orientation={resolvedOrientation}
         viewBox={`0 0 ${svgWidth} ${svgHeight}`}
         preserveAspectRatio="xMidYMid meet"
         onMouseLeave={() => setTooltip(null)}
       >
         {/* Y Axis Gridlines */}
-        {showGrid &&
+        {resolvedShowGrid &&
           yTicks.map((val, idx) => {
             const y = padding.top + graphHeight - (val / niceMax) * graphHeight;
             return (
@@ -169,6 +178,12 @@ export function StackedBarChart({
                 return (
                   <rect
                     key={seriesIdx}
+                    data-chart-series-index={seriesIdx}
+                    data-chart-point
+                    data-index={catIdx}
+                    data-label={cat}
+                    data-series-name={s.name}
+                    data-value={effectiveVal}
                     x={x}
                     y={y}
                     width={barWidth}

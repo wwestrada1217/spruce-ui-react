@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChartContainer, type LegendItem } from './ChartContainer.js';
-import { DEFAULT_CHART_COLORS, type ChartTooltipData } from './types.js';
+import { useChartPalette } from './ChartKernel.js';
+import { DEFAULT_CHART_COLORS, type ChartCommonProps, type ChartTooltipData } from './types.js';
 
 export interface TreemapNode {
   name: string;
@@ -8,7 +9,7 @@ export interface TreemapNode {
   color?: string;
 }
 
-export interface TreemapChartProps {
+export interface TreemapChartProps extends ChartCommonProps {
   data: TreemapNode[];
   title?: string;
   subtitle?: string;
@@ -33,12 +34,14 @@ export function TreemapChart({
   colorScheme = DEFAULT_CHART_COLORS,
   className,
   style,
+  ...commonProps
 }: TreemapChartProps) {
   const [tooltip, setTooltip] = useState<ChartTooltipData | null>(null);
+  const palette = useChartPalette(commonProps.config?.colorScheme ?? colorScheme, commonProps.config?.palette);
 
   if (data.length === 0) {
     return (
-      <ChartContainer title={title} subtitle={subtitle} height={height} className={className} style={style}>
+      <ChartContainer {...commonProps} title={title} subtitle={subtitle} height={height} className={className} style={style}>
         <div style={{ color: 'var(--sp-text-subtle)', fontSize: 13, textAlign: 'center', padding: 32 }}>
           No chart data available
         </div>
@@ -84,17 +87,18 @@ export function TreemapChart({
       currH -= h;
     }
 
-    const color = item.color || colorScheme[idx % colorScheme.length];
+    const color = item.color || palette[idx % palette.length];
     rects.push({ ...item, x, y, w: Math.max(0, w), h: Math.max(0, h), color });
   });
 
   const legendItems: LegendItem[] = rects.map((r) => ({
     label: r.name,
-    color: r.color || colorScheme[0],
+    color: r.color || palette[0],
   }));
 
   return (
     <ChartContainer
+      {...commonProps}
       title={title}
       subtitle={subtitle}
       legend={legendItems}
@@ -113,8 +117,12 @@ export function TreemapChart({
           const share = ((r.value / totalValue) * 100).toFixed(1);
 
           return (
-            <g key={idx}>
+            <g key={idx} data-chart-series-index={idx}>
               <rect
+                data-chart-point
+                data-index={idx}
+                data-label={r.name}
+                data-value={r.value}
                 x={r.x + 2}
                 y={r.y + 2}
                 width={Math.max(0, r.w - 4)}

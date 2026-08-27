@@ -8,9 +8,10 @@
 import './AreaChart.css';
 import { useState } from 'react';
 import { ChartContainer, type LegendItem } from './ChartContainer.js';
-import { DEFAULT_CHART_COLORS, type ChartDataItem, type ChartSeries, type ChartTooltipData } from './types.js';
+import { useChartPalette } from './ChartKernel.js';
+import { DEFAULT_CHART_COLORS, type ChartCommonProps, type ChartDataItem, type ChartSeries, type ChartTooltipData } from './types.js';
 
-export interface AreaChartProps {
+export interface AreaChartProps extends ChartCommonProps {
   data?: ChartDataItem[];
   series?: ChartSeries[];
   categories?: string[];
@@ -42,8 +43,14 @@ export function AreaChart({
   colorScheme = DEFAULT_CHART_COLORS,
   className,
   style,
+  ...commonProps
 }: AreaChartProps) {
   const [tooltip, setTooltip] = useState<ChartTooltipData | null>(null);
+  const palette = useChartPalette(commonProps.config?.colorScheme ?? colorScheme, commonProps.config?.palette);
+  const resolvedShowGrid = commonProps.config?.showGrid ?? showGrid;
+  const resolvedShowDots = commonProps.config?.showDots ?? showDots;
+  const resolvedCurved = commonProps.config?.curve ? commonProps.config.curve !== 'linear' : curved;
+  const resolvedFillOpacity = typeof commonProps.config?.fillOpacity === 'number' ? commonProps.config.fillOpacity : fillOpacity;
 
   let normalizedCategories: string[] = [];
   let normalizedSeries: { name: string; data: number[]; color: string }[] = [];
@@ -53,7 +60,7 @@ export function AreaChart({
     normalizedSeries = series.map((s, idx) => ({
       name: s.name,
       data: s.data.map((d) => (typeof d === 'number' ? d : d.value)),
-      color: s.color || colorScheme[idx % colorScheme.length],
+      color: s.color || palette[idx % palette.length],
     }));
   } else if (data && data.length > 0) {
     normalizedCategories = data.map((d) => d.label);
@@ -61,7 +68,7 @@ export function AreaChart({
       {
         name: 'Value',
         data: data.map((d) => d.value),
-        color: colorScheme[0],
+        color: palette[0],
       },
     ];
   }
@@ -69,7 +76,7 @@ export function AreaChart({
   const categoryCount = normalizedCategories.length;
   if (categoryCount === 0) {
     return (
-      <ChartContainer title={title} subtitle={subtitle} height={height} className={className} style={style}>
+      <ChartContainer {...commonProps} title={title} subtitle={subtitle} height={height} className={className} style={style}>
         <div style={{ color: 'var(--sp-text-subtle)', fontSize: 13, textAlign: 'center', padding: 32 }}>
           No chart data available
         </div>
@@ -99,7 +106,7 @@ export function AreaChart({
     if (points.length === 0) return '';
     if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
 
-    if (!curved) {
+    if (!resolvedCurved) {
       return points.reduce(
         (acc, p, idx) => (idx === 0 ? `M ${p.x} ${p.y}` : `${acc} L ${p.x} ${p.y}`),
         '',
@@ -128,6 +135,7 @@ export function AreaChart({
 
   return (
     <ChartContainer
+      {...commonProps}
       title={title}
       subtitle={subtitle}
       legend={showLegend && normalizedSeries.length > 1 ? legendItems : undefined}
@@ -145,14 +153,14 @@ export function AreaChart({
         <defs>
           {normalizedSeries.map((s, idx) => (
             <linearGradient key={idx} id={`sp-area-grad-${idx}`} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={s.color} stopOpacity={fillOpacity} />
+              <stop offset="0%" stopColor={s.color} stopOpacity={resolvedFillOpacity} />
               <stop offset="100%" stopColor={s.color} stopOpacity={0.02} />
             </linearGradient>
           ))}
         </defs>
 
         {/* Y Axis Gridlines */}
-        {showGrid &&
+        {resolvedShowGrid &&
           yTicks.map((val, idx) => {
             const y = padding.top + graphHeight - (val / niceMax) * graphHeight;
             return (
@@ -220,7 +228,7 @@ export function AreaChart({
           const lineD = getLinePath(points);
 
           return (
-            <g key={seriesIdx}>
+            <g key={seriesIdx} data-chart-series-index={seriesIdx}>
               {/* Gradient Filled Area */}
               <path d={areaD} fill={`url(#sp-area-grad-${seriesIdx})`} className="sp-area-chart-area" />
 
@@ -228,10 +236,15 @@ export function AreaChart({
               <path d={lineD} stroke={s.color} className="sp-area-chart-path" />
 
               {/* Data Point Dots */}
-              {showDots &&
+              {resolvedShowDots &&
                 points.map((pt, ptIdx) => (
                   <circle
                     key={ptIdx}
+                    data-chart-point
+                    data-index={ptIdx}
+                    data-label={pt.cat}
+                    data-series-name={s.name}
+                    data-value={pt.val}
                     cx={pt.x}
                     cy={pt.y}
                     r={4}

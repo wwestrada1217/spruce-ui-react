@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChartContainer, type LegendItem } from './ChartContainer.js';
-import { DEFAULT_CHART_COLORS, type ChartTooltipData } from './types.js';
+import { useChartPalette } from './ChartKernel.js';
+import { DEFAULT_CHART_COLORS, type ChartCommonProps, type ChartTooltipData } from './types.js';
 
 export interface ComboSeries {
   name: string;
@@ -10,7 +11,7 @@ export interface ComboSeries {
   yAxisIndex?: 0 | 1;
 }
 
-export interface ComboChartProps {
+export interface ComboChartProps extends ChartCommonProps {
   series: ComboSeries[];
   categories: string[];
   title?: string;
@@ -34,12 +35,15 @@ export function ComboChart({
   colorScheme = DEFAULT_CHART_COLORS,
   className,
   style,
+  ...commonProps
 }: ComboChartProps) {
   const [tooltip, setTooltip] = useState<ChartTooltipData | null>(null);
+  const palette = useChartPalette(commonProps.config?.colorScheme ?? colorScheme, commonProps.config?.palette);
+  const resolvedShowGrid = commonProps.config?.showGrid ?? showGrid;
 
   if (series.length === 0 || categories.length === 0) {
     return (
-      <ChartContainer title={title} subtitle={subtitle} height={height} className={className} style={style}>
+      <ChartContainer {...commonProps} title={title} subtitle={subtitle} height={height} className={className} style={style}>
         <div style={{ color: 'var(--sp-text-subtle)', fontSize: 13, textAlign: 'center', padding: 32 }}>
           No chart data available
         </div>
@@ -69,11 +73,12 @@ export function ComboChart({
 
   const legendItems: LegendItem[] = series.map((s, idx) => ({
     label: s.name,
-    color: s.color || colorScheme[idx % colorScheme.length],
+    color: s.color || palette[idx % palette.length],
   }));
 
   return (
     <ChartContainer
+      {...commonProps}
       title={title}
       subtitle={subtitle}
       legend={showLegend ? legendItems : undefined}
@@ -89,7 +94,7 @@ export function ComboChart({
         onMouseLeave={() => setTooltip(null)}
       >
         {/* Y Axis Left Gridlines & Labels */}
-        {showGrid &&
+        {resolvedShowGrid &&
           yTicksLeft.map((val, idx) => {
             const y = padding.top + graphHeight - (val / maxBar) * graphHeight;
             return (
@@ -128,7 +133,7 @@ export function ComboChart({
 
         {/* Render Bar Series */}
         {barSeries.map((s, seriesIdx) => {
-          const color = s.color || colorScheme[seriesIdx % colorScheme.length];
+          const color = s.color || palette[seriesIdx % palette.length];
           const singleBarW = (groupWidth * 0.6) / barSeries.length;
 
           return s.data.map((val, catIdx) => {
@@ -140,6 +145,12 @@ export function ComboChart({
             return (
               <rect
                 key={`${seriesIdx}-${catIdx}`}
+                data-chart-series-index={seriesIdx}
+                data-chart-point
+                data-index={catIdx}
+                data-label={categories[catIdx]}
+                data-series-name={s.name}
+                data-value={val}
                 x={x}
                 y={y}
                 width={Math.max(2, singleBarW - 2)}
@@ -170,7 +181,7 @@ export function ComboChart({
 
         {/* Render Line Series */}
         {lineSeries.map((s, seriesIdx) => {
-          const color = s.color || colorScheme[(barSeries.length + seriesIdx) % colorScheme.length];
+          const color = s.color || palette[(barSeries.length + seriesIdx) % palette.length];
           const pts = s.data.map((val, catIdx) => {
             const x = padding.left + catIdx * groupWidth + groupWidth / 2;
             const y = padding.top + graphHeight - (val / maxLine) * graphHeight;
@@ -180,11 +191,16 @@ export function ComboChart({
           const pathD = pts.reduce((acc, p, idx) => (idx === 0 ? `M ${p.x} ${p.y}` : `${acc} L ${p.x} ${p.y}`), '');
 
           return (
-            <g key={seriesIdx}>
+            <g key={seriesIdx} data-chart-series-index={seriesIdx}>
               <path d={pathD} fill="none" stroke={color} strokeWidth={2.5} />
               {pts.map((p, catIdx) => (
                 <circle
                   key={catIdx}
+                  data-chart-point
+                  data-index={catIdx}
+                  data-label={categories[catIdx]}
+                  data-series-name={s.name}
+                  data-value={p.val}
                   cx={p.x}
                   cy={p.y}
                   r={4}

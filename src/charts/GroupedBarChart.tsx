@@ -8,9 +8,10 @@
 import './GroupedBarChart.css';
 import { useState } from 'react';
 import { ChartContainer, type LegendItem } from './ChartContainer.js';
-import { DEFAULT_CHART_COLORS, type ChartSeries, type ChartTooltipData } from './types.js';
+import { useChartPalette } from './ChartKernel.js';
+import { DEFAULT_CHART_COLORS, type ChartCommonProps, type ChartSeries, type ChartTooltipData } from './types.js';
 
-export interface GroupedBarChartProps {
+export interface GroupedBarChartProps extends ChartCommonProps {
   series: ChartSeries[];
   categories: string[];
   title?: string;
@@ -36,13 +37,17 @@ export function GroupedBarChart({
   colorScheme = DEFAULT_CHART_COLORS,
   className,
   style,
+  ...commonProps
 }: GroupedBarChartProps) {
   const [tooltip, setTooltip] = useState<ChartTooltipData | null>(null);
+  const palette = useChartPalette(commonProps.config?.colorScheme ?? colorScheme, commonProps.config?.palette);
+  const resolvedShowGrid = commonProps.config?.showGrid ?? showGrid;
+  const resolvedOrientation = commonProps.config?.orientation ?? orientation;
 
   const categoryCount = categories.length;
   if (categoryCount === 0 || series.length === 0) {
     return (
-      <ChartContainer title={title} subtitle={subtitle} height={height} className={className} style={style}>
+      <ChartContainer {...commonProps} title={title} subtitle={subtitle} height={height} className={className} style={style}>
         <div style={{ color: 'var(--sp-text-subtle)', fontSize: 13, textAlign: 'center', padding: 32 }}>
           No chart data available
         </div>
@@ -53,7 +58,7 @@ export function GroupedBarChart({
   const normalizedSeries = series.map((s, idx) => ({
     name: s.name,
     data: s.data.map((d) => (typeof d === 'number' ? d : d.value)),
-    color: s.color || colorScheme[idx % colorScheme.length],
+    color: s.color || palette[idx % palette.length],
   }));
 
   const allValues = normalizedSeries.flatMap((s) => s.data);
@@ -75,6 +80,7 @@ export function GroupedBarChart({
 
   return (
     <ChartContainer
+      {...commonProps}
       title={title}
       subtitle={subtitle}
       legend={showLegend ? legendItems : undefined}
@@ -89,10 +95,10 @@ export function GroupedBarChart({
         preserveAspectRatio="xMidYMid meet"
         onMouseLeave={() => setTooltip(null)}
       >
-        {orientation === 'horizontal' ? (
+        {resolvedOrientation === 'horizontal' ? (
           <>
             {/* Vertical Gridlines */}
-            {showGrid &&
+            {resolvedShowGrid &&
               ticks.map((val, idx) => {
                 const x = padding.left + (val / niceMax) * graphWidth;
                 return (
@@ -160,6 +166,12 @@ export function GroupedBarChart({
                     return (
                       <rect
                         key={seriesIdx}
+                        data-chart-series-index={seriesIdx}
+                        data-chart-point
+                        data-index={catIdx}
+                        data-label={cat}
+                        data-series-name={s.name}
+                        data-value={val}
                         x={padding.left}
                         y={y}
                         width={barW}
@@ -193,7 +205,7 @@ export function GroupedBarChart({
         ) : (
           <>
             {/* Y Axis Gridlines */}
-            {showGrid &&
+            {resolvedShowGrid &&
               ticks.map((val, idx) => {
                 const y = padding.top + graphHeight - (val / niceMax) * graphHeight;
                 return (
@@ -262,6 +274,12 @@ export function GroupedBarChart({
                     return (
                       <rect
                         key={seriesIdx}
+                        data-chart-series-index={seriesIdx}
+                        data-chart-point
+                        data-index={catIdx}
+                        data-label={cat}
+                        data-series-name={s.name}
+                        data-value={val}
                         x={x}
                         y={y}
                         width={barWidth}

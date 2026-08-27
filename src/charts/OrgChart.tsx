@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChartContainer } from './ChartContainer.js';
-import { type ChartTooltipData } from './types.js';
+import { useChartPalette } from './ChartKernel.js';
+import { type ChartCommonProps, type ChartTooltipData } from './types.js';
 
 export interface OrgNode {
   id: string;
@@ -10,7 +11,7 @@ export interface OrgNode {
   children?: OrgNode[];
 }
 
-export interface OrgChartProps {
+export interface OrgChartProps extends ChartCommonProps {
   data: OrgNode;
   title?: string;
   subtitle?: string;
@@ -36,12 +37,14 @@ export function OrgChart({
   height = 360,
   className,
   style,
+  ...commonProps
 }: OrgChartProps) {
   const [tooltip, setTooltip] = useState<ChartTooltipData | null>(null);
+  const palette = useChartPalette(undefined, commonProps.config?.palette);
 
   if (!data) {
     return (
-      <ChartContainer title={title} subtitle={subtitle} height={height} className={className} style={style}>
+      <ChartContainer {...commonProps} title={title} subtitle={subtitle} height={height} className={className} style={style}>
         <div style={{ color: 'var(--sp-text-subtle)', fontSize: 13, textAlign: 'center', padding: 32 }}>
           No chart data available
         </div>
@@ -85,7 +88,7 @@ export function OrgChart({
   layout(data, 0, 10, svgWidth - 10);
 
   return (
-    <ChartContainer title={title} subtitle={subtitle} tooltip={tooltip} height={height} className={className} style={style}>
+    <ChartContainer {...commonProps} title={title} subtitle={subtitle} tooltip={tooltip} height={height} className={className} style={style}>
       <svg
         className="sp-chart-svg"
         viewBox={`0 0 ${svgWidth} ${svgHeight}`}
@@ -106,7 +109,7 @@ export function OrgChart({
               key={idx}
               d={pathD}
               fill="none"
-              stroke="var(--sp-primary, #0f766e)"
+              stroke={palette[0]}
               strokeWidth={1.5}
               strokeDasharray="4,2"
             />
@@ -114,10 +117,14 @@ export function OrgChart({
         })}
 
         {/* Node Cards */}
-        {positionedNodes.map((pn) => {
+        {positionedNodes.map((pn, idx) => {
           return (
             <g
               key={pn.node.id}
+              data-chart-point
+              data-index={idx}
+              data-label={pn.node.name}
+              data-value={pn.node.role || 'Member'}
               style={{ cursor: 'pointer' }}
               onMouseEnter={(e) => {
                 const containerRect = e.currentTarget.ownerSVGElement?.getBoundingClientRect();
@@ -127,7 +134,7 @@ export function OrgChart({
                   setTooltip({
                     label: pn.node.name,
                     value: pn.node.role || 'Member',
-                    color: '#0f766e',
+                    color: palette[0],
                     x: relX,
                     y: relY,
                   });

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChartContainer, type LegendItem } from './ChartContainer.js';
-import { DEFAULT_CHART_COLORS, type ChartTooltipData } from './types.js';
+import { useChartPalette } from './ChartKernel.js';
+import { DEFAULT_CHART_COLORS, type ChartCommonProps, type ChartTooltipData } from './types.js';
 
 export interface ScatterPoint {
   x: number;
@@ -14,7 +15,7 @@ export interface ScatterSeries {
   color?: string;
 }
 
-export interface ScatterChartProps {
+export interface ScatterChartProps extends ChartCommonProps {
   series: ScatterSeries[];
   title?: string;
   subtitle?: string;
@@ -36,14 +37,17 @@ export function ScatterChart({
   colorScheme = DEFAULT_CHART_COLORS,
   className,
   style,
+  ...commonProps
 }: ScatterChartProps) {
   const [tooltip, setTooltip] = useState<ChartTooltipData | null>(null);
+  const palette = useChartPalette(commonProps.config?.colorScheme ?? colorScheme, commonProps.config?.palette);
+  const resolvedShowGrid = commonProps.config?.showGrid ?? showGrid;
 
   const allPoints = series.flatMap((s) => s.data);
 
   if (series.length === 0 || allPoints.length === 0) {
     return (
-      <ChartContainer title={title} subtitle={subtitle} height={height} className={className} style={style}>
+      <ChartContainer {...commonProps} title={title} subtitle={subtitle} height={height} className={className} style={style}>
         <div style={{ color: 'var(--sp-text-subtle)', fontSize: 13, textAlign: 'center', padding: 32 }}>
           No chart data available
         </div>
@@ -67,7 +71,7 @@ export function ScatterChart({
 
   const legendItems: LegendItem[] = series.map((s, idx) => ({
     label: s.name,
-    color: s.color || colorScheme[idx % colorScheme.length],
+    color: s.color || palette[idx % palette.length],
   }));
 
   const yTicks = [minY, minY + rangeY * 0.33, minY + rangeY * 0.66, maxY];
@@ -75,6 +79,7 @@ export function ScatterChart({
 
   return (
     <ChartContainer
+      {...commonProps}
       title={title}
       subtitle={subtitle}
       legend={showLegend ? legendItems : undefined}
@@ -90,7 +95,7 @@ export function ScatterChart({
         onMouseLeave={() => setTooltip(null)}
       >
         {/* Y Axis Gridlines */}
-        {showGrid &&
+        {resolvedShowGrid &&
           yTicks.map((val, idx) => {
             const y = padding.top + graphHeight - ((val - minY) / rangeY) * graphHeight;
             return (
@@ -136,7 +141,7 @@ export function ScatterChart({
 
         {/* Render Scatter Points */}
         {series.map((s, seriesIdx) => {
-          const color = s.color || colorScheme[seriesIdx % colorScheme.length];
+          const color = s.color || palette[seriesIdx % palette.length];
           return s.data.map((pt, ptIdx) => {
             const cx = padding.left + ((pt.x - minX) / rangeX) * graphWidth;
             const cy = padding.top + graphHeight - ((pt.y - minY) / rangeY) * graphHeight;
@@ -144,6 +149,12 @@ export function ScatterChart({
             return (
               <circle
                 key={`${seriesIdx}-${ptIdx}`}
+                data-chart-series-index={seriesIdx}
+                data-chart-point
+                data-index={ptIdx}
+                data-label={pt.label || `Point (${pt.x}, ${pt.y})`}
+                data-series-name={s.name}
+                data-value={`X: ${pt.x}, Y: ${pt.y}`}
                 cx={cx}
                 cy={cy}
                 r={6}

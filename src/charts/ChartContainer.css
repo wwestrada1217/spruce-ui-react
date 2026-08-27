@@ -13,6 +13,7 @@
   position: relative;
   font-family: inherit;
   box-sizing: border-box;
+  color: var(--sp-chart-axis-text, var(--sp-text-color, #0f172a));
 }
 
 .sp-chart-header {
@@ -40,6 +41,53 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+  touch-action: none;
+  outline: none;
+}
+
+.sp-chart-body:focus-visible {
+  box-shadow: 0 0 0 3px var(--sp-focus-ring-color, rgba(15, 118, 110, 0.35));
+  border-radius: var(--sp-radius-md, 6px);
+}
+
+.sp-chart-content {
+  width: 100%;
+  height: 100%;
+  transition: transform 160ms ease-out;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.sp-chart-content--animated {
+  animation: sp-chart-content-in var(--sp-chart-animation-duration, 600ms) ease-out both;
+}
+
+.sp-chart-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  min-height: 0;
+}
+
+.sp-chart-reset {
+  border: var(--sp-border-width-hairline, 1px) solid var(--sp-border, rgba(15, 23, 42, 0.16));
+  border-radius: var(--sp-radius-sm, 4px);
+  background: var(--sp-surface-0, transparent);
+  color: var(--sp-text-color, currentColor);
+  padding: var(--sp-space-1, 4px) var(--sp-space-2, 8px);
+  font: inherit;
+  font-size: var(--sp-text-xs, 12px);
+  cursor: pointer;
+}
+
+.sp-chart-reset:hover {
+  background: var(--sp-surface-100, rgba(15, 23, 42, 0.06));
+}
+
+.sp-chart-reset:focus-visible,
+.sp-chart-legend-item:focus-visible {
+  outline: 2px solid var(--sp-focus-ring-color, #0f766e);
+  outline-offset: 2px;
 }
 
 .sp-chart-svg {
@@ -65,6 +113,15 @@
   user-select: none;
 }
 
+.sp-chart-container[data-show-axes="false"] .sp-chart-axis-line,
+.sp-chart-container[data-show-axes="false"] .sp-chart-axis-label {
+  display: none;
+}
+
+.sp-chart-container[data-show-labels="false"] .sp-chart-value-label {
+  display: none;
+}
+
 /* Legend */
 .sp-chart-legend {
   display: flex;
@@ -87,6 +144,42 @@
   gap: var(--sp-space-1_5, 6px);
   font-size: var(--sp-text-xs, 12px);
   color: var(--sp-text-color, #0f172a);
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  cursor: default;
+}
+
+button.sp-chart-legend-item {
+  cursor: pointer;
+}
+
+.sp-chart-legend-item--hidden {
+  opacity: 0.38;
+}
+
+.sp-chart-legend-item--hidden span:not(.sp-chart-legend-dot) {
+  text-decoration: line-through;
+}
+
+.sp-chart-legend-value {
+  color: var(--sp-chart-value-label, var(--sp-text-subtle, #64748b));
+  font-variant-numeric: tabular-nums;
+}
+
+/* Chart marks opt into the shared legend visibility contract with the
+   data-chart-series-index attribute. This keeps hiding behavior in the
+   kernel while allowing every chart geometry to remain specialized. */
+.sp-chart-container[data-hidden-series-indexes~="0"] .sp-chart-content [data-chart-series-index="0"],
+.sp-chart-container[data-hidden-series-indexes~="1"] .sp-chart-content [data-chart-series-index="1"],
+.sp-chart-container[data-hidden-series-indexes~="2"] .sp-chart-content [data-chart-series-index="2"],
+.sp-chart-container[data-hidden-series-indexes~="3"] .sp-chart-content [data-chart-series-index="3"],
+.sp-chart-container[data-hidden-series-indexes~="4"] .sp-chart-content [data-chart-series-index="4"],
+.sp-chart-container[data-hidden-series-indexes~="5"] .sp-chart-content [data-chart-series-index="5"],
+.sp-chart-container[data-hidden-series-indexes~="6"] .sp-chart-content [data-chart-series-index="6"],
+.sp-chart-container[data-hidden-series-indexes~="7"] .sp-chart-content [data-chart-series-index="7"] {
+  display: none;
 }
 
 .sp-chart-legend-dot {
@@ -128,4 +221,17 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
+}
+
+@keyframes sp-chart-content-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-chart-content,
+  .sp-chart-content--animated {
+    animation: none;
+    transition: none;
+  }
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChartContainer } from './ChartContainer.js';
-import { type ChartTooltipData } from './types.js';
+import { useChartPalette } from './ChartKernel.js';
+import { type ChartCommonProps, type ChartTooltipData } from './types.js';
 
 export interface WaterfallDataItem {
   label: string;
@@ -8,7 +9,7 @@ export interface WaterfallDataItem {
   isTotal?: boolean;
 }
 
-export interface WaterfallChartProps {
+export interface WaterfallChartProps extends ChartCommonProps {
   data: WaterfallDataItem[];
   title?: string;
   subtitle?: string;
@@ -32,12 +33,19 @@ export function WaterfallChart({
   totalColor = '#0284c7',
   className,
   style,
+  ...commonProps
 }: WaterfallChartProps) {
   const [tooltip, setTooltip] = useState<ChartTooltipData | null>(null);
+  const palette = useChartPalette(commonProps.config?.colorScheme ?? [positiveColor, negativeColor, totalColor], commonProps.config?.palette);
+  const useConfiguredPalette = Boolean(commonProps.config?.palette || commonProps.config?.colorScheme);
+  const resolvedPositiveColor = useConfiguredPalette ? palette[0] : positiveColor;
+  const resolvedNegativeColor = useConfiguredPalette ? palette[1] : negativeColor;
+  const resolvedTotalColor = useConfiguredPalette ? palette[2] : totalColor;
+  const resolvedShowGrid = commonProps.config?.showGrid ?? showGrid;
 
   if (data.length === 0) {
     return (
-      <ChartContainer title={title} subtitle={subtitle} height={height} className={className} style={style}>
+      <ChartContainer {...commonProps} title={title} subtitle={subtitle} height={height} className={className} style={style}>
         <div style={{ color: 'var(--sp-text-subtle)', fontSize: 13, textAlign: 'center', padding: 32 }}>
           No chart data available
         </div>
@@ -85,7 +93,7 @@ export function WaterfallChart({
   const yTicks = [minVal, minVal + range * 0.33, minVal + range * 0.66, maxVal];
 
   return (
-    <ChartContainer title={title} subtitle={subtitle} tooltip={tooltip} height={height} className={className} style={style}>
+      <ChartContainer {...commonProps} title={title} subtitle={subtitle} tooltip={tooltip} height={height} className={className} style={style}>
       <svg
         className="sp-chart-svg"
         viewBox={`0 0 ${svgWidth} ${svgHeight}`}
@@ -93,7 +101,7 @@ export function WaterfallChart({
         onMouseLeave={() => setTooltip(null)}
       >
         {/* Y Axis Gridlines */}
-        {showGrid &&
+        {resolvedShowGrid &&
           yTicks.map((val, idx) => {
             const y = padding.top + graphHeight - ((val - minVal) / range) * graphHeight;
             return (
@@ -138,11 +146,15 @@ export function WaterfallChart({
           const barX = padding.left + idx * barWidth + barWidth * 0.15;
           const actualW = barWidth * 0.7;
 
-          const color = bar.isTotal ? totalColor : bar.value >= 0 ? positiveColor : negativeColor;
+          const color = bar.isTotal ? resolvedTotalColor : bar.value >= 0 ? resolvedPositiveColor : resolvedNegativeColor;
 
           return (
             <g key={idx}>
               <rect
+                data-chart-point
+                data-index={idx}
+                data-label={bar.label}
+                data-value={bar.isTotal ? bar.endVal : bar.value}
                 x={barX}
                 y={yTop}
                 width={actualW}

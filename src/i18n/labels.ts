@@ -498,6 +498,7 @@ export interface SpI18nLabels {
   borderStyle: string;
   borderWidth: string;
   bullish: string;
+  chart: string;
   chartLatest: string;
   chartTotal: string;
   chartTypeBar: string;
@@ -2718,6 +2719,7 @@ export const SP_I18N_DEFAULT_LABELS: SpI18nLabels = {
   borderStyle: 'Border style',
   borderWidth: 'Border width',
   bullish: 'Bullish',
+  chart: 'Chart',
   chartLatest: 'Latest',
   chartTotal: 'Total',
   chartTypeBar: 'Bar chart',

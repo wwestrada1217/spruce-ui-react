@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ChartContainer } from './ChartContainer.js';
-import { type ChartTooltipData } from './types.js';
+import { useChartPalette } from './ChartKernel.js';
+import { type ChartCommonProps, type ChartTooltipData } from './types.js';
 
 export interface HeatmapItem {
   x: string;
@@ -8,7 +9,7 @@ export interface HeatmapItem {
   value: number;
 }
 
-export interface HeatmapChartProps {
+export interface HeatmapChartProps extends ChartCommonProps {
   data: HeatmapItem[];
   xCategories: string[];
   yCategories: string[];
@@ -30,12 +31,15 @@ export function HeatmapChart({
   baseColor = '#0f766e',
   className,
   style,
+  ...commonProps
 }: HeatmapChartProps) {
   const [tooltip, setTooltip] = useState<ChartTooltipData | null>(null);
+  const palette = useChartPalette(commonProps.config?.colorScheme ?? [baseColor], commonProps.config?.palette);
+  const resolvedBaseColor = commonProps.config?.palette || commonProps.config?.colorScheme ? palette[0] : baseColor;
 
   if (data.length === 0 || xCategories.length === 0 || yCategories.length === 0) {
     return (
-      <ChartContainer title={title} subtitle={subtitle} height={height} className={className} style={style}>
+      <ChartContainer {...commonProps} title={title} subtitle={subtitle} height={height} className={className} style={style}>
         <div style={{ color: 'var(--sp-text-subtle)', fontSize: 13, textAlign: 'center', padding: 32 }}>
           No chart data available
         </div>
@@ -64,6 +68,7 @@ export function HeatmapChart({
 
   return (
     <ChartContainer
+      {...commonProps}
       title={title}
       subtitle={subtitle}
       tooltip={tooltip}
@@ -110,14 +115,18 @@ export function HeatmapChart({
             return (
               <g key={`${xIdx}-${yIdx}`}>
                 <rect
+                  data-chart-point
+                  data-index={`${xIdx}-${yIdx}`}
+                  data-label={`${xCat} / ${yCat}`}
+                  data-value={val}
                   x={rectX + 2}
                   y={rectY + 2}
                   width={Math.max(0, cellWidth - 4)}
                   height={Math.max(0, cellHeight - 4)}
                   rx={4}
-                  fill={baseColor}
+                  fill={resolvedBaseColor}
                   fillOpacity={opacity}
-                  stroke={baseColor}
+                  stroke={resolvedBaseColor}
                   strokeWidth={1}
                   style={{ cursor: 'pointer', transition: 'fill-opacity 0.2s ease' }}
                   onMouseEnter={(e) => {
@@ -128,7 +137,7 @@ export function HeatmapChart({
                       setTooltip({
                         label: `${xCat} / ${yCat}`,
                         value: val,
-                        color: baseColor,
+                        color: resolvedBaseColor,
                         x: relX,
                         y: relY,
                       });
