@@ -17,6 +17,9 @@ describe('P1.0-02 form and lookup parity', () => {
     );
 
     await user.click(container.querySelector('.sp-select__trigger') as HTMLElement);
+    expect(getByRole('option', { name: 'Alpha' })).toHaveClass('sp-select__option', 'sp-select__option--selected', 'sp-select__option--highlighted');
+    await user.hover(getByRole('option', { name: 'Beta' }));
+    expect(getByRole('option', { name: 'Beta' })).toHaveClass('sp-select__option--highlighted');
     await user.click(getByRole('option', { name: 'Beta' }));
     expect(onChange).toHaveBeenLastCalledWith(['a', 'b']);
     expect(onSelectedItem).toHaveBeenLastCalledWith({ label: 'Beta', value: 'b' });
@@ -61,7 +64,7 @@ describe('P1.0-02 form and lookup parity', () => {
   it('supports combobox source templates and GridCombobox remote selection', async () => {
     const onComboChange = vi.fn();
     const onGridSelect = vi.fn();
-    const { getByRole, getByText, getAllByRole, user } = renderWithSpruce(
+    const { getByRole, getByText, getAllByRole, queryByRole, user } = renderWithSpruce(
       <>
         <Combobox
           source={[{ name: 'Alpha', id: 'a' }]}
@@ -83,10 +86,36 @@ describe('P1.0-02 form and lookup parity', () => {
     await user.click(inputs[0]);
     await user.keyboard('{ArrowDown}{Enter}');
     expect(onComboChange).toHaveBeenLastCalledWith('a');
+    await user.keyboard('{ArrowDown}');
+    await user.click(getByRole('option', { name: 'Alpha' }));
+    expect(onComboChange).toHaveBeenLastCalledWith('a');
+    expect(queryByRole('listbox')).not.toBeInTheDocument();
     await user.click(inputs[1]);
     expect(getByText('Code')).toBeTruthy();
     await user.click(getByRole('option', { name: /AAlpha/ }));
     expect(onGridSelect).toHaveBeenLastCalledWith('a');
+    expect(queryByRole('listbox')).not.toBeInTheDocument();
+  });
+
+  it('updates uncontrolled Combobox multi-select checkboxes', async () => {
+    const onChange = vi.fn();
+    const { getByRole, user } = renderWithSpruce(
+      <Combobox
+        options={[{ label: 'Alpha', value: 'a' }, { label: 'Beta', value: 'b' }]}
+        multiple
+        onChange={onChange}
+      />,
+    );
+
+    await user.click(getByRole('combobox'));
+    await user.click(getByRole('option', { name: 'Alpha' }));
+    expect(getByRole('option', { name: 'Alpha' })).toHaveAttribute('aria-selected', 'true');
+    expect(getByRole('option', { name: 'Alpha' })).toHaveClass('sp-combo__option--selected');
+    expect(onChange).toHaveBeenLastCalledWith(['a']);
+
+    await user.click(getByRole('option', { name: 'Alpha' }));
+    expect(getByRole('option', { name: 'Alpha' })).toHaveAttribute('aria-selected', 'false');
+    expect(onChange).toHaveBeenLastCalledWith([]);
   });
 
   it('applies shared state and keyboard behavior across primitives in RTL dark theme', async () => {

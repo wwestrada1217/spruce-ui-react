@@ -95,6 +95,7 @@ export function GridCombobox({
   const anchorRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const suppressOpenOnFocusRef = useRef(false);
 
   const load = useCallback(async (requestedPage: number, searchTerm: string) => {
     setLoading(true);
@@ -152,6 +153,10 @@ export function GridCombobox({
   const activeIndex = virtualScroll ? virtualStart + highlightedIndex : highlightedIndex;
   const gridTemplate = columns.map((column) => columnWidths[column.key] ?? column.width ?? '1fr').join(' ');
 
+  function focusInputAfterSelection() {
+    if (document.activeElement !== inputRef.current) suppressOpenOnFocusRef.current = true;
+    inputRef.current?.focus();
+  }
   function selectOption(index: number) {
     const item = items[index];
     const option = normalized[index];
@@ -161,7 +166,7 @@ export function GridCombobox({
     onSelectedItem?.(item);
     setQuery(option.label);
     setOpenState(false);
-    inputRef.current?.focus();
+    focusInputAfterSelection();
   }
   function moveHighlight(delta: number) {
     if (!items.length) return;
@@ -209,7 +214,7 @@ export function GridCombobox({
       {floatingLabel && <label className="sp-gc__floating-label" htmlFor={inputId}>{label}{effectiveRequired && <span aria-hidden="true">*</span>}</label>}
       <div className="sp-gc__input-wrap">
         <Icon name="search" size={14} className="sp-gc__search-icon" />
-        <input ref={inputRef} id={inputId} className="sp-gc__input" placeholder={placeholder === 'Search...' ? t('search') : placeholder} disabled={effectiveDisabled} readOnly={effectiveReadOnly} value={query} onChange={(event: ChangeEvent<HTMLInputElement>) => { setQuery(event.target.value); if (!open) setOpenState(true); else void load(1, event.target.value); }} onFocus={() => setOpenState(true)} onKeyDown={handleKeyDown} role="combobox" aria-expanded={open} aria-haspopup="listbox" aria-autocomplete="list" aria-activedescendant={activeDescendant} aria-label={ariaLabel || (!label ? undefined : label)} aria-labelledby={ariaLabelledBy || undefined} aria-describedby={describedBy} aria-invalid={hasError || undefined} aria-required={effectiveRequired || undefined} aria-readonly={effectiveReadOnly || undefined} />
+        <input ref={inputRef} id={inputId} className="sp-gc__input" placeholder={placeholder === 'Search...' ? t('search') : placeholder} disabled={effectiveDisabled} readOnly={effectiveReadOnly} value={query} onChange={(event: ChangeEvent<HTMLInputElement>) => { setQuery(event.target.value); if (!open) setOpenState(true); else void load(1, event.target.value); }} onFocus={() => { if (suppressOpenOnFocusRef.current) { suppressOpenOnFocusRef.current = false; return; } setOpenState(true); }} onKeyDown={handleKeyDown} role="combobox" aria-expanded={open} aria-haspopup="listbox" aria-autocomplete="list" aria-activedescendant={activeDescendant} aria-label={ariaLabel || (!label ? undefined : label)} aria-labelledby={ariaLabelledBy || undefined} aria-describedby={describedBy} aria-invalid={hasError || undefined} aria-required={effectiveRequired || undefined} aria-readonly={effectiveReadOnly || undefined} />
         {query && !effectiveDisabled && <button type="button" className="sp-gc__clear" tabIndex={-1} aria-label={t('clear')} onMouseDown={(event) => { event.preventDefault(); setQuery(''); onChange?.(''); inputRef.current?.focus(); }}><Icon name="x" size={12} /></button>}
       </div>
     </div>

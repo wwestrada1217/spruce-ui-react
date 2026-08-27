@@ -88,7 +88,8 @@ export function Combobox({
   const errorMessage = firstFormError(errors || field?.errors, error);
   const hasError = Boolean(errorMessage) || Boolean(invalid ?? field?.invalid);
   const describedBy = ariaDescribedBy || field?.describedBy || (errorMessage ? errorId : effectiveHint ? hintId : undefined);
-  const selectedValues = useMemo(() => value === undefined ? [] : Array.isArray(value) ? value : [value], [value]);
+  const [internalSelectedValues, setInternalSelectedValues] = useState<string[]>(() => Array.isArray(value) ? value : value ? [value] : []);
+  const selectedValues = useMemo(() => value === undefined ? internalSelectedValues : Array.isArray(value) ? value : value ? [value] : [], [internalSelectedValues, value]);
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(autoOpen);
   const [items, setItems] = useState<unknown[]>(Array.isArray(lookupSource) ? [...lookupSource] : []);
@@ -102,6 +103,7 @@ export function Combobox({
   const anchorRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const suppressOpenOnFocusRef = useRef(false);
 
   const load = useCallback(async (requestedPage: number, searchTerm: string, append = false) => {
     setLoading(true);
@@ -169,13 +171,21 @@ export function Combobox({
   const activeIndex = virtualScroll ? virtualStart + highlightedIndex : highlightedIndex;
 
   function openPanel() { if (!effectiveDisabled && !effectiveReadOnly) setOpenState(true); }
+  function updateSelection(next: string | string[]) {
+    if (value === undefined) setInternalSelectedValues(Array.isArray(next) ? next : next ? [next] : []);
+    onChange?.(next);
+  }
+  function focusInputAfterSelection() {
+    if (document.activeElement !== inputRef.current) suppressOpenOnFocusRef.current = true;
+    inputRef.current?.focus();
+  }
   function selectOption(index: number) {
     const option = normalized[index];
     if (!option || option.disabled) return;
     const next = multiple ? selectedValues.includes(option.value) ? selectedValues.filter((entry) => entry !== option.value) : [...selectedValues, option.value] : option.value;
-    onChange?.(next);
+    updateSelection(next);
     onSelectedItem?.(items[index] ?? selectedItem);
-    if (multiple) { setQuery(''); inputRef.current?.focus(); } else { setQuery(option.label); setOpenState(false); inputRef.current?.focus(); }
+    if (multiple) { setQuery(''); inputRef.current?.focus(); } else { setQuery(option.label); setOpenState(false); focusInputAfterSelection(); }
   }
   function moveHighlight(delta: number) {
     if (!normalized.length) return;
@@ -198,7 +208,7 @@ export function Combobox({
     else if (event.key === 'PageUp' && virtualPaging && page > 1) { event.preventDefault(); void load(page - 1, query); setHighlightedIndex(0); }
     else if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); if (activeIndex >= 0) selectOption(activeIndex); }
     else if (event.key === 'Escape') { event.preventDefault(); setOpenState(false); }
-    else if (event.key === 'Backspace' && multiple && !query && selectedValues.length) onChange?.(selectedValues.slice(0, -1));
+    else if (event.key === 'Backspace' && multiple && !query && selectedValues.length) updateSelection(selectedValues.slice(0, -1));
     else if (event.key === 'Tab') setOpenState(false);
   }
   function handlePanelScroll(event: UIEvent<HTMLDivElement>) {
@@ -206,7 +216,7 @@ export function Combobox({
     if (virtualScroll) setVirtualStart(Math.max(0, Math.floor(element.scrollTop / itemHeight) - 4));
     if (virtualPaging && element.scrollHeight - element.scrollTop - element.clientHeight < 20 && page < totalPages) void load(page + 1, query);
   }
-  function removeChip(valueToRemove: string, event: ReactMouseEvent) { event.stopPropagation(); onChange?.(selectedValues.filter((entry) => entry !== valueToRemove)); }
+  function removeChip(valueToRemove: string, event: ReactMouseEvent) { event.stopPropagation(); updateSelection(selectedValues.filter((entry) => entry !== valueToRemove)); }
 
   if (effectiveHidden) return null;
   const rootClasses = ['sp-combo', floatingLabel && 'sp-combo--floating', selectedValues.length > 0 && 'sp-combo--floated', open && 'sp-combo--open', effectiveDisabled && 'sp-combo--disabled', effectiveReadOnly && 'sp-combo--readonly', hasError && 'sp-combo--error', variant !== 'default' && `sp-combo--${variant === 'outlined' ? 'outline' : variant}`, className].filter(Boolean).join(' ');
@@ -217,8 +227,8 @@ export function Combobox({
       <div className="sp-combo__input-wrap" onClick={() => inputRef.current?.focus()}>
         {icon ? <Icon name={icon} size={14} className="sp-combo__search-icon" /> : !multiple && <Icon name="search" size={14} className="sp-combo__search-icon" />}
         {multiple && selectedOptions.map((option) => <span key={option.value} className="sp-combo__chip">{option.label}<button type="button" className="sp-combo__chip-remove" tabIndex={-1} aria-label={`${t('remove')} ${option.label}`} onClick={(event) => removeChip(option.value, event)}><Icon name="x" size={10} /></button></span>)}
-        <input ref={inputRef} id={inputId} className="sp-combo__input" value={query} type="text" placeholder={selectedValues.length && multiple ? '' : placeholder === 'Search…' ? t('search') : placeholder} disabled={effectiveDisabled} readOnly={effectiveReadOnly} role="combobox" aria-expanded={open} aria-haspopup="listbox" aria-autocomplete="list" aria-activedescendant={activeDescendant} aria-label={ariaLabel || (!label ? undefined : label)} aria-labelledby={ariaLabelledBy || undefined} aria-describedby={describedBy} aria-invalid={hasError || undefined} aria-required={effectiveRequired || undefined} aria-readonly={effectiveReadOnly || undefined} onChange={(event: ChangeEvent<HTMLInputElement>) => { setQuery(event.target.value); if (!open) openPanel(); else void load(1, event.target.value); }} onFocus={openPanel} onKeyDown={handleKeyDown} />
-        {(query || selectedValues.length) && !effectiveDisabled && <button type="button" className="sp-combo__clear" tabIndex={-1} aria-label={t('clear')} onClick={(event) => { event.stopPropagation(); setQuery(''); onChange?.(multiple ? [] : ''); inputRef.current?.focus(); }}><Icon name="x" size={10} /></button>}
+        <input ref={inputRef} id={inputId} className="sp-combo__input" value={query} type="text" placeholder={selectedValues.length && multiple ? '' : placeholder === 'Search…' ? t('search') : placeholder} disabled={effectiveDisabled} readOnly={effectiveReadOnly} role="combobox" aria-expanded={open} aria-haspopup="listbox" aria-autocomplete="list" aria-activedescendant={activeDescendant} aria-label={ariaLabel || (!label ? undefined : label)} aria-labelledby={ariaLabelledBy || undefined} aria-describedby={describedBy} aria-invalid={hasError || undefined} aria-required={effectiveRequired || undefined} aria-readonly={effectiveReadOnly || undefined} onChange={(event: ChangeEvent<HTMLInputElement>) => { setQuery(event.target.value); if (!open) openPanel(); else void load(1, event.target.value); }} onFocus={() => { if (suppressOpenOnFocusRef.current) { suppressOpenOnFocusRef.current = false; return; } openPanel(); }} onKeyDown={handleKeyDown} />
+        {(query || selectedValues.length) && !effectiveDisabled && <button type="button" className="sp-combo__clear" tabIndex={-1} aria-label={t('clear')} onClick={(event) => { event.stopPropagation(); setQuery(''); updateSelection(multiple ? [] : ''); inputRef.current?.focus(); }}><Icon name="x" size={10} /></button>}
       </div>
     </div>
     {open && createPortal(<div ref={panelRef} className="sp-combo__dropdown" role="listbox" aria-multiselectable={multiple || undefined} style={{ position: 'fixed', top: position.top, left: position.left, width: position.width, zIndex: 999, opacity: ready ? 1 : 0 }} onScroll={handlePanelScroll}>
