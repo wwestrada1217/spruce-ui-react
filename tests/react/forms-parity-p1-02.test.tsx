@@ -99,7 +99,7 @@ describe('P1.0-02 form and lookup parity', () => {
 
   it('updates uncontrolled Combobox multi-select checkboxes', async () => {
     const onChange = vi.fn();
-    const { getByRole, user } = renderWithSpruce(
+    const { container, getByRole, user } = renderWithSpruce(
       <Combobox
         options={[{ label: 'Alpha', value: 'a' }, { label: 'Beta', value: 'b' }]}
         multiple
@@ -107,6 +107,7 @@ describe('P1.0-02 form and lookup parity', () => {
       />,
     );
 
+    expect(container.textContent).not.toContain('0');
     await user.click(getByRole('combobox'));
     await user.click(getByRole('option', { name: 'Alpha' }));
     expect(getByRole('option', { name: 'Alpha' })).toHaveAttribute('aria-selected', 'true');
