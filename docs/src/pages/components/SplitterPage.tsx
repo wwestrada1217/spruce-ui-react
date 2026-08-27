@@ -35,6 +35,17 @@ const MIN_MAX_CODE = `<Splitter>
   </SplitterPane>
 </Splitter>`
 
+const KEYBOARD_CODE = `<Splitter
+  initialSizes={[30, 70]}
+  keyIncrement={5}
+  thin
+  ariaLabel="Inspector split view"
+  onDragStart={() => setDragging(true)}
+  onDragEnd={() => setDragging(false)}
+>
+  ...
+</Splitter>`
+
 const paneStyle: React.CSSProperties = {
   padding: 16,
   fontSize: 13,
@@ -50,6 +61,7 @@ const SECTIONS: Section[] = [
   { id: 'vertical',    label: 'Vertical' },
   { id: 'three-panes', label: 'Three Panes' },
   { id: 'min-max',     label: 'Min / Max' },
+  { id: 'keyboard',   label: 'Keyboard & Thin' },
   { id: 'api',         label: 'API' },
 ]
 
@@ -159,6 +171,19 @@ export function SplitterPage() {
           </CodePreview>
         </section>
 
+        <section id="keyboard" className="demo-section" aria-labelledby="keyboard-heading">
+          <h2 id="keyboard-heading">Keyboard &amp; Thin Mode</h2>
+          <p className="section-desc">Focus a gutter and use the arrow keys to move it. <code>Home</code> moves the preceding pane to its minimum and <code>End</code> moves it to its maximum. Thin mode keeps the full hit area while rendering a subtle 1px divider.</p>
+          <CodePreview code={KEYBOARD_CODE}>
+            <div style={{ height: 200, border: '1px solid var(--sp-border)', borderRadius: 8, overflow: 'hidden' }}>
+              <Splitter initialSizes={[35, 65]} keyIncrement={5} thin ariaLabel="Inspector split view">
+                <SplitterPane><div style={paneStyle}>Focus the divider and press ArrowRight</div></SplitterPane>
+                <SplitterPane><div style={paneStyle}>Thin visual divider</div></SplitterPane>
+              </Splitter>
+            </div>
+          </CodePreview>
+        </section>
+
         <section id="api" className="demo-section">
           <h2>API</h2>
           <h3>Splitter Props</h3>
@@ -171,7 +196,13 @@ export function SplitterPage() {
                 <tr><td><code>orientation</code></td><td><code>'horizontal' | 'vertical'</code></td><td><code>'horizontal'</code></td><td>Split direction</td></tr>
                 <tr><td><code>gutterSize</code></td><td><code>number</code></td><td><code>4</code></td><td>Gutter width/height in px</td></tr>
                 <tr><td><code>initialSizes</code></td><td><code>number[]</code></td><td>—</td><td>Starting sizes in percentages</td></tr>
-                <tr><td><code>onSizeChange</code></td><td><code>(sizes: number[]) =&gt; void</code></td><td>—</td><td>Fired during drag</td></tr>
+                <tr><td><code>sizes</code></td><td><code>number[]</code></td><td>—</td><td>Controlled pane sizes in percentages</td></tr>
+                <tr><td><code>keyIncrement</code></td><td><code>number</code></td><td><code>2</code></td><td>Percentage moved per arrow-key press</td></tr>
+                <tr><td><code>thin</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Render a 1px visual divider while preserving the gutter hit area</td></tr>
+                <tr><td><code>ariaLabel</code></td><td><code>string</code></td><td>localized</td><td>Accessible name for the split view</td></tr>
+                <tr><td><code>onSizeChange</code></td><td><code>(sizes: number[]) =&gt; void</code></td><td>—</td><td>Fired during drag and keyboard changes</td></tr>
+                <tr><td><code>onDragStart</code></td><td><code>() =&gt; void</code></td><td>—</td><td>Fired when pointer or touch dragging starts</td></tr>
+                <tr><td><code>onDragEnd</code></td><td><code>() =&gt; void</code></td><td>—</td><td>Fired when pointer or touch dragging ends</td></tr>
               </tbody>
             </table>
           </div>

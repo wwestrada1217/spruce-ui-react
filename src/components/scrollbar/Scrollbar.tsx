@@ -6,13 +6,13 @@
  */
 
 import './Scrollbar.css';
-import type { ReactNode, CSSProperties } from 'react';
+import type { HTMLAttributes, ReactNode, CSSProperties } from 'react';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 export type ScrollbarThickness = 'thin' | 'medium' | 'thick';
 
-export interface ScrollbarProps {
+export interface ScrollbarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'className' | 'style'> {
   /** Hide scrollbar until hover/focus/active. Default false. */
   autoHide?: boolean;
   /** Scrollbar track width. Default "thin". */
@@ -42,6 +42,7 @@ export function Scrollbar({
   children,
   className,
   style,
+  ...rest
 }: ScrollbarProps) {
   const classes = [
     'sp-scrollbar',
@@ -54,7 +55,7 @@ export function Scrollbar({
     .join(' ');
 
   return (
-    <div className={classes} style={{ overflow: 'auto', ...style }}>
+    <div {...rest} className={classes} style={{ overflow: 'auto', ...style }}>
       {children}
     </div>
   );

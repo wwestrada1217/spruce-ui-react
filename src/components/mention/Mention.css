@@ -97,7 +97,7 @@
   font-size: var(--sp-text-sm, 13px);
   color: var(--sp-mention-text);
   cursor: pointer;
-  text-align: left;
+  text-align: start;
   transition: background var(--sp-duration-fast) var(--sp-ease-default);
 }
 

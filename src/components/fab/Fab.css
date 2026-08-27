@@ -12,7 +12,7 @@
   flex-direction: column;
   align-items: center;
   gap: var(--sp-space-3, 12px);
-  z-index: 50;
+  z-index: var(--sp-z-fab, 1000);
 
   /* Component-level tokens */
   --sp-fab-primary-bg: var(--sp-primary, #2563eb);
@@ -36,12 +36,12 @@
 
 /* ── Fixed positioning ────────────────────────────────────────────────────── */
 
-.sp-fab--bottom-right { position: fixed; bottom: 24px; right: 24px; }
-.sp-fab--bottom-left  { position: fixed; bottom: 24px; left: 24px; }
-.sp-fab--bottom-center { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); }
-.sp-fab--top-right    { position: fixed; top: 24px; right: 24px; }
-.sp-fab--top-left     { position: fixed; top: 24px; left: 24px; }
-.sp-fab--top-center   { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); }
+.sp-fab--bottom-right { position: fixed; bottom: var(--sp-space-6, 24px); right: var(--sp-space-6, 24px); }
+.sp-fab--bottom-left  { position: fixed; bottom: var(--sp-space-6, 24px); left: var(--sp-space-6, 24px); }
+.sp-fab--bottom-center { position: fixed; bottom: var(--sp-space-6, 24px); left: 50%; transform: translateX(-50%); }
+.sp-fab--top-right    { position: fixed; top: var(--sp-space-6, 24px); right: var(--sp-space-6, 24px); }
+.sp-fab--top-left     { position: fixed; top: var(--sp-space-6, 24px); left: var(--sp-space-6, 24px); }
+.sp-fab--top-center   { position: fixed; top: var(--sp-space-6, 24px); left: 50%; transform: translateX(-50%); }
 
 /* ── Main button ──────────────────────────────────────────────────────────── */
 
@@ -97,7 +97,7 @@
 /* ── Extended label ───────────────────────────────────────────────────────── */
 
 .sp-fab__label {
-  margin-left: var(--sp-space-2, 8px);
+  margin-inline-start: var(--sp-space-2, 8px);
 }
 
 /* ── Sizes ────────────────────────────────────────────────────────────────── */

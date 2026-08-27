@@ -10,6 +10,7 @@ import {
   useState,
   useRef,
   useEffect,
+  useId,
   type MouseEvent,
 } from 'react';
 import { Icon } from '../../icons/Icon.js';
@@ -118,7 +119,7 @@ export function Editor({
   className,
   style,
 }: EditorProps) {
-  const { t } = useI18n();
+  const { direction, t } = useI18n();
   const controlledHtml = value !== undefined ? value : content;
   const [internalHtml, setInternalHtml] = useState<string>(controlledHtml ?? '');
   const [isSourceView, setIsSourceView] = useState(false);
@@ -128,6 +129,8 @@ export function Editor({
   const [mentionQuery, setMentionQuery] = useState('');
   const [mentionIndex, setMentionIndex] = useState(0);
   const mentionRangeRef = useRef<Range | null>(null);
+  const mentionPositionRef = useRef<{ start: number; end: number } | null>(null);
+  const mentionPanelId = `sp-editor-mention-${useId().replace(/:/g, '')}`;
   const editorRef = useRef<HTMLDivElement>(null);
 
   const filteredMentionItems = mentionItems.filter((item) => {
@@ -213,12 +216,21 @@ export function Editor({
     before.setEnd(range.endContainer, range.endOffset);
     const text = before.toString();
     const triggerIndex = text.lastIndexOf(mentionTrigger);
-    if (triggerIndex < 0) { setMentionOpen(false); return; }
+    if (triggerIndex < 0 || (triggerIndex > 0 && !/\s/.test(text[triggerIndex - 1] ?? ''))) {
+      setMentionOpen(false);
+      mentionPositionRef.current = null;
+      return;
+    }
     const query = text.slice(triggerIndex + mentionTrigger.length);
-    if (/\s/.test(query)) { setMentionOpen(false); return; }
+    if (/\s/.test(query)) {
+      setMentionOpen(false);
+      mentionPositionRef.current = null;
+      return;
+    }
     const mentionRange = createTextRange(editor, triggerIndex, text.length);
     if (!mentionRange) return;
     mentionRangeRef.current = mentionRange;
+    mentionPositionRef.current = { start: triggerIndex, end: text.length };
     setMentionQuery(query);
     setMentionIndex(0);
     setMentionOpen(true);
@@ -251,7 +263,8 @@ export function Editor({
     const range = mentionRangeRef.current;
     const editor = editorRef.current;
     if (!range || !editor) return;
-    const text = mentionInsertTemplate?.(item) ?? `${mentionTrigger}${item.label}`;
+    const text = mentionInsertTemplate?.(item) ?? `${mentionTrigger}${item.label} `;
+    const mentionPosition = mentionPositionRef.current;
     const mention = document.createElement('span');
     mention.className = 'sp-editor__mention';
     mention.contentEditable = 'false';
@@ -268,9 +281,12 @@ export function Editor({
     window.getSelection()?.addRange(next);
     setMentionOpen(false);
     setMentionQuery('');
+    mentionRangeRef.current = null;
+    mentionPositionRef.current = null;
     handleContentChange();
     editor.focus();
-    onMention?.({ item, start: 0, end: text.length });
+    const start = mentionPosition?.start ?? 0;
+    onMention?.({ item, start, end: start + text.length });
   }
 
   function handleMentionKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
@@ -696,6 +712,10 @@ export function Editor({
             onKeyDown={handleMentionKeyDown}
             role="textbox"
             aria-multiline="true"
+            aria-expanded={mentionOpen}
+            aria-haspopup="listbox"
+            aria-controls={mentionOpen ? mentionPanelId : undefined}
+            aria-activedescendant={mentionOpen && filteredMentionItems.length > 0 ? `${mentionPanelId}-option-${mentionIndex}` : undefined}
             aria-readonly={readOnly}
             aria-disabled={disabled}
             aria-invalid={Boolean(propError) || undefined}
@@ -703,17 +723,18 @@ export function Editor({
           />
         )}
         {mentionOpen && filteredMentionItems.length > 0 && (
-          <div className="sp-editor__mention-panel" role="listbox" aria-label={t('mentionSuggestions')}>
+          <div id={mentionPanelId} className="sp-editor__mention-panel" role="listbox" aria-label={t('mentionSuggestions')} dir={direction}>
             {filteredMentionItems.map((item, index) => (
               <button
                 key={item.id}
+                id={`${mentionPanelId}-option-${index}`}
                 type="button"
                 role="option"
                 aria-selected={index === mentionIndex}
                 onMouseDown={(event) => event.preventDefault()}
                 onClick={() => insertMention(item)}
               >
-                {item.icon && <Icon name={item.icon} size={14} aria-hidden="true" />}
+                {item.icon && <Icon name={item.icon} size={14} />}
                 <span>{item.label}</span>
                 {item.description && <small>{item.description}</small>}
               </button>

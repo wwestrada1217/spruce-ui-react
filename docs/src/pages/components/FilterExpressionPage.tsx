@@ -267,7 +267,7 @@ export function FilterExpressionPage() {
         <section id="field-types" className="demo-section">
           <h2>Field Types</h2>
           <p className="section-desc">
-            Set <code>type</code> on a field to control which input component appears in the value column. Each type also gets a sensible default set of operators so you don't have to configure them manually.
+            Set <code>type</code> on a field to control which input component appears in the value column. Each type also gets a sensible default set of operators so you don't have to configure them manually. Operator labels use the active Spruce locale.
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {TYPE_ROWS.map((r) => (
@@ -338,6 +338,12 @@ export function FilterExpressionPage() {
                   <td><code>5</code></td>
                   <td>Maximum nesting depth for groups</td>
                 </tr>
+                <tr>
+                  <td><code>chrome / radius / border</code></td>
+                  <td><code>Chrome / Radius / Border</code></td>
+                  <td><code>'default'</code></td>
+                  <td>Surface styling tokens for the expression container</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -369,6 +375,22 @@ export function FilterExpressionPage() {
                   <td><code>FilterOperatorOption[]</code></td>
                   <td>Custom operators for this field. When omitted, a default set is chosen based on <code>type</code>.</td>
                 </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>FilterOperatorOption</h3>
+          <p className="section-desc">Use <code>labelKey</code> for labels resolved through <code>useI18n</code>. The exported <code>TEXT_OPERATORS</code>, <code>NUMBER_OPERATORS</code>, <code>DATE_OPERATORS</code>, <code>BOOLEAN_OPERATORS</code>, and deprecated <code>DEFAULT_FILTER_OPERATORS</code> sets are ready to reuse.</p>
+          <div className="api-table-wrap">
+            <table className="api-table">
+              <thead>
+                <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>label</code></td><td><code>string</code></td><td>Fallback display label</td></tr>
+                <tr><td><code>labelKey</code></td><td><code>SpI18nLabelKey?</code></td><td>Localized label key; takes precedence over <code>label</code></td></tr>
+                <tr><td><code>needsValue</code></td><td><code>boolean?</code></td><td>Whether the primary value control is shown; defaults to <code>true</code></td></tr>
+                <tr><td><code>needsSecondValue</code></td><td><code>boolean?</code></td><td>Whether a second value control is shown for range operators</td></tr>
               </tbody>
             </table>
           </div>

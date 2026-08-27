@@ -15,6 +15,7 @@ import {
   isValidElement,
   type ReactNode,
 } from 'react';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 /* ── Types ──────────────────────────────────────────────────────────────── */
 
@@ -28,7 +29,17 @@ export interface SplitterProps {
   orientation?: 'horizontal' | 'vertical';
   gutterSize?: number;
   initialSizes?: number[];
+  /** Controlled pane sizes in percentages. */
+  sizes?: number[];
+  /** Accessible label for the split view. */
+  ariaLabel?: string;
+  /** Percentage moved by each arrow-key press. */
+  keyIncrement?: number;
+  /** Render a 1px visual hairline while preserving the configured hit area. */
+  thin?: boolean;
   onSizeChange?: (sizes: number[]) => void;
+  onDragStart?: () => void;
+  onDragEnd?: () => void;
   className?: string;
   children: ReactNode;
 }
@@ -79,10 +90,17 @@ export function Splitter({
   orientation = 'horizontal',
   gutterSize = 4,
   initialSizes,
+  sizes: controlledSizes,
+  ariaLabel,
+  keyIncrement = 2,
+  thin = false,
   onSizeChange,
+  onDragStart,
+  onDragEnd,
   className = '',
   children,
 }: SplitterProps) {
+  const { isRtl, t } = useI18n();
   const paneMeta = collectPaneMeta(children);
   const paneContent = collectPaneContent(children);
   const paneCount = paneContent.length;
@@ -92,8 +110,14 @@ export function Splitter({
       ? initialSizes
       : Array.from({ length: paneCount }, () => 100 / paneCount);
 
-  const [sizes, setSizes] = useState<number[]>(defaultSizes);
+  const [internalSizes, setInternalSizes] = useState<number[]>(defaultSizes);
   const [dragging, setDragging] = useState(false);
+  const sizes = controlledSizes ?? internalSizes;
+
+  const updateSizes = useCallback((nextSizes: number[]) => {
+    if (controlledSizes === undefined) setInternalSizes(nextSizes);
+    onSizeChange?.(nextSizes);
+  }, [controlledSizes, onSizeChange]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const dragState = useRef<{
@@ -110,10 +134,10 @@ export function Splitter({
     if (prevInitialKey.current !== initialSizesKey && !dragging) {
       prevInitialKey.current = initialSizesKey;
       if (initialSizes && initialSizes.length === paneCount) {
-        setSizes(initialSizes);
+        updateSizes(initialSizes);
       }
     }
-  }, [initialSizesKey, initialSizes, paneCount, dragging]);
+  }, [initialSizesKey, initialSizes, paneCount, dragging, updateSizes]);
 
   const isHorizontal = orientation === 'horizontal';
 
@@ -166,8 +190,9 @@ export function Splitter({
         containerSize,
       };
       setDragging(true);
+      onDragStart?.();
     },
-    [sizes, getContainerSize],
+    [sizes, getContainerSize, onDragStart],
   );
 
   const handleDragMove = useCallback(
@@ -175,7 +200,9 @@ export function Splitter({
       const state = dragState.current;
       if (!state) return;
 
-      const delta = clientPos - state.startPos;
+      const delta = isHorizontal && isRtl
+        ? state.startPos - clientPos
+        : clientPos - state.startPos;
       const deltaPercent = (delta / state.containerSize) * 100;
 
       const newSizes = [...state.startSizes];
@@ -187,16 +214,16 @@ export function Splitter({
 
       const constrained = applyConstraints(newSizes, state.gutterIndex);
 
-      setSizes(constrained);
-      onSizeChange?.(constrained);
+      updateSizes(constrained);
     },
-    [applyConstraints, onSizeChange],
+    [applyConstraints, isHorizontal, isRtl, updateSizes],
   );
 
   const handleDragEnd = useCallback(() => {
     dragState.current = null;
     setDragging(false);
-  }, []);
+    onDragEnd?.();
+  }, [onDragEnd]);
 
   // Mouse events
   useEffect(() => {
@@ -226,6 +253,7 @@ export function Splitter({
 
     const onTouchMove = (e: TouchEvent) => {
       if (e.touches.length === 0) return;
+      e.preventDefault();
       const touch = e.touches[0];
       handleDragMove(isHorizontal ? touch.clientX : touch.clientY);
     };
@@ -234,7 +262,7 @@ export function Splitter({
       handleDragEnd();
     };
 
-    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: false });
     window.addEventListener('touchend', onTouchEnd);
     window.addEventListener('touchcancel', onTouchEnd);
 
@@ -256,6 +284,7 @@ export function Splitter({
   const handleGutterTouchStart = useCallback(
     (gutterIndex: number, e: React.TouchEvent) => {
       if (e.touches.length === 0) return;
+      e.preventDefault();
       const touch = e.touches[0];
       handleDragStart(gutterIndex, isHorizontal ? touch.clientX : touch.clientY);
     },
@@ -263,26 +292,25 @@ export function Splitter({
   );
 
   const handleGutterDoubleClick = useCallback(
-    (_gutterIndex: number) => {
+    () => {
       const resetSizes =
         initialSizes && initialSizes.length === paneCount
           ? [...initialSizes]
           : Array.from({ length: paneCount }, () => 100 / paneCount);
-      setSizes(resetSizes);
-      onSizeChange?.(resetSizes);
+      updateSizes(resetSizes);
     },
-    [initialSizes, paneCount, onSizeChange],
+    [initialSizes, paneCount, updateSizes],
   );
 
   const handleGutterKeyDown = useCallback(
     (gutterIndex: number, e: React.KeyboardEvent) => {
-      const step = 2;
+      const step = keyIncrement;
       const a = gutterIndex;
       const b = gutterIndex + 1;
       let newSizes: number[] | null = null;
 
-      const growKey = isHorizontal ? 'ArrowRight' : 'ArrowDown';
-      const shrinkKey = isHorizontal ? 'ArrowLeft' : 'ArrowUp';
+      const growKey = isHorizontal ? (isRtl ? 'ArrowLeft' : 'ArrowRight') : 'ArrowDown';
+      const shrinkKey = isHorizontal ? (isRtl ? 'ArrowRight' : 'ArrowLeft') : 'ArrowUp';
 
       if (e.key === growKey) {
         e.preventDefault();
@@ -312,17 +340,17 @@ export function Splitter({
 
       if (newSizes) {
         const constrained = applyConstraints(newSizes, gutterIndex);
-        setSizes(constrained);
-        onSizeChange?.(constrained);
+        updateSizes(constrained);
       }
     },
-    [sizes, isHorizontal, paneMeta, applyConstraints, onSizeChange],
+    [sizes, isHorizontal, isRtl, paneMeta, applyConstraints, keyIncrement, updateSizes],
   );
 
   const rootClasses = [
     'sp-splitter',
     `sp-splitter--${orientation}`,
     dragging && 'sp-splitter--dragging',
+    thin && 'sp-splitter--thin',
     className,
   ]
     .filter(Boolean)
@@ -355,11 +383,12 @@ export function Splitter({
           aria-valuenow={Math.round(sizes[i])}
           aria-valuemin={paneMeta[i]?.minSize ?? 0}
           aria-valuemax={paneMeta[i]?.maxSize ?? 100}
+          aria-label={`${t('split')} ${i + 1}`}
           tabIndex={0}
           style={gutterStyle}
           onMouseDown={(e) => handleGutterMouseDown(i, e)}
           onTouchStart={(e) => handleGutterTouchStart(i, e)}
-          onDoubleClick={() => handleGutterDoubleClick(i)}
+          onDoubleClick={handleGutterDoubleClick}
           onKeyDown={(e) => handleGutterKeyDown(i, e)}
         >
           <div className="sp-splitter__gutter-handle" />
@@ -369,7 +398,7 @@ export function Splitter({
   }
 
   return (
-    <div ref={containerRef} className={rootClasses}>
+    <div ref={containerRef} className={rootClasses} role="group" aria-label={ariaLabel ?? t('resizableSplitView')}>
       {elements}
     </div>
   );

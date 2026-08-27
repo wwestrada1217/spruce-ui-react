@@ -39,6 +39,17 @@ const EVENTS_CODE = `<Mention
   placeholder="Type @ and watch the events..."
 />`
 
+const EDITOR_CODE = `const [content, setContent] = useState('')
+
+<Editor
+  value={content}
+  onChange={setContent}
+  mentionItems={users}
+  mentionTrigger="@"
+  onMention={onMentioned}
+  onMentionSearch={onSearch}
+/>`
+
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
   { id: 'basic',   label: 'Basic' },
@@ -46,6 +57,7 @@ const SECTIONS: Section[] = [
   { id: 'trigger', label: 'Custom Trigger' },
   { id: 'sizes',   label: 'Sizes' },
   { id: 'events',  label: 'Events' },
+  { id: 'editor',  label: 'Rich-text Editor' },
   { id: 'api',     label: 'API' },
 ]
 
@@ -245,6 +257,15 @@ export function MentionPage() {
           </CodePreview>
         </section>
 
+        <section id="editor" className="demo-section" aria-labelledby="editor-heading">
+          <h2 id="editor-heading">Rich-text Editor</h2>
+          <p className="section-desc">
+            Angular also exposes a directive for inputs, textareas, and contenteditable elements. In React, use the controlled <code>Editor</code> mention props for rich text; the directive mechanism itself is intentionally not copied into the component API.
+          </p>
+          <CodePreview code={EDITOR_CODE} codeOnly />
+          <p className="section-desc">The <code>Editor</code> mapping preserves item filtering, keyboard selection, custom insertion templates, and <code>onMention</code>/<code>onMentionSearch</code> callbacks.</p>
+        </section>
+
         {/* API */}
         <section id="api" className="demo-section">
           <h2>API</h2>
@@ -257,7 +278,7 @@ export function MentionPage() {
                 <tr><td><code>value</code></td><td><code>string</code></td><td><code>''</code></td><td>Controlled text value</td></tr>
                 <tr><td><code>items</code></td><td><code>MentionItem[]</code></td><td><code>[]</code></td><td>List of mentionable items</td></tr>
                 <tr><td><code>trigger</code></td><td><code>'@' | '#' | '+' | '/'</code></td><td><code>'@'</code></td><td>Character that activates the suggestion panel</td></tr>
-                <tr><td><code>placeholder</code></td><td><code>string</code></td><td><code>'Type @ to mention...'</code></td><td>Textarea placeholder text</td></tr>
+                <tr><td><code>placeholder</code></td><td><code>string</code></td><td>localized <code>typeMentionPrompt</code></td><td>Textarea placeholder text</td></tr>
                 <tr><td><code>disabled</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Disable the input</td></tr>
                 <tr><td><code>rows</code></td><td><code>number</code></td><td><code>3</code></td><td>Number of visible text rows</td></tr>
                 <tr><td><code>size</code></td><td><code>'sm' | 'md' | 'lg'</code></td><td><code>'md'</code></td><td>Input size variant</td></tr>
@@ -287,7 +308,7 @@ export function MentionPage() {
             <table className="api-table">
               <thead><tr><th>Interface</th><th>Properties</th></tr></thead>
               <tbody>
-                <tr><td><code>MentionItem</code></td><td><code>id, label, avatar?, description?</code></td></tr>
+                <tr><td><code>MentionItem</code></td><td><code>id, label, avatar?, icon?, description?</code></td></tr>
                 <tr><td><code>MentionInsertEvent</code></td><td><code>item, start, end</code></td></tr>
               </tbody>
             </table>

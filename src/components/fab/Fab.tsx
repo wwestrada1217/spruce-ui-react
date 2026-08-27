@@ -8,6 +8,7 @@
 import './Fab.css';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Icon } from '../../icons/Icon.js';
+import { useI18n } from '../../i18n/i18n-context.js';
 
 export type FabVariant = 'primary' | 'secondary' | 'danger' | 'success';
 export type FabSize = 'sm' | 'md' | 'lg';
@@ -44,8 +45,8 @@ export interface FabProps {
   onActionClick?: (action: FabAction) => void;
 }
 
-const ICON_SIZES: Record<FabSize, number> = { sm: 18, md: 24, lg: 28 };
-const ACTION_ICON_SIZE = 18;
+const ICON_SIZES: Record<FabSize, number> = { sm: 16, md: 22, lg: 28 };
+const ACTION_ICON_SIZE = 16;
 
 export function Fab({
   icon = 'plus',
@@ -62,6 +63,7 @@ export function Fab({
   onOpenChange,
   onActionClick,
 }: FabProps) {
+  const { t } = useI18n();
   const [internalOpen, setInternalOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -78,15 +80,14 @@ export function Fab({
     const next = !isOpen;
     setInternalOpen(next);
     onOpenChange?.(next);
-    onFabClick?.();
   }, [hasActions, isOpen, onFabClick, onOpenChange]);
 
   const handleActionClick = useCallback(
     (action: FabAction) => {
       if (action.disabled) return;
       onActionClick?.(action);
-      setInternalOpen(false);
-      onOpenChange?.(false);
+    setInternalOpen(false);
+    onOpenChange?.(false);
     },
     [onActionClick, onOpenChange],
   );
@@ -143,6 +144,9 @@ export function Fab({
             'sp-fab__actions',
             actionsAbove ? 'sp-fab__actions--above' : 'sp-fab__actions--below',
           ].join(' ')}
+          role="menu"
+          aria-label={`${label || t('action')} ${t('actions')}`}
+          aria-hidden={!isOpen}
         >
           {actions.map((action, index) => (
             <div
@@ -165,7 +169,9 @@ export function Fab({
                 type="button"
                 disabled={disabled || action.disabled}
                 aria-label={action.label}
-                style={action.color ? { color: action.color } : undefined}
+                tabIndex={isOpen ? 0 : -1}
+                role="menuitem"
+                style={action.color ? { background: action.color } : undefined}
                 onClick={() => handleActionClick(action)}
               >
                 <Icon name={action.icon} size={ACTION_ICON_SIZE} />
@@ -179,8 +185,9 @@ export function Fab({
         className="sp-fab__main"
         type="button"
         disabled={disabled}
-        aria-label={label || 'Floating action'}
+        aria-label={label || t('action')}
         aria-expanded={hasActions ? isOpen : undefined}
+        aria-haspopup={hasActions ? 'menu' : undefined}
         onClick={toggleOpen}
       >
         <span

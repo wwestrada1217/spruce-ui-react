@@ -14,6 +14,14 @@ const THICKNESS_CODE = `<Scrollbar thickness="thin" style={{ height: 150 }}>...<
 <Scrollbar thickness="medium" style={{ height: 150 }}>...</Scrollbar>
 <Scrollbar thickness="thick" style={{ height: 150 }}>...</Scrollbar>`
 
+const AXES_CODE = `<Scrollbar style={{ width: 260, height: 120, overflowX: 'auto' }}>
+  <div style={{ width: 700 }}>Horizontal content...</div>
+</Scrollbar>
+
+<Scrollbar style={{ width: 260, height: 120, overflow: 'auto' }}>
+  <div style={{ width: 700, height: 400 }}>Both axes...</div>
+</Scrollbar>`
+
 const content = Array.from({ length: 30 }, (_, i) => `Line ${i + 1}: Lorem ipsum dolor sit amet, consectetur adipiscing elit.`).join('\n')
 
 const boxStyle: React.CSSProperties = { border: '1px solid var(--sp-border)', borderRadius: 8, overflow: 'hidden' }
@@ -23,6 +31,7 @@ const SECTIONS: Section[] = [
   { id: 'basic',     label: 'Basic' },
   { id: 'auto-hide', label: 'Auto Hide' },
   { id: 'thickness', label: 'Thickness' },
+  { id: 'axes',      label: 'Scroll Axes' },
   { id: 'api',       label: 'API' },
 ]
 
@@ -83,6 +92,27 @@ export function ScrollbarPage() {
           </CodePreview>
         </section>
 
+        <section id="axes" className="demo-section" aria-labelledby="axes-heading">
+          <h2 id="axes-heading">Scroll Axes</h2>
+          <p className="section-desc">The wrapper supports vertical, horizontal, or both scroll axes through the native overflow styles passed in <code>style</code>.</p>
+          <CodePreview code={AXES_CODE}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 16 }}>
+              <div style={boxStyle}>
+                <p style={{ margin: '8px 12px 0', fontSize: 11, color: 'var(--sp-text-muted)' }}>Horizontal</p>
+                <Scrollbar style={{ height: 120, overflowX: 'auto', overflowY: 'hidden', padding: 12 }}>
+                  <div style={{ width: 700, whiteSpace: 'nowrap' }}>Wide content scrolls horizontally → → →</div>
+                </Scrollbar>
+              </div>
+              <div style={boxStyle}>
+                <p style={{ margin: '8px 12px 0', fontSize: 11, color: 'var(--sp-text-muted)' }}>Both axes</p>
+                <Scrollbar style={{ height: 120, overflow: 'auto', padding: 12 }}>
+                  <div style={{ width: 700, height: 300 }}>Content can scroll in both directions.</div>
+                </Scrollbar>
+              </div>
+            </div>
+          </CodePreview>
+        </section>
+
         <section id="api" className="demo-section">
           <h2>API</h2><h3>Props</h3>
           <div className="api-table-wrap"><table className="api-table"><thead><tr><th>Name</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody>
@@ -90,6 +120,8 @@ export function ScrollbarPage() {
             <tr><td><code>thickness</code></td><td><code>'thin' | 'medium' | 'thick'</code></td><td><code>'thin'</code></td><td>Scrollbar width</td></tr>
             <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>—</td><td>Scrollable content</td></tr>
             <tr><td><code>style</code></td><td><code>CSSProperties</code></td><td>—</td><td>Container styles (set height here)</td></tr>
+            <tr><td><code>className</code></td><td><code>string</code></td><td>—</td><td>Additional class names</td></tr>
+            <tr><td>HTML attributes</td><td><code>HTMLAttributes&lt;HTMLDivElement&gt;</code></td><td>—</td><td>Native attributes such as <code>aria-label</code>, <code>tabIndex</code>, and event handlers</td></tr>
           </tbody></table></div>
         </section>
       </div>

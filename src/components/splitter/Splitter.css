@@ -12,6 +12,7 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
+  background: var(--sp-splitter-bg, transparent);
 }
 
 .sp-splitter--horizontal {
@@ -39,7 +40,7 @@
 /* ─── Pane ────────────────────────────────────────────────────────── */
 
 .sp-splitter__pane {
-  overflow: auto;
+  overflow: hidden;
   flex-grow: 0;
   flex-shrink: 0;
   min-width: 0;
@@ -53,8 +54,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--sp-border, #d0d0d0);
-  transition: background 0.15s ease;
+  background: var(--sp-splitter-gutter-bg, var(--sp-border));
+  transition: background var(--sp-duration-fast, 150ms);
   position: relative;
   z-index: 1;
 }
@@ -70,20 +71,22 @@
 }
 
 .sp-splitter__gutter:hover {
-  background: var(--sp-primary, #2563eb);
+  background: var(--sp-splitter-gutter-hover-bg, var(--sp-primary));
 }
 
 .sp-splitter__gutter:focus-visible {
-  outline: 2px solid var(--sp-primary, #2563eb);
-  outline-offset: 0;
+  outline: var(--sp-border-width-medium, 2px) solid var(--sp-splitter-gutter-active-bg, var(--sp-primary));
+  outline-offset: -1px;
 }
 
 /* ─── Gutter Handle ───────────────────────────────────────────────── */
 
 .sp-splitter__gutter-handle {
   border-radius: 2px;
-  background: var(--sp-text-muted, #9d9d9f);
-  transition: background 0.15s ease;
+  background: var(--sp-splitter-gutter-handle-bg, var(--sp-text-muted));
+  transition: background var(--sp-duration-fast, 150ms), opacity var(--sp-duration-fast, 150ms);
+  pointer-events: none;
+  opacity: 0;
 }
 
 .sp-splitter--horizontal .sp-splitter__gutter-handle {
@@ -97,5 +100,62 @@
 }
 
 .sp-splitter__gutter:hover .sp-splitter__gutter-handle {
-  background: #fff;
+  background: var(--sp-splitter-gutter-handle-hover-bg, var(--sp-primary-text));
+  opacity: 1;
+}
+
+/* Thin mode preserves the pointer hit area while rendering a 1px hairline. */
+.sp-splitter--thin .sp-splitter__gutter {
+  background: transparent;
+}
+
+.sp-splitter--thin .sp-splitter__gutter::before {
+  content: '';
+  position: absolute;
+  background: var(--sp-splitter-gutter-bg, var(--sp-border));
+  transition: background var(--sp-duration-fast, 150ms), width var(--sp-duration-fast, 150ms), height var(--sp-duration-fast, 150ms);
+  pointer-events: none;
+  border-radius: var(--sp-radius-sm, 4px);
+}
+
+.sp-splitter--thin.sp-splitter--horizontal .sp-splitter__gutter::before {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  transform: translateX(-50%);
+}
+
+.sp-splitter--thin.sp-splitter--vertical .sp-splitter__gutter::before {
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  transform: translateY(-50%);
+}
+
+.sp-splitter--thin.sp-splitter--horizontal .sp-splitter__gutter:hover::before,
+.sp-splitter--thin.sp-splitter--horizontal .sp-splitter__gutter:focus-visible::before,
+.sp-splitter--thin.sp-splitter--horizontal .sp-splitter__gutter--active::before {
+  width: 100%;
+  background: var(--sp-splitter-gutter-hover-bg, var(--sp-primary));
+}
+
+.sp-splitter--thin.sp-splitter--vertical .sp-splitter__gutter:hover::before,
+.sp-splitter--thin.sp-splitter--vertical .sp-splitter__gutter:focus-visible::before,
+.sp-splitter--thin.sp-splitter--vertical .sp-splitter__gutter--active::before {
+  height: 100%;
+  background: var(--sp-splitter-gutter-hover-bg, var(--sp-primary));
+}
+
+.sp-splitter--thin .sp-splitter__gutter-handle {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-splitter__gutter,
+  .sp-splitter__gutter::before,
+  .sp-splitter__gutter-handle {
+    transition: none;
+  }
 }

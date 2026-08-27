@@ -12,9 +12,12 @@ import {
   useEffect,
   useCallback,
   useMemo,
+  useId,
 } from 'react';
 import { createPortal } from 'react-dom';
 import { useI18n } from '../../i18n/i18n-context.js';
+import { getScrollParents, modalBoundary } from '../../utils/positioning.js';
+import { Icon } from '../../icons/Icon.js';
 
 /* ── Public types ──────────────────────────────────────────────────────── */
 
@@ -22,6 +25,7 @@ export interface MentionItem {
   id: string;
   label: string;
   avatar?: string;
+  icon?: string;
   description?: string;
 }
 
@@ -119,7 +123,7 @@ export function Mention({
   value: controlledValue,
   items = [],
   trigger = '@',
-  placeholder = 'Type @ to mention someone...',
+  placeholder,
   ariaLabel,
   disabled = false,
   rows = 3,
@@ -129,7 +133,9 @@ export function Mention({
   onInsert,
   onSearch,
 }: MentionProps) {
-  const { t } = useI18n();
+  const { direction, t } = useI18n();
+  const instanceId = useId().replace(/:/g, '');
+  const panelId = `sp-mention-panel-${instanceId}`;
   const [internalValue, setInternalValue] = useState('');
   const isControlled = controlledValue !== undefined;
   const currentValue = isControlled ? controlledValue : internalValue;
@@ -143,6 +149,9 @@ export function Mention({
   const anchorRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const blurTimerRef = useRef<number | null>(null);
+
+  const resolvedPlaceholder = placeholder ?? t('typeMentionPrompt').replace('@', trigger);
 
   const defaultInsertTemplate = useCallback(
     (item: MentionItem) => `${trigger}${item.label} `,
@@ -188,20 +197,26 @@ export function Mention({
 
     const panelHeight = panel.offsetHeight || 200;
     const panelWidth = panel.offsetWidth || 260;
-    const viewportH = window.innerHeight;
-    const viewportW = window.innerWidth;
+    const boundary = modalBoundary(anchorRef.current ?? textarea) ?? {
+      top: 0,
+      left: 0,
+      right: window.innerWidth,
+      bottom: window.innerHeight,
+    };
+    const margin = 8;
 
     let top = anchorTop + 4;
     let left = anchorLeft;
 
-    if (top + panelHeight > viewportH - 8) {
+    if (top + panelHeight > boundary.bottom - margin) {
       top = textareaRect.top + caretCoords.top - panelHeight - 4;
     }
 
-    if (left + panelWidth > viewportW - 8) {
-      left = viewportW - panelWidth - 8;
+    if (left + panelWidth > boundary.right - margin) {
+      left = boundary.right - panelWidth - margin;
     }
-    if (left < 8) left = 8;
+    if (left < boundary.left + margin) left = boundary.left + margin;
+    top = Math.max(boundary.top + margin, top);
 
     setPanelPos({ top, left });
   }, []);
@@ -349,7 +364,8 @@ export function Mention({
   }
 
   function handleBlur() {
-    setTimeout(() => {
+    if (blurTimerRef.current !== null) window.clearTimeout(blurTimerRef.current);
+    blurTimerRef.current = window.setTimeout(() => {
       if (panelOpen) closePanel();
     }, 150);
   }
@@ -374,9 +390,20 @@ export function Mention({
   useEffect(() => {
     if (!panelOpen) return;
     const onScroll = () => requestAnimationFrame(reposition);
+    const scrollParents = anchorRef.current ? getScrollParents(anchorRef.current) : [];
+    scrollParents.forEach((element) => element.addEventListener('scroll', onScroll, { passive: true }));
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    window.addEventListener('resize', onScroll);
+    return () => {
+      scrollParents.forEach((element) => element.removeEventListener('scroll', onScroll));
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
   }, [panelOpen, reposition]);
+
+  useEffect(() => () => {
+    if (blurTimerRef.current !== null) window.clearTimeout(blurTimerRef.current);
+  }, []);
 
   /* ── Input class ───────────────────────────────────────────────────── */
 
@@ -394,8 +421,8 @@ export function Mention({
         <textarea
           ref={inputRef}
           className={inputCls}
-          placeholder={placeholder}
-          aria-label={ariaLabel}
+          placeholder={resolvedPlaceholder}
+          aria-label={ariaLabel ?? t('mention')}
           disabled={disabled}
           rows={rows}
           value={currentValue}
@@ -407,6 +434,9 @@ export function Mention({
           aria-multiline="true"
           aria-expanded={panelOpen}
           aria-haspopup="listbox"
+          aria-controls={panelOpen ? panelId : undefined}
+          aria-activedescendant={panelOpen && filtered.length > 0 ? `${panelId}-option-${activeIndex}` : undefined}
+          dir={direction}
         />
       </div>
 
@@ -416,12 +446,14 @@ export function Mention({
             ref={panelRef}
             className="sp-mention__panel"
             role="listbox"
-          aria-label={t('suggestions')}
+            id={panelId}
+            aria-label={t('mentionSuggestions')}
+            dir={direction}
             style={{
               position: 'fixed',
               top: panelPos.top,
               left: panelPos.left,
-              zIndex: 999,
+              zIndex: 1100,
             }}
           >
             {filtered.length > 0 ? (
@@ -429,6 +461,7 @@ export function Mention({
                 <button
                   key={item.id}
                   className={`sp-mention__option${i === activeIndex ? ' sp-mention__option--active' : ''}`}
+                  id={`${panelId}-option-${i}`}
                   type="button"
                   role="option"
                   aria-selected={i === activeIndex}
@@ -443,6 +476,10 @@ export function Mention({
                       width={24}
                       height={24}
                     />
+                  ) : item.icon ? (
+                    <span className="sp-mention__avatar-fallback sp-mention__avatar-fallback--icon">
+                      <Icon name={item.icon} size={14} />
+                    </span>
                   ) : (
                     <span className="sp-mention__avatar-fallback">
                       {item.label.charAt(0).toUpperCase()}

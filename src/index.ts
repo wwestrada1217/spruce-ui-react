@@ -890,12 +890,20 @@ export type { GitGraphProps, GitGraphCommit, GitGraphBranch } from './components
 
 // ─── FilterExpression ────────────────────────────────────────────────────────
 export { FilterExpression } from './components/filter-expression/FilterExpression.js';
+export {
+  DEFAULT_FILTER_OPERATORS,
+  TEXT_OPERATORS,
+  NUMBER_OPERATORS,
+  DATE_OPERATORS,
+  BOOLEAN_OPERATORS,
+} from './components/filter-expression/FilterExpression.js';
 export type {
   FilterExpressionProps,
   FilterField,
   FilterOperatorOption,
   FilterRule,
   FilterGroup,
+  FilterExpressionType,
   FilterLogic,
   FieldType,
 } from './components/filter-expression/FilterExpression.js';
