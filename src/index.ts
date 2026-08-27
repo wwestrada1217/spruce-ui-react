@@ -1021,6 +1021,82 @@ export { ComboChart } from './charts/ComboChart.js';
 export type { ComboChartProps, ComboSeries } from './charts/ComboChart.js';
 export { OrgChart } from './charts/OrgChart.js';
 export type { OrgChartProps, OrgNode } from './charts/OrgChart.js';
+export { CylinderChart } from './charts/CylinderChart.js';
+export type { CylinderChartProps, CylinderChartConfig } from './charts/CylinderChart.js';
+export { PyramidChart } from './charts/PyramidChart.js';
+export type { PyramidChartProps, PyramidChartConfig, PyramidDatum } from './charts/PyramidChart.js';
+export { VennChart } from './charts/VennChart.js';
+export type { VennChartProps, VennChartConfig, VennSet, VennIntersection } from './charts/VennChart.js';
+export { WheelDiagram } from './charts/WheelDiagram.js';
+export type { WheelDiagramProps, WheelDiagramConfig, WheelItem } from './charts/WheelDiagram.js';
+export { FishboneChart } from './charts/FishboneChart.js';
+export type { FishboneChartProps, FishboneDiagramConfig, FishboneCause, FishboneCategory } from './charts/FishboneChart.js';
+export { MapChart } from './charts/MapChart.js';
+export type { MapChartProps, MapChartConfig, MapData, MapRegion, MapMarker, MapConnection } from './charts/MapChart.js';
+export { GraphChart, PerformanceGraph } from './charts/GraphChart.js';
+export type { GraphChartProps, GraphChartConfig, GraphNode, GraphEdge, PerformanceGraphProps, PerformanceGraphConfig } from './charts/GraphChart.js';
+export { DiagramEditor, autoLayoutDiagram } from './charts/DiagramEditor.js';
+export type {
+  DiagramEditorProps,
+  DiagramEditorRef,
+  DiagramShape,
+  DiagramShapeType,
+  DiagramConnector,
+  ConnectorRouteType,
+  DiagramEditorConfig,
+  ShapeDefinition,
+  DiagramLayoutDirection,
+  DiagramLayoutOptions,
+  DiagramSelectionEvent,
+} from './charts/DiagramEditor.js';
+export { TinyBar, TinyBarChart } from './charts/TinyBar.js';
+export type { TinyBarProps, TinyBarChartProps } from './charts/TinyBar.js';
+export { TinyLine, TinyLineChart } from './charts/TinyLine.js';
+export type { TinyLineProps, TinyLineChartProps } from './charts/TinyLine.js';
+export { TinyPie, TinyPieChart } from './charts/TinyPie.js';
+export type { TinyPieProps, TinyPieChartProps } from './charts/TinyPie.js';
+export { TinyDonut, TinyDonutChart } from './charts/TinyDonut.js';
+export type { TinyDonutProps, TinyDonutChartProps } from './charts/TinyDonut.js';
+export { TinyStacked, TinyStackedChart } from './charts/TinyStacked.js';
+export type { TinyStackedProps, TinyStackedChartProps } from './charts/TinyStacked.js';
+export type {
+  TinyDatum,
+  TinySeries,
+  TinyStack,
+  TinyValues,
+  TinyChartSize,
+  TinyValueFormat,
+  TinyHighlight,
+  TinyColorMode,
+  TinyScaleTo,
+  TinyThreshold,
+  TinySizeSpec,
+  TinyChartConfig,
+  TinyBarChartConfig,
+  TinyLineChartConfig,
+  TinyPieChartConfig,
+  TinyDonutChartConfig,
+  TinyStackedChartConfig,
+} from './charts/tiny-types.js';
+export {
+  TINY_SIZE_SPECS,
+  TINY_SERIES_COLORS,
+  TINY_POSITIVE_COLOR,
+  TINY_NEGATIVE_COLOR,
+  TINY_TRACK_COLOR,
+  TINY_TEXT_COLOR,
+  TINY_MUTED_COLOR,
+} from './charts/tiny-types.js';
+export {
+  normalizeTinyValues,
+  sortTinyData,
+  resolveThresholdColor,
+  sumValues,
+  clamp,
+  tinyLinePath,
+  piePath,
+  arcStrokePath,
+} from './charts/tiny-utils.js';
 export type {
   ChartCallbackEvent,
   ChartCommonProps,

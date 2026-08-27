@@ -152,6 +152,16 @@ import { HistogramChartPage } from './pages/charts/HistogramChartPage'
 import { CalendarHeatmapChartPage } from './pages/charts/CalendarHeatmapChartPage'
 import { ComboChartPage } from './pages/charts/ComboChartPage'
 import { OrgChartPage } from './pages/charts/OrgChartPage'
+import { CylinderChartPage } from './pages/charts/CylinderChartPage'
+import { DiagramEditorPage } from './pages/charts/DiagramEditorPage'
+import { FishboneChartPage } from './pages/charts/FishboneChartPage'
+import { GraphChartPage } from './pages/charts/GraphChartPage'
+import { MapChartPage } from './pages/charts/MapChartPage'
+import { PerformanceGraphPage } from './pages/charts/PerformanceGraphPage'
+import { PyramidChartPage } from './pages/charts/PyramidChartPage'
+import { TinyChartsPage } from './pages/charts/TinyChartsPage'
+import { VennChartPage } from './pages/charts/VennChartPage'
+import { WheelDiagramPage } from './pages/charts/WheelDiagramPage'
 import { ChartKernelPage } from './pages/charts/ChartKernelPage'
 import { SparklesPage } from './pages/effects/SparklesPage'
 import { ConfettiPage } from './pages/effects/ConfettiPage'
@@ -374,6 +384,16 @@ function renderPage(hash: string): React.ReactElement {
     case '#/charts/calendar-heatmap-chart':return <CalendarHeatmapChartPage />
     case '#/charts/combo-chart':           return <ComboChartPage />
     case '#/charts/org-chart':             return <OrgChartPage />
+    case '#/charts/cylinder-chart':        return <CylinderChartPage />
+    case '#/charts/diagram-editor':        return <DiagramEditorPage />
+    case '#/charts/fishbone-chart':        return <FishboneChartPage />
+    case '#/charts/graph-chart':           return <GraphChartPage />
+    case '#/charts/map-chart':             return <MapChartPage />
+    case '#/charts/performance-graph':     return <PerformanceGraphPage />
+    case '#/charts/pyramid-chart':         return <PyramidChartPage />
+    case '#/charts/tiny-charts':           return <TinyChartsPage />
+    case '#/charts/venn-chart':            return <VennChartPage />
+    case '#/charts/wheel-diagram':         return <WheelDiagramPage />
     // Effects & Animations
     case '#/effects/sparkles':             return <SparklesPage />
     case '#/effects/confetti':             return <ConfettiPage />
