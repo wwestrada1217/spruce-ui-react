@@ -18,7 +18,10 @@
   border-bottom: 2px solid var(--sp-border, rgba(0, 0, 0, 0.08));
 }
 
-.sp-tabs__tab-strip { display: flex; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+/* The active tab's accent bar sits on top of the header's bottom border. Offsetting the
+   strip itself (instead of each tab) keeps the bar inside the scroll box, so it is never
+   clipped into hidden vertical overflow that has to be scrolled up to see. */
+.sp-tabs__tab-strip { display: flex; margin-block-end: -2px; min-width: 0; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
 .sp-tabs__tab-strip::-webkit-scrollbar { display: none; }
 .sp-tabs__header--borders { border: 1px solid var(--sp-border, rgba(0, 0, 0, .08)); border-radius: var(--sp-radius-md, 6px); }
 .sp-tabs__scroll { align-items: center; background: var(--sp-surface-0, #fff); border: 0; color: var(--sp-text-muted, #4a5568); cursor: pointer; display: inline-flex; justify-content: center; min-width: 32px; }
@@ -39,7 +42,6 @@
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
-  margin-bottom: -2px;
   cursor: pointer;
   transition:
     color var(--sp-duration-normal, 0.15s) var(--sp-ease-default, ease),
@@ -90,12 +92,11 @@
   min-width: 160px;
   flex-shrink: 0;
 }
-.sp-tabs--vertical .sp-tabs__tab-strip { flex-direction: column; overflow: visible; }
+.sp-tabs--vertical .sp-tabs__tab-strip { flex-direction: column; margin-block-end: 0; overflow: visible; }
 
 .sp-tabs--vertical .sp-tabs__tab {
   border-bottom: none;
   border-inline-end: 2px solid transparent;
-  margin-bottom: 0;
   margin-inline-end: -2px;
   justify-content: flex-start;
   width: 100%;

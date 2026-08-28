@@ -152,7 +152,7 @@
   /* ── Text ───────────────────────────────────────────────────────────────*/
   --sp-text: #18181b;
   --sp-text-color: #18181b;
-  --sp-text-muted: #3f3f46;
+  --sp-text-muted: #52525b;
   --sp-text-subtle: #71717a;
   --sp-text-disabled: #a1a1aa;
   --sp-text-inverse: #fafafa;
@@ -925,11 +925,11 @@
   --sp-info-text: #7dd3fc;
 
   /* ── Text ───────────────────────────────────────────────────────────────*/
-  --sp-text: #cccccc;
-  --sp-text-color: #cccccc;
-  --sp-text-muted: #b7b7b7;
-  --sp-text-subtle: #858585;
-  --sp-text-disabled: #5f5f5f;
+  --sp-text: #e4e4e7;
+  --sp-text-color: #e4e4e7;
+  --sp-text-muted: #a1a1aa;
+  --sp-text-subtle: #71717a;
+  --sp-text-disabled: #52525b;
   --sp-text-inverse: #1e1e1e;
 
   /* ── Status tone scale ─────────────────────────────────────────────────*/
