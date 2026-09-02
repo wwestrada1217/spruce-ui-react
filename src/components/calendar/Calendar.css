@@ -158,6 +158,10 @@
   pointer-events: none;
 }
 
+.sp-cal__day--other-month {
+  color: var(--sp-text-subtle, #6b7280);
+}
+
 .sp-cal__day--today {
   font-weight: bold;
   color: var(--sp-primary, #3b82f6);

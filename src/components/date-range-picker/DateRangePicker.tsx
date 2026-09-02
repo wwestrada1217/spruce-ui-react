@@ -34,6 +34,10 @@ export interface DateRangePickerProps {
   placeholder?: string;
   disabled?: boolean;
   inputMode?: boolean;
+  /** Show dates from the previous and next months in the calendar panels. */
+  showOtherMonths?: boolean;
+  /** Allow selecting dates from the previous and next months. */
+  selectOtherMonths?: boolean;
   months?: number;
   presets?: DateRangePreset[];
   className?: string;
@@ -63,17 +67,37 @@ interface DayEntry {
   day: number;
   iso: string;
   empty: boolean;
+  isOtherMonth: boolean;
 }
 
-function buildDays(year: number, month: number, firstDay: number): DayEntry[] {
+function buildDays(
+  year: number,
+  month: number,
+  firstDay: number,
+  showOtherMonths: boolean,
+): DayEntry[] {
   const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const totalCells = Math.ceil((firstDay + daysInMonth) / 7) * 7;
+  const firstGridDate = new Date(year, month, 1 - firstDay);
   const days: DayEntry[] = [];
 
-  for (let i = 0; i < firstDay; i++) {
-    days.push({ day: 0, iso: '', empty: true });
-  }
-  for (let d = 1; d <= daysInMonth; d++) {
-    days.push({ day: d, iso: toISO(year, month, d), empty: false });
+  for (let i = 0; i < totalCells; i++) {
+    const date = new Date(firstGridDate);
+    date.setDate(firstGridDate.getDate() + i);
+    const dateYear = date.getFullYear();
+    const dateMonth = date.getMonth();
+    const isOtherMonth = dateYear !== year || dateMonth !== month;
+
+    if (isOtherMonth && !showOtherMonths) {
+      days.push({ day: 0, iso: '', empty: true, isOtherMonth: false });
+    } else {
+      days.push({
+        day: date.getDate(),
+        iso: toISO(dateYear, dateMonth, date.getDate()),
+        empty: false,
+        isOtherMonth,
+      });
+    }
   }
 
   return days;
@@ -136,6 +160,8 @@ export function DateRangePicker({
   placeholder = 'Select date range',
   disabled = false,
   inputMode = false,
+  showOtherMonths = true,
+  selectOtherMonths = true,
   months: monthCount = 2,
   presets,
   className = '',
@@ -216,9 +242,14 @@ export function DateRangePicker({
       const total = baseYear * 12 + baseMonth + i;
       const month = total % 12;
       const year = Math.floor(total / 12);
-      return { index: i, month, year, days: buildDays(year, month, leadingBlankDays(year, month)) };
+      return {
+        index: i,
+        month,
+        year,
+        days: buildDays(year, month, leadingBlankDays(year, month), showOtherMonths),
+      };
     });
-  }, [baseMonth, baseYear, leadingBlankDays, monthCount]);
+  }, [baseMonth, baseYear, leadingBlankDays, monthCount, showOtherMonths]);
 
   /* ── Positioning ── */
 
@@ -327,7 +358,8 @@ export function DateRangePicker({
   /* ── Day Click ── */
 
   const handleDayClick = useCallback(
-    (iso: string) => {
+    (iso: string, isOtherMonth = false) => {
+      if (isOtherMonth && !selectOtherMonths) return;
       if (picking === 'start') {
         setRangeStart(iso);
         setRangeEnd(null);
@@ -346,7 +378,7 @@ export function DateRangePicker({
         setFocusedDate(iso);
       }
     },
-    [picking, rangeStart],
+    [picking, rangeStart, selectOtherMonths],
   );
 
   /* ── Preset Click ── */
@@ -507,7 +539,13 @@ export function DateRangePicker({
         case 'Enter':
         case ' ':
           e.preventDefault();
-          if (current) handleDayClick(current);
+          if (current) {
+            const currentDate = parseISO(current);
+            const isOtherMonth = !panels.some(
+              (panel) => panel.year === currentDate.year && panel.month === currentDate.month,
+            );
+            handleDayClick(current, isOtherMonth);
+          }
           return;
         case 'Escape':
           e.preventDefault();
@@ -703,14 +741,17 @@ export function DateRangePicker({
                   isBetween(day.iso, rangeStart, rangeEnd);
                 const isToday = day.iso === today;
                 const isFocused = day.iso === focusedDate;
+                const isDisabled = day.isOtherMonth && !selectOtherMonths;
 
                 const cls = [
                   'sp-drp__day',
+                  day.isOtherMonth && 'sp-drp__day--other-month',
                   isStart && 'sp-drp__day--start',
                   isEnd && 'sp-drp__day--end',
                   isInRange && 'sp-drp__day--in-range',
                   isToday && !isStart && !isEnd && 'sp-drp__day--today',
                   isFocused && 'sp-drp__day--focused',
+                  isDisabled && 'sp-drp__day--disabled',
                 ]
                   .filter(Boolean)
                   .join(' ');
@@ -725,7 +766,8 @@ export function DateRangePicker({
                     aria-selected={isStart || isEnd || undefined}
                     aria-current={isToday ? 'date' : undefined}
                     tabIndex={isFocused ? 0 : -1}
-                    onClick={() => handleDayClick(day.iso)}
+                    disabled={isDisabled}
+                    onClick={() => handleDayClick(day.iso, day.isOtherMonth)}
                   >
                     {day.day}
                   </button>

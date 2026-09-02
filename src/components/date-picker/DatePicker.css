@@ -303,6 +303,10 @@
   pointer-events: none;
 }
 
+.sp-dp__day--other-month {
+  color: var(--sp-text-subtle, #6b7280);
+}
+
 .sp-dp__day--today {
   font-weight: bold;
   color: var(--sp-primary, #3b82f6);

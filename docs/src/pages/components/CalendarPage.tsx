@@ -16,6 +16,9 @@ const noWeekends = (date: string) => {
 
 const WEEK_NUMBERS_CODE = `<Calendar showWeekNumbers />`
 
+const OTHER_MONTHS_CODE = `<Calendar showOtherMonths selectOtherMonths />
+<Calendar showOtherMonths selectOtherMonths={false} />`
+
 const NO_FOOTER_CODE = `<Calendar showFooter={false} />`
 
 interface Section { id: string; label: string }
@@ -24,6 +27,7 @@ const SECTIONS: Section[] = [
   { id: 'min-max',        label: 'Min / Max Dates' },
   { id: 'disabled-dates', label: 'Disabled Dates' },
   { id: 'week-numbers',   label: 'Week Numbers' },
+  { id: 'other-months',   label: 'Other Months' },
   { id: 'no-footer',      label: 'Without Footer' },
   { id: 'api',            label: 'API' },
 ]
@@ -112,6 +116,17 @@ export function CalendarPage() {
           </CodePreview>
         </section>
 
+        <section id="other-months" className="demo-section" aria-labelledby="other-months-heading">
+          <h2 id="other-months-heading">Other Months</h2>
+          <p className="section-desc">Show adjacent-month dates in a subtle color. They are selectable by default and can be disabled independently.</p>
+          <CodePreview code={OTHER_MONTHS_CODE}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', gap: 24 }}>
+              <Calendar showOtherMonths selectOtherMonths />
+              <Calendar showOtherMonths selectOtherMonths={false} />
+            </div>
+          </CodePreview>
+        </section>
+
         <section id="no-footer" className="demo-section" aria-labelledby="no-footer-heading">
           <h2 id="no-footer-heading">Without Footer</h2>
           <p className="section-desc">
@@ -139,6 +154,8 @@ export function CalendarPage() {
                 <tr><td><code>disabledDates</code></td><td><code>string[]</code></td><td><code>[]</code></td><td>Array of specific disabled dates (ISO)</td></tr>
                 <tr><td><code>dateFilter</code></td><td><code>(date: string) =&gt; boolean</code></td><td><code>null</code></td><td>Custom filter function</td></tr>
                 <tr><td><code>showWeekNumbers</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Show ISO week numbers</td></tr>
+                <tr><td><code>showOtherMonths</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show dates from adjacent months</td></tr>
+                <tr><td><code>selectOtherMonths</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Allow selecting visible adjacent-month dates</td></tr>
                 <tr><td><code>showFooter</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show Today/Clear footer buttons</td></tr>
               </tbody>
             </table>

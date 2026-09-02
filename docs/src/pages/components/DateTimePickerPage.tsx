@@ -9,6 +9,8 @@ const INPUT_CODE = `<DateTimePicker inputMode placeholder="MM/DD/YYYY hh:MM AM" 
 const SIZES_CODE = `<DateTimePicker size="sm" placeholder="Small" />
 <DateTimePicker size="md" placeholder="Medium" />
 <DateTimePicker size="lg" placeholder="Large" />`
+const OTHER_MONTHS_CODE = `<DateTimePicker showOtherMonths selectOtherMonths placeholder="Adjacent dates selectable" />
+<DateTimePicker showOtherMonths selectOtherMonths={false} placeholder="Adjacent dates disabled" />`
 const DISABLED_CODE = `<DateTimePicker disabled placeholder="Disabled" />`
 
 interface Section { id: string; label: string }
@@ -18,6 +20,7 @@ const SECTIONS: Section[] = [
   { id: 'seconds',    label: 'With Seconds' },
   { id: 'input-mode', label: 'Input Mode' },
   { id: 'sizes',      label: 'Sizes' },
+  { id: 'other-months', label: 'Other Months' },
   { id: 'disabled',   label: 'Disabled' },
   { id: 'api',        label: 'API' },
 ]
@@ -100,6 +103,17 @@ export function DateTimePickerPage() {
           </CodePreview>
         </section>
 
+        <section id="other-months" className="demo-section" aria-labelledby="other-months-heading">
+          <h2 id="other-months-heading">Other Months</h2>
+          <p className="section-desc">Show adjacent-month dates in a subtle color. They are selectable by default and can be disabled independently.</p>
+          <CodePreview code={OTHER_MONTHS_CODE}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12 }}>
+              <DateTimePicker showOtherMonths selectOtherMonths placeholder="Adjacent dates selectable" />
+              <DateTimePicker showOtherMonths selectOtherMonths={false} placeholder="Adjacent dates disabled" />
+            </div>
+          </CodePreview>
+        </section>
+
         <section id="disabled" className="demo-section" aria-labelledby="disabled-heading">
           <h2 id="disabled-heading">Disabled</h2>
           <p className="section-desc">Disable the picker.</p>
@@ -125,6 +139,8 @@ export function DateTimePickerPage() {
                 <tr><td><code>showSeconds</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Show seconds spinner</td></tr>
                 <tr><td><code>inputMode</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Text input with toggle</td></tr>
                 <tr><td><code>disabled</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Disable the picker</td></tr>
+                <tr><td><code>showOtherMonths</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show dates from adjacent months</td></tr>
+                <tr><td><code>selectOtherMonths</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Allow selecting visible adjacent-month dates</td></tr>
               </tbody>
             </table>
           </div>

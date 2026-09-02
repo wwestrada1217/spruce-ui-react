@@ -285,6 +285,17 @@
   pointer-events: none;
 }
 
+.sp-dtp__day--other-month {
+  color: var(--sp-text-subtle, #9ca3af);
+}
+
+.sp-dtp__day--disabled {
+  opacity: 0.45;
+  color: var(--sp-text-muted, #9ca3af);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .sp-dtp__day--today {
   font-weight: 700;
   color: var(--sp-primary, #2563eb);

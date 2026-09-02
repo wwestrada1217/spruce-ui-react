@@ -15,6 +15,9 @@ const PRESETS_CODE = `const presets = [
 
 <DateRangePicker presets={presets} />`
 
+const OTHER_MONTHS_CODE = `<DateRangePicker showOtherMonths selectOtherMonths placeholder="Adjacent dates selectable" />
+<DateRangePicker showOtherMonths selectOtherMonths={false} placeholder="Adjacent dates disabled" />`
+
 const DISABLED_CODE = `<DateRangePicker disabled placeholder="Disabled" />`
 
 const today = new Date()
@@ -37,6 +40,7 @@ const SECTIONS: Section[] = [
   { id: 'basic',      label: 'Basic' },
   { id: 'input-mode', label: 'Input Mode' },
   { id: 'presets',    label: 'With Presets' },
+  { id: 'other-months', label: 'Other Months' },
   { id: 'disabled',   label: 'Disabled' },
   { id: 'api',        label: 'API' },
 ]
@@ -106,6 +110,17 @@ export function DateRangePickerPage() {
           </CodePreview>
         </section>
 
+        <section id="other-months" className="demo-section" aria-labelledby="other-months-heading">
+          <h2 id="other-months-heading">Other Months</h2>
+          <p className="section-desc">Show adjacent-month dates in a subtle color. They are selectable by default and can be disabled independently.</p>
+          <CodePreview code={OTHER_MONTHS_CODE}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12 }}>
+              <DateRangePicker showOtherMonths selectOtherMonths placeholder="Adjacent dates selectable" />
+              <DateRangePicker showOtherMonths selectOtherMonths={false} placeholder="Adjacent dates disabled" />
+            </div>
+          </CodePreview>
+        </section>
+
         <section id="disabled" className="demo-section" aria-labelledby="disabled-heading">
           <h2 id="disabled-heading">Disabled</h2>
           <p className="section-desc">Disable the picker.</p>
@@ -128,6 +143,8 @@ export function DateRangePickerPage() {
                 <tr><td><code>placeholder</code></td><td><code>string</code></td><td><code>'Select range'</code></td><td>Trigger placeholder</td></tr>
                 <tr><td><code>inputMode</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Dual text inputs mode</td></tr>
                 <tr><td><code>disabled</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Disable the picker</td></tr>
+                <tr><td><code>showOtherMonths</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show dates from adjacent months</td></tr>
+                <tr><td><code>selectOtherMonths</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Allow selecting visible adjacent-month dates</td></tr>
                 <tr><td><code>months</code></td><td><code>number</code></td><td><code>2</code></td><td>Number of calendar panels</td></tr>
                 <tr><td><code>presets</code></td><td><code>DateRangePreset[]</code></td><td><code>[]</code></td><td>Preset range options</td></tr>
               </tbody>

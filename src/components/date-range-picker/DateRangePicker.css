@@ -305,6 +305,16 @@
   cursor: default;
 }
 
+.sp-drp__day--other-month {
+  color: var(--sp-text-subtle, #6b7280);
+}
+
+.sp-drp__day--disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .sp-drp__day--today {
   font-weight: bold;
   color: var(--sp-primary, #3b82f6);

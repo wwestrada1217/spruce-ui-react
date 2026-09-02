@@ -24,6 +24,10 @@ export interface CalendarProps {
   dateFilter?: DateFilter | null;
   showWeekNumbers?: boolean;
   weekNumberBackground?: boolean;
+  /** Show dates from the previous and next months in the calendar grid. */
+  showOtherMonths?: boolean;
+  /** Allow selecting dates from the previous and next months. */
+  selectOtherMonths?: boolean;
   showFooter?: boolean;
   className?: string;
 }
@@ -66,6 +70,16 @@ function todayIso(): string {
   return toIso(new Date());
 }
 
+interface CalendarDay {
+  year: number;
+  month: number;
+  day: number;
+  iso: string;
+  isOtherMonth: boolean;
+}
+
+type CalendarCell = CalendarDay | null;
+
 /* ── Component ── */
 
 export function Calendar({
@@ -78,6 +92,8 @@ export function Calendar({
   dateFilter,
   showWeekNumbers = false,
   weekNumberBackground = false,
+  showOtherMonths = true,
+  selectOtherMonths = true,
   showFooter = true,
   className,
 }: CalendarProps) {
@@ -137,35 +153,42 @@ export function Calendar({
   const calendarRows = useMemo(() => {
     const totalDays = daysInMonth(viewYear, viewMonth);
     const firstDow = leadingBlankDays(viewYear, viewMonth);
+    const totalCells = Math.ceil((firstDow + totalDays) / 7) * 7;
+    const firstGridDate = new Date(viewYear, viewMonth, 1 - firstDow);
 
-    const rows: { weekNumber: number; days: (number | null)[] }[] = [];
-    let currentDay = 1;
+    const cells: CalendarCell[] = [];
+    for (let i = 0; i < totalCells; i++) {
+      const date = new Date(firstGridDate);
+      date.setDate(firstGridDate.getDate() + i);
+      const year = date.getFullYear();
+      const month = date.getMonth();
+      const isOtherMonth = year !== viewYear || month !== viewMonth;
 
-    // Build week rows
-    while (currentDay <= totalDays) {
-      const week: (number | null)[] = [];
-      if (currentDay === 1) {
-        // First row: add empty slots before the 1st
-        for (let i = 0; i < firstDow; i++) week.push(null);
-      }
+      cells.push(
+        showOtherMonths || !isOtherMonth
+          ? {
+              year,
+              month,
+              day: date.getDate(),
+              iso: toIso(date),
+              isOtherMonth,
+            }
+          : null,
+      );
+    }
 
-      while (week.length < 7 && currentDay <= totalDays) {
-        week.push(currentDay);
-        currentDay++;
-      }
-
-      // Pad the end of the last row
-      while (week.length < 7) week.push(null);
-
-      // Compute week number from the first real day in this row
-      const firstRealDay = week.find((d) => d !== null)!;
-      const wn = getIsoWeekNumber(new Date(viewYear, viewMonth, firstRealDay));
-
+    const rows: { weekNumber: number; days: CalendarCell[] }[] = [];
+    for (let i = 0; i < cells.length; i += 7) {
+      const week = cells.slice(i, i + 7);
+      const firstRealDay = week.find((d): d is CalendarDay => d !== null)!;
+      const wn = getIsoWeekNumber(
+        new Date(firstRealDay.year, firstRealDay.month, firstRealDay.day),
+      );
       rows.push({ weekNumber: wn, days: week });
     }
 
     return rows;
-  }, [leadingBlankDays, viewYear, viewMonth]);
+  }, [leadingBlankDays, showOtherMonths, viewYear, viewMonth]);
 
   /* ── Navigation helpers ── */
 
@@ -215,12 +238,13 @@ export function Calendar({
   /* ── Selection ── */
 
   const selectDay = useCallback(
-    (day: number) => {
-      const iso = toIso(new Date(viewYear, viewMonth, day));
+    (day: CalendarDay) => {
+      if (day.isOtherMonth && !selectOtherMonths) return;
+      const iso = day.iso;
       if (isDayDisabled(iso)) return;
       onChange?.(iso);
     },
-    [viewYear, viewMonth, isDayDisabled, onChange],
+    [isDayDisabled, onChange, selectOtherMonths],
   );
 
   const selectMonth = useCallback(
@@ -354,7 +378,15 @@ export function Calendar({
         case 'Enter':
         case ' ':
           e.preventDefault();
-          if (focusedDay) selectDay(focusedDay);
+          if (focusedDay) {
+            selectDay({
+              year: viewYear,
+              month: viewMonth,
+              day: focusedDay,
+              iso: toIso(new Date(viewYear, viewMonth, focusedDay)),
+              isOtherMonth: false,
+            });
+          }
           break;
 
         case 'Escape':
@@ -375,7 +407,7 @@ export function Calendar({
   useEffect(() => {
     if (focusedDay !== null && gridRef.current) {
       const btn = gridRef.current.querySelector<HTMLButtonElement>(
-        `[data-day="${focusedDay}"]`,
+        `[data-date="${toIso(new Date(viewYear, viewMonth, focusedDay))}"]`,
       );
       btn?.focus();
     }
@@ -591,14 +623,16 @@ export function Calendar({
                   );
                 }
 
-                const iso = toIso(new Date(viewYear, viewMonth, day));
+                const iso = day.iso;
                 const isSelected = iso === selectedIso;
                 const isToday = iso === today;
-                const isDisabled = isDayDisabled(iso);
-                const isFocused = day === focusedDay;
+                const isDisabled =
+                  (day.isOtherMonth && !selectOtherMonths) || isDayDisabled(iso);
+                const isFocused = !day.isOtherMonth && day.day === focusedDay;
 
                 const dayCls = [
                   'sp-cal__day',
+                  day.isOtherMonth && 'sp-cal__day--other-month',
                   isToday && 'sp-cal__day--today',
                   isSelected && 'sp-cal__day--selected',
                   isFocused && 'sp-cal__day--focused',
@@ -609,18 +643,19 @@ export function Calendar({
 
                 return (
                   <button
-                    key={day}
+                    key={day.iso}
                     type="button"
                     className={dayCls}
-                    data-day={day}
+                    data-day={day.day}
+                    data-date={day.iso}
                     tabIndex={-1}
-                    aria-label={formatDayLabel(day, viewMonth, viewYear)}
+                    aria-label={formatDayLabel(day.day, day.month, day.year)}
                     aria-selected={isSelected}
                     aria-disabled={isDisabled}
                     disabled={isDisabled}
                     onClick={() => selectDay(day)}
                   >
-                    {day}
+                    {day.day}
                   </button>
                 );
               })}

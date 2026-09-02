@@ -30,6 +30,10 @@ export interface DatePickerProps {
   disabled?: boolean;
   /** Render as a text input instead of a button trigger. */
   inputMode?: boolean;
+  /** Show dates from the previous and next months in the calendar grid. */
+  showOtherMonths?: boolean;
+  /** Allow selecting dates from the previous and next months. */
+  selectOtherMonths?: boolean;
   /** Show ISO week numbers column. */
   showWeekNumbers?: boolean;
   /** Apply a subtle background to week number cells. */
@@ -49,6 +53,15 @@ export interface DatePickerProps {
 /* ── Sub-view enum ───────────────────────────────────────────────────────── */
 
 type View = 'days' | 'months' | 'years';
+
+interface CalendarDay {
+  year: number;
+  month: number;
+  day: number;
+  isOtherMonth: boolean;
+}
+
+type CalendarCell = CalendarDay | null;
 
 /* ── Constants ───────────────────────────────────────────────────────────── */
 
@@ -125,6 +138,8 @@ export function DatePicker({
   size = 'md',
   disabled = false,
   inputMode = false,
+  showOtherMonths = true,
+  selectOtherMonths = true,
   showWeekNumbers = false,
   weekNumberBackground = false,
   minDate,
@@ -218,19 +233,30 @@ export function DatePicker({
   const calendarDays = useMemo(() => {
     const offset = leadingBlankDays(viewYear, viewMonth - 1);
     const total = daysInMonth(viewYear, viewMonth);
-    const cells: (number | null)[] = [];
+    const totalCells = Math.ceil((offset + total) / 7) * 7;
+    const firstGridDate = new Date(viewYear, viewMonth - 1, 1 - offset);
+    const cells: CalendarCell[] = [];
 
-    // Leading empties
-    for (let i = 0; i < offset; i++) cells.push(null);
-    // Days
-    for (let d = 1; d <= total; d++) cells.push(d);
+    for (let i = 0; i < totalCells; i++) {
+      const date = new Date(firstGridDate);
+      date.setDate(firstGridDate.getDate() + i);
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const isOtherMonth = year !== viewYear || month !== viewMonth;
+
+      cells.push(
+        showOtherMonths || !isOtherMonth
+          ? { year, month, day: date.getDate(), isOtherMonth }
+          : null,
+      );
+    }
 
     return cells;
-  }, [leadingBlankDays, viewMonth, viewYear]);
+  }, [leadingBlankDays, showOtherMonths, viewMonth, viewYear]);
 
   /** Group calendar cells into rows of 7 for week number computation */
   const calendarRows = useMemo(() => {
-    const rows: (number | null)[][] = [];
+    const rows: CalendarCell[][] = [];
     for (let i = 0; i < calendarDays.length; i += 7) {
       rows.push(calendarDays.slice(i, i + 7));
     }
@@ -325,8 +351,9 @@ export function DatePicker({
 
   /* ── Select a day ────────────────────────────────────────────────────── */
 
-  function selectDay(day: number) {
-    const iso = buildIso(viewYear, viewMonth, day);
+  function selectDay(day: CalendarDay) {
+    const iso = buildIso(day.year, day.month, day.day);
+    if (day.isOtherMonth && !selectOtherMonths) return;
     if (isDateDisabled(iso)) return;
     onChange?.(iso);
     closePanel();
@@ -525,7 +552,12 @@ export function DatePicker({
         if (focusedDate) {
           const p = parseIso(focusedDate);
           if (p && !isDateDisabled(focusedDate)) {
-            selectDay(p.day);
+            selectDay({
+              year: p.year,
+              month: p.month,
+              day: p.day,
+              isOtherMonth: p.year !== viewYear || p.month !== viewMonth,
+            });
           }
         }
         break;
@@ -602,9 +634,9 @@ export function DatePicker({
             // Calculate week number from the first real day in this row
             let weekNum: number | null = null;
             if (wk) {
-              const realDay = row.find((d) => d != null);
+              const realDay = row.find((d): d is CalendarDay => d != null);
               if (realDay != null) {
-                weekNum = isoWeekNumber(viewYear, viewMonth, realDay);
+                weekNum = isoWeekNumber(realDay.year, realDay.month, realDay.day);
               }
             }
 
@@ -632,14 +664,16 @@ export function DatePicker({
                   />,
                 );
               } else {
-                const iso = buildIso(viewYear, viewMonth, day);
+                const iso = buildIso(day.year, day.month, day.day);
                 const isToday = iso === today;
                 const isSelected = iso === value;
                 const isFocused = iso === focusedDate;
-                const isDayDisabled = isDateDisabled(iso);
+                const isDayDisabled =
+                  (day.isOtherMonth && !selectOtherMonths) || isDateDisabled(iso);
 
                 const cls = [
                   'sp-dp__day',
+                  day.isOtherMonth && 'sp-dp__day--other-month',
                   isToday && 'sp-dp__day--today',
                   isSelected && 'sp-dp__day--selected',
                   isFocused && 'sp-dp__day--focused',
@@ -650,17 +684,17 @@ export function DatePicker({
 
                 cells.push(
                   <button
-                    key={`d-${day}`}
+                    key={`d-${iso}`}
                     type="button"
                     className={cls}
                     tabIndex={isFocused ? 0 : -1}
                     disabled={isDayDisabled}
-                    aria-label={formatDayLabel(day, viewMonth - 1, viewYear)}
+                    aria-label={formatDayLabel(day.day, day.month - 1, day.year)}
                     aria-selected={isSelected}
                     aria-current={isToday ? 'date' : undefined}
                     onClick={() => selectDay(day)}
                   >
-                    {day}
+                    {day.day}
                   </button>,
                 );
               }

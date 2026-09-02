@@ -5,7 +5,7 @@
  * The full license information can be found in LICENSE in the root directory of this project.
  */
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
 import { computePosition, getScrollParents, onClickOutside } from '../../utils/positioning.js';
@@ -29,6 +29,10 @@ export interface DateTimePickerProps {
   showSeconds?: boolean;
   /** Render as a text input instead of a button trigger. */
   inputMode?: boolean;
+  /** Show dates from the previous and next months in the calendar grid. */
+  showOtherMonths?: boolean;
+  /** Allow selecting dates from the previous and next months. */
+  selectOtherMonths?: boolean;
   /** Disable all interaction. */
   disabled?: boolean;
   /** Additional CSS class applied to the root wrapper. */
@@ -94,6 +98,15 @@ interface ParsedDateTime {
   minute: number;
   second: number;
 }
+
+interface CalendarDay {
+  year: number;
+  month: number;
+  day: number;
+  isOtherMonth: boolean;
+}
+
+type CalendarCell = CalendarDay | null;
 
 function parseISO(raw: string | null | undefined): ParsedDateTime | null {
   if (!raw) return null;
@@ -195,6 +208,8 @@ export function DateTimePicker({
   use24Hour = false,
   showSeconds = false,
   inputMode = false,
+  showOtherMonths = true,
+  selectOtherMonths = true,
   disabled = false,
   className,
 }: DateTimePickerProps) {
@@ -443,8 +458,9 @@ export function DateTimePicker({
     setYearRangeStart((s) => s + 12);
   }
 
-  function selectDay(day: number) {
-    setSelectedDate({ year: viewYear, month: viewMonth, day });
+  function selectDay(day: CalendarDay) {
+    if (day.isOtherMonth && !selectOtherMonths) return;
+    setSelectedDate({ year: day.year, month: day.month, day: day.day });
   }
 
   function selectMonth(month: number) {
@@ -468,8 +484,29 @@ export function DateTimePicker({
 
   /* ── Calendar grid data ────────────────────────────────────────────────── */
 
-  const daysInMonth = getDaysInMonth(viewYear, viewMonth);
-  const firstDay = leadingBlankDays(viewYear, viewMonth);
+  const calendarDays = useMemo(() => {
+    const offset = leadingBlankDays(viewYear, viewMonth);
+    const total = getDaysInMonth(viewYear, viewMonth);
+    const totalCells = Math.ceil((offset + total) / 7) * 7;
+    const firstGridDate = new Date(viewYear, viewMonth, 1 - offset);
+    const cells: CalendarCell[] = [];
+
+    for (let i = 0; i < totalCells; i++) {
+      const date = new Date(firstGridDate);
+      date.setDate(firstGridDate.getDate() + i);
+      const year = date.getFullYear();
+      const month = date.getMonth();
+      const isOtherMonth = year !== viewYear || month !== viewMonth;
+
+      cells.push(
+        showOtherMonths || !isOtherMonth
+          ? { year, month, day: date.getDate(), isOtherMonth }
+          : null,
+      );
+    }
+
+    return cells;
+  }, [leadingBlankDays, showOtherMonths, viewMonth, viewYear]);
 
   const today = new Date();
   const todayYear = today.getFullYear();
@@ -495,9 +532,6 @@ export function DateTimePicker({
 
   function renderCalendar() {
     if (viewMode === 'days') {
-      const emptySlots: null[] = Array.from({ length: firstDay }, () => null);
-      const daySlots: number[] = Array.from({ length: daysInMonth }, (_, i) => i + 1);
-
       return (
         <>
           <div className="sp-dtp__cal-header">
@@ -531,34 +565,39 @@ export function DateTimePicker({
             ))}
           </div>
           <div className="sp-dtp__grid" role="grid" aria-label={t('calendar')}>
-            {emptySlots.map((_, i) => (
-              <div key={`e${i}`} className="sp-dtp__day sp-dtp__day--empty" />
-            ))}
-            {daySlots.map((d) => {
+            {calendarDays.map((day, i) => {
+              if (day === null) {
+                return <div key={`e${i}`} className="sp-dtp__day sp-dtp__day--empty" />;
+              }
+
               const isToday =
-                viewYear === todayYear && viewMonth === todayMonth && d === todayDay;
+                day.year === todayYear && day.month === todayMonth && day.day === todayDay;
               const isSelected =
                 selectedDate !== null &&
-                selectedDate.year === viewYear &&
-                selectedDate.month === viewMonth &&
-                selectedDate.day === d;
+                selectedDate.year === day.year &&
+                selectedDate.month === day.month &&
+                selectedDate.day === day.day;
+              const isDisabled = day.isOtherMonth && !selectOtherMonths;
               const cls = [
                 'sp-dtp__day',
+                day.isOtherMonth ? 'sp-dtp__day--other-month' : '',
                 isToday && !isSelected ? 'sp-dtp__day--today' : '',
                 isSelected ? 'sp-dtp__day--selected' : '',
+                isDisabled ? 'sp-dtp__day--disabled' : '',
               ]
                 .filter(Boolean)
                 .join(' ');
               return (
                 <button
-                  key={d}
+                  key={`${day.year}-${day.month}-${day.day}`}
                   type="button"
                   className={cls}
-                  onClick={() => selectDay(d)}
-                  aria-label={formatDayLabel(d, viewMonth, viewYear)}
+                  onClick={() => selectDay(day)}
+                  disabled={isDisabled}
+                  aria-label={formatDayLabel(day.day, day.month, day.year)}
                   aria-pressed={isSelected}
                 >
-                  {d}
+                  {day.day}
                 </button>
               );
             })}
