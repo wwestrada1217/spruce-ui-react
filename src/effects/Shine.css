@@ -4,28 +4,31 @@
   overflow: hidden;
 }
 
-.sp-shine--active::after {
+.sp-shine--active::before {
   position: absolute;
   top: -50%;
   left: -50%;
-  width: 200%;
+  z-index: 1;
+  width: var(--sp-shine-width, 30%);
   height: 200%;
   background: linear-gradient(
-    60deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.4) 50%,
-    transparent 70%
+    var(--sp-shine-angle, 120deg),
+    transparent 0%,
+    var(--sp-shine-color, rgba(255, 255, 255, .5)) 50%,
+    transparent 100%
   );
-  transform: rotate(30deg) translateY(-100%);
-  animation: sp-shine-sweep 3s ease-in-out infinite;
+  animation: sp-shine-sweep var(--sp-shine-duration, 2000ms) ease-in-out var(--sp-shine-delay, 1000ms) infinite;
+  pointer-events: none;
   content: '';
 }
 
 @keyframes sp-shine-sweep {
-  0% {
-    transform: rotate(30deg) translateY(-100%);
-  }
-  100% {
-    transform: rotate(30deg) translateY(100%);
+  0% { left: -50%; }
+  100% { left: 150%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-shine--active::before {
+    animation: none;
   }
 }

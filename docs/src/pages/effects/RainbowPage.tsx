@@ -1,93 +1,83 @@
-import { useState, useEffect, useRef } from 'react';
-import { Rainbow, Button } from 'spruce-react';
+import { Button, Rainbow } from 'spruce-react';
 import { CodePreview } from '../../components/CodePreview';
+import { EffectApiTable, EffectDocsLayout } from './EffectDocsLayout';
 
-interface Section { id: string; label: string }
-const SECTIONS: Section[] = [
-  { id: 'rainbow', label: 'Rainbow Gradient' },
-  { id: 'api',     label: 'API' },
+const SECTIONS = [
+  { id: 'modes', label: 'Gradient Modes' },
+  { id: 'colors', label: 'Colors & Speed' },
+  { id: 'api', label: 'API' },
 ];
 
+const MODES_CODE = `<Rainbow rainbowMode="text">
+  <h2>Text gradient</h2>
+</Rainbow>
+<Rainbow rainbowMode="background">
+  <div>Background gradient</div>
+</Rainbow>
+<Rainbow rainbowMode="border" borderWidth={3}>
+  <Button variant="outline">Gradient border</Button>
+</Rainbow>`;
+
+const COLORS_CODE = `<Rainbow
+  rainbowColors={['#3b82f6', '#8b5cf6', '#ec4899']}
+  rainbowSpeed={1}
+>
+  <h3>Fast custom spectrum</h3>
+</Rainbow>
+<Rainbow rainbowAnimate={false}>
+  <h3>Static text gradient</h3>
+</Rainbow>`;
+
 export function RainbowPage() {
-  const [activeSection, setActiveSection] = useState('rainbow');
-  const mainRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) setActiveSection(entry.target.id);
-        }
-      },
-      { threshold: 0.3 },
-    );
-    const sections = mainRef.current?.querySelectorAll('[id]') ?? [];
-    sections.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
-
-  function scrollTo(id: string) {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  const RAINBOW_CODE = `import { Rainbow, Button } from 'spruce-react';
-
-export function Example() {
   return (
-    <Rainbow animated={true} borderWidth={3}>
-      <Button variant="outline">Animated Spectrum Border</Button>
-    </Rainbow>
-  );
-}`;
-
-  return (
-    <div className="features-layout">
-      <div className="features-main" ref={mainRef}>
-        <h1>Rainbow</h1>
-        <p className="docs-desc">
-          Continuous spectrum rainbow gradient animation for eye-catching call-to-action borders.
-        </p>
-
-        <section id="rainbow" className="demo-section">
-          <h2>Spectrum Rainbow Border</h2>
-          <CodePreview code={RAINBOW_CODE}>
-            <div style={{ padding: 24 }}>
-              <Rainbow animated={true} borderWidth={3}>
-                <Button variant="outline">Animated Spectrum Border</Button>
-              </Rainbow>
-            </div>
-          </CodePreview>
-        </section>
-
-        <section id="api" className="demo-section">
-          <h2>API</h2>
-          <h3>Props</h3>
-          <div className="api-table-wrap">
-            <table className="api-table">
-              <thead>
-                <tr><th>Name</th><th>Type</th><th>Default</th><th>Description</th></tr>
-              </thead>
-              <tbody>
-                <tr><td><code>animated</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Enable spectrum movement animation</td></tr>
-                <tr><td><code>borderWidth</code></td><td><code>number</code></td><td><code>2</code></td><td>Gradient border thickness (px)</td></tr>
-              </tbody>
-            </table>
+    <EffectDocsLayout
+      title="Rainbow"
+      description="Apply an animated or static spectrum gradient to text, backgrounds, or borders."
+      sections={SECTIONS}
+    >
+      <section id="modes" className="demo-section">
+        <h2>Gradient Modes</h2>
+        <p className="section-desc">The mode controls where the gradient is painted on the host element.</p>
+        <CodePreview code={MODES_CODE} language="typescript">
+          <div style={{ padding: 28, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
+            <Rainbow rainbowMode="text"><h2 style={{ margin: 0, fontSize: 28 }}>Text gradient</h2></Rainbow>
+            <Rainbow rainbowMode="background" style={{ padding: '10px 18px', color: 'white', borderRadius: 'var(--sp-radius-md)' }}>
+              <span>Background gradient</span>
+            </Rainbow>
+            <Rainbow rainbowMode="border" borderWidth={3}>
+              <Button variant="outline">Gradient border</Button>
+            </Rainbow>
           </div>
-        </section>
-      </div>
+        </CodePreview>
+      </section>
 
-      <nav className="features-toc" aria-label="Table of contents">
-        <p className="features-toc__title">On this page</p>
-        <ul className="toc-list">
-          {SECTIONS.map((s) => (
-            <li key={s.id}>
-              <a className={`toc-link${activeSection === s.id ? ' active' : ''}`} onClick={() => scrollTo(s.id)}>
-                {s.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </div>
+      <section id="colors" className="demo-section">
+        <h2>Colors, Speed &amp; Static Mode</h2>
+        <p className="section-desc">Provide two or more custom colors, tune the cycle duration, or disable animation for a still gradient.</p>
+        <CodePreview code={COLORS_CODE} language="typescript">
+          <div style={{ padding: 28, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+            <Rainbow rainbowColors={['#3b82f6', '#8b5cf6', '#ec4899']} rainbowSpeed={1}>
+              <h3 style={{ margin: 0 }}>Fast custom spectrum</h3>
+            </Rainbow>
+            <Rainbow rainbowAnimate={false}>
+              <h3 style={{ margin: 0 }}>Static text gradient</h3>
+            </Rainbow>
+          </div>
+        </CodePreview>
+      </section>
+
+      <section id="api" className="demo-section">
+        <h2>API</h2>
+        <EffectApiTable rows={[
+          { name: 'enabled', type: 'boolean', defaultValue: 'true', description: 'Enable or disable the effect.' },
+          { name: 'rainbowMode', type: "'text' | 'background' | 'border'", defaultValue: "'text'", description: 'Where to apply the gradient.' },
+          { name: 'rainbowSpeed', type: 'number', defaultValue: '3', description: 'Seconds per animation cycle.' },
+          { name: 'rainbowColors', type: 'string[]', defaultValue: '[]', description: 'Custom gradient colors; defaults to the standard spectrum.' },
+          { name: 'rainbowAnimate', type: 'boolean', defaultValue: 'true', description: 'Animate the gradient when enabled.' },
+          { name: 'borderWidth', type: 'number', defaultValue: '2', description: 'Border thickness in pixels for border mode.' },
+          { name: 'animated / spRainbow', type: 'boolean', defaultValue: '—', description: 'Backwards-compatible animation and enabled aliases.' },
+        ]} />
+      </section>
+    </EffectDocsLayout>
   );
 }

@@ -1127,21 +1127,21 @@ export { bandScale, linearScale, niceLinearDomain } from './charts/scales.js';
 
 // ─── Effects & Animations ───────────────────────────────────────────────────
 export { Sparkles } from './effects/Sparkles.js';
-export type { SparklesProps } from './effects/Sparkles.js';
+export type { SparklesProps, SparkleColor, SparkleSize } from './effects/Sparkles.js';
 export { Confetti } from './effects/Confetti.js';
-export type { ConfettiProps } from './effects/Confetti.js';
+export type { ConfettiProps, ConfettiConfig, ConfettiHandle, ConfettiShape } from './effects/Confetti.js';
 export { Shimmer } from './effects/Shimmer.js';
-export type { ShimmerProps } from './effects/Shimmer.js';
+export type { ShimmerProps, ShimmerDirection } from './effects/Shimmer.js';
 export { Rainbow } from './effects/Rainbow.js';
-export type { RainbowProps } from './effects/Rainbow.js';
+export type { RainbowProps, RainbowMode } from './effects/Rainbow.js';
 export { Shine } from './effects/Shine.js';
-export type { ShineProps } from './effects/Shine.js';
+export type { ShineProps, ShineAngle } from './effects/Shine.js';
 export { Glow } from './effects/Glow.js';
-export type { GlowProps } from './effects/Glow.js';
+export type { GlowProps, GlowVariant } from './effects/Glow.js';
 export { Marquee } from './effects/Marquee.js';
-export type { MarqueeProps } from './effects/Marquee.js';
+export type { MarqueeProps, MarqueeDirection } from './effects/Marquee.js';
 export { Fade } from './effects/Fade.js';
-export type { FadeProps } from './effects/Fade.js';
+export type { FadeProps, FadeDirection, FadeTrigger } from './effects/Fade.js';
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
 export { FocusTrap, AutoFocus, useFocusTrap } from './utils/FocusUtils.js';

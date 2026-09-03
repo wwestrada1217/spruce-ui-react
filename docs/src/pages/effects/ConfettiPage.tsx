@@ -1,102 +1,116 @@
-import { useState, useEffect, useRef } from 'react';
-import { Confetti, Button } from 'spruce-react';
+import { useRef, useState } from 'react';
+import { Button, Confetti, type ConfettiHandle } from 'spruce-react';
 import { CodePreview } from '../../components/CodePreview';
+import { EffectApiTable, EffectDocsLayout } from './EffectDocsLayout';
 
-interface Section { id: string; label: string }
-const SECTIONS: Section[] = [
-  { id: 'confetti', label: 'Confetti Explosion' },
-  { id: 'api',      label: 'API' },
+const SECTIONS = [
+  { id: 'click', label: 'Click Trigger' },
+  { id: 'config', label: 'Configuration' },
+  { id: 'programmatic', label: 'Programmatic Trigger' },
+  { id: 'api', label: 'API' },
 ];
 
+const CLICK_CODE = `import { Confetti, Button } from 'spruce-react';
+
+<Confetti confettiOnClick config={{ count: 80, spread: 70 }}>
+  <Button variant="primary">Click for confetti 🎉</Button>
+</Confetti>`;
+
+const CONFIG_CODE = `<Confetti
+  active={celebrating}
+  count={120}
+  duration={2500}
+  spread={90}
+  colors={['#3b82f6', '#8b5cf6', '#ec4899']}
+  shapes={['circle', 'strip']}
+  originY={60}
+  onStart={() => setCelebrating(true)}
+  onComplete={() => setCelebrating(false)}
+/>`;
+
+const PROGRAMMATIC_CODE = `import { useRef } from 'react';
+import { Confetti, Button, type ConfettiHandle } from 'spruce-react';
+
+const confettiRef = useRef<ConfettiHandle>(null);
+
+<Confetti ref={confettiRef} confettiOnClick={false} />
+<Button onClick={() => confettiRef.current?.fire({ count: 40 })}>
+  Fire burst
+</Button>`;
+
 export function ConfettiPage() {
-  const [activeSection, setActiveSection] = useState('confetti');
-  const [active, setActive] = useState(false);
-  const mainRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) setActiveSection(entry.target.id);
-        }
-      },
-      { threshold: 0.3 },
-    );
-    const sections = mainRef.current?.querySelectorAll('[id]') ?? [];
-    sections.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
-
-  function scrollTo(id: string) {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  const CONFETTI_CODE = `import { useState } from 'react';
-import { Confetti, Button } from 'spruce-react';
-
-export function Example() {
-  const [active, setActive] = useState(false);
+  const [celebrating, setCelebrating] = useState(false);
+  const confettiRef = useRef<ConfettiHandle>(null);
 
   return (
-    <div style={{ position: 'relative', padding: 32 }}>
-      <Confetti active={active} onComplete={() => setActive(false)} />
-      <Button variant="primary" onClick={() => setActive(true)}>
-        Trigger Confetti Celebration 🎉
-      </Button>
-    </div>
-  );
-}`;
-
-  return (
-    <div className="features-layout">
-      <div className="features-main" ref={mainRef}>
-        <h1>Confetti</h1>
-        <p className="docs-desc">
-          Celebratory particle explosion effect for rewarding achievements and successful interactions.
-        </p>
-
-        <section id="confetti" className="demo-section">
-          <h2>Celebratory Confetti</h2>
-          <CodePreview code={CONFETTI_CODE}>
-            <div style={{ position: 'relative', padding: 32, textAlign: 'center', minHeight: 160 }}>
-              <Confetti active={active} onComplete={() => setActive(false)} />
-              <Button variant="primary" onClick={() => setActive(true)}>
-                Trigger Confetti Celebration 🎉
-              </Button>
-            </div>
-          </CodePreview>
-        </section>
-
-        <section id="api" className="demo-section">
-          <h2>API</h2>
-          <h3>Props</h3>
-          <div className="api-table-wrap">
-            <table className="api-table">
-              <thead>
-                <tr><th>Name</th><th>Type</th><th>Default</th><th>Description</th></tr>
-              </thead>
-              <tbody>
-                <tr><td><code>active</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Trigger particle animation</td></tr>
-                <tr><td><code>count</code></td><td><code>number</code></td><td><code>50</code></td><td>Number of confetti pieces</td></tr>
-                <tr><td><code>duration</code></td><td><code>number</code></td><td><code>3000</code></td><td>Animation duration (ms)</td></tr>
-              </tbody>
-            </table>
+    <EffectDocsLayout
+      title="Confetti"
+      description="A configurable celebration burst with click, controlled, and imperative triggers."
+      sections={SECTIONS}
+    >
+      <section id="click" className="demo-section">
+        <h2>Click Trigger</h2>
+        <p className="section-desc">Wrap an interactive control to fire a burst when the host is clicked.</p>
+        <CodePreview code={CLICK_CODE} language="typescript">
+          <div style={{ padding: 32, display: 'flex', justifyContent: 'center' }}>
+            <Confetti confettiOnClick config={{ count: 80, spread: 70 }}>
+              <Button variant="primary">Click for confetti 🎉</Button>
+            </Confetti>
           </div>
-        </section>
-      </div>
+        </CodePreview>
+      </section>
 
-      <nav className="features-toc" aria-label="Table of contents">
-        <p className="features-toc__title">On this page</p>
-        <ul className="toc-list">
-          {SECTIONS.map((s) => (
-            <li key={s.id}>
-              <a className={`toc-link${activeSection === s.id ? ' active' : ''}`} onClick={() => scrollTo(s.id)}>
-                {s.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </div>
+      <section id="config" className="demo-section">
+        <h2>Configuration</h2>
+        <p className="section-desc">Control the burst count, duration, spread, origin, palette, and shape mix.</p>
+        <CodePreview code={CONFIG_CODE} language="typescript">
+          <div style={{ padding: 32, display: 'flex', justifyContent: 'center' }}>
+            <Confetti
+              active={celebrating}
+              count={120}
+              duration={1200}
+              spread={90}
+              colors={['#3b82f6', '#8b5cf6', '#ec4899']}
+              shapes={['circle', 'strip']}
+              onStart={() => setCelebrating(true)}
+              onComplete={() => setCelebrating(false)}
+            />
+            <Button disabled={celebrating} onClick={() => setCelebrating(true)}>
+              {celebrating ? 'Celebrating…' : 'Celebrate'}
+            </Button>
+          </div>
+        </CodePreview>
+      </section>
+
+      <section id="programmatic" className="demo-section">
+        <h2>Programmatic Trigger</h2>
+        <p className="section-desc">Use a ref handle when the burst is owned by a separate action or event.</p>
+        <CodePreview code={PROGRAMMATIC_CODE} language="typescript">
+          <div style={{ padding: 32, display: 'flex', justifyContent: 'center' }}>
+            <Confetti ref={confettiRef} confettiOnClick={false} />
+            <Button variant="outline" onClick={() => confettiRef.current?.fire({ count: 40, spread: 45 })}>
+              Fire burst
+            </Button>
+          </div>
+        </CodePreview>
+      </section>
+
+      <section id="api" className="demo-section">
+        <h2>API</h2>
+        <EffectApiTable rows={[
+          { name: 'active', type: 'boolean', defaultValue: 'false', description: 'Fire once when changed from false to true.' },
+          { name: 'config / spConfetti', type: 'ConfettiConfig', defaultValue: '—', description: 'Object form of the burst configuration.' },
+          { name: 'count', type: 'number', defaultValue: '80', description: 'Number of particles.' },
+          { name: 'duration', type: 'number', defaultValue: '2500', description: 'Animation duration in milliseconds.' },
+          { name: 'spread', type: 'number', defaultValue: '70', description: 'Spread angle in degrees.' },
+          { name: 'colors', type: 'string[]', defaultValue: 'default palette', description: 'Custom particle colors.' },
+          { name: 'shapes', type: 'ConfettiShape[]', defaultValue: "['square', 'circle', 'strip']", description: 'Particle shape mix.' },
+          { name: 'originY', type: 'number', defaultValue: '60', description: 'Start position as a percentage of the host height.' },
+          { name: 'confettiOnClick', type: 'boolean', defaultValue: 'true', description: 'Fire when the host is clicked.' },
+          { name: 'onStart / onComplete', type: '() => void', defaultValue: '—', description: 'Callbacks for burst start and completion.' },
+          { name: 'ref.fire(overrides?)', type: 'ConfettiHandle', defaultValue: '—', description: 'Imperatively fire a burst with optional overrides.' },
+        ]} />
+      </section>
+    </EffectDocsLayout>
   );
 }

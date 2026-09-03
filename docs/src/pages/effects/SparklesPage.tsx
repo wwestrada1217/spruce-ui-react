@@ -1,98 +1,87 @@
-import { useState, useEffect, useRef } from 'react';
-import { Sparkles, Button } from 'spruce-react';
+import { useState } from 'react';
+import { Button, Sparkles } from 'spruce-react';
 import { CodePreview } from '../../components/CodePreview';
+import { EffectApiTable, EffectDocsLayout } from './EffectDocsLayout';
 
-interface Section { id: string; label: string }
-const SECTIONS: Section[] = [
-  { id: 'sparkles', label: 'Sparkles' },
-  { id: 'api',      label: 'API' },
+const SECTIONS = [
+  { id: 'basic', label: 'Particle Overlay' },
+  { id: 'controls', label: 'Colors & Sizes' },
+  { id: 'api', label: 'API' },
 ];
 
+const BASIC_CODE = `import { Sparkles, Button } from 'spruce-react';
+
+<Sparkles sparkleColor="gold" sparkleSize="md" sparkleCount={6}>
+  <Button variant="primary">Magical sparkles</Button>
+</Sparkles>`;
+
+const CONTROLS_CODE = `import { useState } from 'react';
+import { Sparkles, Button } from 'spruce-react';
+
+const [enabled, setEnabled] = useState(true);
+
+<Sparkles
+  enabled={enabled}
+  sparkleColor="rainbow"
+  sparkleSize="lg"
+  sparkleCount={8}
+  sparkleInterval={300}
+>
+  <Button onClick={() => setEnabled((value) => !value)}>
+    Toggle sparkles
+  </Button>
+</Sparkles>`;
+
 export function SparklesPage() {
-  const [activeSection, setActiveSection] = useState('sparkles');
-  const mainRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) setActiveSection(entry.target.id);
-        }
-      },
-      { threshold: 0.3 },
-    );
-    const sections = mainRef.current?.querySelectorAll('[id]') ?? [];
-    sections.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
-
-  function scrollTo(id: string) {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  const SPARKLES_CODE = `import { Sparkles, Button } from 'spruce-react';
-
-export function Example() {
-  return (
-    <Sparkles color="#f59e0b" count={8}>
-      <Button variant="primary">Magical Sparkles</Button>
-    </Sparkles>
-  );
-}`;
+  const [enabled, setEnabled] = useState(true);
 
   return (
-    <div className="features-layout">
-      <div className="features-main" ref={mainRef}>
-        <h1>Sparkles</h1>
-        <p className="docs-desc">
-          Particle sparkles effect for adding subtle magic and accent highlights to UI elements.
-        </p>
-
-        <section id="sparkles" className="demo-section">
-          <h2>Sparkles Particle Overlay</h2>
-          <CodePreview code={SPARKLES_CODE}>
-            <div style={{ padding: 24, display: 'flex', gap: 24, alignItems: 'center' }}>
-              <Sparkles color="#f59e0b" count={8}>
-                <Button variant="primary">Magical Sparkles</Button>
-              </Sparkles>
-              <Sparkles color="#3b82f6" count={6}>
-                <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--sp-text-default)' }}>
-                  Highlighted Headline
-                </span>
-              </Sparkles>
-            </div>
-          </CodePreview>
-        </section>
-
-        <section id="api" className="demo-section">
-          <h2>API</h2>
-          <h3>Props</h3>
-          <div className="api-table-wrap">
-            <table className="api-table">
-              <thead>
-                <tr><th>Name</th><th>Type</th><th>Default</th><th>Description</th></tr>
-              </thead>
-              <tbody>
-                <tr><td><code>color</code></td><td><code>string</code></td><td><code>'#f59e0b'</code></td><td>Particle sparkle color</td></tr>
-                <tr><td><code>count</code></td><td><code>number</code></td><td><code>6</code></td><td>Number of active sparkle particles</td></tr>
-              </tbody>
-            </table>
+    <EffectDocsLayout
+      title="Sparkles"
+      description="A particle sparkle overlay for subtle magic, celebrations, and accent highlights."
+      sections={SECTIONS}
+    >
+      <section id="basic" className="demo-section">
+        <h2>Particle Overlay</h2>
+        <p className="section-desc">Wrap any content to spawn gold sparkle particles at a controlled interval.</p>
+        <CodePreview code={BASIC_CODE} language="typescript">
+          <div style={{ padding: 32, display: 'flex', justifyContent: 'center' }}>
+            <Sparkles sparkleColor="gold" sparkleSize="md" sparkleCount={6}>
+              <Button variant="primary">Magical sparkles</Button>
+            </Sparkles>
           </div>
-        </section>
-      </div>
+        </CodePreview>
+      </section>
 
-      <nav className="features-toc" aria-label="Table of contents">
-        <p className="features-toc__title">On this page</p>
-        <ul className="toc-list">
-          {SECTIONS.map((s) => (
-            <li key={s.id}>
-              <a className={`toc-link${activeSection === s.id ? ' active' : ''}`} onClick={() => scrollTo(s.id)}>
-                {s.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </div>
+      <section id="controls" className="demo-section">
+        <h2>Colors, Sizes &amp; Runtime Control</h2>
+        <p className="section-desc">Use the built-in palettes or a CSS color, select a particle size, and toggle the effect without remounting.</p>
+        <CodePreview code={CONTROLS_CODE} language="typescript">
+          <div style={{ padding: 32, display: 'flex', gap: 24, flexWrap: 'wrap', justifyContent: 'center' }}>
+            <Sparkles sparkleColor="rainbow" sparkleSize="lg" sparkleCount={8} sparkleInterval={300} enabled={enabled}>
+              <Button onClick={() => setEnabled((value) => !value)}>
+                {enabled ? 'Disable' : 'Enable'} sparkles
+              </Button>
+            </Sparkles>
+            <Sparkles sparkleColor="#ec4899" sparkleSize="sm" sparkleCount={4}>
+              <span style={{ padding: 16, color: 'var(--sp-text-default)' }}>Custom pink</span>
+            </Sparkles>
+          </div>
+        </CodePreview>
+      </section>
+
+      <section id="api" className="demo-section">
+        <h2>API</h2>
+        <EffectApiTable rows={[
+          { name: 'enabled', type: 'boolean', defaultValue: 'true', description: 'Enable or disable the effect.' },
+          { name: 'sparkleColor', type: "'gold' | 'rainbow' | 'white' | string", defaultValue: "'gold'", description: 'Built-in palette or custom CSS color.' },
+          { name: 'sparkleSize', type: "'sm' | 'md' | 'lg'", defaultValue: "'md'", description: 'Particle size preset.' },
+          { name: 'sparkleCount', type: 'number', defaultValue: '6', description: 'Maximum particles visible at one time.' },
+          { name: 'sparkleInterval', type: 'number', defaultValue: '400', description: 'Milliseconds between particle spawns.' },
+          { name: 'spSparkles', type: 'boolean', defaultValue: '—', description: 'Angular-compatible alias for enabled.' },
+          { name: 'color / count', type: 'string / number', defaultValue: '—', description: 'Backwards-compatible aliases for sparkleColor and sparkleCount.' },
+        ]} />
+      </section>
+    </EffectDocsLayout>
   );
 }

@@ -1,102 +1,88 @@
-import { useState, useEffect, useRef } from 'react';
-import { Shimmer, Card } from 'spruce-react';
+import { Card, Shimmer } from 'spruce-react';
 import { CodePreview } from '../../components/CodePreview';
+import { EffectApiTable, EffectDocsLayout } from './EffectDocsLayout';
 
-interface Section { id: string; label: string }
-const SECTIONS: Section[] = [
-  { id: 'shimmer', label: 'Shimmer Loading' },
-  { id: 'api',     label: 'API' },
+const SECTIONS = [
+  { id: 'overlay', label: 'Overlay' },
+  { id: 'skeleton', label: 'Skeleton' },
+  { id: 'directions', label: 'Directions' },
+  { id: 'api', label: 'API' },
 ];
 
+const OVERLAY_CODE = `<Shimmer shimmerColor="rgba(255, 255, 255, 0.4)" shimmerDuration={1500}>
+  <Card>Content with a shimmer overlay</Card>
+</Shimmer>`;
+
+const SKELETON_CODE = `<Shimmer
+  enabled={loading}
+  shimmerSkeleton={loading}
+  width="100%"
+  height={120}
+  borderRadius={6}
+/>`;
+
+const DIRECTIONS_CODE = `<Shimmer shimmerDirection="left-right">Left to right</Shimmer>
+<Shimmer shimmerDirection="right-left">Right to left</Shimmer>
+<Shimmer shimmerDirection="top-bottom">Top to bottom</Shimmer>
+<Shimmer shimmerDirection="diagonal">Diagonal</Shimmer>`;
+
 export function ShimmerPage() {
-  const [activeSection, setActiveSection] = useState('shimmer');
-  const mainRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) setActiveSection(entry.target.id);
-        }
-      },
-      { threshold: 0.3 },
-    );
-    const sections = mainRef.current?.querySelectorAll('[id]') ?? [];
-    sections.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
-
-  function scrollTo(id: string) {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  const SHIMMER_CODE = `import { Shimmer, Card } from 'spruce-react';
-
-export function Example() {
   return (
-    <Card style={{ width: 300 }}>
-      <Shimmer width="100%" height={120} borderRadius={6} />
-      <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <Shimmer width="70%" height={16} />
-        <Shimmer width="40%" height={14} />
-      </div>
-    </Card>
-  );
-}`;
-
-  return (
-    <div className="features-layout">
-      <div className="features-main" ref={mainRef}>
-        <h1>Shimmer</h1>
-        <p className="docs-desc">
-          Placeholder skeleton loading wave animation for perceived performance optimization.
-        </p>
-
-        <section id="shimmer" className="demo-section">
-          <h2>Skeleton Shimmer Loading</h2>
-          <CodePreview code={SHIMMER_CODE}>
-            <div style={{ padding: 16 }}>
-              <Card style={{ width: 320 }}>
-                <Shimmer width="100%" height={120} borderRadius={6} />
-                <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <Shimmer width="70%" height={16} />
-                  <Shimmer width="40%" height={14} />
-                </div>
-              </Card>
-            </div>
-          </CodePreview>
-        </section>
-
-        <section id="api" className="demo-section">
-          <h2>API</h2>
-          <h3>Props</h3>
-          <div className="api-table-wrap">
-            <table className="api-table">
-              <thead>
-                <tr><th>Name</th><th>Type</th><th>Default</th><th>Description</th></tr>
-              </thead>
-              <tbody>
-                <tr><td><code>active</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Enable shimmer animation wave</td></tr>
-                <tr><td><code>width</code></td><td><code>number | string</code></td><td><code>undefined</code></td><td>Skeleton placeholder width</td></tr>
-                <tr><td><code>height</code></td><td><code>number | string</code></td><td><code>undefined</code></td><td>Skeleton placeholder height</td></tr>
-              </tbody>
-            </table>
+    <EffectDocsLayout
+      title="Shimmer"
+      description="A configurable loading sweep that can overlay content or render accessible skeleton placeholders."
+      sections={SECTIONS}
+    >
+      <section id="overlay" className="demo-section">
+        <h2>Content Overlay</h2>
+        <p className="section-desc">Keep the content in place while a translucent band sweeps across the host.</p>
+        <CodePreview code={OVERLAY_CODE} language="typescript">
+          <div style={{ padding: 16 }}>
+            <Shimmer shimmerColor="rgba(255, 255, 255, 0.4)" shimmerDuration={1500}>
+              <Card>Content with a shimmer overlay</Card>
+            </Shimmer>
           </div>
-        </section>
-      </div>
+        </CodePreview>
+      </section>
 
-      <nav className="features-toc" aria-label="Table of contents">
-        <p className="features-toc__title">On this page</p>
-        <ul className="toc-list">
-          {SECTIONS.map((s) => (
-            <li key={s.id}>
-              <a className={`toc-link${activeSection === s.id ? ' active' : ''}`} onClick={() => scrollTo(s.id)}>
-                {s.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </div>
+      <section id="skeleton" className="demo-section">
+        <h2>Skeleton Placeholder</h2>
+        <p className="section-desc">Set <code>shimmerSkeleton</code> while loading to hide visual content and expose <code>aria-busy</code>.</p>
+        <CodePreview code={SKELETON_CODE} language="typescript">
+          <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <Shimmer shimmerSkeleton width="100%" height={120} borderRadius={6} />
+            <Shimmer shimmerSkeleton width="70%" height={16} />
+            <Shimmer shimmerSkeleton width="40%" height={14} />
+          </div>
+        </CodePreview>
+      </section>
+
+      <section id="directions" className="demo-section">
+        <h2>Directions &amp; Custom Color</h2>
+        <p className="section-desc">Choose the sweep direction and pass any valid CSS color for the highlight.</p>
+        <CodePreview code={DIRECTIONS_CODE} language="typescript">
+          <div style={{ padding: 24, display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12 }}>
+            {(['left-right', 'right-left', 'top-bottom', 'diagonal'] as const).map((direction) => (
+              <Shimmer key={direction} shimmerDirection={direction} shimmerColor="rgba(59, 130, 246, 0.3)" style={{ padding: 16, border: '1px solid var(--sp-border)' }}>
+                {direction}
+              </Shimmer>
+            ))}
+          </div>
+        </CodePreview>
+      </section>
+
+      <section id="api" className="demo-section">
+        <h2>API</h2>
+        <EffectApiTable rows={[
+          { name: 'enabled', type: 'boolean', defaultValue: 'true', description: 'Enable or disable the effect.' },
+          { name: 'shimmerDuration', type: 'number', defaultValue: '1500', description: 'Sweep duration in milliseconds.' },
+          { name: 'shimmerDirection', type: "'left-right' | 'right-left' | 'top-bottom' | 'diagonal'", defaultValue: "'left-right'", description: 'Sweep direction.' },
+          { name: 'shimmerColor', type: 'string', defaultValue: "'rgba(255, 255, 255, 0.4)'", description: 'Highlight color.' },
+          { name: 'shimmerSkeleton', type: 'boolean', defaultValue: 'false', description: 'Hide visual content and apply skeleton surface styling.' },
+          { name: 'active', type: 'boolean', defaultValue: '—', description: 'Backwards-compatible alias for enabled.' },
+          { name: 'width / height / borderRadius', type: 'number | string', defaultValue: '—', description: 'Optional host dimensions and radius.' },
+        ]} />
+      </section>
+    </EffectDocsLayout>
   );
 }

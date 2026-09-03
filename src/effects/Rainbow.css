@@ -1,37 +1,42 @@
 .sp-rainbow {
   position: relative;
   display: inline-block;
-  border-radius: var(--sp-radius-md, 8px);
-  background: linear-gradient(
-    90deg,
-    #ef4444,
-    #f59e0b,
-    #10b981,
-    #06b6d4,
-    #3b82f6,
-    #8b5cf6,
-    #ec4899,
-    #ef4444
-  );
-  background-size: 200% 200%;
+  background-size: 200% auto;
+}
+
+.sp-rainbow--text {
+  background: var(--sp-rainbow-gradient);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.sp-rainbow--background {
+  background: var(--sp-rainbow-gradient);
+  background-size: 200% auto;
+}
+
+.sp-rainbow--border {
+  border: var(--sp-rainbow-border-width, 2px) solid transparent;
+  background-image: linear-gradient(var(--sp-surface-0), var(--sp-surface-0)), var(--sp-rainbow-gradient);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  background-size: 100% 100%, 200% auto;
 }
 
 .sp-rainbow--animated {
-  animation: sp-rainbow-move 4s linear infinite;
+  animation: sp-rainbow-shift var(--sp-rainbow-speed, 3s) linear infinite;
 }
 
-.sp-rainbow-inner {
-  background: var(--sp-bg-surface, #ffffff);
-  border-radius: calc(var(--sp-radius-md, 8px) - 1px);
-  height: 100%;
-  width: 100%;
+@keyframes sp-rainbow-shift {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
 }
 
-@keyframes sp-rainbow-move {
-  0% {
-    background-position: 0% 50%;
-  }
-  100% {
-    background-position: 200% 50%;
+@media (prefers-reduced-motion: reduce) {
+  .sp-rainbow--animated {
+    animation: none;
   }
 }

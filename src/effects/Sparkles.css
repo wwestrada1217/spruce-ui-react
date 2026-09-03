@@ -1,13 +1,14 @@
 .sp-sparkles-container {
   position: relative;
   display: inline-block;
+  overflow: hidden;
 }
 
 .sp-sparkle-icon {
   position: absolute;
   pointer-events: none;
   z-index: 1;
-  animation: sp-sparkle-spin 1.8s ease-in-out infinite alternate;
+  animation: sp-sparkle-in var(--sp-sparkle-duration, 700ms) ease-in-out forwards;
 }
 
 .sp-sparkles-child {
@@ -15,7 +16,7 @@
   z-index: 0;
 }
 
-@keyframes sp-sparkle-spin {
+@keyframes sp-sparkle-in {
   0% {
     transform: scale(0) rotate(0deg);
     opacity: 0;
@@ -26,6 +27,13 @@
   }
   100% {
     transform: scale(0) rotate(180deg);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-sparkle-icon {
+    animation: none;
     opacity: 0;
   }
 }

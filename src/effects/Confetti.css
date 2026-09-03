@@ -1,25 +1,42 @@
-.sp-confetti-wrap {
-  position: absolute;
+.sp-confetti-host {
+  position: relative;
+  display: inline-block;
+}
+
+.sp-confetti-burst {
+  position: fixed;
   inset: 0;
+  z-index: 9999;
   overflow: hidden;
   pointer-events: none;
-  z-index: 100;
 }
 
-.sp-confetti-piece {
+.sp-confetti-particle {
   position: absolute;
-  top: -20px;
-  border-radius: 2px;
-  animation: sp-confetti-fall linear forwards;
+  animation: sp-confetti-fly var(--sp-confetti-duration, 2500ms) cubic-bezier(.25, .46, .45, .94) forwards;
 }
 
-@keyframes sp-confetti-fall {
+@keyframes sp-confetti-fly {
   0% {
-    top: -20px;
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  70% {
     opacity: 1;
   }
   100% {
-    top: 105%;
+    transform: translate(var(--sp-confetti-dx), calc(var(--sp-confetti-dy) + 600px)) rotate(var(--sp-confetti-rot));
     opacity: 0;
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-confetti-particle {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+.sp-confetti-burst--reduced-motion {
+  display: none;
 }
