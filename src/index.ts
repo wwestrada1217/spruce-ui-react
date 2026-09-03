@@ -1142,6 +1142,22 @@ export { Marquee } from './effects/Marquee.js';
 export type { MarqueeProps, MarqueeDirection } from './effects/Marquee.js';
 export { Fade } from './effects/Fade.js';
 export type { FadeProps, FadeDirection, FadeTrigger } from './effects/Fade.js';
+export { Aura } from './effects/Aura.js';
+export type { AuraProps } from './effects/Aura.js';
+export { Fire } from './effects/Fire.js';
+export type { FireProps, FireColor, FireDensity } from './effects/Fire.js';
+export { Fireworks } from './effects/Fireworks.js';
+export type { FireworksProps, FireworksHandle, FireworksBurst, FireworksIntensity, FireworksPalette } from './effects/Fireworks.js';
+export { FluidFill } from './effects/FluidFill.js';
+export type { FluidFillProps } from './effects/FluidFill.js';
+export { Hourglass } from './effects/Hourglass.js';
+export type { HourglassProps, HourglassHandle, HourglassSize } from './effects/Hourglass.js';
+export { Snowflakes } from './effects/Snowflakes.js';
+export type { SnowflakesProps, SnowflakeSize } from './effects/Snowflakes.js';
+export { Thermometer } from './effects/Thermometer.js';
+export type { ThermometerProps, ThermometerSize, TemperatureUnit } from './effects/Thermometer.js';
+export { WheelOfFortune } from './effects/WheelOfFortune.js';
+export type { WheelOfFortuneProps, WheelOfFortuneHandle, WheelSlice, WheelSize } from './effects/WheelOfFortune.js';
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
 export { FocusTrap, AutoFocus, useFocusTrap } from './utils/FocusUtils.js';

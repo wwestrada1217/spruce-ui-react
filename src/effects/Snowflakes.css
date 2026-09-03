@@ -1,0 +1,27 @@
+.sp-snow-host {
+  position: relative;
+  overflow: hidden;
+}
+
+.sp-snowflake-particle {
+  position: absolute;
+  top: -24px;
+  border-radius: 50%;
+  background: var(--sp-snow-color, #ffffff);
+  pointer-events: none;
+  box-shadow: 0 0 6px rgb(255 255 255 / 80%);
+  animation: sp-snow-fall var(--sp-snow-duration, 6s) linear infinite;
+  opacity: var(--sp-snow-opacity, 0.85);
+}
+
+@keyframes sp-snow-fall {
+  0% { transform: translateY(0) translateX(0) rotate(0deg); }
+  50% { transform: translateY(calc(var(--sp-snow-height, 300px) * 0.5)) translateX(var(--sp-snow-sway, 20px)) rotate(180deg); }
+  100% { transform: translateY(calc(var(--sp-snow-height, 300px) + 30px)) translateX(0) rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-snow-host--reduced-motion .sp-snowflake-particle {
+    animation: none;
+  }
+}

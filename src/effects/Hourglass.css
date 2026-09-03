@@ -1,0 +1,29 @@
+.sp-hourglass {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.sp-hourglass-vessel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--sp-duration-slow, 600ms) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sp-hourglass--flipping .sp-hourglass-vessel { transform: rotate(180deg); }
+
+.sp-sand-stream-line { animation: sp-sand-flow 350ms linear infinite; }
+
+@keyframes sp-sand-flow {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -14; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-hourglass--reduced-motion .sp-hourglass-vessel,
+  .sp-hourglass--reduced-motion .sp-sand-stream-line {
+    animation: none;
+    transition: none;
+  }
+}

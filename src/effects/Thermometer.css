@@ -1,0 +1,47 @@
+.sp-thermometer {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.sp-thermometer-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-space-2, 8px);
+}
+
+.sp-thermometer-svg { flex-shrink: 0; }
+
+.sp-fluid-column {
+  transition: y var(--sp-duration-slow, 600ms) cubic-bezier(0.4, 0, 0.2, 1),
+    height var(--sp-duration-slow, 600ms) cubic-bezier(0.4, 0, 0.2, 1),
+    fill var(--sp-duration-fast, 250ms) ease;
+}
+
+.sp-bulb-pulse { animation: sp-bulb-glow-pulse 1.4s ease-in-out infinite; }
+
+@keyframes sp-bulb-glow-pulse {
+  0%, 100% { filter: drop-shadow(0 0 4px #ef4444); }
+  50% { filter: drop-shadow(0 0 12px #ef4444); }
+}
+
+.sp-thermometer-label {
+  display: flex;
+  flex-direction: column;
+  font-family: inherit;
+  line-height: 1.2;
+}
+
+.sp-thermometer-val {
+  font-size: var(--sp-text-lg, 18px);
+  font-weight: var(--sp-font-bold, 700);
+  letter-spacing: -0.02em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-thermometer--reduced-motion .sp-fluid-column,
+  .sp-thermometer--reduced-motion .sp-bulb-pulse {
+    animation: none;
+    transition: none;
+    filter: none;
+  }
+}

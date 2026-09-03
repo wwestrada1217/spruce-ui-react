@@ -171,6 +171,14 @@ import { ShinePage } from './pages/effects/ShinePage'
 import { GlowPage } from './pages/effects/GlowPage'
 import { MarqueePage } from './pages/effects/MarqueePage'
 import { FadePage } from './pages/effects/FadePage'
+import { AuraPage } from './pages/effects/AuraPage'
+import { FirePage } from './pages/effects/FirePage'
+import { FireworksPage } from './pages/effects/FireworksPage'
+import { FluidFillPage } from './pages/effects/FluidFillPage'
+import { HourglassPage } from './pages/effects/HourglassPage'
+import { SnowflakesPage } from './pages/effects/SnowflakesPage'
+import { ThermometerPage } from './pages/effects/ThermometerPage'
+import { WheelOfFortunePage } from './pages/effects/WheelOfFortunePage'
 import { FocusUtilitiesPage } from './pages/utils/FocusUtilitiesPage'
 import { HighlightPage } from './pages/utils/HighlightPage'
 import { CodePreviewUtilPage } from './pages/utils/CodePreviewUtilPage'
@@ -403,6 +411,14 @@ function renderPage(hash: string): React.ReactElement {
     case '#/effects/glow':                 return <GlowPage />
     case '#/effects/marquee':              return <MarqueePage />
     case '#/effects/fade':                 return <FadePage />
+    case '#/effects/aura':                 return <AuraPage />
+    case '#/effects/fire':                 return <FirePage />
+    case '#/effects/fireworks':            return <FireworksPage />
+    case '#/effects/fluid-fill':           return <FluidFillPage />
+    case '#/effects/hourglass':            return <HourglassPage />
+    case '#/effects/snowflakes':           return <SnowflakesPage />
+    case '#/effects/thermometer':          return <ThermometerPage />
+    case '#/effects/wheel-of-fortune':     return <WheelOfFortunePage />
     // Utilities
     case '#/utils/focus-utilities':
     case '#/utils/focus-directives':       return <FocusUtilitiesPage />

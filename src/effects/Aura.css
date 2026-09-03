@@ -1,0 +1,57 @@
+.sp-aura {
+  position: relative;
+  isolation: isolate;
+}
+
+.sp-aura::before,
+.sp-aura::after {
+  content: '';
+  position: absolute;
+  inset: calc(var(--sp-aura-width, 2px) * -1);
+  border-radius: inherit;
+  background: conic-gradient(from var(--sp-aura-angle, 0deg), var(--sp-aura-gradient));
+  pointer-events: none;
+}
+
+.sp-aura::before {
+  z-index: -3;
+  filter: blur(var(--sp-aura-blur, 12px));
+  opacity: var(--sp-aura-intensity, 0.6);
+}
+
+.sp-aura::after {
+  z-index: -2;
+}
+
+.sp-aura-cover {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: inherit;
+  pointer-events: none;
+}
+
+.sp-aura-animated::before,
+.sp-aura-animated::after {
+  animation: sp-aura-spin var(--sp-aura-speed, 4s) linear infinite;
+}
+
+@property --sp-aura-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes sp-aura-spin {
+  to { --sp-aura-angle: 360deg; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-aura-animated::before,
+  .sp-aura-animated::after,
+  .sp-aura--reduced-motion::before,
+  .sp-aura--reduced-motion::after {
+    animation: none;
+  }
+}
