@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { useI18n, useTheme } from '../../src/index.js';
+import { SPRUCE_THEME_PRESETS, useI18n, useTheme } from '../../src/index.js';
 import {
   expectDocumentDirection,
   expectDocumentTheme,
@@ -18,6 +18,11 @@ function ProviderProbe() {
       <output data-testid="locale">{i18n.locale}</output>
       <output data-testid="direction">{i18n.direction}</output>
       <button type="button" onClick={theme.toggle}>Toggle theme</button>
+      {SPRUCE_THEME_PRESETS.map(preset => (
+        <button key={preset.name} onClick={() => theme.setTheme(preset.name)}>
+          {preset.name}
+        </button>
+      ))}
       <button type="button" onClick={() => i18n.setLabels({ close: 'Dismiss panel' })}>
         Override label
       </button>
@@ -27,6 +32,31 @@ function ProviderProbe() {
 }
 
 describe('SpruceProvider test contract', () => {
+  it('keeps preset styles attached after StrictMode effect cleanup and theme changes', async () => {
+    const { getByRole, user, unmount } = renderWithSpruce(<ProviderProbe />, {
+      reactStrictMode: true,
+      providerProps: { defaultTheme: 'ocean', persist: false },
+    });
+
+    expect(document.head.querySelector('#sp-theme-override')).not.toBeNull();
+
+    for (const preset of SPRUCE_THEME_PRESETS) {
+      await user.click(getByRole('button', { name: preset.name, exact: true }));
+      expectDocumentTheme(preset.base);
+      expect(document.documentElement).toHaveAttribute('data-theme-preset', preset.name);
+      const stylesheet = document.head.querySelector('#sp-theme-override');
+      expect(stylesheet).not.toBeNull();
+      for (const [token, value] of Object.entries(preset.tokens)) {
+        expect(stylesheet?.textContent).toContain(`${token}: ${value};`);
+      }
+    }
+
+    await user.click(getByRole('button', { name: 'Toggle theme' }));
+    expect(document.head.querySelector('#sp-theme-override')?.textContent).toBe('');
+    unmount();
+    expect(document.head.querySelector('#sp-theme-override')).toBeNull();
+  });
+
   it('applies theme state and exposes provider actions', async () => {
     const { getByRole, getByTestId, user } = renderWithSpruce(<ProviderProbe />, {
       providerProps: { defaultTheme: 'dark', persist: false },

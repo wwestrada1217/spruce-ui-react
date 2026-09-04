@@ -360,6 +360,9 @@ export function ThemeProvider({
     return () => {
       styleOverrideRef.current?.remove();
       accentStyleRef.current?.remove();
+      // StrictMode replays effects after cleanup; recreate the detached styles.
+      styleOverrideRef.current = null;
+      accentStyleRef.current = null;
     };
   }, []);
 
