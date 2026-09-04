@@ -1,4 +1,10 @@
 import { FoundationPageShell } from '../../components/FoundationPageShell'
+import { CodePreview } from '../../components/CodePreview'
+
+const USAGE_CODE = `.page-title {
+  font: var(--sp-font-heading-xl) / var(--sp-leading-tight) var(--sp-font-sans);
+  letter-spacing: var(--sp-tracking-tight);
+}`
 
 const SIZES = [
   { token: '--sp-text-2xs', value: '10px' },
@@ -95,9 +101,7 @@ export function TypographyPage() {
               <tr key={item.token}>
                 <td><code>{item.token}</code></td>
                 <td>{item.value}</td>
-                <td style={{ fontSize: `var(${item.token})` }}>
-                  The quick brown fox
-                </td>
+                <td><div className="type-preview"><div className="type-preview__sample" style={{ fontSize: `var(${item.token})` }}>The quick brown fox</div><span className="type-preview__meta">{item.value} · interface type scale</span></div></td>
               </tr>
             ))}
           </tbody>
@@ -106,37 +110,18 @@ export function TypographyPage() {
 
       <section id="font-weights" className="doc-section">
         <h2>Font Weights</h2>
-        <table className="token-table" aria-label="Font weights">
-          <thead>
-            <tr>
-              <th>Token</th>
-              <th>Weight</th>
-              <th>Preview</th>
-            </tr>
-          </thead>
-          <tbody>
-            {WEIGHTS.map(item => (
-              <tr key={item.token}>
-                <td><code>{item.token}</code></td>
-                <td>{item.value}</td>
-                <td style={{ fontWeight: `var(${item.token})` }}>
-                  The quick brown fox
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="weights-grid">
+          {WEIGHTS.map(item => <article key={item.token} className="weight-card"><div className="weight-card__header"><strong>{item.token.replace('--sp-font-', '').replace('-', ' ')}</strong><span>{item.value}</span></div><code>{item.token}</code><p className="weight-card__sample" style={{ fontWeight: `var(${item.token})` }}>Interface hierarchy stays readable when weight changes are intentional.</p><p className="weight-card__usage">Use weight changes for emphasis before jumping to a larger type token.</p></article>)}
+        </div>
       </section>
 
       <section id="families" className="doc-section">
         <h2>Font Families</h2>
-        <div style={{ marginBottom: 'var(--sp-space-4, 16px)' }}>
-          <p><code>--sp-font-sans</code> &mdash; Noto Sans</p>
-          <p style={{ fontFamily: 'var(--sp-font-sans)', fontSize: 'var(--sp-text-lg)', marginTop: 'var(--sp-space-1, 4px)' }}>ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789</p>
-        </div>
-        <div>
-          <p><code>--sp-font-mono</code> &mdash; Noto Sans Mono</p>
-          <p style={{ fontFamily: 'var(--sp-font-mono)', fontSize: 'var(--sp-text-lg)', marginTop: 'var(--sp-space-1, 4px)' }}>ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789</p>
+        <div className="family-grid">
+          {[
+            ['Sans', '--sp-font-sans', 'Noto Sans', 'Application UI, forms, navigation, and prose.'],
+            ['Mono', '--sp-font-mono', 'Noto Sans Mono', 'Code, tabular data, and technical references.'],
+          ].map(([label, token, value, usage]) => <article key={token} className="family-card"><div className="family-card__header"><div><h3>{label}</h3><code>{token}</code></div><span className="family-card__value">{value}</span></div><p className="family-card__sample" style={{ fontFamily: `var(${token})` }}>ABCDEFGHIJKLMNOPQRSTUVWXYZ<br />abcdefghijklmnopqrstuvwxyz<br />0123456789 !@#$%^&amp;*()</p><p className="family-card__usage">{usage}</p></article>)}
         </div>
       </section>
 
@@ -155,10 +140,7 @@ export function TypographyPage() {
               <tr key={item.token}>
                 <td><code>{item.token}</code></td>
                 <td>{item.value}</td>
-                <td style={{ lineHeight: `var(${item.token})`, maxWidth: 360 }}>
-                  Line height controls the vertical rhythm of multi-line text
-                  and directly affects scanability in dense UI.
-                </td>
+                <td><div className="type-preview"><div className="type-preview__sample" style={{ lineHeight: `var(${item.token})`, maxWidth: 360 }}>Line height controls the vertical rhythm of multi-line text and directly affects scanability in dense UI.</div><span className="type-preview__meta">{item.value} leading</span></div></td>
               </tr>
             ))}
           </tbody>
@@ -180,9 +162,7 @@ export function TypographyPage() {
               <tr key={item.token}>
                 <td><code>{item.token}</code></td>
                 <td>{item.value}</td>
-                <td style={{ letterSpacing: `var(${item.token})` }}>
-                  SPRUCE DESIGN SYSTEM
-                </td>
+                <td><div className="type-preview"><div className="type-preview__sample" style={{ letterSpacing: `var(${item.token})` }}>SPRUCE DESIGN SYSTEM</div><span className="type-preview__meta">{item.value} tracking</span></div></td>
               </tr>
             ))}
           </tbody>
@@ -198,10 +178,7 @@ export function TypographyPage() {
       <section id="usage" className="doc-section">
         <h2>Usage</h2>
         <p className="section-desc">Prefer semantic role tokens over raw sizes. This keeps intent visible in component styles and gives themes one place to retune the hierarchy.</p>
-        <div className="code-block"><pre><code>{`.page-title {
-  font: var(--sp-font-heading-xl) / var(--sp-leading-tight) var(--sp-font-sans);
-  letter-spacing: var(--sp-tracking-tight);
-}`}</code></pre></div>
+        <CodePreview codeOnly language="css" code={USAGE_CODE} />
       </section>
     </FoundationPageShell>
   )

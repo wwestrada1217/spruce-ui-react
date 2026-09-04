@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { FoundationPageShell } from '../../components/FoundationPageShell'
 
 const SURFACE_STEPS = [0, 25, 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950]
@@ -56,6 +57,8 @@ const FROSTED_TOKENS = [
 ]
 
 export function ColorsPage() {
+  const [previewTheme, setPreviewTheme] = useState<'light' | 'dark'>('light')
+
   return (
     <FoundationPageShell variant="colors" title="Colors" description="Color tokens define surfaces, text contrast, borders, brand accents, and semantic feedback. Spruce exposes them as CSS custom properties so the same component APIs adapt cleanly across light and dark contexts.">
       <div className="page-header">
@@ -66,6 +69,14 @@ export function ColorsPage() {
           feedback. Spruce exposes them as CSS custom properties so the same component APIs adapt
           cleanly across light and dark contexts.
         </p>
+      </div>
+
+      <div className="theme-switch-banner">
+        <div className="theme-switch-banner__info"><strong>Theme Preview Scope</strong><span>Test how surface, text, and semantic tokens respond to light and dark themes in real time.</span></div>
+        <div className="theme-switch-pills" role="group" aria-label="Color preview theme">
+          <button type="button" className={`theme-pill${previewTheme === 'light' ? ' active' : ''}`} aria-pressed={previewTheme === 'light'} onClick={() => setPreviewTheme('light')}>Light Theme</button>
+          <button type="button" className={`theme-pill${previewTheme === 'dark' ? ' active' : ''}`} aria-pressed={previewTheme === 'dark'} onClick={() => setPreviewTheme('dark')}>Dark Theme</button>
+        </div>
       </div>
 
       <section id="overview" className="doc-section">
@@ -91,7 +102,7 @@ export function ColorsPage() {
           &ldquo;the page&rdquo; and <code>--sp-surface-950</code> is always the
           strongest contrast.
         </p>
-        <div className="swatch-grid">
+        <div className="foundation-color-scope" data-theme={previewTheme}><div className="swatch-grid">
           {SURFACE_STEPS.map(step => (
             <div key={step} className="swatch-item">
               <div
@@ -102,7 +113,7 @@ export function ColorsPage() {
               <code className="swatch-item__token">--sp-surface-{step}</code>
             </div>
           ))}
-        </div>
+        </div></div>
       </section>
 
       <section id="roles" className="doc-section">
@@ -112,7 +123,7 @@ export function ColorsPage() {
           colors communicate meaning such as success, warning, danger, and informational status.
         </p>
         <h3>Primary Roles</h3>
-        <div className="swatch-grid">
+        <div className="foundation-color-scope" data-theme={previewTheme}><div className="swatch-grid">
           {PRIMARY_SWATCHES.map(item => (
             <div key={item.label} className="swatch-item">
               <div
@@ -123,7 +134,7 @@ export function ColorsPage() {
               <code className="swatch-item__token">{item.token}</code>
             </div>
           ))}
-        </div>
+        </div></div>
       </section>
 
       <section className="doc-section">
@@ -133,7 +144,7 @@ export function ColorsPage() {
           translucent <code>-subtle</code> companion for tinted backgrounds
           that keep text legible in both themes.
         </p>
-        <div className="swatch-grid">
+        <div className="foundation-color-scope" data-theme={previewTheme}><div className="swatch-grid">
           {SEMANTIC_SWATCHES.map(item => (
             <div key={item.label} className="swatch-item">
               <div
@@ -144,7 +155,7 @@ export function ColorsPage() {
               <code className="swatch-item__token">{item.token}</code>
             </div>
           ))}
-        </div>
+        </div></div>
       </section>
 
       <section className="doc-section">
@@ -177,7 +188,7 @@ export function ColorsPage() {
           for primary content, and step down gradually for secondary, helper, and disabled states.
         </p>
         <h3>Text roles</h3>
-        <div className="swatch-grid">
+        <div className="foundation-color-scope" data-theme={previewTheme}><div className="swatch-grid">
           {TEXT_SWATCHES.map(item => (
             <div key={item.label} className="swatch-item">
               <div
@@ -188,7 +199,7 @@ export function ColorsPage() {
               <code className="swatch-item__token">{item.token}</code>
             </div>
           ))}
-        </div>
+        </div></div>
       </section>
 
       <section className="doc-section">

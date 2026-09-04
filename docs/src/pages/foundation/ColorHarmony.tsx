@@ -6,6 +6,7 @@ import {
   useTheme,
 } from 'spruce-react'
 import type { HarmonySchemeId } from 'spruce-react'
+import { CodePreview } from '../../components/CodePreview'
 import { FoundationPageShell } from '../../components/FoundationPageShell'
 
 const ROLES = ['primary', 'secondary', 'tertiary'] as const
@@ -123,9 +124,9 @@ export function ColorHarmonyPage() {
       <section id="wheel" className="doc-section">
         <h2>Build your own</h2>
         <p className="section-desc">Named schemes are well-behaved starting points. Choose a scheme, then adjust the seed and inspect the generated companion roles. The React implementation exposes the same palette generation API through <code>buildHarmonyPalette</code>.</p>
-        <div className="code-block"><pre><code>{`const palette = buildHarmonyPalette('#2563eb', 'triadic')
+        <CodePreview codeOnly language="typescript" code={`const palette = buildHarmonyPalette('#2563eb', 'triadic')
 palette.light.secondary.base
-palette.dark.tertiary.text`}</code></pre></div>
+palette.dark.tertiary.text`} />
       </section>
 
       <section id="roles" className="doc-section">
@@ -206,8 +207,7 @@ palette.dark.tertiary.text`}</code></pre></div>
 
       <section id="usage" className="doc-section">
         <h2>Usage</h2>
-        <div className="code-block">
-          <pre><code>{`import { useTheme } from 'spruce-react'
+        <CodePreview codeOnly language="typescript" code={`import { useTheme } from 'spruce-react'
 
 const { setCustomAccentColor, setAccentHarmony, harmonyPalette } = useTheme()
 setCustomAccentColor('#2563eb')
@@ -215,8 +215,7 @@ setAccentHarmony('split-complementary')
 
 // Read the generated values for a chart or canvas integration.
 harmonyPalette?.light.series[0]
-`}</code></pre>
-        </div>
+`} />
       </section>
     </FoundationPageShell>
   )

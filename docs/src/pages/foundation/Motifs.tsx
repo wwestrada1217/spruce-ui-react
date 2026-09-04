@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import { Card, Motif, MotifProvider, Panel, SP_BUILT_IN_MOTIFS } from 'spruce-react'
+import type { SpMotifName } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
 import { FoundationPageShell } from '../../components/FoundationPageShell'
 
@@ -29,6 +31,8 @@ const CUSTOM_MOTIF = {
 }
 
 export function MotifsPage() {
+  const [selectedMotif, setSelectedMotif] = useState<SpMotifName>(SP_BUILT_IN_MOTIFS[0]?.name ?? 'concentric-circles')
+
   return (
     <FoundationPageShell variant="motifs" title="Background motifs" description="A decorative SVG ornament painted behind the content of a banner, card, panel, or any other container. Spruce ships reusable motifs across seven families, and the collection is open — register your own and use it the same way.">
       <div className="page-header">
@@ -62,21 +66,21 @@ export function MotifsPage() {
             ))}
           </tbody>
         </table>
-        <div className="docs-grid" style={{ marginTop: 'var(--sp-space-4)' }}>
+        <div className="motif-catalog" style={{ marginTop: 'var(--sp-space-4)' }}>
           {SP_BUILT_IN_MOTIFS.slice(0, 12).map((definition) => (
-            <Card
-              key={definition.name}
-              padding="sm"
-              chrome="outlined"
-              backgroundMotif={definition.name}
-              motifSize={96}
-              motifOpacity={0.12}
-              style={{ minHeight: 92 }}
-            >
-              <code style={{ fontSize: 'var(--sp-text-xs)' }}>{definition.name}</code>
-            </Card>
+            <button key={definition.name} type="button" className={`motif-swatch${selectedMotif === definition.name ? ' motif-swatch--selected' : ''}`} aria-pressed={selectedMotif === definition.name} onClick={() => setSelectedMotif(definition.name)}>
+              <span className="motif-swatch__art"><Motif motif={definition.name} position="center" size={86} opacity={0.55} /></span>
+              <span className="motif-swatch__label">Preview</span>
+              <code className="motif-swatch__name">{definition.name}</code>
+            </button>
           ))}
         </div>
+        <CodePreview code={MOTIF_CODE}>
+          <Card chrome="filled" backgroundMotif={selectedMotif} motifPosition="center-right" motifAppearance="outlined" style={{ minHeight: 140 }}>
+            <h3 style={{ margin: 0 }}>Selected motif</h3>
+            <p style={{ marginBottom: 0 }}>Choose a swatch above to update this live host.</p>
+          </Card>
+        </CodePreview>
       </section>
 
       <section id="banners" className="doc-section">

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { SPRUCE_THEME_PRESETS } from 'spruce-react'
 import { FoundationPageShell } from '../../components/FoundationPageShell'
+import { CodePreview } from '../../components/CodePreview'
 
 interface PresetDef {
   name: string
@@ -20,6 +21,29 @@ const ALL_PRESETS: PresetDef[] = SPRUCE_THEME_PRESETS.map(theme => ({
 
 const LIGHT_PRESETS = ALL_PRESETS.filter(preset => preset.base === 'light')
 const DARK_PRESETS = ALL_PRESETS.filter(preset => preset.base === 'dark')
+
+const PRESET_USAGE_CODE = `import { useTheme, oceanTheme, nightTheme } from 'spruce-react'
+
+function ThemePicker() {
+  const { registerTheme, setTheme } = useTheme()
+
+  function useOcean() {
+    registerTheme(oceanTheme)
+    setTheme('ocean')
+  }
+
+  function useNight() {
+    registerTheme(nightTheme)
+    setTheme('night')
+  }
+
+  return (
+    <>
+      <button onClick={useOcean}>Ocean</button>
+      <button onClick={useNight}>Night</button>
+    </>
+  )
+}`
 
 function PresetCard({ preset, active, onClick }: { preset: PresetDef; active: boolean; onClick: () => void }) {
   const isDark = preset.base === 'dark'
@@ -44,6 +68,7 @@ function PresetCard({ preset, active, onClick }: { preset: PresetDef; active: bo
 
 export function ThemingPage() {
   const [activePreset, setActivePreset] = useState('ocean')
+  const activeTheme = SPRUCE_THEME_PRESETS.find(theme => theme.name === activePreset) ?? SPRUCE_THEME_PRESETS[0]
 
   return (
     <FoundationPageShell variant="theming" title="Theming" description="The Spruce design system supports fully customizable themes via CSS custom properties. Use this generator to tune the design tokens and export the result as a TypeScript preset or plain CSS override block.">
@@ -297,6 +322,16 @@ function Settings() {
           ))}
         </div>
 
+        <div className="theme-live-preview" style={{ background: activeTheme.tokens['--sp-surface-0'], color: activeTheme.tokens['--sp-text-color'], borderColor: activeTheme.tokens['--sp-border'] }}>
+          <div className="theme-live-preview__header"><div><span className="theme-live-preview__eyebrow">Live preview</span><h3>{activeTheme.displayName}</h3></div><code>{activeTheme.name}</code></div>
+          <p>Preset tokens flow through the same surface, text, border, and action roles used by Spruce components.</p>
+          <div className="theme-live-preview__surface" style={{ background: activeTheme.tokens['--sp-surface-50'], borderColor: activeTheme.tokens['--sp-border'] }}>
+            <strong style={{ color: activeTheme.tokens['--sp-text-color'] }}>Workspace overview</strong>
+            <span style={{ color: activeTheme.tokens['--sp-text-muted'] }}>3 tasks need attention</span>
+            <button type="button" style={{ background: activeTheme.tokens['--sp-primary'], color: activeTheme.tokens['--sp-primary-text'], borderColor: activeTheme.tokens['--sp-primary'] }}>View tasks</button>
+          </div>
+        </div>
+
         <div className="preset-section-label" style={{ marginTop: 16 }}>Dark</div>
         <div className="preset-grid">
           {DARK_PRESETS.map(p => (
@@ -314,30 +349,7 @@ function Settings() {
           Presets are named exports of the main package — register the ones you
           offer, then activate by name.
         </p>
-        <div className="code-block">
-          <pre><code>{`import { useTheme, oceanTheme, nightTheme } from 'spruce-react'
-
-function ThemePicker() {
-  const { registerTheme, setTheme } = useTheme()
-
-  function useOcean() {
-    registerTheme(oceanTheme)
-    setTheme('ocean')
-  }
-
-  function useNight() {
-    registerTheme(nightTheme)
-    setTheme('night')
-  }
-
-  return (
-    <>
-      <button onClick={useOcean}>Ocean</button>
-      <button onClick={useNight}>Night</button>
-    </>
-  )
-}`}</code></pre>
-        </div>
+        <CodePreview codeOnly language="typescript" code={PRESET_USAGE_CODE} />
 
         <h3>Available presets</h3>
         <div className="preset-list-grid">

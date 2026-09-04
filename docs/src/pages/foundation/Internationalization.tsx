@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Alert, Button, Pager, SP_I18N_LOCALES, SpruceI18nProvider, useI18n } from 'spruce-react'
+import { CodePreview } from '../../components/CodePreview'
 import { FoundationPageShell } from '../../components/FoundationPageShell'
 
 const PRINCIPLES = [
@@ -16,6 +17,15 @@ const GUIDANCE = [
   ['Design For Expansion', 'Allow translated labels to grow; avoid fixed widths and truncation that only work for English.'],
   ['Prefer Logical Layout', 'Use logical CSS properties such as margin-inline and inset-inline-start so RTL layouts preserve reading order and placement.'],
 ]
+
+const I18N_DEMO_CODE = `const { locale, direction, t, formatDate, formatNumber } = useI18n()
+
+<div dir={direction}>
+  <Alert title={t('notifications')}>{t('loading')}</Alert>
+  <Button>{t('save')}</Button>
+  <span>{formatDate('2026-08-24')} · {formatNumber(1234567.89)}</span>
+  <Pager totalItems={42} page={2} pageSize={10} />
+</div>`
 
 function InternationalizationDemo({ onLocaleChange }: { onLocaleChange: (locale: string) => void }) {
   const { locale, direction, isRtl, t, formatDate, formatNumber, setLabels } = useI18n()
@@ -67,9 +77,7 @@ formatTime('14:30')
 formatNumber(1234567.89)
 formatRange(startDate, endDate)`}</code></pre></div></section>
 
-    <section id="rtl" className="doc-section"><h2>Direction</h2><p className="section-desc">Set <code>direction: 'rtl'</code> for right-to-left locales. Spruce synchronizes the document direction and component layout. Use logical CSS properties instead of hard-coded left and right positioning so navigation, focus behavior, and reading order remain correct.</p><div className="code-block"><pre><code>{`<div dir={direction}>
-  <Pager totalItems={42} />
-</div>`}</code></pre></div><SpruceI18nProvider key={locale} locale={locale} syncDocument={false}><InternationalizationDemo onLocaleChange={setLocale} /></SpruceI18nProvider></section>
+    <section id="rtl" className="doc-section"><h2>Direction</h2><p className="section-desc">Set <code>direction: 'rtl'</code> for right-to-left locales. Spruce synchronizes the document direction and component layout. Use logical CSS properties instead of hard-coded left and right positioning so navigation, focus behavior, and reading order remain correct.</p><CodePreview code={I18N_DEMO_CODE} language="typescript"><SpruceI18nProvider key={locale} locale={locale} syncDocument={false}><InternationalizationDemo onLocaleChange={setLocale} /></SpruceI18nProvider></CodePreview></section>
 
     <section id="component-guidance" className="doc-section"><h2>Component Guidance</h2><div className="principles-grid">{GUIDANCE.map(([title, body]) => <article key={title} className="principle-card"><h3>{title}</h3><p>{body}</p></article>)}</div></section>
   </FoundationPageShell>

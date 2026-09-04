@@ -1,4 +1,5 @@
 import { FoundationPageShell } from '../../components/FoundationPageShell'
+import { CodePreview } from '../../components/CodePreview'
 
 type Density = 'dense' | 'default' | 'comfortable'
 
@@ -53,6 +54,25 @@ const BEST_PRACTICES = [
   ['Do not use density as typography', 'Density adjusts spacing and sizing rhythm. It should not replace typographic hierarchy, accessibility sizing decisions, or content structure.'],
 ]
 
+const APPLICATION_SCOPE_CODE = `<html data-density="default">
+  <body>
+    <main data-density="dense">
+      <Toolbar />
+      <DataGrid />
+    </main>
+  </body>
+</html>`
+const LOCAL_SCOPE_CODE = `<section data-density="comfortable">
+  <ReviewPanel />
+</section>`
+const SEMANTIC_ALIASES_CODE = `.surface {
+  min-height: var(--sp-density-control-height);
+  padding-inline: var(--sp-density-control-padding-x);
+  gap: var(--sp-density-inline-gap);
+}
+
+.panel { padding: var(--sp-density-panel-padding); }`
+
 export function DensityPage() {
   return (
     <FoundationPageShell variant="density" title="Density" description="Density controls how compact or spacious a surface feels. Spruce exposes density as a shared token family so controls, lists, panels, and data-heavy surfaces can move together between dense, default, and comfortable layouts without introducing component-specific spacing APIs.">
@@ -60,22 +80,9 @@ export function DensityPage() {
 
       <section id="overview" className="doc-section"><h2>Overview</h2><p className="section-desc">Density changes sizing and rhythm as one inherited contract. Choose a preset without changing component meaning or duplicating component-specific spacing APIs.</p><div className="principles-grid">{PRINCIPLES.map(([title, body]) => <article key={title} className="principle-card"><h3>{title}</h3><p>{body}</p></article>)}</div></section>
 
-      <section id="presets" className="doc-section"><h2>Presets</h2><div className="preset-grid">{PRESETS.map(preset => <article key={preset.id} className="preset-card" data-density={preset.id}><h3>{preset.label}</h3><p>{preset.description}</p><p><strong>Best for:</strong> {preset.bestFor}</p><code>data-density=&quot;{preset.id}&quot;</code></article>)}</div></section>
+      <section id="presets" className="doc-section"><h2>Presets</h2><p className="section-desc">Use the preset that matches the task. Dense optimizes for scan-heavy workflows, default is the baseline for most application surfaces, and comfortable creates more breathing room for low-frequency or high-guidance flows.</p><div className="preset-grid">{PRESETS.map(preset => <article key={preset.id} className="preset-card" data-density={preset.id}><div className="preset-card__header"><div><h3>{preset.label}</h3><p>{preset.description}</p></div><span className="preset-chip">{preset.id}</span></div><p className="preset-card__meta"><strong>Best for:</strong> {preset.bestFor}</p><div className="density-preview" aria-hidden="true"><div className="density-preview__toolbar"><span className="density-preview__pill">Filters</span><span className="density-preview__pill">Status</span><span className="density-preview__pill">Owner</span></div><div className="density-preview__controls"><div className="density-preview__control">Search queue</div><div className="density-preview__control density-preview__control--short">Open</div></div><div className="density-preview__list"><div className="density-preview__item">Approval pending</div><div className="density-preview__item">Escalated request</div><div className="density-preview__item">SLA breach warning</div></div></div></article>)}</div></section>
 
-      <section id="applying-density" className="doc-section"><h2>Applying Density</h2><p className="section-desc">Apply density at the application root or on a local subtree. The semantic aliases re-resolve for descendants.</p><div className="code-block"><pre><code>{`<html data-density="default">
-  <body>
-    <main data-density="dense">
-      <Toolbar />
-      <DataGrid />
-    </main>
-  </body>
-</html>`}</code></pre></div><div className="code-block"><pre><code>{`.surface {
-  min-height: var(--sp-density-control-height);
-  padding-inline: var(--sp-density-control-padding-x);
-  gap: var(--sp-density-inline-gap);
-}
-
-.panel { padding: var(--sp-density-panel-padding); }`}</code></pre></div></section>
+      <section id="applying-density" className="doc-section"><h2>Applying Density</h2><p className="section-desc">Apply density at the root for an application-wide default, or scope it to a subtree when a single workspace, panel, or embedded surface needs a different rhythm.</p><div className="code-grid"><article className="code-card"><h3>Application Scope</h3><CodePreview codeOnly language="html" code={APPLICATION_SCOPE_CODE} /><p>Use this when the entire product should share one density preset.</p></article><article className="code-card"><h3>Local Scope</h3><CodePreview codeOnly language="html" code={LOCAL_SCOPE_CODE} /><p>Use a local scope when one surface needs a different rhythm.</p></article></div><article className="code-card code-card--wide"><h3>Consume Semantic Aliases</h3><CodePreview codeOnly language="css" code={SEMANTIC_ALIASES_CODE} /><p>Prefer semantic aliases over hard-coded preset values.</p></article></section>
 
       <section id="tokens" className="doc-section"><h2>Token Reference</h2><table className="token-table" aria-label="Density semantic aliases"><thead><tr><th>Semantic token</th><th>Use</th></tr></thead><tbody>{TOKENS.map(([token, usage]) => <tr key={token}><td><code>{token}</code></td><td>{usage}</td></tr>)}</tbody></table><table className="token-table" aria-label="Density core metrics" style={{ marginTop: 'var(--sp-space-4)' }}><thead><tr><th>Metric</th><th>Dense</th><th>Default</th><th>Comfortable</th></tr></thead><tbody>{METRICS.map(([label, dense, defaultValue, comfortable]) => <tr key={label}><td>{label}</td><td>{dense}</td><td>{defaultValue}</td><td>{comfortable}</td></tr>)}</tbody></table></section>
 

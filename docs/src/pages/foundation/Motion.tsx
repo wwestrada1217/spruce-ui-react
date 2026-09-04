@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { FoundationPageShell } from '../../components/FoundationPageShell'
+import { CodePreview } from '../../components/CodePreview'
 
 const DURATIONS = [
   { token: '--sp-duration-instant', value: '50ms', usage: 'Checkbox ticks, toggle snaps' },
@@ -30,6 +31,18 @@ const SCALES = [
   { token: '--sp-motion-scale-in', value: '0.95', usage: 'Scale entrance start (grows to 1)' },
   { token: '--sp-motion-scale-out', value: '1.05', usage: 'Scale entrance from oversized (shrinks to 1)' },
 ]
+
+const TRANSITION_CODE = `/* Hover lift pattern */
+.my-card {
+  transition:
+    transform var(--sp-duration-normal) var(--sp-ease-spring),
+    box-shadow var(--sp-duration-normal) var(--sp-ease-out);
+}
+
+.my-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--sp-shadow-lg);
+}`
 
 const PATTERNS = [
   { name: 'Fade In', className: 'sp-fade-in', demoClass: 'demo-fade', desc: 'Opacity 0 → 1' },
@@ -269,33 +282,13 @@ export function MotionPage() {
           Compose transition shorthand using duration and easing tokens for
           interactive state changes like hover, focus, and active.
         </p>
-        <div className="code-block">
-          <pre>
-            <code>{`/* Simple property transition */
-.my-button {
-  transition: background var(--sp-duration-fast) var(--sp-ease-out);
-}
-
-/* Multiple properties */
-.my-card {
-  transition:
-    transform var(--sp-duration-normal) var(--sp-ease-spring),
-    box-shadow var(--sp-duration-normal) var(--sp-ease-out),
-    opacity var(--sp-duration-fast) var(--sp-ease-out);
-}
-
-/* Hover lift pattern */
-.my-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--sp-shadow-lg);
-}`}</code>
-          </pre>
-        </div>
-        <div className="transition-demo">
-          <div className="transition-card transition-card--hover">Hover me (lift)</div>
-          <div className="transition-card transition-card--press">Press me (press)</div>
-          <div className="transition-card transition-card--glow">Hover me (glow)</div>
-        </div>
+        <CodePreview code={TRANSITION_CODE} language="css">
+          <div className="transition-demo">
+            <div className="transition-card transition-card--hover">Hover me (lift)</div>
+            <div className="transition-card transition-card--press">Press me (press)</div>
+            <div className="transition-card transition-card--glow">Hover me (glow)</div>
+          </div>
+        </CodePreview>
       </section>
 
       <section id="accessibility" className="doc-section">
