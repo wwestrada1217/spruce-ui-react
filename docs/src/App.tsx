@@ -206,6 +206,9 @@ function useHash(): string {
   const [hash, setHash] = useState(() => window.location.hash || '#/')
 
   useEffect(() => {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual'
+    }
     if (!window.location.hash) {
       window.location.hash = '#/'
     }
@@ -450,14 +453,47 @@ function renderPage(hash: string): React.ReactElement {
 export default function App() {
   const hash = useHash()
   const [mobileOpen, setMobileOpen] = useState(false)
+<<<<<<< HEAD
   const [showBackToTop, setShowBackToTop] = useState(false)
   const mainRef = useRef<HTMLElement>(null)
   const docs = useDocsI18n()
+=======
+  const [prevHash, setPrevHash] = useState(hash)
+  const mainRef = useRef<HTMLElement>(null)
+>>>>>>> 62532470c0daffc6839a483d0d360c9d0a1dd846
 
-  // Close mobile sidebar on navigation
+  // Close mobile sidebar on route navigation
+  if (prevHash !== hash) {
+    setPrevHash(hash)
+    if (mobileOpen) {
+      setMobileOpen(false)
+    }
+  }
+
+  // When changing route/page, always scroll up to the top
   useEffect(() => {
+<<<<<<< HEAD
     const frame = window.requestAnimationFrame(() => setMobileOpen(false))
     return () => window.cancelAnimationFrame(frame)
+=======
+    if (mainRef.current) {
+      mainRef.current.scrollTop = 0
+    }
+    window.scrollTo(0, 0)
+    document.documentElement.scrollTop = 0
+    document.body.scrollTop = 0
+
+    const frameId = requestAnimationFrame(() => {
+      if (mainRef.current) {
+        mainRef.current.scrollTop = 0
+      }
+      window.scrollTo(0, 0)
+      document.documentElement.scrollTop = 0
+      document.body.scrollTop = 0
+    })
+
+    return () => cancelAnimationFrame(frameId)
+>>>>>>> 62532470c0daffc6839a483d0d360c9d0a1dd846
   }, [hash])
 
   useEffect(() => {
@@ -486,7 +522,11 @@ export default function App() {
         <DocsSidebar activeHash={getRouteHash(hash)} />
       </div>
 
+<<<<<<< HEAD
       <main ref={mainRef} className="docs-main" id="main-content" tabIndex={-1}>
+=======
+      <main className="docs-main" id="main-content" ref={mainRef}>
+>>>>>>> 62532470c0daffc6839a483d0d360c9d0a1dd846
         {/* Mobile menu toggle */}
         <button
           className="docs-mobile-menu-btn"
