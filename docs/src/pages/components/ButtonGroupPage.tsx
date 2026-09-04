@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { ButtonGroup } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
+import { DocsPackageBadge } from '../../components/DocsPackageBadge'
 
 const BASIC_CODE = `<ButtonGroup
   items={[
@@ -20,6 +21,15 @@ const TOGGLE_CODE = `<ButtonGroup
   ]}
   variant="outline"
 />`
+
+const VARIANTS_CODE = `<ButtonGroup items={items} variant="primary" />
+<ButtonGroup items={items} variant="secondary" />
+<ButtonGroup items={items} variant="ghost" />`
+
+const ICONS_CODE = `<ButtonGroup items={[
+  { label: 'Edit', value: 'edit', icon: 'edit' },
+  { label: 'Share', value: 'share', icon: 'share-2' },
+]} />`
 
 const MULTI_CODE = `<ButtonGroup
   toggleMode="multiple"
@@ -42,6 +52,8 @@ const items = [
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
   { id: 'basic',    label: 'Basic' },
+  { id: 'variants', label: 'Variants' },
+  { id: 'with-icons', label: 'With Icons' },
   { id: 'toggle',   label: 'Single Toggle' },
   { id: 'multi',    label: 'Multiple Toggle' },
   { id: 'vertical', label: 'Vertical' },
@@ -62,13 +74,34 @@ export function ButtonGroupPage() {
     <div className="features-layout">
       <div className="features-main" ref={mainRef}>
         <h1>Button Group</h1>
-        <p className="docs-desc">Group of connected buttons for related actions or toggle selections. Supports single and multiple toggle modes.</p>
+        <p className="docs-desc">Group of connected buttons for related actions or toggle selections. Supports variants, icons, and single or multiple toggle modes.</p>
+        <DocsPackageBadge packageName="spruce-react" symbols={['ButtonGroup']} />
 
         <section id="basic" className="demo-section" aria-labelledby="basic-heading">
           <h2 id="basic-heading">Basic</h2>
           <p className="section-desc">Connected buttons sharing border radius.</p>
           <CodePreview code={BASIC_CODE}>
             <ButtonGroup items={items} variant="outline" />
+          </CodePreview>
+        </section>
+
+        <section id="variants" className="demo-section" aria-labelledby="variants-heading">
+          <h2 id="variants-heading">Variants</h2>
+          <p className="section-desc">Use the same button variants as <code>Button</code> while keeping the group connected.</p>
+          <CodePreview code={VARIANTS_CODE} language="typescript">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'flex-start' }}>
+              <ButtonGroup items={items} variant="primary" />
+              <ButtonGroup items={items} variant="secondary" />
+              <ButtonGroup items={items} variant="ghost" />
+            </div>
+          </CodePreview>
+        </section>
+
+        <section id="with-icons" className="demo-section" aria-labelledby="with-icons-heading">
+          <h2 id="with-icons-heading">With Icons</h2>
+          <p className="section-desc">Add an icon name to an item for a compact command group.</p>
+          <CodePreview code={ICONS_CODE} language="typescript">
+            <ButtonGroup items={[{ label: 'Edit', value: 'edit', icon: 'edit' }, { label: 'Share', value: 'share', icon: 'share-2' }]} />
           </CodePreview>
         </section>
 

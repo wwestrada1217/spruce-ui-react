@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Card, CardHeader, CardMedia, CardFooter, Icon } from 'spruce-react';
 import { CodePreview } from '../../components/CodePreview';
+import { DocsPackageBadge } from '../../components/DocsPackageBadge';
 
 const BASIC_CODE = `<Card style={{ maxWidth: 320 }}>
   <h3 style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>Project Alpha</h3>
@@ -25,6 +26,14 @@ const VARIANTS_CODE = `<Card variant="default">
   <h3>Filled</h3>
   <p>Subtle background fill.</p>
 </Card>`;
+
+const ELEVATIONS_CODE = `<Card elevation="none">None</Card>
+<Card elevation="xs">Extra small</Card>
+<Card elevation="sm">Small</Card>
+<Card elevation="md">Medium</Card>
+<Card elevation="lg">Large</Card>
+<Card elevation="xl">Extra large</Card>
+<Card elevation="inner">Inner shadow</Card>`;
 
 const CHROME_CODE = `<Card
   chrome="elevated"
@@ -83,6 +92,7 @@ interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
   { id: 'basic',         label: 'Basic' },
   { id: 'variants',      label: 'Variants' },
+  { id: 'elevations',    label: 'Elevations' },
   { id: 'chrome',        label: 'Chrome & Motifs' },
   { id: 'header-footer', label: 'Header & Footer' },
   { id: 'media',         label: 'Media' },
@@ -119,8 +129,9 @@ export function CardPage() {
         <h1>Card</h1>
         <p className="docs-desc">
           A flexible container for grouping related content. Supports headers, media, footers,
-          multiple variants, and interactive hover states.
+          multiple variants, tokenized elevations, and interactive hover states.
         </p>
+        <DocsPackageBadge packageName="spruce-react" symbols={['Card', 'CardHeader', 'CardMedia', 'CardFooter']} />
 
         <section id="basic" className="demo-section" aria-labelledby="basic-heading">
           <h2 id="basic-heading">Basic</h2>
@@ -132,6 +143,26 @@ export function CardPage() {
                 A brief description of the project and its current status.
               </p>
             </Card>
+          </CodePreview>
+        </section>
+
+        <section id="elevations" className="demo-section" aria-labelledby="elevations-heading">
+          <h2 id="elevations-heading">Elevations</h2>
+          <p className="section-desc">
+            Apply tokenized depth with <code>elevation</code>. Use <code>inner</code> for recessed
+            wells and <code>md</code> or above for floating surfaces.
+          </p>
+          <CodePreview code={ELEVATIONS_CODE} language="typescript">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 16 }}>
+              {(['none', 'xs', 'sm', 'md', 'lg', 'xl', 'inner'] as const).map((elevation) => (
+                <Card key={elevation} elevation={elevation} border={elevation === 'none' || elevation === 'inner' ? 'subtle' : 'none'}>
+                  <strong>{elevation}</strong>
+                  <p style={{ margin: '4px 0 0', fontSize: 'var(--sp-text-sm)', color: 'var(--sp-text-muted)' }}>
+                    Tokenized depth
+                  </p>
+                </Card>
+              ))}
+            </div>
           </CodePreview>
         </section>
 

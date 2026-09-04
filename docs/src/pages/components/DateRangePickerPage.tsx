@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { DateRangePicker } from 'spruce-react'
 import type { DateRange, DateRangePreset } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
+import { DocsPackageBadge } from '../../components/DocsPackageBadge'
 
 const BASIC_CODE = `<DateRangePicker placeholder="Select range" onChange={(r) => console.log(r)} />`
 
@@ -17,6 +18,8 @@ const PRESETS_CODE = `const presets = [
 
 const OTHER_MONTHS_CODE = `<DateRangePicker showOtherMonths selectOtherMonths placeholder="Adjacent dates selectable" />
 <DateRangePicker showOtherMonths selectOtherMonths={false} placeholder="Adjacent dates disabled" />`
+
+const MULTI_MONTH_CODE = `<DateRangePicker months={3} placeholder="Three calendar panels" />`
 
 const DISABLED_CODE = `<DateRangePicker disabled placeholder="Disabled" />`
 
@@ -40,6 +43,7 @@ const SECTIONS: Section[] = [
   { id: 'basic',      label: 'Basic' },
   { id: 'input-mode', label: 'Input Mode' },
   { id: 'presets',    label: 'With Presets' },
+  { id: 'multi-month', label: 'Multiple Months' },
   { id: 'other-months', label: 'Other Months' },
   { id: 'disabled',   label: 'Disabled' },
   { id: 'api',        label: 'API' },
@@ -74,8 +78,9 @@ export function DateRangePickerPage() {
         <h1>Date Range Picker</h1>
         <p className="docs-desc">
           Dropdown date range selection with dual calendar panels, optional presets sidebar,
-          and both button and input trigger modes.
+          configurable calendar panels, and both button and input trigger modes.
         </p>
+        <DocsPackageBadge packageName="spruce-react" symbols={['DateRangePicker', 'DateRangePreset']} />
 
         <section id="basic" className="demo-section" aria-labelledby="basic-heading">
           <h2 id="basic-heading">Basic</h2>
@@ -88,6 +93,14 @@ export function DateRangePickerPage() {
               Range: <code>{range.start || '—'}</code> to <code>{range.end || '—'}</code>
             </p>
           )}
+        </section>
+
+        <section id="multi-month" className="demo-section" aria-labelledby="multi-month-heading">
+          <h2 id="multi-month-heading">Multiple Months</h2>
+          <p className="section-desc">Set <code>months</code> when a longer range benefits from more calendar context.</p>
+          <CodePreview code={MULTI_MONTH_CODE} language="typescript">
+            <DateRangePicker months={3} placeholder="Three calendar panels" />
+          </CodePreview>
         </section>
 
         <section id="input-mode" className="demo-section" aria-labelledby="input-mode-heading">

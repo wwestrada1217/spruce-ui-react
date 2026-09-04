@@ -1,8 +1,17 @@
 import { useState, useEffect, useRef } from 'react'
-import { AppHeader, SidebarProvider, Sidebar, SidebarContent, SidebarItem } from 'spruce-react'
+import { AppHeader, Breadcrumbs, BreadcrumbItem, Button, Input, SidebarProvider, Sidebar, SidebarContent, SidebarItem } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
+import { DocsPackageBadge } from '../../components/DocsPackageBadge'
 
 const BASIC_CODE = `<AppHeader title="My App" subtitle="Dashboard" />`
+
+const BREADCRUMBS_CODE = `<AppHeader showToggle={false}>
+  <Breadcrumbs>
+    <BreadcrumbItem href="/">Home</BreadcrumbItem>
+    <BreadcrumbItem href="/settings">Settings</BreadcrumbItem>
+    <BreadcrumbItem active>Profile</BreadcrumbItem>
+  </Breadcrumbs>
+</AppHeader>`
 
 const VARIANTS_CODE = `<AppHeader title="Default" variant="default" />
 <AppHeader title="Filled" variant="filled" />
@@ -15,11 +24,31 @@ const ACTIONS_CODE = `<AppHeader
   subtitle="Dashboard"
   actions={
     <div style={{ display: 'flex', gap: 8 }}>
-      <button>Settings</button>
-      <button>Profile</button>
+      <Button variant="ghost">Settings</Button>
+      <Button variant="ghost">Profile</Button>
     </div>
   }
 />`
+
+const SEARCH_CODE = `<AppHeader showToggle={false}>
+  <Breadcrumbs>
+    <BreadcrumbItem href="/">Home</BreadcrumbItem>
+    <BreadcrumbItem active>Products</BreadcrumbItem>
+  </Breadcrumbs>
+  <div style={{ display: 'flex', gap: 8 }}>
+    <Input placeholder="Search…" iconLeft="search" clearable />
+    <Button iconOnly iconLeft="bell" variant="ghost" aria-label="Notifications" />
+  </div>
+</AppHeader>`
+
+const NON_STICKY_CODE = `<AppHeader sticky={false} showToggle={false}>
+  <Breadcrumbs>
+    <BreadcrumbItem href="/">Home</BreadcrumbItem>
+    <BreadcrumbItem active>Reports</BreadcrumbItem>
+  </Breadcrumbs>
+</AppHeader>`
+
+const HEIGHT_CODE = `<AppHeader height={56} showToggle={false} title="Compact header" />`
 
 const SIDEBAR_TOGGLE_CODE = `function ShellHeader() {
   return <AppHeader>Dashboard</AppHeader>
@@ -33,10 +62,14 @@ const SIDEBAR_TOGGLE_CODE = `function ShellHeader() {
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
   { id: 'basic',    label: 'Basic Usage' },
+  { id: 'breadcrumbs', label: 'With Breadcrumbs' },
+  { id: 'actions',  label: 'With Actions' },
+  { id: 'search', label: 'With Search' },
+  { id: 'sidebar-toggle', label: 'Sidebar Toggle' },
+  { id: 'non-sticky', label: 'Non-sticky' },
+  { id: 'height', label: 'Height' },
   { id: 'variants', label: 'Variants' },
   { id: 'sticky',   label: 'Sticky' },
-  { id: 'actions',  label: 'With Actions' },
-  { id: 'sidebar-toggle', label: 'Sidebar Toggle' },
   { id: 'api',      label: 'API Reference' },
 ]
 
@@ -68,8 +101,10 @@ export function AppHeaderPage() {
         <h1>App Header</h1>
         <p className="docs-desc">
           A top-level application header with logo, title, subtitle, and action slots.
-          Supports multiple visual variants and sticky positioning.
+          Supports breadcrumbs, search and actions, multiple visual variants, configurable height,
+          and sticky positioning.
         </p>
+        <DocsPackageBadge packageName="spruce-react" symbols={['AppHeader', 'Breadcrumbs', 'BreadcrumbItem']} />
 
         <section id="basic" className="demo-section" aria-labelledby="basic-heading">
           <h2 id="basic-heading">Basic Usage</h2>
@@ -79,6 +114,40 @@ export function AppHeaderPage() {
           <CodePreview code={BASIC_CODE}>
             <div style={{ width: '100%' }}>
               <AppHeader title="My App" subtitle="Dashboard" />
+            </div>
+          </CodePreview>
+        </section>
+
+        <section id="breadcrumbs" className="demo-section" aria-labelledby="breadcrumbs-heading">
+          <h2 id="breadcrumbs-heading">With Breadcrumbs</h2>
+          <p className="section-desc">Place <code>Breadcrumbs</code> in the header start slot to show the current page location.</p>
+          <CodePreview code={BREADCRUMBS_CODE} language="typescript">
+            <div style={{ width: '100%' }}>
+              <AppHeader showToggle={false}>
+                <Breadcrumbs>
+                  <BreadcrumbItem href="#/">Home</BreadcrumbItem>
+                  <BreadcrumbItem href="#/settings">Settings</BreadcrumbItem>
+                  <BreadcrumbItem active>Profile</BreadcrumbItem>
+                </Breadcrumbs>
+              </AppHeader>
+            </div>
+          </CodePreview>
+        </section>
+
+        <section id="search" className="demo-section" aria-labelledby="search-heading">
+          <h2 id="search-heading">With Search</h2>
+          <p className="section-desc">Use the <code>actions</code> slot for global search and utility actions.</p>
+          <CodePreview code={SEARCH_CODE} language="typescript">
+            <div style={{ width: '100%' }}>
+              <AppHeader showToggle={false} actions={<div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Input placeholder="Search…" iconLeft="search" clearable />
+                <Button iconOnly iconLeft="bell" variant="ghost" aria-label="Notifications" />
+              </div>}>
+                <Breadcrumbs>
+                  <BreadcrumbItem href="#/">Home</BreadcrumbItem>
+                  <BreadcrumbItem active>Products</BreadcrumbItem>
+                </Breadcrumbs>
+              </AppHeader>
             </div>
           </CodePreview>
         </section>
@@ -134,11 +203,36 @@ export function AppHeaderPage() {
                 subtitle="Dashboard"
                 actions={
                   <div style={{ display: 'flex', gap: 8 }}>
-                    <button>Settings</button>
-                    <button>Profile</button>
+                      <Button variant="ghost">Settings</Button>
+                      <Button variant="ghost">Profile</Button>
                   </div>
                 }
               />
+            </div>
+          </CodePreview>
+        </section>
+
+        <section id="non-sticky" className="demo-section" aria-labelledby="non-sticky-heading">
+          <h2 id="non-sticky-heading">Non-sticky</h2>
+          <p className="section-desc">Set <code>sticky={false}</code> when the header should scroll with the page.</p>
+          <CodePreview code={NON_STICKY_CODE} language="typescript">
+            <div style={{ width: '100%' }}>
+              <AppHeader sticky={false} showToggle={false}>
+                <Breadcrumbs>
+                  <BreadcrumbItem href="#/">Home</BreadcrumbItem>
+                  <BreadcrumbItem active>Reports</BreadcrumbItem>
+                </Breadcrumbs>
+              </AppHeader>
+            </div>
+          </CodePreview>
+        </section>
+
+        <section id="height" className="demo-section" aria-labelledby="height-heading">
+          <h2 id="height-heading">Height</h2>
+          <p className="section-desc">Set <code>height</code> with pixels or any CSS length when the standard shell height does not fit.</p>
+          <CodePreview code={HEIGHT_CODE} language="typescript">
+            <div style={{ width: '100%' }}>
+              <AppHeader height={56} showToggle={false} title="Compact header" />
             </div>
           </CodePreview>
         </section>

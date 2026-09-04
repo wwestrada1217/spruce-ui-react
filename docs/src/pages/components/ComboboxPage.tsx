@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Combobox } from 'spruce-react'
 import type { ComboboxOption } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
+import { DocsPackageBadge } from '../../components/DocsPackageBadge'
 
 const countries: ComboboxOption[] = [
   { label: 'Argentina', value: 'ar' }, { label: 'Australia', value: 'au' },
@@ -24,9 +25,31 @@ const MULTIPLE_CODE = `<Combobox
   placeholder="Search countries..."
 />`
 
+const VARIANTS_CODE = `<Combobox label="Outline combobox" variant="outline" options={countries} />
+<Combobox label="Filled combobox" variant="filled" options={countries} />
+<Combobox label="Required" variant="outline" required options={countries} />`
+
+const ICONS_CODE = `<Combobox options={iconCountries} icon="globe" placeholder="Search locations..." />`
+
+const CUSTOM_ITEM_CODE = `<Combobox
+  options={countries}
+  renderOption={({ option, selected }) => (
+    <span style={{ fontWeight: selected ? 700 : 400 }}>{option.label}</span>
+  )}
+/>`
+
+const iconCountries: ComboboxOption[] = [
+  { label: 'United States', value: 'us', icon: 'globe' },
+  { label: 'United Kingdom', value: 'gb', icon: 'map-pin' },
+  { label: 'Japan', value: 'jp', icon: 'sun' },
+]
+
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
   { id: 'basic',    label: 'Basic' },
+  { id: 'variants', label: 'Floating Labels & Variants' },
+  { id: 'with-icons', label: 'With Icons' },
+  { id: 'custom-item-rendering', label: 'Custom Item Rendering' },
   { id: 'multiple', label: 'Multiple' },
   { id: 'api',      label: 'API' },
 ]
@@ -56,8 +79,10 @@ export function ComboboxPage() {
         <h1>Combobox</h1>
         <p className="docs-desc">
           Searchable dropdown with text input for filtering. Supports single and multiple selection,
-          chips, keyboard navigation, and clear button.
+          floating-label variants, icons, custom option rendering, chips, keyboard navigation, and
+          clear button.
         </p>
+        <DocsPackageBadge packageName="spruce-react" symbols={['Combobox', 'ComboboxOption']} />
 
         <section id="basic" className="demo-section" aria-labelledby="basic-heading">
           <h2 id="basic-heading">Basic</h2>
@@ -68,6 +93,40 @@ export function ComboboxPage() {
             </div>
           </CodePreview>
           {val && <p style={{ fontSize: 13, color: 'var(--sp-text-subtle)', marginTop: 8 }}>Selected: <code>{String(val)}</code></p>}
+        </section>
+
+        <section id="variants" className="demo-section" aria-labelledby="variants-heading">
+          <h2 id="variants-heading">Floating Labels &amp; Variants</h2>
+          <p className="section-desc">Use <code>outline</code> or <code>filled</code> with <code>label</code> for floating-label search fields.</p>
+          <CodePreview code={VARIANTS_CODE} language="typescript">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
+              <Combobox label="Outline combobox" variant="outline" options={countries} placeholder="Search countries..." />
+              <Combobox label="Filled combobox" variant="filled" options={countries} placeholder="Search countries..." />
+              <Combobox label="Required" variant="outline" required options={countries} value="us" />
+            </div>
+          </CodePreview>
+        </section>
+
+        <section id="with-icons" className="demo-section" aria-labelledby="with-icons-heading">
+          <h2 id="with-icons-heading">With Icons</h2>
+          <p className="section-desc">Use <code>icon</code> for a contextual leading icon, and add icon values to individual options.</p>
+          <CodePreview code={ICONS_CODE} language="typescript">
+            <div style={{ maxWidth: 320 }}>
+              <Combobox options={iconCountries} icon="globe" placeholder="Search locations..." />
+            </div>
+          </CodePreview>
+        </section>
+
+        <section id="custom-item-rendering" className="demo-section" aria-labelledby="custom-item-rendering-heading">
+          <h2 id="custom-item-rendering-heading">Custom Item Rendering</h2>
+          <p className="section-desc">Use <code>renderOption</code> for custom option rows without losing filtering, keyboard navigation, or ARIA behavior.</p>
+          <CodePreview code={CUSTOM_ITEM_CODE} language="typescript">
+            <div style={{ maxWidth: 320 }}>
+              <Combobox options={countries} placeholder="Choose a country" renderOption={({ option, selected }) => (
+                <span style={{ fontWeight: selected ? 700 : 400 }}>{option.label}</span>
+              )} />
+            </div>
+          </CodePreview>
         </section>
 
         <section id="multiple" className="demo-section" aria-labelledby="multiple-heading">

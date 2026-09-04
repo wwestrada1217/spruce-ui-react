@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { DatePicker } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
+import { DocsPackageBadge } from '../../components/DocsPackageBadge'
 
 const BASIC_CODE = `<DatePicker placeholder="Pick a date" onChange={(d) => console.log(d)} />`
 const INPUT_CODE = `<DatePicker inputMode placeholder="MM/DD/YYYY" />`
@@ -11,6 +12,11 @@ const SIZES_INPUT_CODE = `<DatePicker inputMode size="sm" placeholder="Small" />
 <DatePicker inputMode size="md" placeholder="Medium" />
 <DatePicker inputMode size="lg" placeholder="Large" />`
 const WEEK_NUMBERS_CODE = `<DatePicker showWeekNumbers placeholder="With week numbers" />`
+const WEEK_NUMBERS_BACKGROUND_CODE = `<DatePicker
+  showWeekNumbers
+  weekNumberBackground
+  placeholder="Highlighted weeks"
+/>`
 const OTHER_MONTHS_CODE = `<DatePicker showOtherMonths selectOtherMonths placeholder="Adjacent dates selectable" />
 <DatePicker showOtherMonths selectOtherMonths={false} placeholder="Adjacent dates disabled" />`
 const DISABLED_CODE = `<DatePicker disabled placeholder="Disabled" />`
@@ -56,8 +62,9 @@ export function DatePickerPage() {
         <h1>Datepicker</h1>
         <p className="docs-desc">
           Calendar-based date selection with button and input modes. Supports keyboard navigation, min/max
-          date constraints, and week numbers.
+          date constraints, adjacent-month dates, and week numbers.
         </p>
+        <DocsPackageBadge packageName="spruce-react" symbols={['DatePicker']} />
 
         <section id="basic" className="demo-section" aria-labelledby="basic-heading">
           <h2 id="basic-heading">Basic</h2>
@@ -105,6 +112,10 @@ export function DatePickerPage() {
           <p className="section-desc">Display ISO week numbers in the dropdown calendar.</p>
           <CodePreview code={WEEK_NUMBERS_CODE}>
             <DatePicker showWeekNumbers placeholder="With week numbers" />
+          </CodePreview>
+          <p className="section-desc">Highlight the week-number column with <code>weekNumberBackground</code>.</p>
+          <CodePreview code={WEEK_NUMBERS_BACKGROUND_CODE} language="typescript">
+            <DatePicker showWeekNumbers weekNumberBackground placeholder="Highlighted weeks" />
           </CodePreview>
         </section>
 

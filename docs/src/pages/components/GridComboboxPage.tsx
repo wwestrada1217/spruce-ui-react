@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { GridCombobox } from 'spruce-react'
 import type { GridComboboxColumn, GridComboboxOption } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
+import { DocsPackageBadge } from '../../components/DocsPackageBadge'
 
 const columns: GridComboboxColumn[] = [
   { key: 'name', label: 'Name', width: '1fr' },
@@ -34,9 +35,35 @@ const BASIC_CODE = `<GridCombobox
   onChange={(v) => console.log(v)}
 />`
 
+const RESIZABLE_CODE = `<GridCombobox
+  columns={columns}
+  options={options}
+  resizableColumns
+  placeholder="Resize columns..."
+/>`
+
+const VIRTUAL_CODE = `<GridCombobox
+  columns={columns}
+  options={options}
+  virtualScroll
+  virtualPaging
+  placeholder="Large data set..."
+/>`
+
+const CUSTOM_ROW_CODE = `<GridCombobox
+  columns={columns}
+  options={options}
+  renderRow={({ option, selected }) => (
+    <strong>{selected ? '✓ ' : ''}{option.label}</strong>
+  )}
+/>`
+
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
   { id: 'basic', label: 'Basic' },
+  { id: 'resizable', label: 'Resizable Columns' },
+  { id: 'virtual', label: 'Virtual Scrolling & Paging' },
+  { id: 'custom-row', label: 'Custom Rows' },
   { id: 'api',   label: 'API' },
 ]
 
@@ -65,8 +92,10 @@ export function GridComboboxPage() {
         <h1>Grid Combobox</h1>
         <p className="docs-desc">
           Searchable combobox that displays options in a multi-column grid with sticky headers.
-          Ideal for selecting from structured data like database records.
+          Ideal for selecting from structured data like database records. Supports resizable
+          columns, custom rows, and virtual scrolling for larger sources.
         </p>
+        <DocsPackageBadge packageName="spruce-react" symbols={['GridCombobox', 'GridComboboxColumn', 'GridComboboxOption']} />
 
         <section id="basic" className="demo-section" aria-labelledby="basic-heading">
           <h2 id="basic-heading">Basic</h2>
@@ -86,6 +115,38 @@ export function GridComboboxPage() {
             </div>
           </CodePreview>
           {val && <p style={{ fontSize: 13, color: 'var(--sp-text-subtle)', marginTop: 8 }}>Selected: <code>{val}</code></p>}
+        </section>
+
+        <section id="resizable" className="demo-section" aria-labelledby="resizable-heading">
+          <h2 id="resizable-heading">Resizable Columns</h2>
+          <p className="section-desc">Enable <code>resizableColumns</code> to let users adjust column widths with accessible resize handles.</p>
+          <CodePreview code={RESIZABLE_CODE} language="typescript">
+            <div style={{ maxWidth: 520 }}>
+              <GridCombobox columns={columns} options={options} resizableColumns placeholder="Resize columns..." filterBy={['name', 'code', 'capital']} />
+            </div>
+          </CodePreview>
+        </section>
+
+        <section id="virtual" className="demo-section" aria-labelledby="virtual-heading">
+          <h2 id="virtual-heading">Virtual Scrolling &amp; Paging</h2>
+          <p className="section-desc">Combine <code>virtualScroll</code> and <code>virtualPaging</code> for large local or remote data sources.</p>
+          <CodePreview code={VIRTUAL_CODE} language="typescript">
+            <div style={{ maxWidth: 520 }}>
+              <GridCombobox columns={columns} options={options} virtualScroll virtualPaging placeholder="Large data set..." filterBy={['name', 'code', 'capital']} />
+            </div>
+          </CodePreview>
+        </section>
+
+        <section id="custom-row" className="demo-section" aria-labelledby="custom-row-heading">
+          <h2 id="custom-row-heading">Custom Rows</h2>
+          <p className="section-desc">Use <code>renderRow</code> to emphasize selected state or add richer row content while the grid manages interaction.</p>
+          <CodePreview code={CUSTOM_ROW_CODE} language="typescript">
+            <div style={{ maxWidth: 480 }}>
+              <GridCombobox columns={columns} options={options} placeholder="Choose a country" filterBy={['name', 'code', 'capital']} renderRow={({ option, selected }) => (
+                <strong>{selected ? '✓ ' : ''}{option.label}</strong>
+              )} />
+            </div>
+          </CodePreview>
         </section>
 
         <section id="api" className="demo-section">

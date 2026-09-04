@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { ProgressBar } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
+import { DocsPackageBadge } from '../../components/DocsPackageBadge'
 
 const BASIC_CODE = `<ProgressBar value={60} />`
 
@@ -39,7 +40,7 @@ const SECTIONS: Section[] = [
   { id: 'with-label',    label: 'With Label' },
   { id: 'striped',       label: 'Striped' },
   { id: 'indeterminate', label: 'Indeterminate' },
-  { id: 'segments',      label: 'Segments' },
+  { id: 'segmented',     label: 'Segmented' },
   { id: 'api',           label: 'API' },
 ]
 
@@ -86,6 +87,7 @@ export function ProgressBarPage() {
           Visualize task completion or loading status with variants, sizes, labels, stripes, and
           indeterminate mode.
         </p>
+        <DocsPackageBadge packageName="spruce-react" symbols={['ProgressBar']} />
 
         <section id="basic" className="demo-section" aria-labelledby="basic-heading">
           <h2 id="basic-heading">Basic</h2>
@@ -174,8 +176,8 @@ export function ProgressBarPage() {
           </CodePreview>
         </section>
 
-        <section id="segments" className="demo-section" aria-labelledby="segments-heading">
-          <h2 id="segments-heading">Segments</h2>
+        <section id="segmented" className="demo-section" aria-labelledby="segmented-heading">
+          <h2 id="segmented-heading">Segmented</h2>
           <p className="section-desc">Render proportional segments with bar, tick, or pill shapes and a tokenized gap.</p>
           <CodePreview code={SEGMENTS_CODE}>
             <div style={progressWrap}>

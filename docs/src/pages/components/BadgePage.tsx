@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Badge } from 'spruce-react';
 import { CodePreview } from '../../components/CodePreview';
+import { DocsPackageBadge } from '../../components/DocsPackageBadge';
 
 const VARIANTS_CODE = `<Badge>Default</Badge>
 <Badge variant="primary">Primary</Badge>
@@ -22,17 +23,32 @@ const SIZES_CODE = `<Badge variant="primary" size="sm">Small</Badge>
 <Badge variant="primary" size="md">Medium</Badge>
 <Badge variant="primary" size="lg">Large</Badge>`;
 
+const CLICKABLE_CODE = `<Badge clickable pill variant="primary" onBadgeClick={handleFilter}>
+  Filter active
+</Badge>`;
+
+const BORDERLESS_CODE = `<Badge borderless variant="primary">Primary</Badge>
+<Badge borderless dot variant="success">Online</Badge>`;
+
+const ICON_CODE = `<Badge icon="shield" variant="primary">Verified</Badge>
+<Badge icon="check-circle" variant="success">Completed</Badge>
+<Badge icon="clock" variant="info">In progress</Badge>`;
+
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
   { id: 'variants', label: 'Variants' },
   { id: 'pill',     label: 'Pill' },
   { id: 'dot',      label: 'With Dot' },
   { id: 'sizes',    label: 'Sizes' },
+  { id: 'clickable', label: 'Clickable' },
+  { id: 'borderless', label: 'Borderless' },
+  { id: 'with-icon', label: 'With Icon' },
   { id: 'api',      label: 'API' },
 ];
 
 export function BadgePage() {
   const [activeSection, setActiveSection] = useState('variants');
+  const [badgeClicks, setBadgeClicks] = useState(0);
   const mainRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -59,8 +75,9 @@ export function BadgePage() {
         <h1>Badge</h1>
         <p className="docs-desc">
           Small status indicators, counts, or labels. Available as square or pill, with an optional
-          dot indicator.
+          dot indicator and an interactive mode for filter chips or compact actions.
         </p>
+        <DocsPackageBadge packageName="spruce-react" symbols={['Badge']} />
 
         <section id="variants" className="demo-section" aria-labelledby="variants-heading">
           <h2 id="variants-heading">Variants</h2>
@@ -117,6 +134,54 @@ export function BadgePage() {
               <Badge variant="primary" size="sm">Small</Badge>
               <Badge variant="primary" size="md">Medium</Badge>
               <Badge variant="primary" size="lg">Large</Badge>
+            </div>
+          </CodePreview>
+        </section>
+
+        <section id="clickable" className="demo-section" aria-labelledby="clickable-heading">
+          <h2 id="clickable-heading">Clickable</h2>
+          <p className="section-desc">
+            Enable <code>clickable</code> when a badge performs a compact action. It renders as a
+            native button with keyboard support.
+          </p>
+          <CodePreview code={CLICKABLE_CODE} language="typescript">
+            <div className="demo-row">
+              <Badge clickable pill variant="primary" onBadgeClick={() => setBadgeClicks((count) => count + 1)}>
+                Filter active
+              </Badge>
+              <Badge clickable dot variant="info" onBadgeClick={() => setBadgeClicks((count) => count + 1)}>
+                {badgeClicks} clicks
+              </Badge>
+            </div>
+          </CodePreview>
+        </section>
+
+        <section id="borderless" className="demo-section" aria-labelledby="borderless-heading">
+          <h2 id="borderless-heading">Borderless</h2>
+          <p className="section-desc">
+            Remove the perimeter border while keeping the tinted background and text treatment.
+          </p>
+          <CodePreview code={BORDERLESS_CODE}>
+            <div className="demo-row">
+              <Badge borderless>Default</Badge>
+              <Badge borderless variant="primary">Primary</Badge>
+              <Badge borderless variant="success">Success</Badge>
+              <Badge borderless dot variant="success">Online</Badge>
+            </div>
+          </CodePreview>
+        </section>
+
+        <section id="with-icon" className="demo-section" aria-labelledby="with-icon-heading">
+          <h2 id="with-icon-heading">With Icon</h2>
+          <p className="section-desc">
+            Use <code>icon</code>, <code>iconLeft</code>, or <code>iconRight</code> for compact
+            visual context. Icon sizes scale with the badge size.
+          </p>
+          <CodePreview code={ICON_CODE}>
+            <div className="demo-row">
+              <Badge icon="shield" variant="primary">Verified</Badge>
+              <Badge icon="check-circle" variant="success">Completed</Badge>
+              <Badge icon="clock" variant="info">In progress</Badge>
             </div>
           </CodePreview>
         </section>

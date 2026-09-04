@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { MaskedInput } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
+import { DocsPackageBadge } from '../../components/DocsPackageBadge'
 
 const PHONE_CODE = `<MaskedInput mask="(999) 999-9999" placeholder="Phone number" />`
 
@@ -16,6 +17,9 @@ const CUSTOM_CODE = `{/* Only digits */}
 
 {/* Alphanumeric */}
 <MaskedInput mask="***-***" placeholder="License key" />`
+
+const VARIANTS_CODE = `<MaskedInput label="Outline phone" variant="outline" mask="(999) 999-9999" />
+<MaskedInput label="Filled phone" variant="filled" mask="(999) 999-9999" />`
 
 const SIZES_CODE = `<MaskedInput mask="(999) 999-9999" size="sm" />
 <MaskedInput mask="(999) 999-9999" size="md" />
@@ -38,6 +42,7 @@ const SECTIONS: Section[] = [
   { id: 'date',        label: 'Date' },
   { id: 'credit-card', label: 'Credit Card' },
   { id: 'custom',      label: 'Custom Patterns' },
+  { id: 'variants',    label: 'Floating Labels & Variants' },
   { id: 'sizes',       label: 'Sizes' },
   { id: 'states',      label: 'States' },
   { id: 'raw',         label: 'Raw vs Formatted' },
@@ -81,8 +86,9 @@ export function MaskedInputPage() {
         <p className="docs-desc">
           Text input with an automatic formatting mask. Literal separators are inserted automatically
           as you type. Mask characters: <code>9</code> = digit, <code>a</code> = letter,
-          <code>*</code> = alphanumeric.
+          <code>*</code> = alphanumeric. Supports floating-label visual variants.
         </p>
+        <DocsPackageBadge packageName="spruce-react" symbols={['MaskedInput']} />
 
         <section id="phone" className="demo-section" aria-labelledby="phone-heading">
           <h2 id="phone-heading">Phone Number</h2>
@@ -90,6 +96,17 @@ export function MaskedInputPage() {
           <CodePreview code={PHONE_CODE}>
             <div style={{ maxWidth: 320 }}>
               <MaskedInput mask="(999) 999-9999" placeholder="Phone number" clearable />
+            </div>
+          </CodePreview>
+        </section>
+
+        <section id="variants" className="demo-section" aria-labelledby="variants-heading">
+          <h2 id="variants-heading">Floating Labels &amp; Variants</h2>
+          <p className="section-desc">Use <code>outline</code> or <code>filled</code> with a label for floating-label masked fields.</p>
+          <CodePreview code={VARIANTS_CODE} language="typescript">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
+              <MaskedInput label="Outline phone" variant="outline" mask="(999) 999-9999" />
+              <MaskedInput label="Filled phone" variant="filled" mask="(999) 999-9999" />
             </div>
           </CodePreview>
         </section>

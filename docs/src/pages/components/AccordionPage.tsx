@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { Accordion, AccordionItem } from 'spruce-react';
+import { Accordion, AccordionItem, Badge, Button } from 'spruce-react';
 import { CodePreview } from '../../components/CodePreview';
+import { DocsPackageBadge } from '../../components/DocsPackageBadge';
 
 const BASIC_CODE = `<Accordion>
   <AccordionItem header="What is Spruce?">
@@ -30,6 +31,24 @@ const MULTIPLE_CODE = `<Accordion multiple>
   </AccordionItem>
 </Accordion>`;
 
+const VARIANTS_CODE = `<Accordion variant="contained">...</Accordion>
+<Accordion variant="separated" size="lg">...</Accordion>
+<Accordion variant="flush" indicator="plus">...</Accordion>`;
+
+const RICH_HEADERS_CODE = `<Accordion multiple>
+  <AccordionItem
+    header={<><span>Pending invitations</span> <Badge size="sm" variant="warning">3</Badge></>}
+    actions={<Button size="sm" variant="ghost">Resend</Button>}
+  >Invitations expire after seven days.</AccordionItem>
+</Accordion>`;
+
+const CONTROLLED_CODE = `const [open, setOpen] = useState(['a'])
+<Accordion multiple value={open} onValueChange={setOpen}>...</Accordion>`;
+
+const LAZY_CODE = `<Accordion multiple lazy>
+  <AccordionItem header="Usage report">Built after first open.</AccordionItem>
+</Accordion>`;
+
 const DISABLED_CODE = `<Accordion>
   <AccordionItem header="Available">Active panel.</AccordionItem>
   <AccordionItem header="Locked" disabled>This panel is disabled.</AccordionItem>
@@ -43,7 +62,12 @@ const STANDALONE_CODE = `<AccordionItem header="Standalone item">
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
   { id: 'basic',      label: 'Basic usage' },
+  { id: 'variants',   label: 'Variants & sizes' },
+  { id: 'indicators', label: 'Indicators' },
   { id: 'multiple',   label: 'Multiple open' },
+  { id: 'rich-headers', label: 'Rich headers' },
+  { id: 'controlled', label: 'Controlled state' },
+  { id: 'lazy',       label: 'Deferred panels' },
   { id: 'disabled',   label: 'Disabled item' },
   { id: 'standalone', label: 'Standalone' },
   { id: 'api',        label: 'API' },
@@ -51,6 +75,7 @@ const SECTIONS: Section[] = [
 
 export function AccordionPage() {
   const [activeSection, setActiveSection] = useState('basic');
+  const [open, setOpen] = useState<string[]>(['a']);
   const mainRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -76,8 +101,10 @@ export function AccordionPage() {
         <h1>Accordion</h1>
         <p className="docs-desc">
           Collapsible content panels with accessible keyboard navigation and ARIA attributes.
-          Supports single-open (default) and multi-open modes.
+          Supports variants, configurable indicators, single-open (default) and multi-open modes,
+          controlled state, and deferred panels.
         </p>
+        <DocsPackageBadge packageName="spruce-react" symbols={['Accordion', 'AccordionItem']} />
 
         <section id="basic" className="demo-section" aria-labelledby="basic-heading">
           <h2 id="basic-heading">Basic usage</h2>
@@ -105,6 +132,35 @@ export function AccordionPage() {
           </CodePreview>
         </section>
 
+        <section id="variants" className="demo-section" aria-labelledby="variants-heading">
+          <h2 id="variants-heading">Variants &amp; Sizes</h2>
+          <p className="section-desc">
+            <code>contained</code> frames the group, <code>separated</code> gives each item its own
+            surface, and <code>flush</code> removes outer chrome. <code>size</code> adjusts density.
+          </p>
+          <CodePreview code={VARIANTS_CODE} language="typescript">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <Accordion variant="contained"><AccordionItem header="Contained" defaultOpen>One framed surface.</AccordionItem><AccordionItem header="Second item">Hairline dividers.</AccordionItem></Accordion>
+              <Accordion variant="separated" size="lg"><AccordionItem header="Separated" defaultOpen>Each item is its own card.</AccordionItem><AccordionItem header="Second item">Cards are spaced apart.</AccordionItem></Accordion>
+              <Accordion variant="flush" size="sm"><AccordionItem header="Flush" defaultOpen>No outer border or background.</AccordionItem><AccordionItem header="Second item">Only a hairline rule remains.</AccordionItem></Accordion>
+            </div>
+          </CodePreview>
+        </section>
+
+        <section id="indicators" className="demo-section" aria-labelledby="indicators-heading">
+          <h2 id="indicators-heading">Indicators</h2>
+          <p className="section-desc">
+            Choose <code>chevron</code>, <code>plus</code>, or <code>none</code>, and place the
+            indicator at the start or end of the row.
+          </p>
+          <CodePreview code={`<Accordion indicator="plus" indicatorPosition="start">...</Accordion>`} language="typescript">
+            <Accordion indicator="plus" indicatorPosition="start">
+              <AccordionItem header="Leading plus" defaultOpen>The indicator leads the title.</AccordionItem>
+              <AccordionItem header="Second item">Closed items show a plus.</AccordionItem>
+            </Accordion>
+          </CodePreview>
+        </section>
+
         <section id="multiple" className="demo-section" aria-labelledby="multiple-heading">
           <h2 id="multiple-heading">Multiple open</h2>
           <p className="section-desc">
@@ -119,6 +175,55 @@ export function AccordionPage() {
                 <AccordionItem header="Section C">Content for section C.</AccordionItem>
               </Accordion>
             </div>
+          </CodePreview>
+        </section>
+
+        <section id="rich-headers" className="demo-section" aria-labelledby="rich-headers-heading">
+          <h2 id="rich-headers-heading">Rich Headers &amp; Row Actions</h2>
+          <p className="section-desc">
+            Headers accept React content and <code>actions</code> keeps a command outside the
+            disclosure trigger.
+          </p>
+          <CodePreview code={RICH_HEADERS_CODE} language="typescript">
+            <Accordion multiple>
+              <AccordionItem
+                header={<span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>Pending invitations <Badge size="sm" variant="warning">3</Badge></span>}
+                actions={<Button size="sm" variant="ghost" iconLeft="refresh-cw">Resend</Button>}
+              >Invitations expire after seven days. Resending issues a fresh link.</AccordionItem>
+              <AccordionItem header="Deployment keys" actions={<Button size="sm" variant="ghost" iconLeft="plus">Add key</Button>} trigger="indicator">
+                Read-only keys can be scoped to a single repository.
+              </AccordionItem>
+            </Accordion>
+          </CodePreview>
+        </section>
+
+        <section id="controlled" className="demo-section" aria-labelledby="controlled-heading">
+          <h2 id="controlled-heading">Controlled State</h2>
+          <p className="section-desc">Drive open panels from application state with <code>value</code> and <code>onValueChange</code>.</p>
+          <CodePreview code={CONTROLLED_CODE} language="typescript">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <Button size="sm" variant="outline" onClick={() => setOpen(['a', 'c'])}>Open first and last</Button>
+                <Button size="sm" variant="outline" onClick={() => setOpen([])}>Close all</Button>
+                <span style={{ fontSize: 'var(--sp-text-sm)', color: 'var(--sp-text-muted)' }}>Open: {open.length ? open.join(', ') : 'none'}</span>
+              </div>
+              <Accordion multiple value={open} onValueChange={setOpen}>
+                <AccordionItem value="a" header="Region">Primary region and failover.</AccordionItem>
+                <AccordionItem value="b" header="Networking">Peering and egress rules.</AccordionItem>
+                <AccordionItem value="c" header="Backups">Snapshot schedule and retention.</AccordionItem>
+              </Accordion>
+            </div>
+          </CodePreview>
+        </section>
+
+        <section id="lazy" className="demo-section" aria-labelledby="lazy-heading">
+          <h2 id="lazy-heading">Deferred Panels</h2>
+          <p className="section-desc"><code>lazy</code> holds panel content back until it first opens, useful for heavy charts, grids, and editors.</p>
+          <CodePreview code={LAZY_CODE} language="typescript">
+            <Accordion multiple lazy>
+              <AccordionItem header="Usage report">Built only after the first open.</AccordionItem>
+              <AccordionItem header="Audit log">Built only after the first open.</AccordionItem>
+            </Accordion>
           </CodePreview>
         </section>
 

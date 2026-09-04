@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { ToastProvider, useToast, Button } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
+import { DocsPackageBadge } from '../../components/DocsPackageBadge'
 
 const BASIC_CODE = `const toast = useToast()
 
@@ -8,6 +9,11 @@ const BASIC_CODE = `const toast = useToast()
 <Button onClick={() => toast.success('Operation successful')}>Success</Button>
 <Button onClick={() => toast.warning('Please review')}>Warning</Button>
 <Button onClick={() => toast.danger('Something went wrong')}>Danger</Button>`
+
+const VARIANTS_CODE = `toast.show({ message: 'Information', variant: 'info' })
+toast.show({ message: 'Completed', variant: 'success' })
+toast.show({ message: 'Review needed', variant: 'warning' })
+toast.show({ message: 'Failed', variant: 'danger' })`
 
 const TITLE_CODE = `toast.show({ title: 'Update Available', message: 'A new version is ready.', variant: 'info' })`
 
@@ -23,12 +29,19 @@ toast.show({ message: 'Solid success toast', variant: 'success', solid: true })`
 const STACK_CODE = `toast.setStackMode('collapsible')
 toast.show({ message: 'Hover or focus the stack to expand it', duration: 0 })`
 
+const PERSISTENT_CODE = `toast.show({ message: 'This stays until dismissed', duration: 0 })`
+const POSITIONS_CODE = `toast.setPosition('bottom-left')`
+
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
   { id: 'basic',  label: 'Basic' },
+  { id: 'variants', label: 'Variants' },
   { id: 'title',  label: 'With Title' },
   { id: 'action', label: 'With Action' },
   { id: 'solid',  label: 'Solid' },
+  { id: 'persistent', label: 'Persistent' },
+  { id: 'positions', label: 'Positions' },
+  { id: 'collapsible-stack', label: 'Collapsible Stack' },
   { id: 'stack',  label: 'Position & Stack' },
   { id: 'api',    label: 'API' },
 ]
@@ -46,6 +59,19 @@ function ToastDemos() {
             <Button variant="outline" size="sm" onClick={() => toast.success('Operation completed successfully')}>Success</Button>
             <Button variant="outline" size="sm" onClick={() => toast.warning('Please review your input')}>Warning</Button>
             <Button variant="outline" size="sm" onClick={() => toast.danger('Something went wrong')}>Danger</Button>
+          </div>
+        </CodePreview>
+      </section>
+
+      <section id="variants" className="demo-section" aria-labelledby="variants-heading">
+        <h2 id="variants-heading">Variants</h2>
+        <p className="section-desc">Use semantic variants to communicate information, success, warning, and danger.</p>
+        <CodePreview code={VARIANTS_CODE} language="typescript">
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <Button size="sm" onClick={() => toast.info('Information')}>Info</Button>
+            <Button size="sm" onClick={() => toast.success('Completed')}>Success</Button>
+            <Button size="sm" onClick={() => toast.warning('Review needed')}>Warning</Button>
+            <Button size="sm" onClick={() => toast.danger('Failed')}>Danger</Button>
           </div>
         </CodePreview>
       </section>
@@ -79,6 +105,14 @@ function ToastDemos() {
         </CodePreview>
       </section>
 
+      <section id="persistent" className="demo-section" aria-labelledby="persistent-heading">
+        <h2 id="persistent-heading">Persistent</h2>
+        <p className="section-desc">Set <code>duration={0}</code> when a toast must remain until the user dismisses it.</p>
+        <CodePreview code={PERSISTENT_CODE} language="typescript">
+          <Button size="sm" onClick={() => toast.show({ message: 'This stays until dismissed', duration: 0 })}>Show persistent toast</Button>
+        </CodePreview>
+      </section>
+
       <section id="stack" className="demo-section" aria-labelledby="stack-heading">
         <h2 id="stack-heading">Position &amp; Stack</h2>
         <p className="section-desc">Move the container at runtime or collapse a busy toast stack until it receives hover or keyboard focus.</p>
@@ -88,6 +122,30 @@ function ToastDemos() {
             <Button variant="outline" size="sm" onClick={() => toast.setPosition('top-right')}>Top right</Button>
             <Button variant="outline" size="sm" onClick={() => toast.setStackMode('collapsible')}>Collapsible stack</Button>
             <Button variant="outline" size="sm" onClick={() => toast.setStackMode('default')}>Default stack</Button>
+            <Button size="sm" onClick={() => toast.show({ message: 'Hover or focus the stack to expand it', duration: 0 })}>Add persistent toast</Button>
+          </div>
+        </CodePreview>
+      </section>
+
+      <section id="positions" className="demo-section" aria-labelledby="positions-heading">
+        <h2 id="positions-heading">Positions</h2>
+        <p className="section-desc">Change the current provider position with <code>setPosition</code>.</p>
+        <CodePreview code={POSITIONS_CODE} language="typescript">
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <Button size="sm" variant="outline" onClick={() => toast.setPosition('bottom-left')}>Bottom left</Button>
+            <Button size="sm" variant="outline" onClick={() => toast.setPosition('bottom-right')}>Bottom right</Button>
+            <Button size="sm" variant="outline" onClick={() => toast.setPosition('top-left')}>Top left</Button>
+          </div>
+        </CodePreview>
+      </section>
+
+      <section id="collapsible-stack" className="demo-section" aria-labelledby="collapsible-stack-heading">
+        <h2 id="collapsible-stack-heading">Collapsible Stack</h2>
+        <p className="section-desc">Collapse a busy stack until it receives hover or keyboard focus.</p>
+        <CodePreview code={STACK_CODE} language="typescript">
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <Button size="sm" variant="outline" onClick={() => toast.setStackMode('collapsible')}>Enable collapsing</Button>
+            <Button size="sm" variant="outline" onClick={() => toast.setStackMode('default')}>Default stack</Button>
             <Button size="sm" onClick={() => toast.show({ message: 'Hover or focus the stack to expand it', duration: 0 })}>Add persistent toast</Button>
           </div>
         </CodePreview>
@@ -114,6 +172,7 @@ export function ToastPage() {
         <div className="features-main" ref={mainRef}>
           <h1>Toast</h1>
           <p className="docs-desc">Non-blocking notification system with multiple variants, positions, actions, and auto-dismiss. Uses a context provider pattern.</p>
+          <DocsPackageBadge packageName="spruce-react" symbols={['ToastProvider', 'useToast']} />
           <ToastDemos />
 
           <section id="api" className="demo-section">

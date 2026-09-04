@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { DateTimePicker } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
+import { DocsPackageBadge } from '../../components/DocsPackageBadge'
 
 const BASIC_CODE = `<DateTimePicker placeholder="Select date & time" onChange={(v) => console.log(v)} />`
 const FORMAT_CODE = `<DateTimePicker use24Hour placeholder="24-hour format" />`
@@ -55,6 +56,7 @@ export function DateTimePickerPage() {
         <p className="docs-desc">
           Combined date and time selection in a single dropdown. Calendar grid on top, time spinners below.
         </p>
+        <DocsPackageBadge packageName="spruce-react" symbols={['DateTimePicker']} />
 
         <section id="basic" className="demo-section" aria-labelledby="basic-heading">
           <h2 id="basic-heading">Basic</h2>

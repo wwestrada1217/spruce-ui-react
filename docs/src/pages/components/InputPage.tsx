@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Input } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
+import { DocsPackageBadge } from '../../components/DocsPackageBadge'
 
 const BASIC_CODE = `<Input placeholder="Enter text..." />
 <Input placeholder="Search..." iconLeft="search" clearable />
@@ -8,6 +9,10 @@ const BASIC_CODE = `<Input placeholder="Enter text..." />
 <Input placeholder="Username" hint="3-20 characters, letters and numbers only" />
 <Input placeholder="Disabled" disabled />
 <Input type="password" placeholder="Password" iconLeft="check" />`
+
+const VARIANTS_CODE = `<Input label="Outline form field" variant="outline" placeholder="Placeholder" />
+<Input label="Filled form field" variant="filled" placeholder="Placeholder" />
+<Input label="Required outline" variant="outline" required value="Pre-filled value" />`
 
 const SIZES_CODE = `<Input size="sm" placeholder="Small" />
 <Input size="md" placeholder="Medium" />
@@ -22,6 +27,7 @@ const CLEARABLE_CODE = `<Input placeholder="Clearable input" clearable />`
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
   { id: 'basic',     label: 'Basic' },
+  { id: 'variants',  label: 'Floating Labels & Variants' },
   { id: 'sizes',     label: 'Sizes' },
   { id: 'icons',     label: 'With Icons' },
   { id: 'clearable', label: 'Clearable' },
@@ -67,8 +73,10 @@ export function InputPage() {
       <div className="features-main" ref={mainRef}>
         <h1>Input</h1>
         <p className="docs-desc">
-          A versatile text input with support for icons, clearable state, validation errors, and hints.
+          A versatile text input with support for floating labels, visual variants, icons, clearable
+          state, validation errors, and hints.
         </p>
+        <DocsPackageBadge packageName="spruce-react" symbols={['Input']} />
 
         <section id="basic" className="demo-section" aria-labelledby="basic-heading">
           <h2 id="basic-heading">Basic</h2>
@@ -101,6 +109,21 @@ export function InputPage() {
                 <label style={labelStyle}>Password</label>
                 <Input type="password" placeholder="Password" iconLeft="check" />
               </div>
+            </div>
+          </CodePreview>
+        </section>
+
+        <section id="variants" className="demo-section" aria-labelledby="variants-heading">
+          <h2 id="variants-heading">Floating Labels &amp; Variants</h2>
+          <p className="section-desc">
+            Use <code>variant="outline"</code> or <code>variant="filled"</code> with a label for
+            a floating-label field treatment.
+          </p>
+          <CodePreview code={VARIANTS_CODE} language="typescript">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
+              <Input label="Outline form field" variant="outline" placeholder="Placeholder" />
+              <Input label="Filled form field" variant="filled" placeholder="Placeholder" />
+              <Input label="Required outline" variant="outline" required defaultValue="Pre-filled value" />
             </div>
           </CodePreview>
         </section>

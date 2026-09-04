@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Select } from 'spruce-react'
 import type { SelectOption } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
+import { DocsPackageBadge } from '../../components/DocsPackageBadge'
 
 const fruits: SelectOption[] = [
   { label: 'Apple', value: 'apple' },
@@ -30,6 +31,32 @@ const MULTIPLE_CODE = `<Select
   onChange={(v) => console.log(v)}
 />`
 
+const VARIANTS_CODE = `<Select label="Outline select" variant="outline" options={fruits} />
+<Select label="Filled select" variant="filled" options={fruits} />
+<Select label="Required" variant="outline" required options={fruits} />`
+
+const ICONS_CODE = `<Select options={iconFruits} icon="globe" placeholder="Choose a region" />
+<Select options={iconFruits} placeholder="Choose a file" />`
+
+const CUSTOM_ITEM_CODE = `<Select
+  options={workspaceOptions}
+  renderOption={({ option, selected }) => (
+    <span style={{ fontWeight: selected ? 700 : 400 }}>{option.label}</span>
+  )}
+/>`
+
+const iconFruits: SelectOption[] = [
+  { label: 'Apple', value: 'apple', icon: 'circle' },
+  { label: 'Banana', value: 'banana', icon: 'sun' },
+  { label: 'Cherry', value: 'cherry', icon: 'heart' },
+]
+
+const workspaceOptions: SelectOption[] = [
+  { label: 'Design system', value: 'design', description: 'Shared UI components' },
+  { label: 'Documentation', value: 'docs', description: 'Guides and examples' },
+  { label: 'Operations', value: 'ops', description: 'Internal tools' },
+]
+
 const SIZES_CODE = `<Select options={fruits} size="sm" placeholder="Small" />
 <Select options={fruits} size="md" placeholder="Medium" />
 <Select options={fruits} size="lg" placeholder="Large" />`
@@ -48,6 +75,9 @@ const ERROR_CODE = `<Select options={fruits} error="Please select a fruit" place
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
   { id: 'basic',    label: 'Basic' },
+  { id: 'variants', label: 'Floating Labels & Variants' },
+  { id: 'with-icons', label: 'With Icons' },
+  { id: 'custom-item-rendering', label: 'Custom Item Rendering' },
   { id: 'multiple', label: 'Multiple' },
   { id: 'sizes',    label: 'Sizes' },
   { id: 'disabled', label: 'Disabled Option' },
@@ -81,8 +111,10 @@ export function SelectPage() {
         <h1>Select</h1>
         <p className="docs-desc">
           Dropdown select with single and multiple selection modes. Supports keyboard navigation,
-          disabled options, chips for multi-select, and error state.
+          floating-label variants, icons, custom option rendering, disabled options, chips for
+          multi-select, and error state.
         </p>
+        <DocsPackageBadge packageName="spruce-react" symbols={['Select', 'SelectOption']} />
 
         <section id="basic" className="demo-section" aria-labelledby="basic-heading">
           <h2 id="basic-heading">Basic</h2>
@@ -93,6 +125,41 @@ export function SelectPage() {
             </div>
           </CodePreview>
           {val && <p style={{ fontSize: 13, color: 'var(--sp-text-subtle)', marginTop: 8 }}>Selected: <code>{String(val)}</code></p>}
+        </section>
+
+        <section id="variants" className="demo-section" aria-labelledby="variants-heading">
+          <h2 id="variants-heading">Floating Labels &amp; Variants</h2>
+          <p className="section-desc">Use <code>outline</code> or <code>filled</code> with <code>label</code> for floating-label fields.</p>
+          <CodePreview code={VARIANTS_CODE} language="typescript">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+              <Select label="Outline select" variant="outline" options={fruits} placeholder="Choose fruit" />
+              <Select label="Filled select" variant="filled" options={fruits} placeholder="Choose fruit" />
+              <Select label="Required" variant="outline" required options={fruits} value="apple" />
+            </div>
+          </CodePreview>
+        </section>
+
+        <section id="with-icons" className="demo-section" aria-labelledby="with-icons-heading">
+          <h2 id="with-icons-heading">With Icons</h2>
+          <p className="section-desc">Add a leading icon to the field, or provide icons on individual options.</p>
+          <CodePreview code={ICONS_CODE} language="typescript">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 320 }}>
+              <Select options={iconFruits} icon="globe" placeholder="Choose a region" />
+              <Select options={iconFruits} placeholder="Choose a file" />
+            </div>
+          </CodePreview>
+        </section>
+
+        <section id="custom-item-rendering" className="demo-section" aria-labelledby="custom-item-rendering-heading">
+          <h2 id="custom-item-rendering-heading">Custom Item Rendering</h2>
+          <p className="section-desc">Use <code>renderOption</code> to control option content while Select keeps its keyboard and ARIA behavior.</p>
+          <CodePreview code={CUSTOM_ITEM_CODE} language="typescript">
+            <div style={{ maxWidth: 320 }}>
+              <Select options={workspaceOptions} placeholder="Choose a workspace" renderOption={({ option, selected }) => (
+                <span style={{ fontWeight: selected ? 700 : 400 }}>{option.label}{option.description ? ` — ${option.description}` : ''}</span>
+              )} />
+            </div>
+          </CodePreview>
         </section>
 
         <section id="multiple" className="demo-section" aria-labelledby="multiple-heading">

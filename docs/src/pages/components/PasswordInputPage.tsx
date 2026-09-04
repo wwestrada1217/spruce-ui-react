@@ -1,8 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
 import { PasswordInput, PasswordProgress } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
+import { DocsPackageBadge } from '../../components/DocsPackageBadge'
 
 const BASIC_CODE = `<PasswordInput placeholder="Enter password" />`
+
+const VARIANTS_CODE = `<PasswordInput label="Outline password" variant="outline" placeholder="Enter password" />
+<PasswordInput label="Filled password" variant="filled" placeholder="Enter password" />`
 
 const SIZES_CODE = `<PasswordInput size="sm" placeholder="Small" />
 <PasswordInput size="md" placeholder="Medium (default)" />
@@ -27,6 +31,7 @@ const DISABLED_CODE = `<PasswordInput placeholder="Disabled" disabled />`
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
   { id: 'basic',         label: 'Basic' },
+  { id: 'variants',      label: 'Floating Labels & Variants' },
   { id: 'sizes',         label: 'Sizes' },
   { id: 'with-progress', label: 'With Progress' },
   { id: 'with-error',    label: 'With Error' },
@@ -63,8 +68,9 @@ export function PasswordInputPage() {
         <h1>Password Input</h1>
         <p className="docs-desc">
           Password input with a visibility toggle button. Pair with <code>PasswordProgress</code> to show
-          real-time strength feedback.
+          real-time strength feedback. Supports floating-label visual variants.
         </p>
+        <DocsPackageBadge packageName="spruce-react" symbols={['PasswordInput', 'PasswordProgress']} />
 
         <section id="basic" className="demo-section" aria-labelledby="basic-heading">
           <h2 id="basic-heading">Basic</h2>
@@ -72,6 +78,17 @@ export function PasswordInputPage() {
           <CodePreview code={BASIC_CODE}>
             <div style={{ maxWidth: 360 }}>
               <PasswordInput placeholder="Enter password" />
+            </div>
+          </CodePreview>
+        </section>
+
+        <section id="variants" className="demo-section" aria-labelledby="variants-heading">
+          <h2 id="variants-heading">Floating Labels &amp; Variants</h2>
+          <p className="section-desc">Use <code>outline</code> or <code>filled</code> with a label for floating-label password fields.</p>
+          <CodePreview code={VARIANTS_CODE} language="typescript">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
+              <PasswordInput label="Outline password" variant="outline" placeholder="Enter password" />
+              <PasswordInput label="Filled password" variant="filled" placeholder="Enter password" />
             </div>
           </CodePreview>
         </section>

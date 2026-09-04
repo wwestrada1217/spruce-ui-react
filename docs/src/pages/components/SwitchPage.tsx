@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Switch } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
+import { DocsPackageBadge } from '../../components/DocsPackageBadge'
 
 const BASIC_CODE = `<Switch onChange={(checked) => console.log(checked)}>
   Enable notifications
@@ -8,9 +9,14 @@ const BASIC_CODE = `<Switch onChange={(checked) => console.log(checked)}>
 <Switch>Dark mode</Switch>
 <Switch disabled>Disabled switch</Switch>`
 
+const ICONS_CODE = `<Switch showIcon defaultChecked>With checkmark icon</Switch>
+<Switch checkedIcon="check" uncheckedIcon="x">Custom state icons</Switch>
+<Switch showIcon disabled defaultChecked>Disabled with icon</Switch>`
+
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
   { id: 'basic', label: 'Basic' },
+  { id: 'icons', label: 'Handle Icons' },
   { id: 'api',   label: 'API' },
 ]
 
@@ -42,8 +48,10 @@ export function SwitchPage() {
       <div className="features-main" ref={mainRef}>
         <h1>Switch</h1>
         <p className="docs-desc">
-          Toggle switches for boolean settings, with optional disabled state.
+          Toggle switches for boolean settings, with optional disabled state and configurable handle
+          icons.
         </p>
+        <DocsPackageBadge packageName="spruce-react" symbols={['Switch']} />
 
         <section id="basic" className="demo-section" aria-labelledby="basic-heading">
           <h2 id="basic-heading">Basic</h2>
@@ -60,6 +68,21 @@ export function SwitchPage() {
           <p style={{ marginTop: 8, fontSize: 13, color: 'var(--sp-text-subtle, #718096)' }}>
             Notifications: {notifications ? 'On' : 'Off'}
           </p>
+        </section>
+
+        <section id="icons" className="demo-section" aria-labelledby="icons-heading">
+          <h2 id="icons-heading">Handle Icons</h2>
+          <p className="section-desc">
+            Add icons to the switch thumb with <code>showIcon</code>, or customize the checked and
+            unchecked states independently.
+          </p>
+          <CodePreview code={ICONS_CODE} language="typescript">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <Switch showIcon defaultChecked>With checkmark icon</Switch>
+              <Switch checkedIcon="check" uncheckedIcon="x">Custom state icons</Switch>
+              <Switch showIcon disabled defaultChecked>Disabled with icon</Switch>
+            </div>
+          </CodePreview>
         </section>
 
         <section id="api" className="demo-section">

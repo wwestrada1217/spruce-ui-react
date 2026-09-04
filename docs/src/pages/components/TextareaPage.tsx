@@ -1,8 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
 import { Textarea } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
+import { DocsPackageBadge } from '../../components/DocsPackageBadge'
 
 const BASIC_CODE = `<Textarea placeholder="Write your message..." />`
+
+const VARIANTS_CODE = `<Textarea label="Outline message" variant="outline" placeholder="Write your message..." />
+<Textarea label="Filled message" variant="filled" placeholder="Write your message..." />`
 
 const CHAR_LIMIT_CODE = `<Textarea
   placeholder="Maximum 200 characters..."
@@ -31,6 +35,7 @@ const STATES_CODE = `<Textarea placeholder="With error" error="This field is req
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
   { id: 'basic',      label: 'Basic' },
+  { id: 'variants',   label: 'Floating Labels & Variants' },
   { id: 'char-limit', label: 'Character Limit' },
   { id: 'rows',       label: 'Custom Rows' },
   { id: 'resize',     label: 'Resize Options' },
@@ -68,6 +73,7 @@ export function TextareaPage() {
         <p className="docs-desc">
           Multi-line text input with character counting, resize control, sizes, and validation states.
         </p>
+        <DocsPackageBadge packageName="spruce-react" symbols={['Textarea']} />
 
         <section id="basic" className="demo-section" aria-labelledby="basic-heading">
           <h2 id="basic-heading">Basic</h2>
@@ -75,6 +81,17 @@ export function TextareaPage() {
           <CodePreview code={BASIC_CODE}>
             <div style={{ maxWidth: 500 }}>
               <Textarea placeholder="Write your message..." />
+            </div>
+          </CodePreview>
+        </section>
+
+        <section id="variants" className="demo-section" aria-labelledby="variants-heading">
+          <h2 id="variants-heading">Floating Labels &amp; Variants</h2>
+          <p className="section-desc">Use <code>outline</code> or <code>filled</code> with a label for floating-label text areas.</p>
+          <CodePreview code={VARIANTS_CODE} language="typescript">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
+              <Textarea label="Outline message" variant="outline" placeholder="Write your message..." />
+              <Textarea label="Filled message" variant="filled" placeholder="Write your message..." />
             </div>
           </CodePreview>
         </section>

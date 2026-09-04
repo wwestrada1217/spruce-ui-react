@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { Alert } from 'spruce-react';
+import { Alert, Button } from 'spruce-react';
 import { CodePreview } from '../../components/CodePreview';
+import { DocsPackageBadge } from '../../components/DocsPackageBadge';
 
 const VARIANTS_CODE = `<Alert variant="info">This is an informational message.</Alert>
 <Alert variant="success">Operation completed successfully.</Alert>
@@ -24,6 +25,9 @@ const DISMISSIBLE_CODE = `<Alert variant="warning" title="Session expiring" dism
   Click the X to dismiss this alert.
 </Alert>`;
 
+const TINY_CODE = `<Alert size="sm" variant="info">Saving automatically every 30 seconds.</Alert>
+<Alert size="sm" variant="success" title="Saved">Changes synced to the server.</Alert>`;
+
 const MOTIF_CODE = `<Alert variant="info" size="sm" backgroundMotif="arc-orbit">
   Compact contextual feedback with a decorative background motif.
 </Alert>
@@ -36,6 +40,7 @@ const SECTIONS: Section[] = [
   { id: 'variants',    label: 'Variants' },
   { id: 'with-title',  label: 'With Title' },
   { id: 'dismissible', label: 'Dismissible' },
+  { id: 'tiny',        label: 'Tiny' },
   { id: 'motif',       label: 'Motif & Size' },
   { id: 'api',         label: 'API' },
 ];
@@ -68,8 +73,10 @@ export function AlertPage() {
       <div className="features-main" ref={mainRef}>
         <h1>Alert</h1>
         <p className="docs-desc">
-          Contextual feedback messages for user actions. Supports 4 variants, optional title, and dismissible close button.
+          Contextual feedback messages for user actions. Supports 4 variants, optional title,
+          compact sizing, decorative motifs, and a dismissible close button.
         </p>
+        <DocsPackageBadge packageName="spruce-react" symbols={['Alert']} />
 
         <section id="variants" className="demo-section" aria-labelledby="variants-heading">
           <h2 id="variants-heading">Variants</h2>
@@ -119,21 +126,29 @@ export function AlertPage() {
                   Click the X to dismiss this alert.
                 </Alert>
               </div>
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => setKey((k) => k + 1)}
-                style={{
-                  fontSize: 12,
-                  color: 'var(--text-3)',
-                  background: 'none',
-                  border: '1px solid var(--border)',
-                  borderRadius: 4,
-                  padding: '4px 10px',
-                  cursor: 'pointer',
-                  alignSelf: 'flex-start',
-                }}
+                style={{ alignSelf: 'flex-start' }}
               >
                 Reset alerts
-              </button>
+              </Button>
+            </div>
+          </CodePreview>
+        </section>
+
+        <section id="tiny" className="demo-section" aria-labelledby="tiny-heading">
+          <h2 id="tiny-heading">Tiny</h2>
+          <p className="section-desc">
+            Use <code>size="sm"</code> in compact panels, modals, and dialogs. The parent owns the
+            gap between stacked alerts.
+          </p>
+          <CodePreview code={TINY_CODE} language="typescript">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-space-3)', width: '100%' }}>
+              <Alert size="sm" variant="info">Saving automatically every 30 seconds.</Alert>
+              <Alert size="sm" variant="success" title="Saved">Changes synced to the server.</Alert>
+              <Alert size="sm" variant="warning" dismissible onClose={() => undefined}>Unsaved changes will be lost.</Alert>
             </div>
           </CodePreview>
         </section>
