@@ -453,14 +453,10 @@ function renderPage(hash: string): React.ReactElement {
 export default function App() {
   const hash = useHash()
   const [mobileOpen, setMobileOpen] = useState(false)
-<<<<<<< HEAD
   const [showBackToTop, setShowBackToTop] = useState(false)
-  const mainRef = useRef<HTMLElement>(null)
-  const docs = useDocsI18n()
-=======
   const [prevHash, setPrevHash] = useState(hash)
   const mainRef = useRef<HTMLElement>(null)
->>>>>>> 62532470c0daffc6839a483d0d360c9d0a1dd846
+  const docs = useDocsI18n()
 
   // Close mobile sidebar on route navigation
   if (prevHash !== hash) {
@@ -472,10 +468,6 @@ export default function App() {
 
   // When changing route/page, always scroll up to the top
   useEffect(() => {
-<<<<<<< HEAD
-    const frame = window.requestAnimationFrame(() => setMobileOpen(false))
-    return () => window.cancelAnimationFrame(frame)
-=======
     if (mainRef.current) {
       mainRef.current.scrollTop = 0
     }
@@ -493,7 +485,6 @@ export default function App() {
     })
 
     return () => cancelAnimationFrame(frameId)
->>>>>>> 62532470c0daffc6839a483d0d360c9d0a1dd846
   }, [hash])
 
   useEffect(() => {
@@ -522,11 +513,7 @@ export default function App() {
         <DocsSidebar activeHash={getRouteHash(hash)} />
       </div>
 
-<<<<<<< HEAD
       <main ref={mainRef} className="docs-main" id="main-content" tabIndex={-1}>
-=======
-      <main className="docs-main" id="main-content" ref={mainRef}>
->>>>>>> 62532470c0daffc6839a483d0d360c9d0a1dd846
         {/* Mobile menu toggle */}
         <button
           className="docs-mobile-menu-btn"
