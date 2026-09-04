@@ -1,0 +1,63 @@
+.sp-icon-motion-host {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.sp-icon-motion-target {
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+.sp-icon-motion-host--active .sp-icon-motion-target:not(.sp-icon-swap-layer .sp-icon-motion-target) {
+  animation-duration: var(--sp-icon-motion-duration, 300ms);
+  animation-fill-mode: both;
+}
+.sp-icon-motion-host--active .sp-icon-motion-target { animation-name: none; }
+.sp-icon-motion-host--active.sp-icon-motion--bounce .sp-icon-motion-target { animation-name: sp-icon-bounce-kf; }
+.sp-icon-motion-host--active.sp-icon-motion--pulse .sp-icon-motion-target { animation-name: sp-icon-pulse-kf; }
+.sp-icon-motion-host--active.sp-icon-motion--wiggle .sp-icon-motion-target { animation-name: sp-icon-wiggle-kf; }
+.sp-icon-motion-host--active.sp-icon-motion--spin .sp-icon-motion-target { animation-name: sp-icon-spin-kf; }
+.sp-icon-motion-host--active.sp-icon-motion--spin-continuous .sp-icon-motion-target { animation: sp-icon-spin-kf var(--sp-icon-motion-duration, 800ms) linear infinite; }
+.sp-icon-motion-host--active.sp-icon-motion--float .sp-icon-motion-target { animation: sp-icon-float-kf var(--sp-icon-motion-duration, 800ms) ease-in-out infinite alternate; }
+.sp-icon-motion-host--active.sp-icon-motion--rotate-90 .sp-icon-motion-target { transform: rotate(90deg); transition: transform var(--sp-icon-motion-duration, 300ms) ease; }
+.sp-icon-motion-host--active.sp-icon-motion--rotate-180 .sp-icon-motion-target { transform: rotate(180deg); transition: transform var(--sp-icon-motion-duration, 300ms) ease; }
+.sp-icon-motion-host--active.sp-icon-motion--slide-right .sp-icon-motion-target { transform: translateX(4px); transition: transform var(--sp-icon-motion-duration, 250ms) ease; }
+.sp-icon-motion-host--active.sp-icon-motion--slide-left .sp-icon-motion-target { transform: translateX(-4px); transition: transform var(--sp-icon-motion-duration, 250ms) ease; }
+.sp-icon-motion-host--active.sp-icon-motion--slide-up .sp-icon-motion-target { transform: translateY(-4px); transition: transform var(--sp-icon-motion-duration, 250ms) ease; }
+.sp-icon-motion-host--active.sp-icon-motion--slide-down .sp-icon-motion-target { transform: translateY(4px); transition: transform var(--sp-icon-motion-duration, 300ms) ease; }
+.sp-icon-motion-host--active.sp-icon-motion--pop .sp-icon-motion-target { transform: scale(1.2); transition: transform var(--sp-icon-motion-duration, 200ms) ease; }
+.sp-icon-motion-host:focus-within .sp-icon-motion-target { animation-play-state: running; }
+
+@keyframes sp-icon-spin-kf { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+@keyframes sp-icon-bounce-kf { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-4px); } 60% { transform: translateY(-1px); } }
+@keyframes sp-icon-pulse-kf { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.25); } }
+@keyframes sp-icon-wiggle-kf { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-12deg); } 50% { transform: rotate(12deg); } 75% { transform: rotate(-6deg); } }
+@keyframes sp-icon-float-kf { from { transform: translateY(0); } to { transform: translateY(-3px); } }
+
+.sp-icon-swap-layer {
+  position: absolute;
+  inset: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+}
+.sp-icon-swap-layer .sp-icon { width: 100% !important; height: 100% !important; }
+.sp-icon-motion-host--swap.sp-icon-motion-host--active .sp-icon-motion-target { opacity: 0; }
+.sp-icon-motion-host--swap.sp-icon-motion-host--active .sp-icon-swap-layer { opacity: 1; }
+.sp-icon-swap-layer--flip { transform: rotateY(-90deg); }
+.sp-icon-motion-host--active .sp-icon-swap-layer--flip { transform: rotateY(0); transition: transform var(--sp-icon-motion-duration, 300ms) ease; }
+.sp-icon-swap-layer--rotate { transform: rotate(-90deg); }
+.sp-icon-motion-host--active .sp-icon-swap-layer--rotate { transform: rotate(0); transition: transform var(--sp-icon-motion-duration, 300ms) ease; }
+.sp-icon-swap-layer--slide-up { transform: translateY(100%); }
+.sp-icon-motion-host--active .sp-icon-swap-layer--slide-up { transform: translateY(0); transition: transform var(--sp-icon-motion-duration, 300ms) ease; }
+.sp-icon-swap-layer--scale { transform: scale(0.5); }
+.sp-icon-motion-host--active .sp-icon-swap-layer--scale { transform: scale(1); transition: transform var(--sp-icon-motion-duration, 300ms) ease; }
+.sp-icon-swap-layer--crossfade { transition: opacity var(--sp-icon-motion-duration, 300ms) ease; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-icon-motion-target,
+  .sp-icon-swap-layer { animation: none !important; transform: none !important; transition: none !important; }
+}

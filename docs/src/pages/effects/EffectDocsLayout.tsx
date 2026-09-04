@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { DocsPackageBadge } from '../../components/DocsPackageBadge';
 
 export interface EffectSection {
   id: string;
@@ -17,9 +18,11 @@ export interface EffectDocsLayoutProps {
   description: string;
   sections: EffectSection[];
   children: ReactNode;
+  packageName?: string;
+  packageSymbols?: readonly string[];
 }
 
-export function EffectDocsLayout({ title, description, sections, children }: EffectDocsLayoutProps) {
+export function EffectDocsLayout({ title, description, sections, children, packageName, packageSymbols }: EffectDocsLayoutProps) {
   const [activeSection, setActiveSection] = useState(sections[0]?.id ?? '');
   const mainRef = useRef<HTMLDivElement>(null);
 
@@ -46,6 +49,7 @@ export function EffectDocsLayout({ title, description, sections, children }: Eff
       <div className="features-main" ref={mainRef}>
         <h1>{title}</h1>
         <p className="docs-desc">{description}</p>
+        {packageName && <DocsPackageBadge packageName={packageName} symbols={packageSymbols} />}
         {children}
       </div>
       <nav className="features-toc" aria-label="Table of contents">

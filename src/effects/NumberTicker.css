@@ -1,0 +1,35 @@
+.sp-number-counter { font-variant-numeric: tabular-nums; }
+
+.sp-number-ticker {
+  display: inline-flex;
+  align-items: baseline;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+  line-height: 1;
+}
+
+.sp-ticker__reels {
+  display: inline-flex;
+  align-items: baseline;
+  height: 1em;
+  overflow: hidden;
+  line-height: 1em;
+}
+
+.sp-ticker__col { display: inline-block; height: 1em; overflow: hidden; vertical-align: baseline; }
+.sp-ticker__reel {
+  display: flex;
+  flex-direction: column;
+  transform: translateY(0);
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+.sp-ticker__digit,
+.sp-ticker__char { display: inline-flex; align-items: center; justify-content: center; height: 1em; line-height: 1em; }
+.sp-ticker__prefix,
+.sp-ticker__suffix { white-space: pre; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-ticker__reel { transition: none !important; }
+}

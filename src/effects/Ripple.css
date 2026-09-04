@@ -1,0 +1,38 @@
+.sp-ripple-host {
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+}
+
+.sp-ripple-host.sp-ripple--unbounded {
+  overflow: visible;
+}
+
+.sp-ripple-wave {
+  position: absolute;
+  z-index: 1;
+  border-radius: 50%;
+  pointer-events: none;
+  user-select: none;
+  transform: scale(0);
+  opacity: 0.35;
+  background-color: var(--sp-ripple-color-override, var(--sp-ripple-color, currentColor));
+  animation: sp-ripple-expand-kf cubic-bezier(0.2, 0, 0.2, 1) forwards;
+}
+
+.sp-ripple-wave--fading {
+  opacity: 0 !important;
+  transition: opacity 250ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+@keyframes sp-ripple-expand-kf {
+  to { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-ripple-wave {
+    transform: scale(1) !important;
+    animation: none !important;
+    opacity: 0.15 !important;
+  }
+}

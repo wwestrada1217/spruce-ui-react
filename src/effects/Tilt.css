@@ -1,0 +1,27 @@
+.sp-tilt-host {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.sp-tilt-glare {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  width: 200%;
+  height: 200%;
+  transform-origin: 0% 0%;
+  pointer-events: none;
+  opacity: 0;
+  border-radius: inherit;
+  transition: opacity 150ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-tilt-host {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .sp-tilt-glare { display: none !important; }
+}

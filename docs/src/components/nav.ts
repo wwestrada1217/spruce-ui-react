@@ -256,6 +256,12 @@ const RAW_NAV_SECTIONS: NavSection[] = [
       { icon: 'sparkles',        label: 'Snowflakes', route: '#/effects/snowflakes' },
       { icon: 'activity',        label: 'Thermometer', route: '#/effects/thermometer' },
       { icon: 'gamepad-directional', label: 'Wheel of Fortune', route: '#/effects/wheel-of-fortune' },
+      { icon: 'activity',          label: 'Ripple',         route: '#/effects/ripple' },
+      { icon: 'layers',            label: '3D Tilt',        route: '#/effects/tilt' },
+      { icon: 'zap',                label: 'Shake',          route: '#/effects/shake' },
+      { icon: 'sparkles',          label: 'Icon Motion',    route: '#/effects/icon-motion' },
+      { icon: 'move-horizontal',   label: 'Slide',          route: '#/effects/slide' },
+      { icon: 'bar-chart-2',       label: 'Number Ticker',  route: '#/effects/number-ticker' },
     ],
   },
   {

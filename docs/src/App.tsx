@@ -184,6 +184,12 @@ import { HourglassPage } from './pages/effects/HourglassPage'
 import { SnowflakesPage } from './pages/effects/SnowflakesPage'
 import { ThermometerPage } from './pages/effects/ThermometerPage'
 import { WheelOfFortunePage } from './pages/effects/WheelOfFortunePage'
+import { RipplePage } from './pages/effects/RipplePage'
+import { TiltPage } from './pages/effects/TiltPage'
+import { ShakePage } from './pages/effects/ShakePage'
+import { IconMotionPage } from './pages/effects/IconMotionPage'
+import { SlidePage } from './pages/effects/SlidePage'
+import { NumberTickerPage } from './pages/effects/NumberTickerPage'
 import { FocusUtilitiesPage } from './pages/utils/FocusUtilitiesPage'
 import { HighlightPage } from './pages/utils/HighlightPage'
 import { CodePreviewUtilPage } from './pages/utils/CodePreviewUtilPage'
@@ -435,6 +441,12 @@ function renderPage(hash: string): React.ReactElement {
     case '#/effects/snowflakes':           return <SnowflakesPage />
     case '#/effects/thermometer':          return <ThermometerPage />
     case '#/effects/wheel-of-fortune':     return <WheelOfFortunePage />
+    case '#/effects/ripple':                return <RipplePage />
+    case '#/effects/tilt':                  return <TiltPage />
+    case '#/effects/shake':                 return <ShakePage />
+    case '#/effects/icon-motion':           return <IconMotionPage />
+    case '#/effects/slide':                 return <SlidePage />
+    case '#/effects/number-ticker':         return <NumberTickerPage />
     // Utilities
     case '#/utils/focus-utilities':
     case '#/utils/focus-directives':       return <FocusUtilitiesPage />

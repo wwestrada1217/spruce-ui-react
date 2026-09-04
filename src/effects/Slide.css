@@ -1,0 +1,9 @@
+.sp-slide-host { will-change: transform; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-slide-host {
+    transform: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+  }
+}
