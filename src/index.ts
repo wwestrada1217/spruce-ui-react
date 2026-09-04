@@ -38,6 +38,7 @@ export { Alert } from './components/alert/Alert.js';
 export type { AlertProps, AlertVariant, AlertSize } from './components/alert/Alert.js';
 
 // ─── Decorative motifs ───────────────────────────────────────────────────────
+export { useReducedMotion } from './effects/effect-utils.js';
 export { Motif } from './components/motif/Motif.js';
 export type {
   MotifProps,

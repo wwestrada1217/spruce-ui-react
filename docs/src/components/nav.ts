@@ -3,12 +3,18 @@ export interface NavLeaf {
   route: string;
   icon?: string;
   soon?: boolean;
+  /** Short summary used by the home catalog and documentation search. */
+  description?: string;
+  /** Search aliases beyond the route and visible label. */
+  keywords?: string[];
 }
 
 export interface NavBranch {
   label: string;
   icon: string;
   children: NavLeaf[];
+  description?: string;
+  keywords?: string[];
 }
 
 export interface NavSection {
@@ -20,7 +26,24 @@ export function isNavBranch(item: NavLeaf | NavBranch): item is NavBranch {
   return 'children' in item && Array.isArray((item as NavBranch).children);
 }
 
-export const NAV_SECTIONS: NavSection[] = [
+/** Return the route portion of a hash URL, excluding a deep-link fragment. */
+export function getRouteHash(hash: string): string {
+  const fragmentStart = hash.indexOf('#', 1);
+  return fragmentStart >= 0 ? hash.slice(0, fragmentStart) : hash;
+}
+
+/** Return the section fragment from a hash URL, if one is present. */
+export function getSectionFragment(hash: string): string {
+  const fragmentStart = hash.indexOf('#', 1);
+  if (fragmentStart < 0) return '';
+  try {
+    return decodeURIComponent(hash.slice(fragmentStart + 1));
+  } catch {
+    return hash.slice(fragmentStart + 1);
+  }
+}
+
+const RAW_NAV_SECTIONS: NavSection[] = [
   {
     label: 'Foundations',
     items: [
@@ -246,6 +269,7 @@ export const NAV_SECTIONS: NavSection[] = [
       { icon: 'chevron-up',   label: 'Hide on Scroll',  route: '#/utils/hide-on-scroll'  },
       { icon: 'more-vertical',label: 'Overflow',        route: '#/utils/overflow'        },
       { icon: 'app-window',   label: 'Code Preview',    route: '#/utils/code-preview'    },
+      { icon: 'app-window',   label: 'Documentation Platform', route: '#/utils/docs-platform' },
     ],
   },
   {
@@ -259,6 +283,68 @@ export const NAV_SECTIONS: NavSection[] = [
       { icon: 'clipboard-check', label: 'Project Workspace', route: '#/blocks/project-workspace' },
       { icon: 'help-circle',     label: 'Support Desk',      route: '#/blocks/support-desk'      },
       { icon: 'mail',            label: 'Email App',         route: '#/blocks/email'              },
+      { icon: 'bar-chart',       label: 'Charts',             route: '#/blocks/charts'             },
+      { icon: 'shield',          label: 'Privacy & Cookie Consent', route: '#/blocks/cookie-consent' },
+      { icon: 'table',           label: 'Operations Grid',    route: '#/blocks/operations-grid'   },
+      { icon: 'route',           label: 'REST Client Workflow', route: '#/blocks/rest-client-workflow' },
+      { icon: 'trending-up',     label: 'Stocks App',         route: '#/blocks/stocks'             },
     ],
   },
 ];
+
+function words(value: string): string[] {
+  return value
+    .replace(/^#\//, '')
+    .split(/[\s/\-_&]+/)
+    .map((word) => word.trim().toLowerCase())
+    .filter((word) => word.length > 1);
+}
+
+function defaultDescription(item: NavLeaf): string {
+  return `${item.label} documentation, examples, and API reference.`;
+}
+
+function enrichLeaf(item: NavLeaf): NavLeaf {
+  return {
+    ...item,
+    description: item.description ?? defaultDescription(item),
+    keywords: Array.from(new Set([...words(item.label), ...words(item.route), ...(item.keywords ?? [])])),
+  };
+}
+
+/** Navigation entries with stable descriptions and search aliases. */
+export const NAV_SECTIONS: NavSection[] = RAW_NAV_SECTIONS.map((section) => ({
+  ...section,
+  items: section.items.map((entry) =>
+    isNavBranch(entry)
+      ? {
+          ...entry,
+          description: entry.description ?? `${entry.label} documentation and examples.`,
+          keywords: Array.from(new Set([...words(entry.label), ...(entry.keywords ?? [])])),
+          children: entry.children.map(enrichLeaf),
+        }
+      : enrichLeaf(entry),
+  ),
+}));
+
+/** A flattened, metadata-rich view shared by the sidebar, home catalog, and search. */
+export interface FlatNavItem {
+  section: string;
+  parentLabel?: string;
+  item: NavLeaf;
+}
+
+export function flattenNavSections(sections: readonly NavSection[] = NAV_SECTIONS): FlatNavItem[] {
+  return sections.flatMap((section) =>
+    section.items.flatMap((entry) => {
+      if (isNavBranch(entry)) {
+        return entry.children.map((child) => ({
+          section: section.label,
+          parentLabel: entry.label,
+          item: child,
+        }));
+      }
+      return [{ section: section.label, item: entry }];
+    }),
+  );
+}

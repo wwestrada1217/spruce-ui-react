@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { FocusTrap, AutoFocus, Button, Input, Card } from 'spruce-react';
 import { CodePreview } from '../../components/CodePreview';
+import { DocsPackageBadge } from '../../components/DocsPackageBadge';
 
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
@@ -72,6 +73,7 @@ export function Example() {
         <p className="docs-desc">
           Keyboard navigation and accessibility focus management helpers including Focus Trap and Auto Focus wrappers.
         </p>
+        <DocsPackageBadge packageName="spruce-react" symbols={['FocusTrap', 'AutoFocus', 'useFocusTrap']} />
 
         <section id="focustrap" className="demo-section">
           <h2>Focus Trap</h2>
@@ -113,6 +115,9 @@ export function Example() {
               </thead>
               <tbody>
                 <tr><td><code>active</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Trap tab focus inside container</td></tr>
+                <tr><td><code>autoFocus</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Move focus to the first focusable element when activated.</td></tr>
+                <tr><td><code>restoreFocus</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Restore focus to the previously active element when deactivated.</td></tr>
+                <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>required</td><td>Focusable content contained by the trap.</td></tr>
               </tbody>
             </table>
           </div>

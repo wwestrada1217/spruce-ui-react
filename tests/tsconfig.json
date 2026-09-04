@@ -3,6 +3,9 @@
   "compilerOptions": {
     "tsBuildInfoFile": "../node_modules/.tmp/tsconfig.tests.tsbuildinfo",
     "types": ["vite/client"],
+    "paths": {
+      "spruce-react": ["../src/index.ts"]
+    },
     "noEmit": true
   },
   "include": [

@@ -31,6 +31,12 @@
   margin-left: auto;
 }
 
+.cp__tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .cp__tab {
   display: inline-flex;
   align-items: center;
@@ -83,6 +89,65 @@
   padding: 24px;
   background: var(--cp-bg);
   min-height: 56px;
+}
+
+.cp__preview-shell {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+}
+
+.cp__preview-shell--with-properties {
+  grid-template-columns: minmax(0, 1fr) var(--cp-property-panel-width, 420px);
+}
+
+.cp__preview--split {
+  min-width: 0;
+  overflow: auto;
+}
+
+.cp__splitter {
+  position: absolute;
+  z-index: 2;
+  align-self: stretch;
+  width: 12px;
+  margin-inline-start: -6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: col-resize;
+}
+
+.cp__preview-shell--with-properties .cp__splitter {
+  inset-block: 0;
+  inset-inline-start: calc(100% - var(--cp-property-panel-width, 420px));
+}
+
+.cp__splitter span {
+  display: block;
+  width: 2px;
+  height: 100%;
+  margin: 0 auto;
+  background: var(--cp-border);
+}
+
+.cp__splitter:hover span,
+.cp__splitter:focus-visible span {
+  background: var(--sp-primary);
+}
+
+.cp__splitter:focus-visible {
+  outline: 2px solid var(--sp-focus-ring, #2563eb);
+  outline-offset: -2px;
+}
+
+.cp__property-panel {
+  min-width: 0;
+  max-height: 480px;
+  overflow: auto;
+  border-inline-start: 1px solid var(--cp-border);
+  background: var(--sp-surface-0, #fff);
 }
 
 .cp--compact .cp__preview {
@@ -138,4 +203,35 @@
   background: var(--sp-ce-bg, #1e1e2e);
   color: var(--sp-ce-text, #dce0f5);
   border-bottom-color: var(--sp-ce-focus-border, #89b4fa);
+}
+
+.cp__tab:focus-visible,
+.cp__copy:focus-visible,
+.cp__file-tab:focus-visible {
+  outline: 2px solid var(--sp-focus-ring, #2563eb);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cp__tab,
+  .cp__copy,
+  .cp__file-tab {
+    transition: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .cp__preview-shell--with-properties {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cp__property-panel {
+    max-height: 360px;
+    border-block-start: 1px solid var(--cp-border);
+    border-inline-start: 0;
+  }
+
+  .cp__splitter {
+    display: none;
+  }
 }

@@ -1,0 +1,61 @@
+.docs-package-badge {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  gap: var(--sp-space-1);
+  padding-inline-start: var(--sp-space-1);
+  color: var(--sp-text-subtle);
+  background: var(--sp-surface-50);
+  border-radius: var(--sp-radius-lg);
+}
+
+.docs-package-badge__name {
+  direction: ltr;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--sp-font-mono);
+  font-size: var(--sp-text-xs);
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+.docs-package-badge__copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--sp-radius-full);
+  background: transparent;
+  color: var(--sp-text-muted);
+  cursor: pointer;
+  transition: background var(--sp-duration-fast), color var(--sp-duration-fast);
+}
+
+.docs-package-badge__copy:hover {
+  background: var(--sp-surface-100);
+  color: var(--sp-text-color);
+}
+
+.docs-package-badge__copy:focus-visible {
+  outline: var(--sp-focus-ring-width) solid var(--sp-focus-ring-color, var(--sp-primary));
+  outline-offset: 1px;
+}
+
+.docs-package-badge__status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .docs-package-badge__copy { transition: none; }
+}

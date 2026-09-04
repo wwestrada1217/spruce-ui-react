@@ -2448,15 +2448,6 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
       ref={gridContainerRef}
       className={hostClasses}
       style={hostStyle}
-      role="grid"
-      aria-label={ariaLabel}
-      aria-labelledby={ariaLabelledBy}
-      aria-busy={loading || virtualPagingLoading ? true : undefined}
-      aria-rowcount={totalRowsCount}
-      aria-colcount={ariaColumnCount}
-      aria-multiselectable={effectiveSelectionMode === 'multiple' ? true : undefined}
-      onKeyDown={handleGridKeyDown}
-      tabIndex={0}
       data-testid="datagridex-host"
     >
       {/* Optional Top Toolbar */}
@@ -2688,6 +2679,15 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
           <div
             className="sp-datagridex__grid sp-datagridex-matrix"
             style={{ gridTemplateColumns }}
+            role="grid"
+            aria-label={ariaLabel}
+            aria-labelledby={ariaLabelledBy}
+            aria-busy={loading || virtualPagingLoading ? true : undefined}
+            aria-rowcount={totalRowsCount}
+            aria-colcount={ariaColumnCount}
+            aria-multiselectable={effectiveSelectionMode === 'multiple' ? true : undefined}
+            onKeyDown={handleGridKeyDown}
+            tabIndex={0}
           >
             {/* Column Group Header Row */}
             {orderedColumnGroups.length > 0 && (
@@ -2802,7 +2802,7 @@ function DatagridexInner<T extends object = Record<string, unknown>>(
                 </div>
               )}
               {effectiveSelectionMode !== 'none' && (
-                <div className="sp-datagridex__header-cell sp-datagridex__selection-cell" role="columnheader">
+                <div className="sp-datagridex__header-cell sp-datagridex__selection-cell" role="columnheader" aria-label={`${t('selectAllRowsOnPage')}`}>
                   {effectiveSelectionMode === 'multiple' && (
                     <Checkbox
                       ariaLabel={`${t('selectAllRowsOnPage')}`}

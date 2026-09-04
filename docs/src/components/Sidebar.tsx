@@ -13,6 +13,7 @@ import {
 } from 'spruce-react';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { DocsSearch } from './DocsSearch';
+import { DocsI18nPicker, useDocsI18n } from './DocsI18n';
 import { NAV_SECTIONS, isNavBranch } from './nav';
 import type { NavLeaf } from './nav';
 import { SPRUCE_VERSION } from '../version';
@@ -22,8 +23,9 @@ interface DocsSidebarProps {
 }
 
 export function DocsSidebar({ activeHash }: DocsSidebarProps) {
+  const docs = useDocsI18n();
   return (
-    <Sidebar enableRail={false} allowCollapsible={false} allowResponsive={false}>
+    <Sidebar label={docs.t('documentationNavigation')} enableRail={false} allowCollapsible={false} allowResponsive={false}>
       <SidebarHeader showBorders>
         <a className="docs-brand" href="#/" aria-label="Spruce React Design System — home">
           <Icon name="logo" size={32} aria-hidden="true" />
@@ -32,7 +34,7 @@ export function DocsSidebar({ activeHash }: DocsSidebarProps) {
               <span className="docs-brand__name">Spruce</span>
               <span className="docs-brand__badge">v{SPRUCE_VERSION}</span>
             </span>
-            <span className="docs-brand__subtitle">Design System</span>
+            <span className="docs-brand__subtitle">{docs.t('brandSubtitle')}</span>
           </div>
         </a>
       </SidebarHeader>
@@ -47,7 +49,7 @@ export function DocsSidebar({ activeHash }: DocsSidebarProps) {
           icon="home"
           active={activeHash === '#/' || activeHash === '#' || activeHash === ''}
         >
-          Home
+          {docs.t('home')}
         </SidebarItem>
 
         <SidebarItem
@@ -56,7 +58,7 @@ export function DocsSidebar({ activeHash }: DocsSidebarProps) {
           icon="clock"
           active={activeHash === '#/changelog'}
         >
-          Changelog
+          {docs.t('changelog')}
         </SidebarItem>
 
         <SidebarItem
@@ -65,7 +67,7 @@ export function DocsSidebar({ activeHash }: DocsSidebarProps) {
           icon="code"
           active={activeHash === '#/development'}
         >
-          Development
+          {docs.t('development')}
         </SidebarItem>
 
         <SidebarSeparator />
@@ -74,7 +76,7 @@ export function DocsSidebar({ activeHash }: DocsSidebarProps) {
           <div key={section.label}>
             {sectionIndex > 0 && <SidebarSeparator />}
             <SidebarGroup>
-              <SidebarGroupLabel>{section.label}</SidebarGroupLabel>
+              <SidebarGroupLabel>{docs.section(section.label)}</SidebarGroupLabel>
               {section.items.map((item) =>
                 isNavBranch(item) ? (
                   <SidebarMenuGroup
@@ -118,9 +120,11 @@ export function DocsSidebar({ activeHash }: DocsSidebarProps) {
       </SidebarContent>
 
       <SidebarFooter showBorders>
-        <ThemeSwitcher />
+        <div className="docs-sidebar-footer-controls">
+          <ThemeSwitcher />
+          <DocsI18nPicker />
+        </div>
       </SidebarFooter>
     </Sidebar>
   );
 }
-

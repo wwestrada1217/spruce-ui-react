@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { DocsSidebar } from './components/Sidebar'
 import { HomePage } from './pages/HomePage'
 import { ColorsPage } from './pages/foundation/Colors'
@@ -127,6 +127,11 @@ import { EmailBlockPage } from './pages/blocks/EmailBlockPage'
 import { FeedsBlockPage } from './pages/blocks/FeedsBlockPage'
 import { ProjectWorkspaceBlockPage } from './pages/blocks/ProjectWorkspaceBlockPage'
 import { SupportDeskBlockPage } from './pages/blocks/SupportDeskBlockPage'
+import { ChartsBlockPage } from './pages/blocks/ChartsBlockPage'
+import { CookieConsentBlockPage } from './pages/blocks/CookieConsentBlockPage'
+import { OperationsGridBlockPage } from './pages/blocks/OperationsGridBlockPage'
+import { RestClientWorkflowBlockPage } from './pages/blocks/RestClientWorkflowBlockPage'
+import { StocksBlockPage } from './pages/blocks/StocksBlockPage'
 import { BarChartPage } from './pages/charts/BarChartPage'
 import { PieChartPage } from './pages/charts/PieChartPage'
 import { LineChartPage } from './pages/charts/LineChartPage'
@@ -182,6 +187,7 @@ import { WheelOfFortunePage } from './pages/effects/WheelOfFortunePage'
 import { FocusUtilitiesPage } from './pages/utils/FocusUtilitiesPage'
 import { HighlightPage } from './pages/utils/HighlightPage'
 import { CodePreviewUtilPage } from './pages/utils/CodePreviewUtilPage'
+import { DocsPlatformPage } from './pages/utils/DocsPlatformPage'
 import { ChangelogPage } from './pages/ChangelogPage'
 import { DevelopmentPage } from './pages/DevelopmentPage'
 import { ComingSoonPage } from './pages/ComingSoonPage'
@@ -193,6 +199,8 @@ import { PdfViewerPage } from './pages/components/PdfViewerPage'
 import { TextDiffPage } from './pages/components/TextDiffPage'
 import { PlanCardsPage } from './pages/components/PlanCardsPage'
 import { FeatureGatePage } from './pages/components/FeatureGatePage'
+import { getRouteHash } from './components/nav'
+import { useDocsI18n } from './components/DocsI18n'
 
 function useHash(): string {
   const [hash, setHash] = useState(() => window.location.hash || '#/')
@@ -210,7 +218,7 @@ function useHash(): string {
 }
 
 function renderPage(hash: string): React.ReactElement {
-  switch (hash) {
+  switch (getRouteHash(hash)) {
     case '#/':
     case '#':
     case '':                            return <HomePage />
@@ -365,6 +373,11 @@ function renderPage(hash: string): React.ReactElement {
     case '#/blocks/feeds':                   return <FeedsBlockPage />
     case '#/blocks/project-workspace':       return <ProjectWorkspaceBlockPage />
     case '#/blocks/support-desk':            return <SupportDeskBlockPage />
+    case '#/blocks/charts':                  return <ChartsBlockPage />
+    case '#/blocks/cookie-consent':          return <CookieConsentBlockPage />
+    case '#/blocks/operations-grid':         return <OperationsGridBlockPage />
+    case '#/blocks/rest-client-workflow':    return <RestClientWorkflowBlockPage />
+    case '#/blocks/stocks':                  return <StocksBlockPage />
     // Charts
     case '#/charts/chart-kernel':           return <ChartKernelPage />
     case '#/charts/bar-chart':              return <BarChartPage />
@@ -424,6 +437,7 @@ function renderPage(hash: string): React.ReactElement {
     case '#/utils/focus-directives':       return <FocusUtilitiesPage />
     case '#/utils/highlight':              return <HighlightPage />
     case '#/utils/code-preview':           return <CodePreviewUtilPage />
+    case '#/utils/docs-platform':          return <DocsPlatformPage />
     // Core (data) — support both old and new routes
     case '#/data/data-source':
     case '#/core/data-source':                return <DataSourcePage />
@@ -436,11 +450,27 @@ function renderPage(hash: string): React.ReactElement {
 export default function App() {
   const hash = useHash()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [showBackToTop, setShowBackToTop] = useState(false)
+  const mainRef = useRef<HTMLElement>(null)
+  const docs = useDocsI18n()
 
   // Close mobile sidebar on navigation
   useEffect(() => {
-    setMobileOpen(false)
+    const frame = window.requestAnimationFrame(() => setMobileOpen(false))
+    return () => window.cancelAnimationFrame(frame)
   }, [hash])
+
+  useEffect(() => {
+    const main = mainRef.current
+    if (!main) return
+    const onScroll = () => setShowBackToTop(main.scrollTop > 300)
+    main.addEventListener('scroll', onScroll, { passive: true })
+    return () => main.removeEventListener('scroll', onScroll)
+  }, [])
+
+  function scrollToTop(): void {
+    mainRef.current?.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
+  }
 
   return (
     <div className="docs-layout">
@@ -452,16 +482,18 @@ export default function App() {
         />
       )}
 
-      <div className={`docs-sidebar-wrap${mobileOpen ? ' mobile-open' : ''}`}>
-        <DocsSidebar activeHash={hash} />
+      <div id="docs-sidebar-navigation" className={`docs-sidebar-wrap${mobileOpen ? ' mobile-open' : ''}`}>
+        <DocsSidebar activeHash={getRouteHash(hash)} />
       </div>
 
-      <main className="docs-main" id="main-content">
+      <main ref={mainRef} className="docs-main" id="main-content" tabIndex={-1}>
         {/* Mobile menu toggle */}
         <button
           className="docs-mobile-menu-btn"
           onClick={() => setMobileOpen((v) => !v)}
-          aria-label="Toggle navigation"
+          aria-expanded={mobileOpen}
+          aria-controls="docs-sidebar-navigation"
+          aria-label={docs.t('toggleNavigationMenu')}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="3" y1="6" x2="21" y2="6" />
@@ -473,6 +505,11 @@ export default function App() {
           {renderPage(hash)}
         </div>
       </main>
+      {showBackToTop && (
+        <button type="button" className="docs-back-to-top" onClick={scrollToTop} aria-label={docs.t('backToTop')} title={docs.t('backToTop')}>
+          ↑
+        </button>
+      )}
     </div>
   )
 }

@@ -5,11 +5,14 @@ import '../../src/tokens/tokens.css'
 import '../../src/tokens/motion-patterns.css'
 import App from './App.tsx'
 import { SpruceProvider } from 'spruce-react'
+import { DocsI18nProvider } from './components/DocsI18n'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <SpruceProvider>
-      <App />
+      <DocsI18nProvider>
+        <App />
+      </DocsI18nProvider>
     </SpruceProvider>
   </StrictMode>,
 )

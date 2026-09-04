@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Highlight, Input, Card } from 'spruce-react';
 import { CodePreview } from '../../components/CodePreview';
+import { DocsPackageBadge } from '../../components/DocsPackageBadge';
 
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
@@ -57,6 +58,7 @@ export function Example() {
         <p className="docs-desc">
           Text search query substring matching and visual text highlighting component.
         </p>
+        <DocsPackageBadge packageName="spruce-react" symbols={['Highlight']} />
 
         <section id="highlight" className="demo-section">
           <h2>Interactive Search Highlight</h2>
@@ -85,6 +87,8 @@ export function Example() {
               <tbody>
                 <tr><td><code>text</code></td><td><code>string</code></td><td><code>''</code></td><td>Full body text content</td></tr>
                 <tr><td><code>query</code></td><td><code>string</code></td><td><code>''</code></td><td>Substring query to highlight</td></tr>
+                <tr><td><code>highlightStyle</code></td><td><code>React.CSSProperties</code></td><td>yellow mark style</td><td>Inline styles applied to matched <code>&lt;mark&gt;</code> elements.</td></tr>
+                <tr><td><code>className</code></td><td><code>string</code></td><td><code>''</code></td><td>Class applied to the text wrapper.</td></tr>
               </tbody>
             </table>
           </div>

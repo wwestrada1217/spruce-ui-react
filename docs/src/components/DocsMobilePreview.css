@@ -1,0 +1,86 @@
+.docs-mobile-preview {
+  --device-screen-w: 300px;
+  --device-screen-h: 620px;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding-block: var(--sp-space-5);
+}
+
+.docs-mobile-preview__device {
+  position: relative;
+  padding: 12px;
+  border-radius: 54px;
+  background: linear-gradient(150deg, var(--sp-surface-700) 0%, var(--sp-surface-900) 38%, var(--sp-surface-800) 100%);
+  box-shadow: 0 1px 0 1px color-mix(in srgb, var(--sp-text-inverse) 12%, transparent) inset, 0 0 0 2px color-mix(in srgb, var(--sp-surface-950) 55%, transparent), var(--sp-shadow-2xl);
+}
+
+.docs-mobile-preview__button { position: absolute; width: 3px; border-radius: 2px; background: var(--sp-surface-700); }
+.docs-mobile-preview__button--silent { inset-inline-start: -3px; inset-block-start: 104px; height: 28px; }
+.docs-mobile-preview__button--volup { inset-inline-start: -3px; inset-block-start: 150px; height: 50px; }
+.docs-mobile-preview__button--voldn { inset-inline-start: -3px; inset-block-start: 214px; height: 50px; }
+.docs-mobile-preview__button--power { inset-inline-end: -3px; inset-block-start: 176px; height: 72px; }
+
+.docs-mobile-preview__screen {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: var(--device-screen-w);
+  height: var(--device-screen-h);
+  max-width: 78vw;
+  overflow: hidden;
+  border-radius: 44px;
+  background: var(--sp-surface-25, var(--sp-surface-50));
+  color: var(--sp-text-color);
+}
+
+.docs-mobile-preview__screen::before {
+  content: '';
+  position: absolute;
+  z-index: 5;
+  inset-block-start: 11px;
+  inset-inline-start: 50%;
+  width: 92px;
+  height: 26px;
+  border-radius: var(--sp-radius-full);
+  background: var(--sp-surface-950);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.docs-mobile-preview__statusbar {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  height: 46px;
+  padding: 0 24px 0 28px;
+  font-size: var(--sp-text-sm);
+  font-weight: var(--sp-font-semibold);
+}
+
+.docs-mobile-preview__statusbar-right { display: inline-flex; align-items: center; gap: 6px; }
+.docs-mobile-preview__signal { display: inline-flex; align-items: flex-end; gap: 2px; height: 11px; }
+.docs-mobile-preview__signal i { width: 3px; height: 4px; border-radius: 1px; background: currentColor; }
+.docs-mobile-preview__signal i:nth-child(2) { height: 6px; }
+.docs-mobile-preview__signal i:nth-child(3) { height: 8px; }
+.docs-mobile-preview__signal i:nth-child(4) { height: 10px; }
+.docs-mobile-preview__signal i:nth-child(2) { height: 6px; }
+.docs-mobile-preview__signal i:nth-child(3) { height: 8px; }
+.docs-mobile-preview__signal i:nth-child(4) { height: 10px; }
+.docs-mobile-preview__battery { position: relative; width: 24px; height: 12px; padding: 1.5px; border: 1px solid currentColor; border-radius: 3px; }
+.docs-mobile-preview__battery::after { content: ''; position: absolute; inset-inline-end: -3px; inset-block-start: 3px; width: 2px; height: 5px; border-radius: 0 1px 1px 0; background: currentColor; }
+.docs-mobile-preview__battery span { display: block; width: 80%; height: 100%; border-radius: 1px; background: currentColor; }
+
+.docs-mobile-preview__content { position: relative; display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; overflow-y: auto; padding-block-end: 24px; -webkit-overflow-scrolling: touch; }
+.docs-mobile-preview__content[data-align='top'] { justify-content: flex-start; }
+.docs-mobile-preview__content[data-align='center'] { justify-content: center; }
+.docs-mobile-preview__content[data-align='bottom'] { justify-content: flex-end; }
+.docs-mobile-preview__content[data-align='fill'] { padding-block-end: 0; }
+.docs-mobile-preview__home { position: absolute; z-index: 4; inset-block-end: 8px; inset-inline-start: 50%; width: 124px; height: 5px; border-radius: var(--sp-radius-full); background: currentColor; opacity: .32; transform: translateX(-50%); pointer-events: none; }
+
+@media (max-width: 520px) {
+  .docs-mobile-preview { --device-screen-w: 78vw; --device-screen-h: 150vw; }
+}

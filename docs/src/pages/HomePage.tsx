@@ -175,6 +175,11 @@ const BLOCKS: NavCard[] = [
   { icon: 'clipboard-check', label: 'Project Workspace', route: '#/blocks/project-workspace', description: 'Project management views' },
   { icon: 'help-circle',     label: 'Support Desk',      route: '#/blocks/support-desk',      description: 'Help desk and ticketing' },
   { icon: 'mail',            label: 'Email App',         route: '#/blocks/email',              description: 'Email client layout' },
+  { icon: 'bar-chart',       label: 'Charts',             route: '#/blocks/charts',             description: 'Analytics dashboards and chart compositions' },
+  { icon: 'shield',          label: 'Privacy & Cookie Consent', route: '#/blocks/cookie-consent', description: 'GDPR/CCPA privacy consent banner' },
+  { icon: 'table',           label: 'Operations Grid',    route: '#/blocks/operations-grid',   description: 'Queue triage and bulk review workspace' },
+  { icon: 'route',           label: 'REST Client Workflow', route: '#/blocks/rest-client-workflow', description: 'Conditional API request pipelines' },
+  { icon: 'trending-up',     label: 'Stocks App',         route: '#/blocks/stocks',             description: 'Ticker, candlestick, and watchlist dashboard' },
 ];
 
 const COMPONENT_COUNT = COMPONENT_SECTIONS.reduce((sum, s) => sum + s.items.length, 0) + CHARTS.length + EFFECTS.length + UTILITIES.length;
