@@ -62,43 +62,23 @@ export function TypographyPage() {
         <p className="page-tag">Foundation</p>
         <h1>Typography</h1>
         <p className="page-lead">
-          Spruce sets UI text in <strong>Noto Sans</strong>, a neutral sans
-          built for dense interfaces. Code and numeric data use{' '}
-          <strong>Noto Sans Mono</strong>. Both families are exposed through
-          semantic CSS aliases so applications can override them consistently.
-          The full scale is exposed as CSS custom properties.
+          Typography tokens define readable hierarchy for interface chrome, dense data, long-form
+          body copy, and code-oriented surfaces. The scale is deliberately compact so enterprise
+          workflows can remain information rich without feeling cramped.
         </p>
       </div>
 
-      <section className="doc-section">
-        <h2>Font Families</h2>
-        <div style={{ marginBottom: 'var(--sp-space-4, 16px)' }}>
-          <p><code>--sp-font-sans</code> &mdash; Noto Sans</p>
-          <p
-            style={{
-              fontFamily: 'var(--sp-font-sans)',
-              fontSize: 'var(--sp-text-lg)',
-              marginTop: 'var(--sp-space-1, 4px)',
-            }}
-          >
-            ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789
-          </p>
-        </div>
-        <div>
-          <p><code>--sp-font-mono</code> &mdash; Noto Sans Mono</p>
-          <p
-            style={{
-              fontFamily: 'var(--sp-font-mono)',
-              fontSize: 'var(--sp-text-lg)',
-              marginTop: 'var(--sp-space-1, 4px)',
-            }}
-          >
-            ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789
-          </p>
+      <section id="overview" className="doc-section">
+        <h2>Overview</h2>
+        <p className="section-desc">Use the typography scale to establish rank, rhythm, and legibility. A consistent type system keeps tables, forms, navigation, and documentation aligned even when components vary in density or available space.</p>
+        <div className="principles-grid">
+          <article className="principle-card"><h3>Hierarchy over novelty</h3><p>Use type to rank information clearly. Size and weight should help users scan faster, not create visual noise.</p></article>
+          <article className="principle-card"><h3>Compact by default</h3><p>The scale is tuned for product UI, dense tables, and operational screens where clarity matters more than dramatic contrast.</p></article>
+          <article className="principle-card"><h3>Semantic roles win</h3><p>Assign tokens to roles like title, body, caption, or code rather than styling each component independently.</p></article>
         </div>
       </section>
 
-      <section className="doc-section">
+      <section id="type-scale" className="doc-section">
         <h2>Type Scale</h2>
         <table className="token-table" aria-label="Type scale">
           <thead>
@@ -122,35 +102,7 @@ export function TypographyPage() {
         </table>
       </section>
 
-      <section className="doc-section">
-        <h2>Semantic Usage Tokens</h2>
-        <p className="section-desc">
-          Prefer these role-based aliases over raw sizes — they document intent
-          and give the system one place to retune the hierarchy.
-        </p>
-        <table className="token-table" aria-label="Font usage tokens">
-          <thead>
-            <tr>
-              <th>Token</th>
-              <th>Maps to</th>
-              <th>Usage</th>
-              <th>Preview</th>
-            </tr>
-          </thead>
-          <tbody>
-            {USAGE.map(item => (
-              <tr key={item.token}>
-                <td><code>{item.token}</code></td>
-                <td><code>{item.alias}</code> ({item.value})</td>
-                <td>{item.desc}</td>
-                <td style={{ fontSize: `var(${item.token})` }}>Spruce</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </section>
-
-      <section className="doc-section">
+      <section id="font-weights" className="doc-section">
         <h2>Font Weights</h2>
         <table className="token-table" aria-label="Font weights">
           <thead>
@@ -174,7 +126,19 @@ export function TypographyPage() {
         </table>
       </section>
 
-      <section className="doc-section">
+      <section id="families" className="doc-section">
+        <h2>Font Families</h2>
+        <div style={{ marginBottom: 'var(--sp-space-4, 16px)' }}>
+          <p><code>--sp-font-sans</code> &mdash; Noto Sans</p>
+          <p style={{ fontFamily: 'var(--sp-font-sans)', fontSize: 'var(--sp-text-lg)', marginTop: 'var(--sp-space-1, 4px)' }}>ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789</p>
+        </div>
+        <div>
+          <p><code>--sp-font-mono</code> &mdash; Noto Sans Mono</p>
+          <p style={{ fontFamily: 'var(--sp-font-mono)', fontSize: 'var(--sp-text-lg)', marginTop: 'var(--sp-space-1, 4px)' }}>ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789</p>
+        </div>
+      </section>
+
+      <section id="line-heights" className="doc-section">
         <h2>Line Heights</h2>
         <table className="token-table" aria-label="Line heights">
           <thead>
@@ -199,7 +163,7 @@ export function TypographyPage() {
         </table>
       </section>
 
-      <section className="doc-section">
+      <section id="letter-spacing" className="doc-section">
         <h2>Letter Spacing</h2>
         <table className="token-table" aria-label="Letter spacing">
           <thead>
@@ -221,6 +185,21 @@ export function TypographyPage() {
             ))}
           </tbody>
         </table>
+      </section>
+
+      <section id="semantic-roles" className="doc-section">
+        <h2>Semantic Roles</h2>
+        <p className="section-desc">Prefer these role-based aliases over raw sizes — they document intent and give the system one place to retune the hierarchy.</p>
+        <table className="token-table" aria-label="Font usage tokens"><thead><tr><th>Token</th><th>Maps to</th><th>Usage</th><th>Preview</th></tr></thead><tbody>{USAGE.map(item => <tr key={item.token}><td><code>{item.token}</code></td><td><code>{item.alias}</code> ({item.value})</td><td>{item.desc}</td><td style={{ fontSize: `var(${item.token})` }}>Spruce</td></tr>)}</tbody></table>
+      </section>
+
+      <section id="usage" className="doc-section">
+        <h2>Usage</h2>
+        <p className="section-desc">Prefer semantic role tokens over raw sizes. This keeps intent visible in component styles and gives themes one place to retune the hierarchy.</p>
+        <div className="code-block"><pre><code>{`.page-title {
+  font: var(--sp-font-heading-xl) / var(--sp-leading-tight) var(--sp-font-sans);
+  letter-spacing: var(--sp-tracking-tight);
+}`}</code></pre></div>
       </section>
     </>
   )

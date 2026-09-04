@@ -60,15 +60,28 @@ export function ColorsPage() {
         <p className="page-tag">Foundation</p>
         <h1>Colors</h1>
         <p className="page-lead">
-          Spruce uses quiet zinc neutrals with an evergreen brand accent. The
-          surface scale runs from 0 (lightest) to 950 (darkest) and
-          automatically inverts in dark mode. All colors are defined as CSS
-          custom properties with the <code>--sp-</code> prefix — style with
-          tokens, never hard-coded values, and both themes come for free.
+          Color tokens define surfaces, text contrast, borders, brand accents, and semantic
+          feedback. Spruce exposes them as CSS custom properties so the same component APIs adapt
+          cleanly across light and dark contexts.
         </p>
       </div>
 
-      <section className="doc-section">
+      <section id="overview" className="doc-section">
+        <h2>Overview</h2>
+        <p className="section-desc">
+          Color should communicate hierarchy and state before decoration. Use neutral surfaces as
+          the structural baseline, apply primary only where focus or action matters, and reserve
+          semantic colors for status and feedback.
+        </p>
+        <div className="principles-grid">
+          <article className="principle-card"><h3>Structure first</h3><p>Use neutral surfaces and text roles to establish hierarchy before adding accent color.</p></article>
+          <article className="principle-card"><h3>Meaningful accents</h3><p>Apply primary colors where focus or action matters, and semantic colors for status and feedback.</p></article>
+          <article className="principle-card"><h3>Theme resilient</h3><p>Consume token names rather than fixed visual values so relationships survive theme changes.</p></article>
+        </div>
+        <div className="principle-card"><h3>Theme Behavior</h3><p>Surface tokens such as <code>--sp-surface-0</code> through <code>--sp-surface-950</code> are semantic layers rather than fixed visual outcomes. Their relationship is preserved when the active theme changes.</p></div>
+      </section>
+
+      <section id="surface-scale" className="doc-section">
         <h2>Surface Scale</h2>
         <p className="section-desc">
           Slate-tinted grays for backgrounds, panels, and containers. In dark
@@ -90,13 +103,13 @@ export function ColorsPage() {
         </div>
       </section>
 
-      <section className="doc-section">
-        <h2>Primary</h2>
+      <section id="roles" className="doc-section">
+        <h2>Brand And Semantic Roles</h2>
         <p className="section-desc">
-          The evergreen-teal brand accent. <code>Subtle</code> is a translucent
-          tint for selected/hover fills; <code>On Primary</code> is the text
-          color used on solid primary surfaces.
+          Primary colors guide attention and confirm the active path through the interface. Semantic
+          colors communicate meaning such as success, warning, danger, and informational status.
         </p>
+        <h3>Primary Roles</h3>
         <div className="swatch-grid">
           {PRIMARY_SWATCHES.map(item => (
             <div key={item.label} className="swatch-item">
@@ -112,7 +125,7 @@ export function ColorsPage() {
       </section>
 
       <section className="doc-section">
-        <h2>Semantic</h2>
+        <h3>Semantic Roles</h3>
         <p className="section-desc">
           Status colors for alerts, badges, and validation. Each has a
           translucent <code>-subtle</code> companion for tinted backgrounds
@@ -133,7 +146,7 @@ export function ColorsPage() {
       </section>
 
       <section className="doc-section">
-        <h2>Status tints and on-tint roles</h2>
+        <h3>Status tints and on-tint roles</h3>
         <p className="section-desc">
           The <code>-tint</code>, <code>-tint-border</code>, and{' '}
           <code>-on-tint</code> roles use a shared perceptual tone scale. Use
@@ -155,12 +168,13 @@ export function ColorsPage() {
         </table>
       </section>
 
-      <section className="doc-section">
-        <h2>Text</h2>
+      <section id="text-borders" className="doc-section">
+        <h2>Text And Borders</h2>
         <p className="section-desc">
-          A four-step text hierarchy plus an inverse color for text on
-          contrasting surfaces (tooltips, solid buttons).
+          Text and border tokens establish readable hierarchy. Use the strongest text token only
+          for primary content, and step down gradually for secondary, helper, and disabled states.
         </p>
+        <h3>Text roles</h3>
         <div className="swatch-grid">
           {TEXT_SWATCHES.map(item => (
             <div key={item.label} className="swatch-item">
@@ -176,7 +190,7 @@ export function ColorsPage() {
       </section>
 
       <section className="doc-section">
-        <h2>Borders, Interaction &amp; Overlay</h2>
+        <h3>Borders, Interaction &amp; Overlay</h3>
         <p className="section-desc">
           Functional colors consumed by nearly every component. Pair the border
           colors with the width tokens (<code>--sp-border-width-hairline</code>,{' '}
@@ -211,8 +225,10 @@ export function ColorsPage() {
         </table>
       </section>
 
-      <section className="doc-section">
-        <h2>Frosted Glass</h2>
+      <section id="specialized-tokens" className="doc-section">
+        <h2>Specialized Tokens</h2>
+        <p className="section-desc">Spruce includes dedicated tokens for modern frosted glass surfaces, accessible focus glow indicators, and data visualization color palettes.</p>
+        <h3>Frosted Glass</h3>
         <p className="section-desc">
           Tokens for translucent &ldquo;glass&rdquo; panels, plus the{' '}
           <code>.sp-frosted</code> / <code>.sp-frosted--strong</code> utility
@@ -253,7 +269,7 @@ export function ColorsPage() {
       </section>
 
       <section className="doc-section">
-        <h2>Focus Ring &mdash; &ldquo;Precision Glow&rdquo;</h2>
+        <h3>Focus &amp; Precision Glow</h3>
         <p className="section-desc">
           Spruce&rsquo;s brand fingerprint for keyboard focus: a crisp outline
           (<code>--sp-focus-ring-color</code>, <code>--sp-focus-ring-width</code>,{' '}
@@ -277,6 +293,16 @@ export function ColorsPage() {
         >
           Tab to me
         </button>
+      </section>
+
+      <section id="usage" className="doc-section">
+        <h2>Usage</h2>
+        <p className="section-desc">Build surfaces from semantic tokens rather than fixed hex values. That keeps the component contract stable across theme switches and avoids manual dark-mode overrides inside each component.</p>
+        <div className="code-block"><pre><code>{`.panel {
+  background: var(--sp-surface-0);
+  color: var(--sp-text-color);
+  border: var(--sp-border-width-hairline) solid var(--sp-border);
+}`}</code></pre></div>
       </section>
     </>
   )

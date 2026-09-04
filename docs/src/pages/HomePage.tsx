@@ -21,12 +21,18 @@ const FOUNDATIONS: NavCard[] = [
   { icon: 'palette',        label: 'Colors',       route: '#/foundation/colors',         description: 'Palette, semantic tokens, and surface scales' },
   { icon: 'align-left',     label: 'Typography',   route: '#/foundation/typography',     description: 'Font families, sizes, weights, and line heights' },
   { icon: 'ruler',          label: 'Spacing',      route: '#/foundation/spacing',        description: 'Consistent spacing scale and layout rhythm' },
+  { icon: 'minus',          label: 'Borders',      route: '#/foundation/borders',        description: 'Border widths and divider colors for tables, panels, and chrome' },
+  { icon: 'sliders-horizontal', label: 'Density',   route: '#/foundation/density',       description: 'Compact, default, and comfortable sizing tokens' },
   { icon: 'layers',         label: 'Shadows',      route: '#/foundation/shadows',        description: 'Elevation levels for depth and hierarchy' },
   { icon: 'sparkles',       label: 'Iconography',  route: '#/foundation/iconography',    description: 'SVG icon library with inline rendering' },
+  { icon: 'shapes',         label: 'Background motifs', route: '#/foundation/motifs',    description: 'Decorative SVG ornaments for containers and banners' },
+  { icon: 'image',          label: 'Illustrations', route: '#/foundation/illustrations', description: 'Visual guidance for status and empty states' },
   { icon: 'brush',          label: 'Theming',      route: '#/foundation/theming',        description: 'Customize themes, color presets, and design tokens' },
+  { icon: 'palette',        label: 'Color Harmony', route: '#/foundation/color-harmony', description: 'Generate accessible companion and chart colors' },
   { icon: 'play',           label: 'Motion',       route: '#/foundation/motion',         description: 'Duration, easing, and animation tokens with accessibility fallbacks' },
   { icon: 'message-circle', label: 'Voice & Tone', route: '#/foundation/voice-and-tone', description: 'Writing guidelines for clear, consistent, and human interface copy' },
   { icon: 'globe',          label: 'Internationalization', route: '#/foundation/internationalization', description: 'Locale packs, formatting, labels, and right-to-left layout guidance' },
+  { icon: 'shield',         label: 'Accessibility', route: '#/foundation/accessibility',  description: 'Keyboard, semantics, contrast, motion, and testing guidance' },
 ];
 
 const CORE: NavCard[] = [

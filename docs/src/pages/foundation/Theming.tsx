@@ -50,13 +50,13 @@ export function ThemingPage() {
         <p className="page-tag">Foundation</p>
         <h1>Theming</h1>
         <p className="page-lead">
-          The Spruce design system supports fully customizable themes via CSS
-          custom properties. Use built-in presets, define your own themes, or
-          override tokens directly in CSS.
+          The Spruce design system supports fully customizable themes via CSS custom properties.
+          Use this generator to tune the design tokens and export the result as a TypeScript preset
+          or plain CSS override block.
         </p>
       </div>
 
-      <section className="doc-section">
+      <section id="built-in" className="doc-section">
         <h2>Built-in themes</h2>
         <p className="section-desc">
           Spruce ships with two base themes — <strong>light</strong> and{' '}
@@ -153,7 +153,7 @@ function ThemeSwitcher() {
         </table>
       </section>
 
-      <section className="doc-section">
+      <section id="custom" className="doc-section">
         <h2>Custom themes</h2>
         <p className="section-desc">
           Create a custom theme by defining a <code>SpruceTheme</code> object.
@@ -274,7 +274,7 @@ function Settings() {
         </div>
       </section>
 
-      <section className="doc-section">
+      <section id="presets" className="doc-section">
         <h2>Preset themes</h2>
         <p className="section-desc">
           Spruce includes {ALL_PRESETS.length} ready-made presets. Each preset
@@ -359,8 +359,26 @@ function ThemePicker() {
         </div>
       </section>
 
-      <section className="doc-section">
-        <h2>Accents and color harmony</h2>
+      <section id="frosted-surface" className="doc-section">
+        <h2>Frosted surface</h2>
+        <p className="section-desc">Frosted surfaces use semantic background, border, blur, and shadow tokens so glass panels adapt with the active theme.</p>
+        <div className="code-block"><pre><code>{`<div className="sp-frosted">
+  Floating panel content
+</div>`}</code></pre></div>
+      </section>
+
+      <section id="theme-switcher" className="doc-section">
+        <h2>Theme switcher component</h2>
+        <p className="section-desc">Use the theme hook to build a compact switcher, or pair it with the application's settings surface. Keep theme preference separate from the resolved light or dark mode.</p>
+        <div className="code-block"><pre><code>{`const { preference, resolved, setTheme, toggle } = useTheme()
+
+<button type="button" onClick={toggle}>
+  {preference} ({resolved})
+</button>`}</code></pre></div>
+      </section>
+
+      <section id="palette-generator" className="doc-section">
+        <h2>Palette Generator</h2>
         <p className="section-desc">
           The provider owns an independent accent layer. Choose a shipped accent,
           supply a custom hex value, or derive secondary, tertiary, and chart
@@ -407,8 +425,8 @@ function BrandControls() {
         </p>
       </section>
 
-      <section className="doc-section">
-        <h2>Token reference</h2>
+      <section id="editor" className="doc-section">
+        <h2>Token editor</h2>
         <p className="section-desc">
           The most commonly overridden tokens when building custom themes.
           Changes apply live via CSS custom properties on <code>:root</code>.
@@ -467,6 +485,19 @@ function BrandControls() {
             <tr><td>--sp-radius-full</td><td>9999px</td><td>Fully rounded</td></tr>
           </tbody>
         </table>
+      </section>
+
+      <section id="export" className="doc-section">
+        <h2>Export</h2>
+        <p className="section-desc">Export the active token overrides as CSS custom properties or a typed theme object when moving a palette from the editor into an application package.</p>
+        <div className="code-block"><pre><code>{`export const brandTheme = {
+  name: 'brand',
+  displayName: 'Brand',
+  base: 'light',
+  tokens: {
+    '--sp-primary': '#166534',
+  },
+}`}</code></pre></div>
       </section>
     </>
   )

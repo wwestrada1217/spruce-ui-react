@@ -188,7 +188,7 @@ export function VoiceAndTonePage() {
         </p>
       </div>
 
-      <section className="doc-section">
+      <section id="principles" className="doc-section">
         <h2>Principles</h2>
         <p className="section-desc">
           Every word in the interface is part of the user experience. These
@@ -204,7 +204,7 @@ export function VoiceAndTonePage() {
         </div>
       </section>
 
-      <section className="doc-section">
+      <section id="voice" className="doc-section">
         <h2>Voice</h2>
         <p className="section-desc">
           Voice is the personality behind our words. It stays the same regardless
@@ -230,7 +230,7 @@ export function VoiceAndTonePage() {
         </div>
       </section>
 
-      <section className="doc-section">
+      <section id="tone-spectrum" className="doc-section">
         <h2>Tone Spectrum</h2>
         <p className="section-desc">
           Tone shifts depending on context. An error message sounds different
@@ -259,7 +259,7 @@ export function VoiceAndTonePage() {
         </div>
       </section>
 
-      <section className="doc-section">
+      <section id="writing-guidelines" className="doc-section">
         <h2>Writing Guidelines</h2>
         <p className="section-desc">
           Practical rules for writing interface copy that is clear, scannable,
@@ -289,7 +289,7 @@ export function VoiceAndTonePage() {
         ))}
       </section>
 
-      <section className="doc-section">
+      <section id="component-copy" className="doc-section">
         <h2>Component Copy</h2>
         <p className="section-desc">
           Guidance for writing copy within specific UI components.
@@ -308,7 +308,7 @@ export function VoiceAndTonePage() {
         </div>
       </section>
 
-      <section className="doc-section">
+      <section id="formatting" className="doc-section">
         <h2>Formatting</h2>
         <p className="section-desc">
           Conventions for capitalization, punctuation, and structure.
@@ -333,7 +333,7 @@ export function VoiceAndTonePage() {
         </table>
       </section>
 
-      <section className="doc-section">
+      <section id="inclusive-language" className="doc-section">
         <h2>Inclusive Language</h2>
         <p className="section-desc">
           Write for everyone. Inclusive language is respectful, precise, and

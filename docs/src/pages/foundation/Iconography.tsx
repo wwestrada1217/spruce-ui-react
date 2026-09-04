@@ -118,10 +118,10 @@ export function IconographyPage() {
         <p className="page-tag">Foundation</p>
         <h1>Iconography</h1>
         <p className="page-lead">
-          Spruce ships {ALL_ICONS.length} icons across {COLLECTIONS.length} categories.
-          All icons are outlined SVGs on a 24 x 24 px artboard with a 2 px stroke.
-          They are tree-shakeable — import only what you need. Click any icon to copy
-          its name.
+          Spruce includes a lightweight SVG icon system. Icons are registered through the React
+          icon registry and rendered with the <code>&lt;Icon&gt;</code> component. All icons inherit
+          <code>currentColor</code> and can be tree-shaken by importing only the collections or
+          individual icons your application uses.
         </p>
       </div>
 
@@ -153,7 +153,7 @@ export function IconographyPage() {
       </div>
 
       {/* Usage */}
-      <section className="doc-section">
+      <section id="usage" className="doc-section">
         <h2>Usage</h2>
         <p className="section-desc">
           Render icons with the <code>{'<Icon>'}</code> component. Pass the icon
@@ -213,6 +213,22 @@ export function IconographyPage() {
         </table>
       </section>
 
+      <section id="thickness" className="doc-section">
+        <h2>Icon Thickness / Stroke Width</h2>
+        <p className="section-desc">Spruce icons use a consistent outlined SVG treatment and inherit <code>currentColor</code>. The React <code>Icon</code> API controls name, size, accessible label, class, and style; use an icon definition with the desired stroke treatment when a different weight is required.</p>
+        <div style={{ display: 'flex', gap: 24, alignItems: 'center', padding: 16, background: 'var(--sp-surface-50)', border: '1px solid var(--sp-border)', borderRadius: 'var(--sp-radius-md)' }}>
+          {[1, 1.5, 2, 3].map(weight => <div key={weight} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}><Icon name="check" size={28} /><span style={{ fontSize: 12, color: 'var(--sp-text-muted)' }}>{weight}px</span></div>)}
+        </div>
+      </section>
+
+      <section id="setup" className="doc-section">
+        <h2>Setup &amp; Tree Shaking</h2>
+        <p className="section-desc">The provider registers the icon set used by the application. Import individual definitions or spread selected collections into <code>iconSet</code> to keep bundles small.</p>
+        <CodePreview code={TREE_SHAKE_CODE}><div><Icon name="check" size={20} /><Icon name="x" size={20} /><Icon name="star" size={20} /></div></CodePreview>
+        <h3>Auto-Registration</h3>
+        <p className="section-desc">When no custom registry is supplied, Spruce's provider makes the bundled icon set available to <code>Icon</code>. A custom icon registry takes precedence for names it registers.</p>
+      </section>
+
       {/* Search results or categorized grid */}
       {filtered ? (
         <section className="doc-section">
@@ -231,9 +247,11 @@ export function IconographyPage() {
           </div>
         </section>
       ) : (
-        COLLECTIONS.map((col) => (
+        <>
+        <section id="collections" className="doc-section"><h2>Collections</h2><p className="section-desc">Icons are grouped by product meaning so teams can find familiar actions, status, navigation, content, and data symbols.</p></section>
+        {COLLECTIONS.map((col) => (
           <section key={col.label} className="doc-section">
-            <h2>{col.label} <span style={{ fontSize: 13, fontWeight: 400, color: 'var(--sp-text-subtle)' }}>({col.icons.length})</span></h2>
+            <h3>{col.label} <span style={{ fontSize: 13, fontWeight: 400, color: 'var(--sp-text-subtle)' }}>({col.icons.length})</span></h3>
             <div className="icon-grid" role="list" aria-label={`${col.label} icons`}>
               {col.icons.map(([name]) => (
                 <div key={name} role="listitem">
@@ -242,7 +260,8 @@ export function IconographyPage() {
               ))}
             </div>
           </section>
-        ))
+        ))}
+        </>
       )}
 
       {/* Sizes */}
@@ -263,7 +282,7 @@ export function IconographyPage() {
 
       {/* Duotone */}
       <section className="doc-section">
-        <h2>Duotone</h2>
+        <h2>Duotone Icons</h2>
         <p className="section-desc">
           Duotone icons use a secondary fill path. Its color and opacity are
           controlled by two CSS custom properties.
@@ -313,6 +332,14 @@ export function IconographyPage() {
         </table>
       </section>
 
+      <section id="flags" className="doc-section">
+        <h2>Flag Icons</h2>
+        <p className="section-desc">Use the registered flag icon names for locale and country selectors. Keep country names visible or available through an accessible label; a flag alone is not a sufficient language name.</p>
+        <div className="icon-grid" role="list" aria-label="Flag icon examples">
+          {['flag-us', 'flag-gb', 'flag-fr', 'flag-de', 'flag-jp', 'flag-ph'].map(name => <div key={name} role="listitem"><IconItem name={name} /></div>)}
+        </div>
+      </section>
+
       {/* Tree shaking */}
       <section className="doc-section">
         <h2>Tree Shaking</h2>
@@ -327,6 +354,11 @@ export function IconographyPage() {
             <Icon name="star" size={20} />
           </div>
         </CodePreview>
+      </section>
+
+      <section id="api" className="doc-section">
+        <h2>API</h2>
+        <table className="token-table" aria-label="Icon API"><thead><tr><th>Prop</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td><code>name</code></td><td>string</td><td>Registered icon name.</td></tr><tr><td><code>size</code></td><td>number</td><td>Width and height in pixels.</td></tr><tr><td><code>ariaLabel</code></td><td>string</td><td>Accessible name for meaningful icons; decorative icons remain hidden from assistive technology.</td></tr><tr><td><code>className</code> / <code>style</code></td><td>string / CSSProperties</td><td>Additional styling hooks and inline overrides.</td></tr></tbody></table>
       </section>
     </>
   )

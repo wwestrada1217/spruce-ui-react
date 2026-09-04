@@ -32,15 +32,22 @@ export function MotifsPage() {
     <>
       <div className="page-header">
         <p className="page-tag">Foundation</p>
-        <h1>Motifs</h1>
+        <h1>Background motifs</h1>
         <p className="page-lead">
-          Motifs are decorative depth behind a surface. They are typed, token-colored,
-          clipped to the owner, and hidden from assistive technology.
+          A decorative SVG ornament painted behind the content of a banner, card, panel, or any
+          other container. Spruce ships {SP_BUILT_IN_MOTIFS.length} reusable motifs across seven
+          families; motifs never
+          change layout, interaction, or the accessible name of their host.
         </p>
       </div>
 
-      <section className="doc-section">
-        <h2>Built-in library</h2>
+      <section id="overview" className="doc-section">
+        <h2>Overview</h2>
+        <p className="section-desc">Set <code>backgroundMotif</code> on a container and it gains a quiet geometric backdrop. The host owns positioning and clipping; the motif stays behind content and is hidden from assistive technology.</p>
+      </section>
+
+      <section id="library" className="doc-section">
+        <h2>The motif library</h2>
         <p>
           Spruce ships {SP_BUILT_IN_MOTIFS.length} reusable motifs across seven families.
           The <code>backgroundMotif</code> input is physical, so <code>center-right</code>
@@ -71,8 +78,8 @@ export function MotifsPage() {
         </div>
       </section>
 
-      <section className="doc-section">
-        <h2>Container usage</h2>
+      <section id="banners" className="doc-section">
+        <h2>In notification banners</h2>
         <CodePreview code={MOTIF_CODE}>
           <Card
             chrome="filled"
@@ -92,8 +99,8 @@ export function MotifsPage() {
         </p>
       </section>
 
-      <section className="doc-section">
-        <h2>Controls</h2>
+      <section id="position" className="doc-section">
+        <h2>Position</h2>
         <div className="docs-grid">
           <Panel chrome="outlined" backgroundMotif="dot-grid" motifPosition="top-left" motifSize={130} motifOpacity={0.08}>
             <strong>Position</strong><br />Nine physical anchors; no automatic mirroring in RTL.
@@ -109,8 +116,17 @@ export function MotifsPage() {
         </ul>
       </section>
 
-      <section className="doc-section">
-        <h2>Custom definitions</h2>
+      <section id="size" className="doc-section"><h2>Size</h2><p className="section-desc"><code>motifSize</code> accepts a number in pixels or any CSS length. Keep the ornament large enough to read as atmosphere and small enough that it never competes with content.</p></section>
+      <section id="opacity" className="doc-section"><h2>Opacity</h2><p className="section-desc"><code>motifOpacity</code> defaults to <code>0.1</code>. Use a low-opacity token color so foreground content remains the strongest visual layer; dark mode can tune the token independently.</p></section>
+      <section id="appearance" className="doc-section"><h2>Filled and outlined</h2><p className="section-desc">Choose <code>auto</code>, <code>outlined</code>, or <code>filled</code> appearance. Outlined motifs are quieter for dense surfaces; filled motifs can add more presence to empty states and feature panels.</p></section>
+      <section id="rotation" className="doc-section"><h2>Rotation and cropped compositions</h2><p className="section-desc">Use rotation and offsets to crop a motif against a corner or edge. The clipped composition should support the surface hierarchy rather than introduce a new layout region.</p></section>
+      <section id="themes" className="doc-section"><h2>Light and dark</h2><p className="section-desc">Motifs inherit semantic token colors, so the same definition works in light and dark themes. Do not hard-code a raw color for a decorative layer.</p></section>
+      <section id="container" className="doc-section"><h2>Any container</h2><p className="section-desc">Cards, panels, alerts, banners, and custom relative containers can host a motif. The owner supplies positioning context, clipping, and spacing.</p></section>
+      <section id="responsive" className="doc-section"><h2>Responsive behavior</h2><p className="section-desc">Motifs scale with their host and should remain decorative at narrow widths. Reduce size or opacity in compact layouts when the ornament competes with readable content.</p></section>
+      <section id="sources" className="doc-section"><h2>Four sources</h2><p className="section-desc">A host can resolve a named motif, an icon, or raw SVG according to its API. Raw SVG wins over an icon, which wins over a named motif. All sources are decorative.</p></section>
+
+      <section id="adding" className="doc-section">
+        <h2>Adding your own motifs</h2>
         <p>
           React uses a controlled provider for trusted custom SVG definitions. A custom name
           overrides a built-in name only within that provider subtree.
@@ -127,8 +143,8 @@ export function MotifsPage() {
         </CodePreview>
       </section>
 
-      <section className="doc-section">
-        <h2>Accessibility and themes</h2>
+      <section id="accessibility" className="doc-section">
+        <h2>Accessibility</h2>
         <ul>
           <li>The Motif root is <code>aria-hidden="true"</code> and <code>pointer-events: none</code>.</li>
           <li>Motifs never receive focus, announce text, or alter a component’s accessible name.</li>

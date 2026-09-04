@@ -1,155 +1,55 @@
 const SPACINGS = [
-  { token: '--sp-space-0', value: '0' },
-  { token: '--sp-space-px', value: '1px' },
-  { token: '--sp-space-0_5', value: '2px' },
-  { token: '--sp-space-1', value: '4px' },
-  { token: '--sp-space-1_5', value: '6px' },
-  { token: '--sp-space-2', value: '8px' },
-  { token: '--sp-space-2_5', value: '10px' },
-  { token: '--sp-space-3', value: '12px' },
-  { token: '--sp-space-3_5', value: '14px' },
-  { token: '--sp-space-4', value: '16px' },
-  { token: '--sp-space-5', value: '20px' },
-  { token: '--sp-space-6', value: '24px' },
-  { token: '--sp-space-7', value: '28px' },
-  { token: '--sp-space-8', value: '32px' },
-  { token: '--sp-space-9', value: '36px' },
-  { token: '--sp-space-10', value: '40px' },
-  { token: '--sp-space-12', value: '48px' },
-  { token: '--sp-space-14', value: '56px' },
-  { token: '--sp-space-16', value: '64px' },
-  { token: '--sp-space-20', value: '80px' },
-  { token: '--sp-space-24', value: '96px' },
+  ['0', '--sp-space-0', '0', 'Reset spacing and collapse edges where needed.'], ['px', '--sp-space-px', '1px', 'Hairline alignment and optical corrections.'],
+  ['0.5', '--sp-space-0_5', '2px', 'Micro-adjustments inside dense controls.'], ['1', '--sp-space-1', '4px', 'Tight icon spacing and compressed inline layouts.'],
+  ['1.5', '--sp-space-1_5', '6px', 'Dense field labels, helper rows, and tight chips.'], ['2', '--sp-space-2', '8px', 'Compact gaps between related controls and metadata.'],
+  ['2.5', '--sp-space-2_5', '10px', 'Tight but readable panel and toolbar spacing.'], ['3', '--sp-space-3', '12px', 'Default internal gaps across common UI blocks.'],
+  ['3.5', '--sp-space-3_5', '14px', 'Intermediate spacing for nuanced control groups.'], ['4', '--sp-space-4', '16px', 'Default card padding and component separation.'],
+  ['5', '--sp-space-5', '20px', 'Roomier group spacing inside larger surfaces.'], ['6', '--sp-space-6', '24px', 'Section spacing inside panels and drawers.'],
+  ['8', '--sp-space-8', '32px', 'Layout-level rhythm between major blocks.'], ['10', '--sp-space-10', '40px', 'Generous separation for feature sections and hero layouts.'],
+  ['12', '--sp-space-12', '48px', 'Large vertical rhythm and multi-panel separation.'], ['14', '--sp-space-14', '56px', 'Expanded structural spacing for wide layouts.'],
+  ['16', '--sp-space-16', '64px', 'Page section spacing and roomy content blocks.'], ['20', '--sp-space-20', '80px', 'Hero spacing, landing sections, and immersive layouts.'],
+  ['24', '--sp-space-24', '96px', 'Maximum structural separation on large canvases.'],
+]
+
+const RHYTHM = [
+  ['Micro rhythm', '0.5–2', 'Use for icon gaps, label-to-control spacing, and compact metadata inside a component.'],
+  ['Component rhythm', '2.5–6', 'Use for related controls, stacked content, card interiors, and panel groups.'],
+  ['Section rhythm', '8–12', 'Use to separate major blocks within a page, drawer, or dialog.'],
+  ['Page rhythm', '14–24', 'Use for hero layouts, page sections, and large structural transitions.'],
 ]
 
 const RADII = [
-  { token: '--sp-radius-none', value: '0' },
-  { token: '--sp-radius-sm', value: '2px' },
-  { token: '--sp-radius-md', value: '3px' },
-  { token: '--sp-radius-lg', value: '4px' },
-  { token: '--sp-radius-xl', value: '6px' },
-  { token: '--sp-radius-2xl', value: '8px' },
-  { token: '--sp-radius-full', value: '9999px' },
+  ['None', '--sp-radius-none', '0', 'Grid lines, flush layouts, and intentionally sharp boundaries.'], ['Small', '--sp-radius-sm', '2px', 'Dense inputs, chips, and compact utility surfaces.'],
+  ['Medium', '--sp-radius-md', '3px', 'Default control radius for many interactive elements.'], ['Large', '--sp-radius-lg', '4px', 'Buttons, cards, and panels that need a softer edge.'],
+  ['XL', '--sp-radius-xl', '6px', 'Prominent containers, dialogs, and elevated surfaces.'], ['2XL', '--sp-radius-2xl', '8px', 'Feature panels and standout containers with more generous shaping.'],
+  ['Full', '--sp-radius-full', '9999px', 'Pills, badges, circular actions, and avatar treatments.'],
 ]
 
-const BORDER_WIDTHS = [
-  { token: '--sp-border-width-none', value: '0', desc: 'Explicitly borderless' },
-  { token: '--sp-border-width-hairline', value: '1px', desc: 'Default divider / control outline (grids, tables, splitters)' },
-  { token: '--sp-border-width-medium', value: '2px', desc: 'Section breaks, emphasis separators, aggregate rows' },
-]
-
-const DENSITY_ALIASES = [
-  { token: '--sp-density-control-height', dense: '28px', def: '32px', comfy: '36px' },
-  { token: '--sp-density-control-padding-x', dense: '8px', def: '10px', comfy: '12px' },
-  { token: '--sp-density-inline-gap', dense: '8px', def: '10px', comfy: '12px' },
-  { token: '--sp-density-stack-gap', dense: '12px', def: '16px', comfy: '20px' },
-  { token: '--sp-density-icon-size', dense: '14px', def: '16px', comfy: '18px' },
-  { token: '--sp-density-list-item-min-height', dense: '28px', def: '32px', comfy: '40px' },
-  { token: '--sp-density-panel-padding', dense: '12px', def: '16px', comfy: '20px' },
-  { token: '--sp-density-datagrid-row-height', dense: '26px', def: '32px', comfy: '38px' },
+const BEST_PRACTICES = [
+  ['Pick a default internal gap and repeat it', 'Repeated rhythm makes component content feel intentional and easier to scan.'],
+  ['Use larger jumps for structure, not decoration', 'Reserve large tokens for separating groups, sections, and page regions.'],
+  ['Tie radius to component role', 'Use the same radius family for controls and surfaces that belong to the same interaction level.'],
 ]
 
 export function SpacingPage() {
   return (
     <>
-      <div className="page-header">
-        <p className="page-tag">Foundation</p>
-        <h1>Spacing</h1>
-        <p className="page-lead">
-          A 4px-base spacing scale exposed as CSS custom properties, with
-          half-steps for fine control in dense UI. Use these for consistent
-          padding, margins, and gaps — components own their internal padding,
-          while parents own the space between siblings (prefer container{' '}
-          <code>gap</code> over per-child margins).
-        </p>
-      </div>
+      <div className="page-header"><p className="page-tag">Foundation</p><h1>Spacing</h1><p className="page-lead">Spacing tokens create layout rhythm, breathable controls, and consistent separation between interface layers. The scale is based on a compact system that still leaves room for expressive page structure and generous content sections.</p></div>
 
-      <section className="doc-section">
-        <h2>Scale</h2>
-        <div role="list" aria-label="Spacing scale">
-          {SPACINGS.map(s => (
-            <div key={s.token} className="spacing-row" role="listitem">
-              <span className="spacing-token">{s.token}</span>
-              <div className="spacing-bar-wrap">
-                <div
-                  className="spacing-bar"
-                  style={{ width: `var(${s.token})` }}
-                  aria-hidden="true"
-                />
-                <span className="spacing-px">{s.value}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      <section id="overview" className="doc-section"><h2>Overview</h2><p className="section-desc">Spacing is a layout contract. Components own their internal padding, while parents own the space between siblings. Prefer container <code>gap</code> over per-child margins so the relationship remains visible in the layout.</p><div className="principles-grid"><article className="principle-card"><h3>Rhythm beats randomness</h3><p>Repeated spacing values create a predictable visual cadence and make interfaces easier to scan.</p></article><article className="principle-card"><h3>Density and spacing cooperate</h3><p>Density presets adjust semantic control and panel rhythm while this scale remains the shared source of values.</p></article><article className="principle-card"><h3>Scale intent with distance</h3><p>Use smaller tokens for touch points within a component and larger tokens to separate groups, sections, and page regions.</p></article></div></section>
 
-      <section className="doc-section">
-        <h2>Border Radius</h2>
-        <div className="radius-grid">
-          {RADII.map(r => (
-            <div key={r.token} className="radius-item">
-              <div
-                className="radius-item__box"
-                style={{ borderRadius: `var(${r.token})` }}
-                aria-hidden="true"
-              />
-              <code>{r.token}</code>
-              <span className="radius-item__value">{r.value}</span>
-            </div>
-          ))}
-        </div>
-      </section>
+      <section id="scale" className="doc-section"><h2>Scale</h2><div role="list" aria-label="Spacing scale">{SPACINGS.map(([label, token, value, usage]) => <div key={token} className="spacing-row" role="listitem"><span className="spacing-token"><code>{token}</code></span><div className="spacing-bar-wrap"><div className="spacing-bar" style={{ width: `var(${token})` }} aria-hidden="true" /><span className="spacing-px">{value}</span></div><span>{label} — {usage}</span></div>)}</div></section>
 
-      <section className="doc-section">
-        <h2>Border Widths</h2>
-        <p className="section-desc">
-          Pair with the border color tokens:{' '}
-          <code>border: var(--sp-border-width-hairline) solid var(--sp-border)</code>.
-          Dark mode themes only the border <em>colors</em> — widths never change.
-        </p>
-        <table className="token-table" aria-label="Border widths">
-          <thead>
-            <tr><th>Token</th><th>Value</th><th>Usage</th></tr>
-          </thead>
-          <tbody>
-            {BORDER_WIDTHS.map(b => (
-              <tr key={b.token}>
-                <td><code>{b.token}</code></td>
-                <td>{b.value}</td>
-                <td>{b.desc}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </section>
+      <section id="layout-rhythm" className="doc-section"><h2>Layout Rhythm</h2><div className="principles-grid">{RHYTHM.map(([title, range, body]) => <article key={title} className="principle-card"><h3>{title}</h3><code>{range}</code><p>{body}</p></article>)}</div></section>
 
-      <section className="doc-section">
-        <h2>Density</h2>
-        <p className="section-desc">
-          Density presets define semantic sizing for controls, lists, panels,
-          and datagrids. Set{' '}
-          <code>data-density=&quot;dense | default | comfortable&quot;</code> on
-          any container and the semantic aliases below re-resolve for that
-          subtree. (Preset-specific tokens such as{' '}
-          <code>--sp-density-dense-control-height</code> are also available for
-          local overrides.)
-        </p>
-        <table className="token-table" aria-label="Density aliases">
-          <thead>
-            <tr><th>Semantic token</th><th>Dense</th><th>Default</th><th>Comfortable</th></tr>
-          </thead>
-          <tbody>
-            {DENSITY_ALIASES.map(d => (
-              <tr key={d.token}>
-                <td><code>{d.token}</code></td>
-                <td>{d.dense}</td>
-                <td>{d.def}</td>
-                <td>{d.comfy}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </section>
+      <section id="radius" className="doc-section"><h2>Border Radius</h2><div className="radius-grid">{RADII.map(([label, token, value, usage]) => <div key={token} className="radius-item"><div className="radius-item__box" style={{ borderRadius: `var(${token})` }} aria-hidden="true" /><strong>{label}</strong><code>{token}</code><span className="radius-item__value">{value}</span><small>{usage}</small></div>)}</div></section>
+
+      <section id="usage" className="doc-section"><h2>Usage</h2><div className="code-block"><pre><code>{`.card {
+  display: grid;
+  gap: var(--sp-space-4);
+  padding: var(--sp-space-6);
+  border-radius: var(--sp-radius-lg);
+}`}</code></pre></div><div className="principles-grid">{BEST_PRACTICES.map(([title, body]) => <article key={title} className="principle-card"><h3>{title}</h3><p>{body}</p></article>)}</div></section>
     </>
   )
 }

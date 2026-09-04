@@ -109,12 +109,12 @@ export function MotionPage() {
         <p className="page-tag">Foundation</p>
         <h1>Motion</h1>
         <p className="page-lead">
-          Tokens, patterns, and CSS utilities for consistent, accessible motion
-          across the design system.
+          Tokens, patterns, and React animation utilities for consistent, accessible motion across
+          the design system.
         </p>
       </div>
 
-      <section className="doc-section">
+      <section id="duration" className="doc-section">
         <h2>Duration Tokens</h2>
         <p className="section-desc">
           Duration tokens define how long animations and transitions run. Use
@@ -150,7 +150,7 @@ export function MotionPage() {
         </table>
       </section>
 
-      <section className="doc-section">
+      <section id="easing" className="doc-section">
         <h2>Easing Tokens</h2>
         <p className="section-desc">
           Easing curves control the acceleration profile of animations. Each
@@ -171,7 +171,20 @@ export function MotionPage() {
         </button>
       </section>
 
-      <section className="doc-section">
+      <section id="reference" className="doc-section">
+        <h2>Quick Reference</h2>
+        <table className="token-table" aria-label="Motion quick reference">
+          <thead><tr><th>Need</th><th>Use</th></tr></thead>
+          <tbody>
+            <tr><td>Micro interaction</td><td><code>--sp-duration-fast</code> + <code>--sp-ease-out</code></td></tr>
+            <tr><td>Default entrance</td><td><code>.sp-fade-in</code> or <code>.sp-slide-up-in</code></td></tr>
+            <tr><td>Transient overlay</td><td><code>--sp-duration-normal</code> + <code>--sp-motion-distance-md</code></td></tr>
+            <tr><td>Reduced motion</td><td>Use tokens and verify <code>prefers-reduced-motion: reduce</code></td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="distance" className="doc-section">
         <h2>Distance &amp; Scale Tokens</h2>
         <p className="section-desc">
           Distance tokens define how far elements travel during slide animations.
@@ -204,7 +217,7 @@ export function MotionPage() {
         </table>
       </section>
 
-      <section className="doc-section">
+      <section id="patterns" className="doc-section">
         <h2>Animation Patterns</h2>
         <p className="section-desc">
           Pre-built keyframe animations that consume motion tokens. Click any
@@ -237,7 +250,19 @@ export function MotionPage() {
         </table>
       </section>
 
-      <section className="doc-section">
+      <section id="angular" className="doc-section">
+        <h2>Angular Enter &amp; Leave Animations</h2>
+        <p className="section-desc">
+          React does not use Angular's animation DSL. Use the equivalent Spruce motion utility
+          classes or CSS transitions for enter and leave states, and keep the same duration,
+          distance, easing, and reduced-motion tokens.
+        </p>
+        <div className="code-block"><pre><code>{`<div className={isOpen ? 'sp-slide-up-in' : 'sp-slide-up-out'}>
+  <Panel />
+</div>`}</code></pre></div>
+      </section>
+
+      <section id="transitions" className="doc-section">
         <h2>CSS Transitions</h2>
         <p className="section-desc">
           Compose transition shorthand using duration and easing tokens for
@@ -272,7 +297,7 @@ export function MotionPage() {
         </div>
       </section>
 
-      <section className="doc-section">
+      <section id="accessibility" className="doc-section">
         <h2>Accessibility</h2>
         <p className="section-desc">
           The motion system automatically respects the{' '}

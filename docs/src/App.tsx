@@ -15,6 +15,7 @@ import { DensityPage } from './pages/foundation/Density'
 import { MotifsPage } from './pages/foundation/Motifs'
 import { AccessibilityPage } from './pages/foundation/Accessibility'
 import { InternationalizationPage } from './pages/foundation/Internationalization'
+import { IllustrationsPage } from './pages/foundation/Illustrations'
 import { ButtonPage } from './pages/components/ButtonPage'
 import { BadgePage } from './pages/components/BadgePage'
 import { CheckboxPage } from './pages/components/CheckboxPage'
@@ -247,6 +248,7 @@ function renderPage(hash: string): React.ReactElement {
     case '#/foundation/motifs':         return <MotifsPage />
     case '#/foundation/accessibility':  return <AccessibilityPage />
     case '#/foundation/internationalization': return <InternationalizationPage />
+    case '#/foundation/illustrations':      return <IllustrationsPage />
     case '#/components/button':         return <ButtonPage />
     case '#/components/badge':          return <BadgePage />
     case '#/components/checkbox':       return <CheckboxPage />
