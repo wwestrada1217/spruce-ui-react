@@ -6,6 +6,7 @@ import {
   useTheme,
 } from 'spruce-react'
 import type { HarmonySchemeId } from 'spruce-react'
+import { FoundationPageShell } from '../../components/FoundationPageShell'
 
 const ROLES = ['primary', 'secondary', 'tertiary'] as const
 
@@ -43,7 +44,7 @@ export function ColorHarmonyPage() {
   const displayedPalette = preview ?? harmonyPalette
 
   return (
-    <>
+    <FoundationPageShell variant="harmony" title="Color harmony" description="An accent paints one hue. A harmony derives companion hues from that same brand color — where they sit on the wheel is the scheme's job — and publishes them as secondary and tertiary roles plus a categorical ramp for charts. Every generated color is contrast-checked before it ships, so the scheme chooses hue and the token contract chooses lightness.">
       <div className="page-header">
         <p className="page-tag">Foundation</p>
         <h1>Color Harmony</h1>
@@ -217,6 +218,6 @@ harmonyPalette?.light.series[0]
 `}</code></pre>
         </div>
       </section>
-    </>
+    </FoundationPageShell>
   )
 }

@@ -1,3 +1,5 @@
+import { FoundationPageShell } from '../../components/FoundationPageShell'
+
 const PRINCIPLES = [
   ['Use elevation sparingly', 'A shadow should explain separation or interaction. Flat surfaces and borders are often enough.'],
   ['Match depth to stack order', 'A modal should feel more elevated than the page beneath it, and its shadow should agree with its z-index layer.'],
@@ -36,7 +38,7 @@ const BEST_PRACTICES = [
 
 export function ShadowsPage() {
   return (
-    <>
+    <FoundationPageShell variant="shadows" title="Shadows" description="Elevation tokens create depth, focus, and layer separation. Shadows should clarify the stack of the interface, while z-index tokens keep overlays, popovers, and temporary surfaces ordered in a predictable way.">
       <div className="page-header"><p className="page-tag">Foundation</p><h1>Shadows</h1><p className="page-lead">Elevation tokens create depth, focus, and layer separation. Shadows should clarify the stack of the interface, while z-index tokens keep overlays, popovers, and temporary surfaces ordered in a predictable way.</p></div>
 
       <section id="overview" className="doc-section"><h2>Overview</h2><p className="section-desc">Elevation is a system, not a decoration. Use lower shadow levels for subtle separation, use higher levels only for transient or highly interactive surfaces, and rely on z-index tokens to define stacking rather than arbitrary large numbers.</p><div className="principles-grid">{PRINCIPLES.map(([title, body]) => <article key={title} className="principle-card"><h3>{title}</h3><p>{body}</p></article>)}</div></section>
@@ -51,6 +53,6 @@ export function ShadowsPage() {
   box-shadow: var(--sp-shadow-md);
   z-index: var(--sp-z-popover);
 }`}</code></pre></div><div className="principles-grid">{BEST_PRACTICES.map(([title, body]) => <article key={title} className="principle-card"><h3>{title}</h3><p>{body}</p></article>)}</div></section>
-    </>
+    </FoundationPageShell>
   )
 }

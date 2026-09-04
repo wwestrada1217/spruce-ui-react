@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { FoundationPageShell } from '../../components/FoundationPageShell'
 
 const DURATIONS = [
   { token: '--sp-duration-instant', value: '50ms', usage: 'Checkbox ticks, toggle snaps' },
@@ -104,7 +105,7 @@ export function MotionPage() {
   const [easingKey, setEasingKey] = useState(0)
 
   return (
-    <>
+    <FoundationPageShell variant="motion" title="Motion" description="Tokens, patterns, and React animation utilities for consistent, accessible motion across the design system.">
       <div className="page-header">
         <p className="page-tag">Foundation</p>
         <h1>Motion</h1>
@@ -355,6 +356,6 @@ document.documentElement.setAttribute('data-reduce-motion', 'true')`}</code>
           <li>Test your interface with <code>prefers-reduced-motion: reduce</code> enabled to verify that all content remains functional and visible.</li>
         </ul>
       </section>
-    </>
+    </FoundationPageShell>
   )
 }

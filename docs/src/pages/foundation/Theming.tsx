@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { SPRUCE_THEME_PRESETS } from 'spruce-react'
+import { FoundationPageShell } from '../../components/FoundationPageShell'
 
 interface PresetDef {
   name: string
@@ -45,7 +46,7 @@ export function ThemingPage() {
   const [activePreset, setActivePreset] = useState('ocean')
 
   return (
-    <>
+    <FoundationPageShell variant="theming" title="Theming" description="The Spruce design system supports fully customizable themes via CSS custom properties. Use this generator to tune the design tokens and export the result as a TypeScript preset or plain CSS override block.">
       <div className="page-header">
         <p className="page-tag">Foundation</p>
         <h1>Theming</h1>
@@ -499,6 +500,6 @@ function BrandControls() {
   },
 }`}</code></pre></div>
       </section>
-    </>
+    </FoundationPageShell>
   )
 }

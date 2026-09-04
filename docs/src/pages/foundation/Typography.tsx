@@ -1,3 +1,5 @@
+import { FoundationPageShell } from '../../components/FoundationPageShell'
+
 const SIZES = [
   { token: '--sp-text-2xs', value: '10px' },
   { token: '--sp-text-xs', value: '12px' },
@@ -57,7 +59,7 @@ const TRACKING = [
 
 export function TypographyPage() {
   return (
-    <>
+    <FoundationPageShell variant="typography" title="Typography" description="Typography tokens define readable hierarchy for interface chrome, dense data, long-form body copy, and code-oriented surfaces. The scale is deliberately compact so enterprise workflows can remain information rich without feeling cramped.">
       <div className="page-header">
         <p className="page-tag">Foundation</p>
         <h1>Typography</h1>
@@ -201,6 +203,6 @@ export function TypographyPage() {
   letter-spacing: var(--sp-tracking-tight);
 }`}</code></pre></div>
       </section>
-    </>
+    </FoundationPageShell>
   )
 }

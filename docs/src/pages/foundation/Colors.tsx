@@ -1,3 +1,5 @@
+import { FoundationPageShell } from '../../components/FoundationPageShell'
+
 const SURFACE_STEPS = [0, 25, 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950]
 
 const PRIMARY_SWATCHES = [
@@ -55,7 +57,7 @@ const FROSTED_TOKENS = [
 
 export function ColorsPage() {
   return (
-    <>
+    <FoundationPageShell variant="colors" title="Colors" description="Color tokens define surfaces, text contrast, borders, brand accents, and semantic feedback. Spruce exposes them as CSS custom properties so the same component APIs adapt cleanly across light and dark contexts.">
       <div className="page-header">
         <p className="page-tag">Foundation</p>
         <h1>Colors</h1>
@@ -304,6 +306,6 @@ export function ColorsPage() {
   border: var(--sp-border-width-hairline) solid var(--sp-border);
 }`}</code></pre></div>
       </section>
-    </>
+    </FoundationPageShell>
   )
 }

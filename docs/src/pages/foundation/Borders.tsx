@@ -1,3 +1,5 @@
+import { FoundationPageShell } from '../../components/FoundationPageShell'
+
 const PRINCIPLES = [
   ['Default to hairline', 'Most internal dividers and grid lines should use the hairline width with the default border color so dense UIs stay crisp without heavy rules.'],
   ['Lean on color before width', 'When a divider needs more presence, step up to --sp-border-strong before reaching for a thicker stroke.'],
@@ -27,7 +29,7 @@ const BEST_PRACTICES = [
 
 export function BordersPage() {
   return (
-    <>
+    <FoundationPageShell variant="borders" title="Borders" description="Border width and color tokens keep dividers, table chrome, and panel frames consistent. Pair width tokens with the border color scale so light and dark themes stay aligned without re-tuning every component.">
       <div className="page-header">
         <p className="page-tag">Foundation</p>
         <h1>Borders</h1>
@@ -70,6 +72,6 @@ section.major-break {
 }`}</code></pre></div>
         <div className="principles-grid">{BEST_PRACTICES.map(([title, body]) => <article key={title} className="principle-card"><h3>{title}</h3><p>{body}</p></article>)}</div>
       </section>
-    </>
+    </FoundationPageShell>
   )
 }

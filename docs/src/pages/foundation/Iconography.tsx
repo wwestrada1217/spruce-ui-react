@@ -15,6 +15,7 @@ import {
 } from 'spruce-react'
 import type { IconDefinition } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
+import { FoundationPageShell } from '../../components/FoundationPageShell'
 
 // ── Collection metadata ──────────────────────────────────────────────────────
 
@@ -113,7 +114,7 @@ export function IconographyPage() {
   }, [search])
 
   return (
-    <>
+    <FoundationPageShell variant="iconography" title="Iconography" description="Spruce includes a lightweight SVG icon system. Icons are registered through the React icon registry and rendered with the Icon component. All icons inherit currentColor and can be tree-shaken by importing only the collections or individual icons your application uses.">
       <div className="page-header">
         <p className="page-tag">Foundation</p>
         <h1>Iconography</h1>
@@ -360,6 +361,6 @@ export function IconographyPage() {
         <h2>API</h2>
         <table className="token-table" aria-label="Icon API"><thead><tr><th>Prop</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td><code>name</code></td><td>string</td><td>Registered icon name.</td></tr><tr><td><code>size</code></td><td>number</td><td>Width and height in pixels.</td></tr><tr><td><code>ariaLabel</code></td><td>string</td><td>Accessible name for meaningful icons; decorative icons remain hidden from assistive technology.</td></tr><tr><td><code>className</code> / <code>style</code></td><td>string / CSSProperties</td><td>Additional styling hooks and inline overrides.</td></tr></tbody></table>
       </section>
-    </>
+    </FoundationPageShell>
   )
 }

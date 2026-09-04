@@ -1,3 +1,5 @@
+import { FoundationPageShell } from '../../components/FoundationPageShell'
+
 type Density = 'dense' | 'default' | 'comfortable'
 
 const PRINCIPLES = [
@@ -53,7 +55,7 @@ const BEST_PRACTICES = [
 
 export function DensityPage() {
   return (
-    <>
+    <FoundationPageShell variant="density" title="Density" description="Density controls how compact or spacious a surface feels. Spruce exposes density as a shared token family so controls, lists, panels, and data-heavy surfaces can move together between dense, default, and comfortable layouts without introducing component-specific spacing APIs.">
       <div className="page-header"><p className="page-tag">Foundation</p><h1>Density</h1><p className="page-lead">Density controls how compact or spacious a surface feels. Spruce exposes density as a shared token family so controls, lists, panels, and data-heavy surfaces can move together between dense, default, and comfortable layouts without introducing component-specific spacing APIs.</p></div>
 
       <section id="overview" className="doc-section"><h2>Overview</h2><p className="section-desc">Density changes sizing and rhythm as one inherited contract. Choose a preset without changing component meaning or duplicating component-specific spacing APIs.</p><div className="principles-grid">{PRINCIPLES.map(([title, body]) => <article key={title} className="principle-card"><h3>{title}</h3><p>{body}</p></article>)}</div></section>
@@ -82,6 +84,6 @@ export function DensityPage() {
       <section id="datagrid" className="doc-section"><h2>Datagrid Behavior</h2><p className="section-desc">Datagrid inherits density from the nearest scope by default and can override that density per grid when a local divergence is necessary. Row lines, headers, filters, toolbars, pagination, and cell padding remain coordinated.</p><table className="token-table" aria-label="Datagrid density metrics"><thead><tr><th>Metric</th><th>Dense</th><th>Default</th><th>Comfortable</th></tr></thead><tbody>{DATAGRID.map(([label, dense, defaultValue, comfortable]) => <tr key={label}><td>{label}</td><td>{dense}</td><td>{defaultValue}</td><td>{comfortable}</td></tr>)}</tbody></table></section>
 
       <section id="best-practices" className="doc-section"><h2>Best Practices</h2><div className="principles-grid">{BEST_PRACTICES.map(([title, body]) => <article key={title} className="principle-card"><h3>{title}</h3><p>{body}</p></article>)}</div></section>
-    </>
+    </FoundationPageShell>
   )
 }

@@ -1,3 +1,5 @@
+import { FoundationPageShell } from '../../components/FoundationPageShell'
+
 const PRINCIPLES = [
   ['Keyboard First', 'Every interactive component must be reachable, operable, and dismissible without a pointer.'],
   ['Clear Semantics', 'Use native controls and landmark structure before adding ARIA. ARIA should clarify behavior, not repair avoidable markup.'],
@@ -44,7 +46,7 @@ const TESTING = [
 
 export function AccessibilityPage() {
   return (
-    <>
+    <FoundationPageShell variant="accessibility" title="Accessibility" description="Spruce components are designed to be keyboard operable, readable by assistive technology, resilient across themes, and practical for teams building WCAG-aligned enterprise interfaces.">
       <div className="page-header">
         <p className="page-tag">Foundation</p>
         <h1>Accessibility</h1>
@@ -90,6 +92,6 @@ export function AccessibilityPage() {
         <p className="section-desc">Validate accessibility at the component, documentation, and product levels. Static analysis catches common misses, while manual review confirms real behavior.</p>
         <table className="token-table" aria-label="Accessibility testing workflow"><thead><tr><th>Step</th><th>What To Verify</th></tr></thead><tbody>{TESTING.map(([step, verify]) => <tr key={step}><td>{step}</td><td>{verify}</td></tr>)}</tbody></table>
       </section>
-    </>
+    </FoundationPageShell>
   )
 }

@@ -1254,6 +1254,278 @@ code {
   flex-wrap: wrap;
 }
 
+/* ── Angular-parity foundation editorial shell ─────────────────────────────── */
+.foundation-editorial {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(168px, 196px);
+  column-gap: clamp(var(--sp-space-6), 4vw, var(--sp-space-12));
+  align-items: start;
+  container: foundation-page / inline-size;
+}
+
+.foundation-editorial > .features-main {
+  min-inline-size: 0;
+  gap: clamp(var(--sp-space-10), 5vw, var(--sp-space-16));
+}
+
+.foundation-editorial > .features-main > .page-header {
+  display: none;
+}
+
+.foundation-editorial .foundation-hero {
+  display: grid;
+  grid-template-columns: minmax(14rem, 0.85fr) minmax(20rem, 1.15fr);
+  gap: clamp(var(--sp-space-6), 4vw, var(--sp-space-12));
+  align-items: center;
+  min-block-size: 19rem;
+  padding-block: var(--sp-space-4) clamp(var(--sp-space-8), 5vw, var(--sp-space-12));
+  border-block-end: 1px solid var(--sp-border);
+}
+
+.foundation-editorial .foundation-hero__copy {
+  min-inline-size: 0;
+}
+
+.foundation-editorial .foundation-hero h1 {
+  max-inline-size: 12ch;
+  margin: 0;
+  color: var(--sp-text-color);
+  font-size: clamp(2.75rem, 7cqi, 4.75rem);
+  font-weight: var(--sp-font-bold);
+  letter-spacing: -0.035em;
+  line-height: 0.96;
+  text-wrap: balance;
+}
+
+.foundation-editorial--internationalization .foundation-hero h1 {
+  font-size: clamp(2.25rem, 4.5cqi, 3.25rem);
+}
+
+.foundation-editorial .foundation-hero .docs-desc {
+  max-inline-size: 66ch;
+  margin: var(--sp-space-5) 0 0;
+  color: var(--sp-text-muted);
+  font-size: clamp(var(--sp-text-md), 1.6cqi, var(--sp-text-lg));
+  line-height: var(--sp-leading-relaxed);
+}
+
+.foundation-editorial .foundation-instrument {
+  display: block;
+  inline-size: 100%;
+  max-inline-size: 35rem;
+  block-size: auto;
+  justify-self: end;
+  color: var(--sp-text-color);
+}
+
+.foundation-editorial .foundation-instrument__frame {
+  fill: var(--sp-surface-0);
+  stroke: var(--sp-border);
+}
+
+.foundation-editorial .foundation-instrument__surface { fill: var(--sp-surface-50); }
+.foundation-editorial .foundation-instrument__surface-strong { fill: var(--sp-surface-100); }
+.foundation-editorial .foundation-instrument__grid,
+.foundation-editorial .foundation-instrument__rule {
+  fill: none;
+  stroke: var(--sp-border);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.foundation-editorial .foundation-instrument__rule--strong { fill: none; stroke: var(--sp-text-muted); }
+.foundation-editorial .foundation-instrument__ink { fill: var(--sp-text-color); }
+.foundation-editorial .foundation-instrument__muted { fill: var(--sp-text-muted); }
+.foundation-editorial .foundation-instrument__accent { fill: var(--sp-primary); }
+.foundation-editorial .foundation-instrument__accent-line {
+  fill: none;
+  stroke: var(--sp-primary);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+.foundation-editorial .foundation-instrument__focus {
+  fill: none;
+  stroke: var(--sp-focus-ring-color, var(--sp-primary));
+  stroke-width: 3;
+  vector-effect: non-scaling-stroke;
+}
+.foundation-editorial .foundation-instrument__success { fill: var(--sp-success); }
+.foundation-editorial .foundation-instrument__warning { fill: var(--sp-warning); }
+.foundation-editorial .foundation-instrument__danger { fill: var(--sp-danger); }
+
+.foundation-editorial .doc-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-space-4);
+  margin-block-end: 0;
+  scroll-margin-block-start: var(--sp-space-8);
+}
+
+.foundation-editorial .features-main > .doc-section:not(:first-of-type) {
+  padding-block-start: clamp(var(--sp-space-8), 4vw, var(--sp-space-12));
+  border-block-start: 1px solid var(--sp-border);
+}
+
+.foundation-editorial .features-main > .doc-section:nth-of-type(n + 3) {
+  content-visibility: auto;
+  contain-intrinsic-size: auto none auto 36rem;
+}
+
+.foundation-editorial .doc-section h2 {
+  max-inline-size: 20ch;
+  margin: 0;
+  color: var(--sp-text-color);
+  font-size: clamp(var(--sp-text-xl), 3cqi, var(--sp-text-3xl));
+  font-weight: var(--sp-font-semibold);
+  letter-spacing: -0.025em;
+  line-height: var(--sp-leading-tight);
+  text-wrap: balance;
+}
+
+.foundation-editorial .doc-section h3 { color: var(--sp-text-color); }
+.foundation-editorial .doc-section > p,
+.foundation-editorial .section-desc {
+  max-inline-size: 72ch;
+  color: var(--sp-text-muted);
+  line-height: var(--sp-leading-relaxed);
+}
+
+.foundation-editorial .token-table {
+  margin: 0;
+  background: var(--sp-surface-0);
+  border: 1px solid var(--sp-border);
+  border-radius: var(--sp-radius-md);
+  overflow: hidden;
+}
+
+.foundation-editorial .token-table th,
+.foundation-editorial .token-table td {
+  padding: var(--sp-space-3) var(--sp-space-4);
+  text-align: start;
+  vertical-align: top;
+  border-bottom: 1px solid var(--sp-border);
+}
+
+.foundation-editorial .token-table th {
+  background: var(--sp-surface-50);
+  color: var(--sp-text-color);
+  font-weight: var(--sp-font-semibold);
+}
+
+.foundation-editorial .token-table tbody tr:last-child td { border-bottom: 0; }
+
+.foundation-editorial .code-block {
+  background: var(--sp-surface-50);
+  border-color: var(--sp-border);
+  border-radius: var(--sp-radius-md);
+}
+
+.foundation-editorial .code-block code {
+  color: var(--sp-text-color);
+}
+
+.foundation-editorial .principles-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin-block-start: var(--sp-space-3);
+  border-block: 1px solid var(--sp-border);
+}
+
+.foundation-editorial .principle-card {
+  min-inline-size: 0;
+  padding: var(--sp-space-5) var(--sp-space-5) var(--sp-space-6);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.foundation-editorial .principle-card + .principle-card { border-inline-start: 1px solid var(--sp-border); }
+.foundation-editorial .principle-card h3 { margin: 0 0 var(--sp-space-2); font-size: var(--sp-text-md); }
+.foundation-editorial .principle-card p { margin: 0; color: var(--sp-text-muted); line-height: var(--sp-leading-relaxed); }
+
+.foundation-editorial .features-toc {
+  position: sticky;
+  inset-block-start: var(--sp-space-6);
+  align-self: start;
+  max-block-size: calc(100dvb - var(--sp-space-12));
+  padding-block-start: var(--sp-space-2);
+  overflow: auto;
+  scrollbar-width: thin;
+}
+
+.foundation-editorial .features-toc__title {
+  margin: 0 0 var(--sp-space-3);
+  color: var(--sp-text-muted);
+  font-size: var(--sp-text-xs);
+  font-weight: var(--sp-font-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.foundation-editorial .toc-list { gap: 1px; }
+.foundation-editorial .toc-link {
+  display: block;
+  width: 100%;
+  padding: 7px var(--sp-space-3);
+  color: var(--sp-text-muted);
+  text-align: start;
+  border: 0;
+  border-inline-start: 1px solid var(--sp-border);
+  border-radius: 0;
+  background: transparent;
+  line-height: 1.35;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 150ms ease, background 150ms ease, border-color 150ms ease;
+}
+
+.foundation-editorial .toc-link:hover {
+  color: var(--sp-text-color);
+  background: var(--sp-surface-50);
+}
+
+.foundation-editorial .toc-link.active {
+  color: var(--sp-primary);
+  background: transparent;
+  border-inline-start-color: var(--sp-primary);
+  font-weight: var(--sp-font-semibold);
+}
+
+@container foundation-page (inline-size < 54rem) {
+  .foundation-editorial .foundation-hero {
+    grid-template-columns: 1fr;
+    min-block-size: auto;
+  }
+  .foundation-editorial .foundation-instrument { max-inline-size: none; justify-self: stretch; }
+}
+
+@media (max-width: 900px) {
+  .foundation-editorial { grid-template-columns: minmax(0, 1fr); }
+  .foundation-editorial .features-toc { display: none; }
+}
+
+@media (max-width: 640px) {
+  .foundation-editorial > .features-main { gap: var(--sp-space-10); }
+  .foundation-editorial .foundation-hero { gap: var(--sp-space-6); padding-block-start: 0; }
+  .foundation-editorial .foundation-hero h1 { font-size: clamp(2.5rem, 14vw, 3.5rem); }
+  .foundation-editorial--internationalization .foundation-hero h1 { font-size: clamp(2.125rem, 9.25vw, 2.375rem); }
+  .foundation-editorial .principles-grid { grid-template-columns: 1fr; }
+  .foundation-editorial .principle-card + .principle-card { border-inline-start: 0; border-block-start: 1px solid var(--sp-border); }
+}
+
+@media (forced-colors: active) {
+  .foundation-editorial .foundation-instrument__frame,
+  .foundation-editorial .foundation-instrument__grid,
+  .foundation-editorial .foundation-instrument__rule,
+  .foundation-editorial .foundation-instrument__focus { stroke: CanvasText; }
+  .foundation-editorial .foundation-instrument__ink,
+  .foundation-editorial .foundation-instrument__accent,
+  .foundation-editorial .foundation-instrument__success,
+  .foundation-editorial .foundation-instrument__warning,
+  .foundation-editorial .foundation-instrument__danger { fill: CanvasText; }
+}
+
 .cl-release__version {
   font-size: 20px;
   font-weight: 700;

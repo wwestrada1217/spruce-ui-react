@@ -1,3 +1,5 @@
+import { FoundationPageShell } from '../../components/FoundationPageShell'
+
 const SPACINGS = [
   ['0', '--sp-space-0', '0', 'Reset spacing and collapse edges where needed.'], ['px', '--sp-space-px', '1px', 'Hairline alignment and optical corrections.'],
   ['0.5', '--sp-space-0_5', '2px', 'Micro-adjustments inside dense controls.'], ['1', '--sp-space-1', '4px', 'Tight icon spacing and compressed inline layouts.'],
@@ -33,7 +35,7 @@ const BEST_PRACTICES = [
 
 export function SpacingPage() {
   return (
-    <>
+    <FoundationPageShell variant="spacing" title="Spacing" description="Spacing tokens create layout rhythm, breathable controls, and consistent separation between interface layers. The scale is based on a compact system that still leaves room for expressive page structure and generous content sections.">
       <div className="page-header"><p className="page-tag">Foundation</p><h1>Spacing</h1><p className="page-lead">Spacing tokens create layout rhythm, breathable controls, and consistent separation between interface layers. The scale is based on a compact system that still leaves room for expressive page structure and generous content sections.</p></div>
 
       <section id="overview" className="doc-section"><h2>Overview</h2><p className="section-desc">Spacing is a layout contract. Components own their internal padding, while parents own the space between siblings. Prefer container <code>gap</code> over per-child margins so the relationship remains visible in the layout.</p><div className="principles-grid"><article className="principle-card"><h3>Rhythm beats randomness</h3><p>Repeated spacing values create a predictable visual cadence and make interfaces easier to scan.</p></article><article className="principle-card"><h3>Density and spacing cooperate</h3><p>Density presets adjust semantic control and panel rhythm while this scale remains the shared source of values.</p></article><article className="principle-card"><h3>Scale intent with distance</h3><p>Use smaller tokens for touch points within a component and larger tokens to separate groups, sections, and page regions.</p></article></div></section>
@@ -50,6 +52,6 @@ export function SpacingPage() {
   padding: var(--sp-space-6);
   border-radius: var(--sp-radius-lg);
 }`}</code></pre></div><div className="principles-grid">{BEST_PRACTICES.map(([title, body]) => <article key={title} className="principle-card"><h3>{title}</h3><p>{body}</p></article>)}</div></section>
-    </>
+    </FoundationPageShell>
   )
 }

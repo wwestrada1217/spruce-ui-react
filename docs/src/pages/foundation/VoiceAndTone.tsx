@@ -1,3 +1,5 @@
+import { FoundationPageShell } from '../../components/FoundationPageShell'
+
 const PRINCIPLES = [
   {
     title: 'Clarity over cleverness',
@@ -178,7 +180,7 @@ const INCLUSIVE_RULES = [
 
 export function VoiceAndTonePage() {
   return (
-    <>
+    <FoundationPageShell variant="voice" title="Voice & Tone" description="Guidelines for writing clear, consistent, and human interface copy across the design system.">
       <div className="page-header">
         <p className="page-tag">Foundation</p>
         <h1>Voice &amp; Tone</h1>
@@ -358,6 +360,6 @@ export function VoiceAndTonePage() {
           </tbody>
         </table>
       </section>
-    </>
+    </FoundationPageShell>
   )
 }

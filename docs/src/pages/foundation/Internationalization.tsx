@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Alert, Button, Pager, SP_I18N_LOCALES, SpruceI18nProvider, useI18n } from 'spruce-react'
+import { FoundationPageShell } from '../../components/FoundationPageShell'
 
 const PRINCIPLES = [
   ['One Application Contract', 'Configure locale, labels, formatting, and direction once at the application boundary so every component reads the same language context.'],
@@ -34,7 +35,7 @@ function InternationalizationDemo({ onLocaleChange }: { onLocaleChange: (locale:
 
 export function InternationalizationPage() {
   const [locale, setLocale] = useState('en-US')
-  return <>
+  return <FoundationPageShell variant="internationalization" title="Internationalization" description="Every Spruce component resolves its own text through Spruce i18n: visible labels, placeholders, empty states, tooltips, and assistive-technology labels. Pick a language and the whole library follows, including document direction and date formatting.">
     <div className="page-header"><p className="page-tag">Foundation</p><h1>Internationalization</h1><p className="page-lead">Every Spruce component resolves its own text through Spruce i18n: visible labels, placeholders, empty states, tooltips, and assistive-technology labels. Pick a language and the whole library follows, including document direction and date formatting.</p></div>
 
     <section id="overview" className="doc-section"><h2>Overview</h2><p className="section-desc">Configure i18n once at the application boundary. Components use the shared SpruceI18nProvider for default labels, date formatting, calendar labels, and direction-aware document metadata while still allowing local inputs for product-specific copy.</p><div className="principles-grid">{PRINCIPLES.map(([title, body]) => <article key={title} className="principle-card"><h3>{title}</h3><p>{body}</p></article>)}</div></section>
@@ -71,5 +72,5 @@ formatRange(startDate, endDate)`}</code></pre></div></section>
 </div>`}</code></pre></div><SpruceI18nProvider key={locale} locale={locale} syncDocument={false}><InternationalizationDemo onLocaleChange={setLocale} /></SpruceI18nProvider></section>
 
     <section id="component-guidance" className="doc-section"><h2>Component Guidance</h2><div className="principles-grid">{GUIDANCE.map(([title, body]) => <article key={title} className="principle-card"><h3>{title}</h3><p>{body}</p></article>)}</div></section>
-  </>
+  </FoundationPageShell>
 }

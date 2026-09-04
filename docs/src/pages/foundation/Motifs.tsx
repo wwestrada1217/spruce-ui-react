@@ -1,5 +1,6 @@
 import { Card, Motif, MotifProvider, Panel, SP_BUILT_IN_MOTIFS } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
+import { FoundationPageShell } from '../../components/FoundationPageShell'
 
 const FAMILIES = [
   { name: 'Geometric', count: 24, examples: 'Diamonds, facets, cubes, crosses, and steps' },
@@ -29,7 +30,7 @@ const CUSTOM_MOTIF = {
 
 export function MotifsPage() {
   return (
-    <>
+    <FoundationPageShell variant="motifs" title="Background motifs" description="A decorative SVG ornament painted behind the content of a banner, card, panel, or any other container. Spruce ships reusable motifs across seven families, and the collection is open — register your own and use it the same way.">
       <div className="page-header">
         <p className="page-tag">Foundation</p>
         <h1>Background motifs</h1>
@@ -175,6 +176,6 @@ export function MotifsPage() {
           and where applicable <code>elevation</code>; see the Card and Panel APIs.
         </p>
       </section>
-    </>
+    </FoundationPageShell>
   )
 }
