@@ -221,7 +221,7 @@ export function MyPage() {
           <h2>Basic</h2>
           <p className="section-desc">
             Wrap any component in <code>&lt;CodePreview&gt;</code> and pass the source via the{' '}
-            <code>code</code> prop. Defaults to TypeScript syntax highlighting.
+            <code>code</code> prop. Defaults to HTML syntax highlighting.
           </p>
           <CodePreview code={basicCode}>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -364,7 +364,7 @@ export function MyPage() {
                 <tr>
                   <td><code>language</code></td>
                   <td><code>CodeLanguage</code></td>
-                  <td><code>'typescript'</code></td>
+                  <td><code>'html'</code></td>
                   <td>
                     Syntax highlighting language when using <code>code</code> (html, typescript,
                     css, scss, json, python, sql, csharp, markdown, javascript)
@@ -475,8 +475,7 @@ export function MyPage() {
                 <tr>
                   <td>Syntax highlighting</td>
                   <td>
-                    Powered by the <code>CodeEditor</code> component with line numbers and theme
-                    token colors
+                    Powered by <code>DocsCodeViewer</code> with line numbers and theme token colors
                   </td>
                 </tr>
                 <tr>
@@ -498,7 +497,7 @@ export function MyPage() {
                 </tr>
                 <tr>
                   <td>Multi-language</td>
-                  <td>Supports every language the <code>CodeEditor</code> tokenizer ships with</td>
+                  <td>Supports multiple languages via built-in tokenizer</td>
                 </tr>
                 <tr>
                   <td>Property panel</td>
