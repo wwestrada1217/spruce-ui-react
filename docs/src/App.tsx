@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { DocsSidebar } from './components/Sidebar'
 import { HomePage } from './pages/HomePage'
 import { ColorsPage } from './pages/foundation/Colors'
@@ -198,6 +198,9 @@ function useHash(): string {
   const [hash, setHash] = useState(() => window.location.hash || '#/')
 
   useEffect(() => {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual'
+    }
     if (!window.location.hash) {
       window.location.hash = '#/'
     }
@@ -436,10 +439,36 @@ function renderPage(hash: string): React.ReactElement {
 export default function App() {
   const hash = useHash()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [prevHash, setPrevHash] = useState(hash)
+  const mainRef = useRef<HTMLElement>(null)
 
-  // Close mobile sidebar on navigation
+  // Close mobile sidebar on route navigation
+  if (prevHash !== hash) {
+    setPrevHash(hash)
+    if (mobileOpen) {
+      setMobileOpen(false)
+    }
+  }
+
+  // When changing route/page, always scroll up to the top
   useEffect(() => {
-    setMobileOpen(false)
+    if (mainRef.current) {
+      mainRef.current.scrollTop = 0
+    }
+    window.scrollTo(0, 0)
+    document.documentElement.scrollTop = 0
+    document.body.scrollTop = 0
+
+    const frameId = requestAnimationFrame(() => {
+      if (mainRef.current) {
+        mainRef.current.scrollTop = 0
+      }
+      window.scrollTo(0, 0)
+      document.documentElement.scrollTop = 0
+      document.body.scrollTop = 0
+    })
+
+    return () => cancelAnimationFrame(frameId)
   }, [hash])
 
   return (
@@ -456,7 +485,7 @@ export default function App() {
         <DocsSidebar activeHash={hash} />
       </div>
 
-      <main className="docs-main" id="main-content">
+      <main className="docs-main" id="main-content" ref={mainRef}>
         {/* Mobile menu toggle */}
         <button
           className="docs-mobile-menu-btn"
