@@ -82,6 +82,7 @@ export function DocsSidebar({ activeHash }: DocsSidebarProps) {
                   <SidebarMenuGroup
                     key={item.label}
                     icon={item.icon}
+                    defaultExpanded={item.children.some((child) => activeHash === child.route)}
                     items={item.children.map((child) => (
                       <SidebarItem
                         key={child.route}

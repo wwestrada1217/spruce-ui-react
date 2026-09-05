@@ -2,6 +2,7 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
   Icon,
+  Popover,
   SP_I18N_LOCALES,
   useI18n,
   type SpDirection,
@@ -276,81 +277,68 @@ export interface DocsI18nPickerProps {
 export function DocsI18nPicker({ className = '', compact = false }: DocsI18nPickerProps) {
   const docs = useDocsI18n();
   const [open, setOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const onPointerDown = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
-    };
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpen(false);
-    };
-    document.addEventListener('pointerdown', onPointerDown);
-    document.addEventListener('keydown', onKeyDown);
-    return () => {
-      document.removeEventListener('pointerdown', onPointerDown);
-      document.removeEventListener('keydown', onKeyDown);
-    };
-  }, [open]);
 
   const dayOptions = [
     [0, docs.t('sunday')], [1, docs.t('monday')], [5, docs.t('friday')], [6, docs.t('saturday')],
   ] as const;
 
   return (
-    <div ref={rootRef} className={['docs-i18n-picker', className].filter(Boolean).join(' ')}>
-      <button
-        type="button"
-        className={`docs-i18n-picker__trigger${compact ? ' docs-i18n-picker__trigger--compact' : ''}`}
-        aria-expanded={open}
-        aria-haspopup="dialog"
-        aria-label={docs.t('languageSettings')}
-        title={docs.t('languageSettings')}
-        onClick={() => setOpen((current) => !current)}
-      >
-        <Icon name="globe" size={16} aria-hidden="true" />
-        {!compact && <span className="docs-i18n-picker__trigger-label">{docs.locale}</span>}
-      </button>
+    <Popover
+      className={['docs-i18n-picker', className].filter(Boolean).join(' ')}
+      placement="top-end"
+      offset={8}
+      open={open}
+      onOpenChange={setOpen}
+      panelClassName="docs-i18n-picker__panel"
+      panelAriaLabel={docs.t('languageSettings')}
+      trigger={
+        <button
+          type="button"
+          className={`docs-i18n-picker__trigger${compact ? ' docs-i18n-picker__trigger--compact' : ''}`}
+          aria-label={docs.t('languageSettings')}
+          title={docs.t('languageSettings')}
+        >
+          <Icon name="globe" size={16} aria-hidden="true" />
+          {!compact && <span className="docs-i18n-picker__trigger-label">{docs.locale}</span>}
+        </button>
+      }
+    >
+      <div>
+        <div className="docs-i18n-picker__header">
+          <h2>{docs.t('internationalization')}</h2>
+          <button type="button" className="docs-i18n-picker__close" onClick={() => setOpen(false)} aria-label={docs.t('closeLanguageSettings')}>
+            <Icon name="x" size={14} aria-hidden="true" />
+          </button>
+        </div>
 
-      {open && (
-        <section className="docs-i18n-picker__panel" role="dialog" aria-label={docs.t('languageSettings')}>
-          <div className="docs-i18n-picker__header">
-            <h2>{docs.t('internationalization')}</h2>
-            <button type="button" className="docs-i18n-picker__close" onClick={() => setOpen(false)} aria-label={docs.t('closeLanguageSettings')}>
-              <Icon name="x" size={14} aria-hidden="true" />
-            </button>
-          </div>
-
-          <label>
-            <span>{docs.t('locale')}</span>
-            <select value={docs.locale} onChange={(event) => docs.setLocale(event.target.value)}>
-              {docs.availableLocales.map((locale) => <option key={locale.code} value={locale.code}>{locale.nativeLabel}</option>)}
-            </select>
-          </label>
-          <label>
-            <span>{docs.t('direction')}</span>
-            <select value={docs.direction} onChange={(event) => docs.setDirection(event.target.value as SpDirection)}>
-              <option value="ltr">{docs.t('leftToRight')}</option>
-              <option value="rtl">{docs.t('rightToLeft')}</option>
-            </select>
-          </label>
-          <label>
-            <span>{docs.t('firstDay')}</span>
-            <select value={docs.firstDayOfWeek} onChange={(event) => docs.setFirstDayOfWeek(Number(event.target.value))}>
-              {dayOptions.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-            </select>
-          </label>
-          <label className="docs-i18n-picker__check">
-            <input type="checkbox" checked={docs.syncDocument} onChange={(event) => docs.setSyncDocument(event.target.checked)} />
-            <span>{docs.t('syncDocumentLangAndDir')}</span>
-          </label>
-          <div className="docs-i18n-picker__meta" aria-live="polite">
-            <span>{docs.locale}</span><span>{docs.direction.toUpperCase()}</span>
-          </div>
-        </section>
-      )}
-    </div>
+        <label>
+          <span>{docs.t('locale')}</span>
+          <select value={docs.locale} onChange={(event) => docs.setLocale(event.target.value)}>
+            {docs.availableLocales.map((locale) => <option key={locale.code} value={locale.code}>{locale.nativeLabel}</option>)}
+          </select>
+        </label>
+        <label>
+          <span>{docs.t('direction')}</span>
+          <select value={docs.direction} onChange={(event) => docs.setDirection(event.target.value as SpDirection)}>
+            <option value="ltr">{docs.t('leftToRight')}</option>
+            <option value="rtl">{docs.t('rightToLeft')}</option>
+          </select>
+        </label>
+        <label>
+          <span>{docs.t('firstDay')}</span>
+          <select value={docs.firstDayOfWeek} onChange={(event) => docs.setFirstDayOfWeek(Number(event.target.value))}>
+            {dayOptions.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+          </select>
+        </label>
+        <label className="docs-i18n-picker__check">
+          <input type="checkbox" checked={docs.syncDocument} onChange={(event) => docs.setSyncDocument(event.target.checked)} />
+          <span>{docs.t('syncDocumentLangAndDir')}</span>
+        </label>
+        <div className="docs-i18n-picker__meta" aria-live="polite">
+          <span>{docs.locale}</span><span>{docs.direction.toUpperCase()}</span>
+        </div>
+      </div>
+    </Popover>
   );
 }
 
