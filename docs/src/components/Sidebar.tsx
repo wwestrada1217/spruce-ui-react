@@ -75,7 +75,7 @@ export function DocsSidebar({ activeHash }: DocsSidebarProps) {
         {NAV_SECTIONS.map((section, sectionIndex) => (
           <div key={section.label}>
             {sectionIndex > 0 && <SidebarSeparator />}
-            <SidebarGroup>
+            <SidebarGroup collapsible>
               <SidebarGroupLabel>{docs.section(section.label)}</SidebarGroupLabel>
               {section.items.map((item) =>
                 isNavBranch(item) ? (

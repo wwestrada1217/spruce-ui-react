@@ -6,6 +6,7 @@
  */
 
 import { useId, type ReactNode } from 'react';
+import { Icon } from '../../icons/Icon.js';
 import { useSidebar } from './SidebarContext.js';
 import { useSidebarGroup } from './SidebarGroup.js';
 
@@ -37,6 +38,11 @@ export function SidebarGroupLabel({ children, actions }: SidebarGroupLabelProps)
           onClick={toggleLabel}
         >
           <span className="sp-sidebar-group-label__text">{children}</span>
+          <Icon
+            name="chevron-right"
+            size={12}
+            className={`sp-sidebar-group-label__chevron${group.expanded ? ' sp-sidebar-group-label__chevron--expanded' : ''}`}
+          />
         </button>
       ) : (
         <span id={labelId} className="sp-sidebar-group-label__text">{children}</span>

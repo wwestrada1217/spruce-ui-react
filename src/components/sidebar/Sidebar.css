@@ -251,6 +251,8 @@
 }
 
 .sp-sidebar-group-label__text {
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -268,6 +270,16 @@
   font: inherit;
   text-align: start;
   cursor: pointer;
+}
+
+.sp-sidebar-group-label__chevron {
+  flex-shrink: 0;
+  color: var(--sp-text-muted, #4a5568);
+  transition: transform var(--sp-duration-normal, 200ms) var(--sp-ease-default, ease);
+}
+
+.sp-sidebar-group-label__chevron--expanded {
+  transform: rotate(90deg);
 }
 
 .sp-sidebar-group-label__toggle:focus-visible {
