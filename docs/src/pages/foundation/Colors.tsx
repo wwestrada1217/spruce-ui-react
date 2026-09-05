@@ -1,7 +1,22 @@
 import { useState } from 'react'
 import { FoundationPageShell } from '../../components/FoundationPageShell'
+import { CodePreview } from '../../components/CodePreview'
 
 const SURFACE_STEPS = [0, 25, 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950]
+
+const SURFACE_GUIDANCE = [
+  ['0–50', 'Primary app backgrounds, cards, panels, and high-emphasis raised surfaces.'],
+  ['100–300', 'Muted containers, dividers, hover states, subtle fills, and inactive UI chrome.'],
+  ['400–600', 'Low-emphasis icons, subdued accents, and transitional neutral elements.'],
+  ['700–950', 'Deep canvases, inverse surfaces, overlays, and dark presentation layers.'],
+]
+
+const SURFACE_ALIASES = [
+  ['--sp-surface', '--sp-bg / --sp-background', 'var(--sp-surface-0)', 'Default page and canvas background across application layouts.'],
+  ['--sp-surface-raised', '', 'Light: --sp-surface-50 / Dark: --sp-surface-100', 'Raised cards, dropdown panels, dialogs, and elevated surfaces.'],
+  ['--sp-surface-sunken', '', 'Light: --sp-surface-100 / Dark: --sp-surface-25', 'Inset wells, code editors, search input cavities, and recessed containers.'],
+  ['--sp-surface-hover', '', 'var(--sp-content-hover-bg)', 'Hover fill for interactive lists, table rows, and navigation items.'],
+]
 
 const PRIMARY_SWATCHES = [
   { label: 'Primary', token: '--sp-primary' },
@@ -54,6 +69,41 @@ const FROSTED_TOKENS = [
   { token: '--sp-frosted-blur', desc: 'Backdrop blur + saturation for glass panels' },
   { token: '--sp-frosted-blur-strong', desc: 'Heavier blur for modals and command bars' },
   { token: '--sp-frosted-shadow', desc: 'Elevation shadow tuned for glass surfaces' },
+]
+
+const COMPANION_ROLES = [
+  ['--sp-secondary', 'Companion accent', 'Second non-semantic accent for CTAs, badges, and tag categories.'],
+  ['--sp-secondary-subtle', 'Companion tint', 'Tinted background carrying the secondary hue for badges and highlight rows.'],
+  ['--sp-secondary-text', 'Label on fill', 'Label color that reads on the secondary fill.'],
+  ['--sp-tertiary', 'Third accent', 'Third non-semantic accent for a distinct category or series.'],
+  ['--sp-tertiary-subtle', 'Companion tint', 'Tinted background carrying the tertiary hue.'],
+  ['--sp-tertiary-text', 'Label on fill', 'Label color that reads on the tertiary fill.'],
+]
+
+const CHART_TOKENS = [
+  ['--sp-chart-series-1 … --sp-chart-series-8', 'Categorical series ramp for chart data.'],
+  ['--sp-chart-axis-line', 'Axis line and chart frame.'],
+  ['--sp-chart-grid-line', 'Low-emphasis grid lines.'],
+  ['--sp-chart-tooltip-bg', 'Tooltip container background.'],
+  ['--sp-chart-tooltip-text', 'Text placed inside chart tooltips.'],
+  ['--sp-chart-track-bg', 'Track behind progress and gauge values.'],
+]
+
+const USAGE_CODE = `.panel {
+  background: var(--sp-surface-0);
+  color: var(--sp-text-color);
+  border: var(--sp-border-width-hairline) solid var(--sp-border);
+}
+
+.panel__action:hover {
+  background: var(--sp-primary-subtle);
+  color: var(--sp-primary);
+}`
+
+const BEST_PRACTICES = [
+  ['Prefer role tokens over palette values', 'Map components to semantic roles like surface, text, border, or primary so themes can redefine the look without changing component code.'],
+  ['Keep primary selective', 'If too many surfaces use primary, nothing stands out. Reserve it for actions, selection, and the most important active state.'],
+  ['Use semantic colors for meaning only', 'Avoid using success or danger as generic decoration. Their visual language should stay tied to outcome and state.'],
 ]
 
 export function ColorsPage() {
@@ -114,6 +164,14 @@ export function ColorsPage() {
             </div>
           ))}
         </div></div>
+        <table className="token-table" aria-label="Surface scale guidance">
+          <thead><tr><th>Range</th><th>Use For</th></tr></thead>
+          <tbody>{SURFACE_GUIDANCE.map(([range, usage]) => <tr key={range}><td><strong>{range}</strong></td><td>{usage}</td></tr>)}</tbody>
+        </table>
+        <table className="token-table" aria-label="Surface aliases" style={{ marginTop: 'var(--sp-space-4)' }}>
+          <thead><tr><th>Token</th><th>Alias</th><th>Maps to</th><th>Use For</th></tr></thead>
+          <tbody>{SURFACE_ALIASES.map(([token, alias, mapping, usage]) => <tr key={token}><td><code>{token}</code></td><td>{alias ? <code>{alias}</code> : '—'}</td><td><code>{mapping}</code></td><td>{usage}</td></tr>)}</tbody>
+        </table>
       </section>
 
       <section id="roles" className="doc-section">
@@ -178,6 +236,15 @@ export function ColorsPage() {
               </tr>
             ))}
           </tbody>
+        </table>
+      </section>
+
+      <section className="doc-section">
+        <h3>Companion accent roles</h3>
+        <p className="section-desc">Use secondary and tertiary for additional categories without borrowing meaning from success, warning, danger, or info. They alias primary until a theme or color harmony gives them derived hues.</p>
+        <table className="token-table" aria-label="Companion accent roles">
+          <thead><tr><th>Token</th><th>Type</th><th>Use For</th></tr></thead>
+          <tbody>{COMPANION_ROLES.map(([token, type, usage]) => <tr key={token}><td><code>{token}</code></td><td>{type}</td><td>{usage}</td></tr>)}</tbody>
         </table>
       </section>
 
@@ -298,7 +365,7 @@ export function ColorsPage() {
           style={{
             padding: 'var(--sp-space-2) var(--sp-space-4)',
             borderRadius: 'var(--sp-radius-md)',
-            border: '1px solid var(--sp-border-strong)',
+            border: 'var(--sp-border-width-hairline) solid var(--sp-border-strong)',
             background: 'var(--sp-surface-50)',
             color: 'var(--sp-text-color)',
             cursor: 'pointer',
@@ -308,14 +375,22 @@ export function ColorsPage() {
         </button>
       </section>
 
+      <section className="doc-section">
+        <h3>Data Visualization Palette</h3>
+        <p className="section-desc">Chart tokens keep axes, gridlines, tooltips, tracks, and categorical series consistent across themes and color-harmony presets.</p>
+        <table className="token-table" aria-label="Data visualization color tokens">
+          <thead><tr><th>Token</th><th>Use For</th></tr></thead>
+          <tbody>{CHART_TOKENS.map(([token, usage]) => <tr key={token}><td><code>{token}</code></td><td>{usage}</td></tr>)}</tbody>
+        </table>
+      </section>
+
       <section id="usage" className="doc-section">
         <h2>Usage</h2>
         <p className="section-desc">Build surfaces from semantic tokens rather than fixed hex values. That keeps the component contract stable across theme switches and avoids manual dark-mode overrides inside each component.</p>
-        <div className="code-block"><pre><code>{`.panel {
-  background: var(--sp-surface-0);
-  color: var(--sp-text-color);
-  border: var(--sp-border-width-hairline) solid var(--sp-border);
-}`}</code></pre></div>
+        <div className="usage-grid">
+          <article className="code-card"><h3>Token Consumption</h3><CodePreview codeOnly language="css" code={USAGE_CODE} /></article>
+          <article className="guidance-card"><h3>Best Practices</h3><div className="best-practices">{BEST_PRACTICES.map(([title, body]) => <div key={title} className="best-practice-item"><strong>{title}</strong><p>{body}</p></div>)}</div></article>
+        </div>
       </section>
     </FoundationPageShell>
   )

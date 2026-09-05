@@ -1338,6 +1338,10 @@ code {
   line-height: var(--sp-leading-relaxed);
 }
 
+.foundation-editorial .foundation-hero__copy .docs-package-badge {
+  margin-block-start: var(--sp-space-4);
+}
+
 .foundation-editorial .foundation-instrument {
   display: block;
   inline-size: 100%;

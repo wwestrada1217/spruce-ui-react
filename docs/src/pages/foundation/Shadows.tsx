@@ -1,4 +1,21 @@
 import { FoundationPageShell } from '../../components/FoundationPageShell'
+import { CodePreview } from '../../components/CodePreview'
+import { SPRUCE_SHADOWS, SPRUCE_Z_INDEX } from 'spruce-react'
+
+const USAGE_CODE = `.popover {
+  box-shadow: var(--sp-shadow-md);
+  z-index: var(--sp-z-popover);
+}
+
+.dialog-backdrop {
+  background: var(--sp-overlay-bg);
+  z-index: var(--sp-z-overlay);
+}
+
+.dialog {
+  box-shadow: var(--sp-shadow-lg);
+  z-index: var(--sp-z-modal);
+}`
 
 const PRINCIPLES = [
   ['Use elevation sparingly', 'A shadow should explain separation or interaction. Flat surfaces and borders are often enough.'],
@@ -7,13 +24,13 @@ const PRINCIPLES = [
 ]
 
 const SHADOWS = [
-  ['None', '--sp-shadow-none', 'none', 'Flat surfaces, borders-only containers, and intentionally quiet UI.'],
-  ['XS', '--sp-shadow-xs', '0 1px 2px rgba(0, 0, 0, 0.05)', 'Subtle separation for low-rise cards and compact surfaces.'],
-  ['SM', '--sp-shadow-sm', '0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)', 'Default lifted cards, dropdown shells, and compact overlays.'],
-  ['MD', '--sp-shadow-md', '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)', 'Popovers, menus, and surfaces that need clear separation.'],
-  ['LG', '--sp-shadow-lg', '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)', 'Dialogs, command palettes, and more prominent transient layers.'],
-  ['XL', '--sp-shadow-xl', '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)', 'High-priority modals and isolated spotlight surfaces.'],
-  ['Inner', '--sp-shadow-inner', 'inset 0 2px 4px rgba(0, 0, 0, 0.06)', 'Pressed states, recessed inputs, and inset treatments.'],
+  ['None', '--sp-shadow-none', SPRUCE_SHADOWS.none, 'Flat surfaces, borders-only containers, and intentionally quiet UI.'],
+  ['XS', '--sp-shadow-xs', SPRUCE_SHADOWS.xs, 'Subtle separation for low-rise cards and compact surfaces.'],
+  ['SM', '--sp-shadow-sm', SPRUCE_SHADOWS.sm, 'Default lifted cards, dropdown shells, and compact overlays.'],
+  ['MD', '--sp-shadow-md', SPRUCE_SHADOWS.md, 'Popovers, menus, and surfaces that need clear separation.'],
+  ['LG', '--sp-shadow-lg', SPRUCE_SHADOWS.lg, 'Dialogs, command palettes, and more prominent transient layers.'],
+  ['XL', '--sp-shadow-xl', SPRUCE_SHADOWS.xl, 'High-priority modals and isolated spotlight surfaces.'],
+  ['Inner', '--sp-shadow-inner', SPRUCE_SHADOWS.inner, 'Pressed states, recessed inputs, and inset treatments.'],
 ]
 
 const LAYERS = [
@@ -23,15 +40,15 @@ const LAYERS = [
 ]
 
 const Z_LEVELS = [
-  ['--sp-z-base', 0, 'Default stacking context for ordinary content.'], ['--sp-z-dropdown', 100, 'Dropdown menus and compact selectable lists.'],
-  ['--sp-z-sticky', 200, 'Sticky headers, pinned rows, and persistent region chrome.'], ['--sp-z-overlay', 300, 'Backdrops and overlay shells beneath modal content.'],
-  ['--sp-z-modal', 400, 'Modal dialogs and primary blocking surfaces.'], ['--sp-z-popover', 500, 'Popovers or contextual layers that may open above other overlays.'],
-  ['--sp-z-toast', 600, 'Toast notifications and transient global notices.'], ['--sp-z-tooltip', 700, 'Tooltip surfaces that need to clear nearby overlays.'],
+  ['--sp-z-base', SPRUCE_Z_INDEX.base, 'Default stacking context for ordinary content.'], ['--sp-z-dropdown', SPRUCE_Z_INDEX.dropdown, 'Dropdown menus and compact selectable lists.'],
+  ['--sp-z-sticky', SPRUCE_Z_INDEX.sticky, 'Sticky headers, pinned rows, and persistent region chrome.'], ['--sp-z-overlay', SPRUCE_Z_INDEX.overlay, 'Backdrops and overlay shells beneath modal content.'],
+  ['--sp-z-modal', SPRUCE_Z_INDEX.modal, 'Modal dialogs and primary blocking surfaces.'], ['--sp-z-popover', SPRUCE_Z_INDEX.popover, 'Popovers or contextual layers that may open above other overlays.'],
+  ['--sp-z-toast', SPRUCE_Z_INDEX.toast, 'Toast notifications and transient global notices.'], ['--sp-z-tooltip', SPRUCE_Z_INDEX.tooltip, 'Tooltip surfaces that need to clear nearby overlays.'],
 ]
 
 const BEST_PRACTICES = [
   ['Let borders do some of the work', 'A subtle border can separate a surface without making every card look elevated.'],
-  ['Themes can shadow every control at once', 'Use semantic shadow tokens so light and dark themes can retune elevation globally.'],
+  ['Themes can shadow every control at once', 'Use --sp-control-shadow for buttons, fields, and toggles, and --sp-surface-shadow for cards. Both default to none so themes can opt into a coordinated elevation treatment.'],
   ['Keep overlay steps predictable', 'Choose a shadow and z-index rung together rather than inventing local values.'],
   ['Escalate only when the interaction changes', 'Reserve large shadows for surfaces that interrupt or demand attention.'],
 ]
@@ -49,10 +66,7 @@ export function ShadowsPage() {
 
       <section id="z-index" className="doc-section"><h2>Z-Index Scale</h2><p className="section-desc">The z-index scale gives overlays a predictable order. Components should consume these tokens instead of inventing local stacks that are hard to reconcile later.</p><table className="token-table" aria-label="Z-index scale"><thead><tr><th>Token</th><th>Value</th><th>Use For</th></tr></thead><tbody>{Z_LEVELS.map(([token, value, usage]) => <tr key={token}><td><code>{token}</code></td><td>{value}</td><td>{usage}</td></tr>)}</tbody></table></section>
 
-      <section id="usage" className="doc-section"><h2>Usage</h2><p className="section-desc">Treat shadow and z-index tokens as a matched pair. Visual depth alone is not enough for overlays, and a high stack value without visual elevation often feels accidental.</p><div className="code-block"><pre><code>{`.popover {
-  box-shadow: var(--sp-shadow-md);
-  z-index: var(--sp-z-popover);
-}`}</code></pre></div><div className="principles-grid">{BEST_PRACTICES.map(([title, body]) => <article key={title} className="principle-card"><h3>{title}</h3><p>{body}</p></article>)}</div></section>
+      <section id="usage" className="doc-section"><h2>Usage</h2><p className="section-desc">Treat shadow and z-index tokens as a matched pair. Visual depth alone is not enough for overlays, and a high stack value without visual elevation often feels accidental.</p><div className="usage-grid"><article className="code-card"><h3>Token Consumption</h3><CodePreview codeOnly language="css" code={USAGE_CODE} /></article><article className="guidance-card"><h3>Best Practices</h3><div className="best-practices">{BEST_PRACTICES.map(([title, body]) => <div key={title} className="best-practice-item"><strong>{title}</strong><p>{body}</p></div>)}</div></article></div></section>
     </FoundationPageShell>
   )
 }

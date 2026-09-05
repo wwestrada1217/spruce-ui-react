@@ -6,6 +6,12 @@ const USAGE_CODE = `.page-title {
   letter-spacing: var(--sp-tracking-tight);
 }`
 
+const BEST_PRACTICES = [
+  ['Keep most UI between SM and LG', 'Operational products rarely need oversized type. Use the compact middle of the scale for tables, forms, navigation, and dense workflows.'],
+  ['Escalate with weight before size', 'Inside cards, tables, and form groups, a weight change usually creates enough emphasis without disrupting the surrounding rhythm.'],
+  ['Reserve mono for technical content', 'Use the mono family for code, IDs, tabular values, and other content where character alignment carries meaning.'],
+]
+
 const SIZES = [
   { token: '--sp-text-2xs', value: '10px' },
   { token: '--sp-text-xs', value: '12px' },
@@ -88,6 +94,7 @@ export function TypographyPage() {
 
       <section id="type-scale" className="doc-section">
         <h2>Type Scale</h2>
+        <p className="section-desc">The scale moves from metadata to page-level headings in measured steps. Keep adjacent levels close together so visual hierarchy feels deliberate instead of theatrical.</p>
         <table className="token-table" aria-label="Type scale">
           <thead>
             <tr>
@@ -110,6 +117,7 @@ export function TypographyPage() {
 
       <section id="font-weights" className="doc-section">
         <h2>Font Weights</h2>
+        <p className="section-desc">Weight is the second lever after size. Prefer weight changes for emphasis inside a single size band before jumping to a larger type token.</p>
         <div className="weights-grid">
           {WEIGHTS.map(item => <article key={item.token} className="weight-card"><div className="weight-card__header"><strong>{item.token.replace('--sp-font-', '').replace('-', ' ')}</strong><span>{item.value}</span></div><code>{item.token}</code><p className="weight-card__sample" style={{ fontWeight: `var(${item.token})` }}>Interface hierarchy stays readable when weight changes are intentional.</p><p className="weight-card__usage">Use weight changes for emphasis before jumping to a larger type token.</p></article>)}
         </div>
@@ -117,16 +125,18 @@ export function TypographyPage() {
 
       <section id="families" className="doc-section">
         <h2>Font Families</h2>
+        <p className="section-desc">Spruce uses a primary sans family for application UI and a dedicated mono family for code, tabular data, and technical references.</p>
         <div className="family-grid">
           {[
-            ['Sans', '--sp-font-sans', 'Noto Sans', 'Application UI, forms, navigation, and prose.'],
-            ['Mono', '--sp-font-mono', 'Noto Sans Mono', 'Code, tabular data, and technical references.'],
+            ['Sans', '--sp-font-sans', 'Primary UI family', 'Application UI, forms, navigation, and prose.'],
+            ['Mono', '--sp-font-mono', 'Technical family', 'Code, tabular data, and technical references.'],
           ].map(([label, token, value, usage]) => <article key={token} className="family-card"><div className="family-card__header"><div><h3>{label}</h3><code>{token}</code></div><span className="family-card__value">{value}</span></div><p className="family-card__sample" style={{ fontFamily: `var(${token})` }}>ABCDEFGHIJKLMNOPQRSTUVWXYZ<br />abcdefghijklmnopqrstuvwxyz<br />0123456789 !@#$%^&amp;*()</p><p className="family-card__usage">{usage}</p></article>)}
         </div>
       </section>
 
       <section id="line-heights" className="doc-section">
         <h2>Line Heights</h2>
+        <p className="section-desc">Line height establishes vertical leading for prose and interface controls. Tight line heights prevent headings from spilling out of components, while normal and relaxed leading maintain legibility across paragraph blocks.</p>
         <table className="token-table" aria-label="Line heights">
           <thead>
             <tr>
@@ -149,6 +159,7 @@ export function TypographyPage() {
 
       <section id="letter-spacing" className="doc-section">
         <h2>Letter Spacing</h2>
+        <p className="section-desc">Letter spacing (tracking) adjusts character density. Wider tracking enhances readability for all-caps metadata and eyebrows, while tighter tracking keeps large display headings cohesive.</p>
         <table className="token-table" aria-label="Letter spacing">
           <thead>
             <tr>
@@ -171,14 +182,17 @@ export function TypographyPage() {
 
       <section id="semantic-roles" className="doc-section">
         <h2>Semantic Roles</h2>
-        <p className="section-desc">Prefer these role-based aliases over raw sizes — they document intent and give the system one place to retune the hierarchy.</p>
+        <p className="section-desc">Semantic role tokens map abstract type scale steps to explicit functional UI roles. Using semantic tokens ensures consistent hierarchy across components without hardcoding font sizes.</p>
         <table className="token-table" aria-label="Font usage tokens"><thead><tr><th>Token</th><th>Maps to</th><th>Usage</th><th>Preview</th></tr></thead><tbody>{USAGE.map(item => <tr key={item.token}><td><code>{item.token}</code></td><td><code>{item.alias}</code> ({item.value})</td><td>{item.desc}</td><td style={{ fontSize: `var(${item.token})` }}>Spruce</td></tr>)}</tbody></table>
       </section>
 
       <section id="usage" className="doc-section">
         <h2>Usage</h2>
-        <p className="section-desc">Prefer semantic role tokens over raw sizes. This keeps intent visible in component styles and gives themes one place to retune the hierarchy.</p>
-        <CodePreview codeOnly language="css" code={USAGE_CODE} />
+        <p className="section-desc">Apply the scale through semantic component roles such as eyebrow, title, body, or caption. That keeps documentation, dashboards, and complex workflows visually consistent even when the surrounding layout changes.</p>
+        <div className="usage-grid">
+          <article className="code-card"><h3>Token Consumption</h3><CodePreview codeOnly language="css" code={USAGE_CODE} /></article>
+          <article className="guidance-card"><h3>Best Practices</h3><div className="best-practices">{BEST_PRACTICES.map(([title, body]) => <div key={title} className="best-practice-item"><strong>{title}</strong><p>{body}</p></div>)}</div></article>
+        </div>
       </section>
     </FoundationPageShell>
   )

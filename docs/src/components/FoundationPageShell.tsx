@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { DocsPackageBadge } from './DocsPackageBadge'
 
 type FoundationVariant =
   | 'accessibility'
@@ -27,6 +28,8 @@ export interface FoundationPageShellProps {
   description: ReactNode
   variant: FoundationVariant
   children: ReactNode
+  packageName?: string
+  packageSymbols?: readonly string[]
 }
 
 function FoundationInstrument({ variant }: { variant: FoundationVariant }) {
@@ -127,7 +130,7 @@ function FoundationInstrument({ variant }: { variant: FoundationVariant }) {
   )
 }
 
-export function FoundationPageShell({ title, description, variant, children }: FoundationPageShellProps) {
+export function FoundationPageShell({ title, description, variant, children, packageName = 'spruce-react', packageSymbols }: FoundationPageShellProps) {
   const shellRef = useRef<HTMLDivElement>(null)
   const [sections, setSections] = useState<FoundationSection[]>([])
   const [activeSection, setActiveSection] = useState('')
@@ -163,7 +166,7 @@ export function FoundationPageShell({ title, description, variant, children }: F
 
   return <div ref={shellRef} className={`foundation-editorial foundation-editorial--${variant}`}>
     <header className="foundation-hero">
-      <div className="foundation-hero__copy"><h1>{title}</h1><p className="docs-desc">{description}</p></div>
+      <div className="foundation-hero__copy"><h1>{title}</h1><p className="docs-desc">{description}</p><DocsPackageBadge packageName={packageName} symbols={packageSymbols} /></div>
       <FoundationInstrument variant={variant} />
     </header>
     <div className="foundation-editorial__body">

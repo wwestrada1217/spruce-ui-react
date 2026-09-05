@@ -21,6 +21,15 @@ const COLORS = [
   ['--sp-border-focus', 'Focus and selection outlines; typically driven by focus rings rather than layout borders.'],
 ]
 
+const COMPONENT_GUIDANCE = [
+  ['Dividers', '--sp-border-width-hairline + --sp-border', 'Default for rows, columns, list sections, and quiet internal separators.'],
+  ['Cards and panels', '--sp-border-width-hairline + --sp-border', 'Pair the hairline with a radius so the container edge stays crisp without requiring a heavy shadow.'],
+  ['Inputs and controls', '--sp-border-width-hairline + --sp-control-border-color', 'Use the control alias for button, field, toggle, and selector outlines so themes can change them together.'],
+  ['Floating surfaces', '--sp-overlay-border-width + --sp-overlay-border', 'Use the overlay edge for popovers, dropdowns, menus, and pickers that overlap page content.'],
+  ['Focus and selection', '--sp-border-focus + focus ring tokens', 'Keep focus visible without shifting layout; use the focus ring for keyboard state and border color for selected edges.'],
+  ['Datagrid', '--grid-stroke / --grid-stroke-md', 'Map row lines to hairline and reserve medium width for headers, aggregates, and major breaks.'],
+]
+
 const BEST_PRACTICES = [
   ['Compose width and color', 'Declare borders as width + style + color using tokens, e.g. var(--sp-border-width-hairline) solid var(--sp-border).'],
   ['Give floating panels a visible edge', 'Popovers, dropdown panels, menus, and pickers use var(--sp-overlay-border-width) solid var(--sp-overlay-border) instead of the divider color, so the panel edge stays findable against the content behind it.'],
@@ -89,6 +98,8 @@ export function BordersPage() {
 
       <section id="components" className="doc-section">
         <h2>Components</h2>
+        <p className="section-desc">Component families map foundation widths and colors to local aliases so controls, panels, overlays, and data surfaces share one stroke scale.</p>
+        <table className="token-table" aria-label="Component border guidance"><thead><tr><th>Component family</th><th>Recommended tokens</th><th>Guidance</th></tr></thead><tbody>{COMPONENT_GUIDANCE.map(([component, tokens, guidance]) => <tr key={component}><td>{component}</td><td><code>{tokens}</code></td><td>{guidance}</td></tr>)}</tbody></table>
         <p className="section-desc">The datagrid maps foundation widths to local aliases (<code>--grid-stroke</code>, <code>--grid-stroke-md</code>) so row lines, headers, and toolbars share one stroke scale. See <a href="#/components/datagrid">Datagrid</a> for full API and examples.</p>
       </section>
 
