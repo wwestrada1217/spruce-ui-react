@@ -5,6 +5,27 @@ All notable changes to `spruce-react` are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2026-09-05
+
+### Added
+
+- Completed the React design-system foundation: typed color, typography, spacing, density, borders, shadows, z-index, motion, icon, motif, and illustration collections.
+- Added Angular-parity theme infrastructure with light, dark, and system modes, 34 built-in theme presets, accent presets, custom accents, color harmony, persistence, and runtime token updates.
+- Expanded the library with the remaining navigation, action, feedback, data-display, workspace, editor, chart, effect, and utility components, plus core data adapters and Datagridex support.
+- Added comprehensive documentation coverage with live examples, CodePreview updates, application blocks, foundation pages, and Angular-aligned navigation, sidebar groups, and appearance controls.
+
+### Changed
+
+- Aligned React components and documentation behavior with the Angular design system, including responsive overlays, RTL and internationalization support, theme-aware surfaces, and shared token contracts.
+- Completed the built-in icon registry and collection exports, and added full SVG illustration and motif registries with searchable documentation galleries.
+- Updated form controls and date/time pickers to use the shared border foundation; corrected slider layout, sidebar groups, documentation shells, and theme-switcher presentation.
+
+### Fixed
+
+- Fixed theme preset token precedence so dark presets correctly apply their own primary colors, while base Spruce themes retain their evergreen accent.
+- Fixed duplicate Spruce theme entries in the docs appearance switcher and prevented explicit pink/custom accents from leaking into base Spruce light and dark selections.
+- Fixed adjacent-month date rendering, viewport-aware picker positioning, empty combobox clearing, tab and color-token behavior, and other Angular parity gaps.
+
 ## [0.1.4] - 2026-07-27
 
 ### Added
