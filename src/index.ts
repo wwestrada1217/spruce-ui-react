@@ -60,6 +60,7 @@ export {
   SP_BUILT_IN_MOTIFS,
   SP_BUILT_IN_MOTIF_NAMES,
 } from './components/motif/motif-definitions.js';
+export * from './components/motif/collections/index.js';
 export type {
   SpBuiltInMotif,
   SpBuiltInMotifDefinition,
