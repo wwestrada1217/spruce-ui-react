@@ -8,7 +8,7 @@ a { color: inherit; }
 /* ── Docs-level aliases (map to Spruce tokens so themes apply automatically) */
 :root {
   --sidebar-w: 252px;
-  --content-max: 960px;
+  --content-max: 1200px;
 
   --bg:        var(--sp-surface-50);
   --surface:   var(--sp-surface-0);
@@ -113,11 +113,11 @@ a { color: inherit; }
 
 /* When a features-layout (with TOC) is present, allow wider content */
 .page-inner:has(.features-layout) {
-  max-width: 1120px;
+  max-width: 1440px;
 }
 
 .page-inner:has(.docs-page-layout) {
-  max-width: 1120px;
+  max-width: 1440px;
 }
 
 /* ── Docs brand (inside sidebar header) ─────────────────────────────────────── */
