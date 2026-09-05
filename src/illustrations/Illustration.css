@@ -1,0 +1,25 @@
+.sp-illustration {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  max-inline-size: 100%;
+  aspect-ratio: 4 / 3;
+  flex-shrink: 0;
+  vertical-align: middle;
+  line-height: 0;
+  --sp-ill-card: var(--sp-surface-0);
+  --sp-ill-card-subtle: var(--sp-surface-50);
+  --sp-ill-subtle: var(--sp-surface-100);
+  --sp-ill-border: var(--sp-border);
+  --sp-ill-text: var(--sp-text-color);
+  --sp-ill-muted: var(--sp-text-muted);
+  --sp-ill-halo: color-mix(in srgb, var(--sp-text-muted) 12%, transparent);
+  --sp-ill-color: var(--sp-primary);
+}
+
+.sp-illustration.sp-illustration--hide-badge .sp-ill-badge { display: none; }
+.sp-illustration.sp-illustration--monochrome:not(.sp-illustration--tinted) > svg { filter: grayscale(100%) contrast(1.02); }
+.sp-illustration > svg { display: block; inline-size: 100%; block-size: 100%; transition: filter var(--sp-duration-normal), transform var(--sp-duration-normal); }
+.sp-illustration.sp-illustration--tinted { --sp-ill-halo: color-mix(in srgb, var(--sp-ill-color) 12%, transparent); }

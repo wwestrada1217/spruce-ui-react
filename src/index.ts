@@ -1183,3 +1183,10 @@ export type { HighlightProps } from './utils/Highlight.js';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 export * from './data/index.js';
+
+// ─── Illustrations ──────────────────────────────────────────────────────────
+export { Illustration } from './illustrations/Illustration.js';
+export type { IllustrationProps, IllustrationSize } from './illustrations/Illustration.js';
+export type { IllustrationDefinition, IllustrationCategory } from './illustrations/illustration-definition.js';
+export { illustrationSet } from './illustrations/illustration-definition.js';
+export * from './illustrations/collections/index.js';
