@@ -162,16 +162,16 @@ export function FoundationPageShell({ title, description, variant, children }: F
   }
 
   return <div ref={shellRef} className={`foundation-editorial foundation-editorial--${variant}`}>
-    <div className="features-main">
-      <header className="foundation-hero">
-        <div className="foundation-hero__copy"><h1>{title}</h1><p className="docs-desc">{description}</p></div>
-        <FoundationInstrument variant={variant} />
-      </header>
-      {children}
+    <header className="foundation-hero">
+      <div className="foundation-hero__copy"><h1>{title}</h1><p className="docs-desc">{description}</p></div>
+      <FoundationInstrument variant={variant} />
+    </header>
+    <div className="foundation-editorial__body">
+      <div className="features-main">{children}</div>
+      {sections.length > 0 && <nav className="features-toc" aria-label="On this page">
+        <p className="features-toc__title">On this page</p>
+        <ul className="toc-list">{sections.map(section => <li key={section.id}><button type="button" className={`toc-link${activeSection === section.id ? ' active' : ''}`} onClick={() => scrollTo(section.id)}>{section.label}</button></li>)}</ul>
+      </nav>}
     </div>
-    {sections.length > 0 && <nav className="features-toc" aria-label="On this page">
-      <p className="features-toc__title">On this page</p>
-      <ul className="toc-list">{sections.map(section => <li key={section.id}><button type="button" className={`toc-link${activeSection === section.id ? ' active' : ''}`} onClick={() => scrollTo(section.id)}>{section.label}</button></li>)}</ul>
-    </nav>}
   </div>
 }

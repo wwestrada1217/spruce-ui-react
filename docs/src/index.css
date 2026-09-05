@@ -1256,19 +1256,25 @@ code {
 
 /* ── Angular-parity foundation editorial shell ─────────────────────────────── */
 .foundation-editorial {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(var(--sp-space-10), 5vw, var(--sp-space-16));
+  container: foundation-page / inline-size;
+}
+
+.foundation-editorial__body {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(168px, 196px);
   column-gap: clamp(var(--sp-space-6), 4vw, var(--sp-space-12));
   align-items: start;
-  container: foundation-page / inline-size;
 }
 
-.foundation-editorial > .features-main {
+.foundation-editorial__body > .features-main {
   min-inline-size: 0;
   gap: clamp(var(--sp-space-10), 5vw, var(--sp-space-16));
 }
 
-.foundation-editorial > .features-main > .page-header {
+.foundation-editorial__body > .features-main > .page-header {
   display: none;
 }
 
@@ -1360,12 +1366,12 @@ code {
   scroll-margin-block-start: var(--sp-space-8);
 }
 
-.foundation-editorial .features-main > .doc-section:not(:first-of-type) {
+.foundation-editorial__body .features-main > .doc-section:not(:first-of-type) {
   padding-block-start: clamp(var(--sp-space-8), 4vw, var(--sp-space-12));
   border-block-start: 1px solid var(--sp-border);
 }
 
-.foundation-editorial .features-main > .doc-section:nth-of-type(n + 3) {
+.foundation-editorial__body .features-main > .doc-section:nth-of-type(n + 3) {
   content-visibility: auto;
   contain-intrinsic-size: auto none auto 36rem;
 }
@@ -1492,7 +1498,7 @@ code {
   font-weight: var(--sp-font-semibold);
 }
 
-@container foundation-page (inline-size < 54rem) {
+@container foundation-page (inline-size < 40rem) {
   .foundation-editorial .foundation-hero {
     grid-template-columns: 1fr;
     min-block-size: auto;
@@ -1501,12 +1507,12 @@ code {
 }
 
 @media (max-width: 900px) {
-  .foundation-editorial { grid-template-columns: minmax(0, 1fr); }
+  .foundation-editorial__body { grid-template-columns: minmax(0, 1fr); }
   .foundation-editorial .features-toc { display: none; }
 }
 
 @media (max-width: 640px) {
-  .foundation-editorial > .features-main { gap: var(--sp-space-10); }
+  .foundation-editorial__body > .features-main { gap: var(--sp-space-10); }
   .foundation-editorial .foundation-hero { gap: var(--sp-space-6); padding-block-start: 0; }
   .foundation-editorial .foundation-hero h1 { font-size: clamp(2.5rem, 14vw, 3.5rem); }
   .foundation-editorial--internationalization .foundation-hero h1 { font-size: clamp(2.125rem, 9.25vw, 2.375rem); }
