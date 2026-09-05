@@ -21,7 +21,6 @@ const SYMBOLS: Record<string, readonly string[]> = {
   '#/components/datagridex': ['Datagridex'],
   '#/components/datetime-picker': ['DatetimePicker'],
   '#/components/daterange-picker': ['DateRangePicker'],
-  '#/components/feature-gate': ['FeatureGate'],
   '#/components/form-builder': ['FormBuilder'],
   '#/components/gantt': ['GanttChart'],
   '#/components/image-compare': ['ImageCompare'],
@@ -50,7 +49,6 @@ const SYMBOLS: Record<string, readonly string[]> = {
   '#/charts/stacked-area-chart': ['StackedAreaChart'],
   '#/charts/tiny-charts': ['TinyBar', 'TinyLine', 'TinyPie', 'TinyDonut', 'TinyStacked'],
   '#/utils/code-preview': ['CodePreview'],
-  '#/utils/docs-platform': ['CodePreview', 'DocsMobilePreview', 'DocsSectionScrubber'],
   '#/utils/focus-utilities': ['FocusTrap', 'AutoFocus'],
   '#/utils/highlight': ['Highlight'],
 };

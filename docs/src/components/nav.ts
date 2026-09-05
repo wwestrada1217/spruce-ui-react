@@ -69,7 +69,6 @@ const RAW_NAV_SECTIONS: NavSection[] = [
     items: [
       { icon: 'database', label: 'Data Source',  route: '#/core/data-source'  },
       { icon: 'layers',   label: 'Data Context', route: '#/core/data-context' },
-      { icon: 'git-branch', label: 'Node Store', route: '#/core/data-context' },
     ],
   },
   {
@@ -108,7 +107,6 @@ const RAW_NAV_SECTIONS: NavSection[] = [
       { icon: 'file-text',          label: 'PDF Viewer',         route: '#/components/pdf-viewer'      },
       { icon: 'file-diff',          label: 'Text Diff',          route: '#/components/text-diff'       },
       { icon: 'credit-card',        label: 'Plan Cards',         route: '#/components/plan-cards'      },
-      { icon: 'lock',               label: 'Feature Gate',       route: '#/components/feature-gate'    },
     ],
   },
   {
@@ -276,7 +274,6 @@ const RAW_NAV_SECTIONS: NavSection[] = [
       { icon: 'chevron-up',   label: 'Hide on Scroll',  route: '#/utils/hide-on-scroll'  },
       { icon: 'more-vertical',label: 'Overflow',        route: '#/utils/overflow'        },
       { icon: 'app-window',   label: 'Code Preview',    route: '#/utils/code-preview'    },
-      { icon: 'app-window',   label: 'Documentation Platform', route: '#/utils/docs-platform' },
     ],
   },
   {
@@ -293,7 +290,6 @@ const RAW_NAV_SECTIONS: NavSection[] = [
       { icon: 'bar-chart',       label: 'Charts',             route: '#/blocks/charts'             },
       { icon: 'shield',          label: 'Privacy & Cookie Consent', route: '#/blocks/cookie-consent' },
       { icon: 'table',           label: 'Operations Grid',    route: '#/blocks/operations-grid'   },
-      { icon: 'route',           label: 'REST Client Workflow', route: '#/blocks/rest-client-workflow' },
       { icon: 'trending-up',     label: 'Stocks App',         route: '#/blocks/stocks'             },
     ],
   },

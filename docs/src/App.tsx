@@ -131,7 +131,6 @@ import { SupportDeskBlockPage } from './pages/blocks/SupportDeskBlockPage'
 import { ChartsBlockPage } from './pages/blocks/ChartsBlockPage'
 import { CookieConsentBlockPage } from './pages/blocks/CookieConsentBlockPage'
 import { OperationsGridBlockPage } from './pages/blocks/OperationsGridBlockPage'
-import { RestClientWorkflowBlockPage } from './pages/blocks/RestClientWorkflowBlockPage'
 import { StocksBlockPage } from './pages/blocks/StocksBlockPage'
 import { BarChartPage } from './pages/charts/BarChartPage'
 import { PieChartPage } from './pages/charts/PieChartPage'
@@ -194,7 +193,6 @@ import { NumberTickerPage } from './pages/effects/NumberTickerPage'
 import { FocusUtilitiesPage } from './pages/utils/FocusUtilitiesPage'
 import { HighlightPage } from './pages/utils/HighlightPage'
 import { CodePreviewUtilPage } from './pages/utils/CodePreviewUtilPage'
-import { DocsPlatformPage } from './pages/utils/DocsPlatformPage'
 import { ChangelogPage } from './pages/ChangelogPage'
 import { DevelopmentPage } from './pages/DevelopmentPage'
 import { ComingSoonPage } from './pages/ComingSoonPage'
@@ -205,7 +203,6 @@ import { PropertyPanelPage } from './pages/components/PropertyPanelPage'
 import { PdfViewerPage } from './pages/components/PdfViewerPage'
 import { TextDiffPage } from './pages/components/TextDiffPage'
 import { PlanCardsPage } from './pages/components/PlanCardsPage'
-import { FeatureGatePage } from './pages/components/FeatureGatePage'
 import { getRouteHash } from './components/nav'
 import { useDocsI18n } from './components/DocsI18n'
 
@@ -355,8 +352,6 @@ function renderPage(hash: string): React.ReactElement {
     case '#/components/pdf-viewer':          return <PdfViewerPage />
     case '#/components/text-diff':           return <TextDiffPage />
     case '#/components/plan-cards':          return <PlanCardsPage />
-    case '#/components/feature-gate':
-    case '#/components/entitlements':        return <FeatureGatePage />
     case '#/components/filter-expression':  return <FilterExpressionPage />
     case '#/components/list':               return <ListPage />
     case '#/components/terminal':           return <TerminalPage />
@@ -387,7 +382,6 @@ function renderPage(hash: string): React.ReactElement {
     case '#/blocks/charts':                  return <ChartsBlockPage />
     case '#/blocks/cookie-consent':          return <CookieConsentBlockPage />
     case '#/blocks/operations-grid':         return <OperationsGridBlockPage />
-    case '#/blocks/rest-client-workflow':    return <RestClientWorkflowBlockPage />
     case '#/blocks/stocks':                  return <StocksBlockPage />
     // Charts
     case '#/charts/chart-kernel':           return <ChartKernelPage />
@@ -454,7 +448,6 @@ function renderPage(hash: string): React.ReactElement {
     case '#/utils/focus-directives':       return <FocusUtilitiesPage />
     case '#/utils/highlight':              return <HighlightPage />
     case '#/utils/code-preview':           return <CodePreviewUtilPage />
-    case '#/utils/docs-platform':          return <DocsPlatformPage />
     // Core (data) — support both old and new routes
     case '#/data/data-source':
     case '#/core/data-source':                return <DataSourcePage />
