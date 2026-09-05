@@ -18,9 +18,15 @@
 
 .sp-motif__art,
 .sp-motif__art svg {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
+}
+
+.sp-motif__art {
+  line-height: 0;
 }
 
 .sp-motif__art svg {

@@ -1791,7 +1791,7 @@ code {
 .foundation-editorial .motif-swatch:focus-visible { outline: var(--sp-focus-ring-width) solid var(--sp-focus-ring-color, var(--sp-primary)); outline-offset: 2px; }
 .foundation-editorial .motif-swatch--selected .motif-swatch__art { background: var(--sp-primary-subtle); }
 .foundation-editorial .motif-swatch--selected .motif-swatch__label { color: var(--sp-primary); }
-.foundation-editorial .motif-swatch__art { position: relative; display: block; block-size: 6rem; min-block-size: 0; }
+.foundation-editorial .motif-swatch__art { position: relative; isolation: isolate; display: block; block-size: 6rem; min-block-size: 0; }
 .foundation-editorial .motif-swatch__label { display: block; font-size: var(--sp-text-sm); font-weight: var(--sp-font-semibold); }
 .foundation-editorial .motif-swatch__name { align-self: flex-start; margin-block-start: calc(var(--sp-space-1) * -1); padding: 1px var(--sp-space-1); color: var(--sp-text-subtle); background: var(--sp-surface-50); border-radius: var(--sp-radius-sm); }
 .foundation-editorial .motif-banner-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: var(--sp-space-3); }
