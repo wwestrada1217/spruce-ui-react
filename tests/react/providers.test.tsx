@@ -69,6 +69,20 @@ describe('SpruceProvider test contract', () => {
     expectDocumentTheme('light');
   });
 
+  it('lets dark preset tokens override the base dark token layer', async () => {
+    const { getByRole, user } = renderWithSpruce(<ProviderProbe />, {
+      providerProps: { persist: false },
+    });
+
+    const preset = SPRUCE_THEME_PRESETS.find((theme) => theme.name === 'modern-dark');
+    expect(preset).toBeDefined();
+    await user.click(getByRole('button', { name: 'modern-dark', exact: true }));
+
+    const stylesheet = document.head.querySelector('#sp-theme-override')?.textContent;
+    expect(stylesheet).toContain(":root[data-theme='light'],\n:root[data-theme='dark']");
+    expect(stylesheet).toContain(`--sp-primary: ${preset?.tokens['--sp-primary']};`);
+  });
+
   it('supports RTL document synchronization and localized label overrides', async () => {
     const { getByRole, getByText, getByTestId, user } = renderWithRtl(<ProviderProbe />, {
       providerProps: { persist: false, syncDocument: true },

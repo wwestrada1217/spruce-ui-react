@@ -646,9 +646,9 @@ function modeTokens(mode: HarmonyModePalette): Record<string, string> {
 }
 
 /**
- * Serializes a harmony for injection after the base theme. Same `:root` /
- * `:root.dark, :root[data-theme='dark']` shape as the plain accent stylesheet,
- * so load order decides the winner and specificity stays flat.
+ * Serializes a harmony for injection after the base theme. Mode-specific root
+ * selectors keep the generated palette at the same specificity as the theme
+ * override layer while the later style element lets harmony win.
  */
 export function buildHarmonyStylesheet(
   baseHex: string,
@@ -661,7 +661,7 @@ export function buildHarmonyStylesheet(
       .map(([k, v]) => `  ${k}: ${v};`)
       .join('\n');
   return (
-    `:root {\n${serialize(modeTokens(palette.light))}\n}\n` +
+    `:root[data-theme='light'] {\n${serialize(modeTokens(palette.light))}\n}\n` +
     `:root.dark,\n:root[data-theme='dark'] {\n${serialize(modeTokens(palette.dark))}\n}`
   );
 }
@@ -703,5 +703,4 @@ export function harmonyContrastReport(palette: HarmonyPalette): HarmonyContrastR
   }
   return rows;
 }
-
 

@@ -30,12 +30,19 @@ const BASE_OPTIONS: ThemeOption[] = [
   { id: 'dark', label: 'Spruce Dark', color: '#22c55e', mode: 'dark' },
 ];
 
-const PRESET_OPTIONS: ThemeOption[] = SPRUCE_THEME_PRESETS.map(theme => ({
-  id: theme.name,
-  label: theme.displayName,
-  color: theme.tokens['--sp-primary'] ?? (theme.base === 'dark' ? '#94a3b8' : '#166534'),
-  mode: theme.base,
-}));
+// `light` and `dark` are the base Spruce themes exposed above. The preset
+// registry also contains their full-token aliases, but showing both creates
+// duplicate Spruce and Spruce Dark cards in the gallery.
+const BASE_PRESET_IDS = new Set(['spruce', 'spruce-dark']);
+
+const PRESET_OPTIONS: ThemeOption[] = SPRUCE_THEME_PRESETS
+  .filter(theme => !BASE_PRESET_IDS.has(theme.name))
+  .map(theme => ({
+    id: theme.name,
+    label: theme.displayName,
+    color: theme.tokens['--sp-primary'] ?? (theme.base === 'dark' ? '#94a3b8' : '#166534'),
+    mode: theme.base,
+  }));
 
 const ALL_OPTIONS = [...BASE_OPTIONS, ...PRESET_OPTIONS];
 
@@ -188,6 +195,9 @@ export function ThemeSwitcher({ compact = false }: ThemeSwitcherProps) {
 
   function activate(id: string) {
     setTheme(id as Parameters<typeof setTheme>[0]);
+    // Base Spruce themes own their evergreen primary. Do not carry an
+    // explicitly selected Rose/custom accent into the light or dark base.
+    if (id === 'light' || id === 'dark') resetAccent();
     writeStorage(THEME_KEY, id);
   }
 

@@ -170,8 +170,8 @@ export function Slider({
             {showMarker && <span className="sp-slider__marker" aria-hidden="true">{current}</span>}
           </div>
         </div>
+        {showTicks && <div className="sp-slider__ticks"><span>{min}</span><span>{max}</span></div>}
       </div>
-      {showTicks && <div className="sp-slider__ticks"><span>{min}</span><span>{max}</span></div>}
       {errorMessage && <p className="sp-slider__error" role="alert" id={errorId}>{errorMessage}</p>}
       {!errorMessage && effectiveHint && <p className="sp-slider__hint" id={hintId}>{effectiveHint}</p>}
     </div>

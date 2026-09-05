@@ -11,7 +11,7 @@
   align-items: center;
   gap: var(--sp-space-2, 8px);
   padding: 0 var(--sp-space-3, 12px);
-  border: 1px solid var(--sp-control-border-color, var(--sp-border-strong));
+  border: var(--sp-border-width-hairline, 1px) solid var(--sp-input-border, var(--sp-border-strong));
   border-radius: var(--sp-radius-md, 6px);
   background: var(--sp-surface-0, #fff);
   transition: border-color var(--sp-duration-normal, 200ms) var(--sp-ease-default, ease),
@@ -47,7 +47,7 @@
   background: var(--sp-surface-100);
   border-color: transparent;
   border-radius: var(--sp-radius-sm);
-  border-block-end-color: var(--sp-control-border-color, var(--sp-border-strong));
+  border-block-end-color: var(--sp-input-border, var(--sp-border-strong));
 }
 
 .sp-input-wrap--chrome-ghost {

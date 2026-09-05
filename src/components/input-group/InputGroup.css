@@ -1,6 +1,6 @@
 .sp-input-group {
   --sp-input-group-bg: var(--sp-surface-0);
-  --sp-input-group-border: var(--sp-control-border-color, var(--sp-border-strong));
+  --sp-input-group-border: var(--sp-input-border, var(--sp-border-strong));
   --sp-input-group-radius: var(--sp-radius-md);
   --sp-input-group-height: var(--sp-density-control-height, 32px);
   --sp-input-group-padding-x: var(--sp-density-control-padding-x, 10px);

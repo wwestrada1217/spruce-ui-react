@@ -415,14 +415,14 @@ export function buildCustomAccentStylesheet(hexInput: string): string | null {
   const darkLines = Object.entries(dark)
     .map(([k, v]) => `  ${k}: ${v};`)
     .join('\n');
-  return `:root {\n${lightLines}\n}\n:root.dark,\n:root[data-theme='dark'] {\n${darkLines}\n}`;
+  return `:root[data-theme='light'] {\n${lightLines}\n}\n:root.dark,\n:root[data-theme='dark'] {\n${darkLines}\n}`;
 }
 
 /**
  * Serializes accent overrides for injection after the base theme.
- * Uses `:root` so specificity matches global tokens and `#sp-theme-override`
- * (`:root { … }`); load order then lets accent win. Dark block beats
- * `[data-theme='dark'], .dark` from `_theme-dark.scss`.
+ * Uses mode-specific root selectors so specificity matches the theme override
+ * layer. The style element is injected later, so an explicitly selected
+ * accent still wins over the active theme's primary tokens.
  */
 export function buildAccentStylesheet(accent: AccentId, customHex?: string | null): string | null {
   if (accent === 'default') return null;
@@ -438,7 +438,6 @@ export function buildAccentStylesheet(accent: AccentId, customHex?: string | nul
   const darkLines = Object.entries(preset.dark)
     .map(([k, v]) => `  ${k}: ${v};`)
     .join('\n');
-  return `:root {\n${lightLines}\n}\n:root.dark,\n:root[data-theme='dark'] {\n${darkLines}\n}`;
+  return `:root[data-theme='light'] {\n${lightLines}\n}\n:root.dark,\n:root[data-theme='dark'] {\n${darkLines}\n}`;
 }
-
 

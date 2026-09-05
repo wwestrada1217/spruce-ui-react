@@ -24,8 +24,8 @@
   gap: 8px;
   height: 32px;
   padding: 0 10px;
-  border: 1px solid var(--sp-border-strong, #d1d5db);
-  border-radius: 6px;
+  border: var(--sp-border-width-hairline, 1px) solid var(--sp-border-strong, #d1d5db);
+  border-radius: var(--sp-radius-md, 6px);
   background: var(--sp-surface-0, #fff);
   font-family: inherit;
   font-size: 13px;
@@ -42,9 +42,9 @@
 
 .sp-drp__trigger:focus-visible,
 .sp-drp--open .sp-drp__trigger {
-  outline: none;
-  border-color: var(--sp-primary, #3b82f6);
-  box-shadow: 0 0 0 2px var(--sp-primary-subtle, rgba(37, 99, 235, 0.2));
+  outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color, var(--sp-border-focus));
+  outline-offset: var(--sp-focus-ring-offset, 2px);
+  border-color: var(--sp-border-focus, var(--sp-primary));
 }
 
 .sp-drp__trigger:disabled {
@@ -70,8 +70,8 @@
 .sp-drp__input-wrap {
   display: inline-flex;
   align-items: center;
-  border: 1px solid var(--sp-border-strong, #d1d5db);
-  border-radius: 6px;
+  border: var(--sp-border-width-hairline, 1px) solid var(--sp-border-strong, #d1d5db);
+  border-radius: var(--sp-radius-md, 6px);
   background: var(--sp-surface-0, #fff);
   overflow: hidden;
   transition:
@@ -81,8 +81,9 @@
 
 .sp-drp__input-wrap:focus-within,
 .sp-drp--open .sp-drp__input-wrap {
-  border-color: var(--sp-primary, #3b82f6);
-  box-shadow: 0 0 0 2px var(--sp-primary-subtle, rgba(37, 99, 235, 0.2));
+  outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color, var(--sp-border-focus));
+  outline-offset: var(--sp-focus-ring-offset, 2px);
+  border-color: var(--sp-border-focus, var(--sp-primary));
 }
 
 .sp-drp__input-wrap--disabled {
@@ -123,7 +124,7 @@
   height: 30px;
   padding: 0;
   border: none;
-  border-left: 1px solid var(--sp-border, #e5e7eb);
+  border-inline-start: var(--sp-border-width-hairline, 1px) solid var(--sp-border);
   background: transparent;
   color: var(--sp-text-subtle, #6b7280);
   cursor: pointer;
@@ -144,8 +145,8 @@
 .sp-drp__dropdown {
   padding: 12px;
   background: var(--sp-surface-0, #fff);
-  border: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08));
-  border-radius: 8px;
+  border: var(--sp-overlay-border-width, var(--sp-border-width-hairline, 1px)) solid var(--sp-overlay-border, var(--sp-border-strong));
+  border-radius: var(--sp-radius-lg, 8px);
   box-shadow: var(--sp-shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1));
   animation: sp-drp-slide-in var(--sp-duration-fast, 100ms) var(--sp-ease-out, ease-out) both;
 }
@@ -397,7 +398,7 @@
   gap: 2px;
   padding-right: 12px;
   margin-right: 12px;
-  border-right: 1px solid var(--sp-border, #e5e7eb);
+  border-inline-end: var(--sp-border-width-hairline, 1px) solid var(--sp-border);
   min-width: 140px;
 }
 
@@ -442,7 +443,7 @@
   gap: 8px;
   margin-top: 12px;
   padding-top: 8px;
-  border-top: 1px solid var(--sp-border, #e5e7eb);
+  border-block-start: var(--sp-border-width-hairline, 1px) solid var(--sp-border);
 }
 
 .sp-drp__action {
@@ -450,8 +451,8 @@
   align-items: center;
   justify-content: center;
   padding: 6px 12px;
-  border: 1px solid var(--sp-border-strong, #d1d5db);
-  border-radius: 6px;
+  border: var(--sp-border-width-hairline, 1px) solid var(--sp-border-strong, #d1d5db);
+  border-radius: var(--sp-radius-md, 6px);
   background: transparent;
   font-family: inherit;
   font-size: 13px;
@@ -468,8 +469,8 @@
 }
 
 .sp-drp__action:focus-visible {
-  outline: 2px solid var(--sp-primary, #3b82f6);
-  outline-offset: -2px;
+  outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color, var(--sp-border-focus));
+  outline-offset: var(--sp-focus-ring-offset, 2px);
 }
 
 .sp-drp__action--primary {

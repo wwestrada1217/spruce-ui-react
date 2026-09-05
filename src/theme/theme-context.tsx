@@ -240,7 +240,11 @@ export function ThemeProvider({
     const css = Object.entries({ ...nextTheme.tokens, ...nextTheme.customTokens })
       .map(([key, value]) => '  ' + key + ': ' + value + ';')
       .join('\n');
-    styleOverrideRef.current.textContent = ':root {\n' + css + '\n}';
+    // Match the specificity of the base dark-mode token block. A plain
+    // `:root` rule loses to `[data-theme='dark']`, which made dark presets
+    // retain the default dark primary color instead of their own token.
+    styleOverrideRef.current.textContent =
+      ":root[data-theme='light'],\n:root[data-theme='dark'] {\n" + css + '\n}';
   }, []);
 
   const clearTokenOverrides = useCallback(() => {

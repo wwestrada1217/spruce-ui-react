@@ -24,8 +24,8 @@
   gap: 8px;
   height: 32px;
   padding: 6px 12px;
-  border: 1px solid var(--sp-border-strong, rgba(0, 0, 0, 0.14));
-  border-radius: 6px;
+  border: var(--sp-border-width-hairline, 1px) solid var(--sp-border-strong, rgba(0, 0, 0, 0.14));
+  border-radius: var(--sp-radius-md, 6px);
   background: var(--sp-surface-0, #fff);
   font-size: 13px;
   font-family: inherit;
@@ -44,8 +44,8 @@
 
 .sp-dp__trigger:focus-visible,
 .sp-dp--open .sp-dp__trigger {
-  outline: 2px solid var(--sp-primary, #3b82f6);
-  outline-offset: -2px;
+  outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color, var(--sp-border-focus));
+  outline-offset: var(--sp-focus-ring-offset, 2px);
 }
 
 .sp-dp__trigger:disabled {
@@ -82,8 +82,8 @@
   align-items: center;
   height: 32px;
   padding: 0 0 0 12px;
-  border: 1px solid var(--sp-border-strong, rgba(0, 0, 0, 0.14));
-  border-radius: 6px;
+  border: var(--sp-border-width-hairline, 1px) solid var(--sp-border-strong, rgba(0, 0, 0, 0.14));
+  border-radius: var(--sp-radius-md, 6px);
   background: var(--sp-surface-0, #fff);
   box-sizing: border-box;
   transition:
@@ -97,8 +97,8 @@
 
 .sp-dp__input-wrap:focus-within,
 .sp-dp--open .sp-dp__input-wrap {
-  outline: 2px solid var(--sp-primary, #3b82f6);
-  outline-offset: -2px;
+  outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color, var(--sp-border-focus));
+  outline-offset: var(--sp-focus-ring-offset, 2px);
 }
 
 .sp-dp__input-wrap--disabled {
@@ -140,8 +140,8 @@
   height: 100%;
   padding: 0;
   border: none;
-  border-left: 1px solid var(--sp-border-strong, rgba(0, 0, 0, 0.14));
-  border-radius: 0 6px 6px 0;
+  border-inline-start: var(--sp-border-width-hairline, 1px) solid var(--sp-border);
+  border-radius: 0 var(--sp-radius-md, 6px) var(--sp-radius-md, 6px) 0;
   background: transparent;
   color: var(--sp-text, inherit);
   cursor: pointer;
@@ -153,8 +153,8 @@
 }
 
 .sp-dp__input-toggle:focus-visible {
-  outline: 2px solid var(--sp-primary, #3b82f6);
-  outline-offset: -2px;
+  outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color, var(--sp-border-focus));
+  outline-offset: var(--sp-focus-ring-offset, 2px);
 }
 
 /* ── Dropdown panel ── */
@@ -163,8 +163,8 @@
   width: 280px;
   padding: 12px;
   background: var(--sp-surface-0, #fff);
-  border: 1px solid var(--sp-border, #e5e7eb);
-  border-radius: 8px;
+  border: var(--sp-overlay-border-width, var(--sp-border-width-hairline, 1px)) solid var(--sp-overlay-border, var(--sp-border-strong));
+  border-radius: var(--sp-radius-lg, 8px);
   box-shadow: var(--sp-shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1));
   box-sizing: border-box;
   user-select: none;
@@ -412,7 +412,7 @@
   justify-content: space-between;
   margin-top: 8px;
   padding-top: 8px;
-  border-top: 1px solid var(--sp-border, #e5e7eb);
+  border-block-start: var(--sp-border-width-hairline, 1px) solid var(--sp-border);
 }
 
 .sp-dp__today-btn,

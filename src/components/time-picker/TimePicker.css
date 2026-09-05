@@ -20,8 +20,8 @@
   gap: 8px;
   height: 32px;
   padding: 0 10px;
-  border: 1px solid var(--sp-border, rgba(0, 0, 0, 0.12));
-  border-radius: 6px;
+  border: var(--sp-border-width-hairline, 1px) solid var(--sp-border-strong, rgba(0, 0, 0, 0.14));
+  border-radius: var(--sp-radius-md, 6px);
   background: var(--sp-surface-0, #fff);
   font-family: inherit;
   font-size: var(--sp-text-sm, 13px);
@@ -31,12 +31,12 @@
 }
 
 .sp-tp__trigger:hover:not(:disabled) {
-  border-color: var(--sp-border-hover, rgba(0, 0, 0, 0.24));
+  border-color: var(--sp-surface-400, var(--sp-border-strong));
 }
 
 .sp-tp__trigger:focus-visible {
-  outline: 2px solid var(--sp-focus-ring-color, #2563eb);
-  outline-offset: 2px;
+  outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color, var(--sp-border-focus));
+  outline-offset: var(--sp-focus-ring-offset, 2px);
 }
 
 .sp-tp__trigger--sm {
@@ -65,16 +65,16 @@
   display: inline-flex;
   align-items: center;
   height: 32px;
-  border: 1px solid var(--sp-border, rgba(0, 0, 0, 0.12));
-  border-radius: 6px;
+  border: var(--sp-border-width-hairline, 1px) solid var(--sp-border-strong, rgba(0, 0, 0, 0.14));
+  border-radius: var(--sp-radius-md, 6px);
   background: var(--sp-surface-0, #fff);
   overflow: hidden;
   transition: border-color var(--sp-duration-fast, 100ms) var(--sp-ease-default, ease);
 }
 
 .sp-tp__input-wrap:focus-within {
-  border-color: var(--sp-primary, #2563eb);
-  box-shadow: 0 0 0 2px var(--sp-focus-ring-color, rgba(37, 99, 235, 0.25));
+  border-color: var(--sp-border-focus, var(--sp-primary));
+  box-shadow: 0 0 0 var(--sp-focus-ring-width, 2px) var(--sp-focus-glow-color);
 }
 
 .sp-tp__input-wrap--sm {
@@ -123,7 +123,7 @@
   height: 100%;
   flex-shrink: 0;
   border: none;
-  border-left: 1px solid var(--sp-border, rgba(0, 0, 0, 0.12));
+  border-inline-start: var(--sp-border-width-hairline, 1px) solid var(--sp-border);
   background: var(--sp-surface-50, #f9fafb);
   color: var(--sp-text-muted, #6b7280);
   cursor: pointer;
@@ -135,8 +135,8 @@
 }
 
 .sp-tp__input-toggle:focus-visible {
-  outline: 2px solid var(--sp-focus-ring-color, #2563eb);
-  outline-offset: -2px;
+  outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color, var(--sp-border-focus));
+  outline-offset: var(--sp-focus-ring-offset, 2px);
 }
 
 .sp-tp__input-toggle:disabled {
@@ -148,14 +148,14 @@
 .sp-tp__panel {
   min-width: 160px;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: var(--sp-radius-lg, 8px);
   box-shadow: var(
     --sp-shadow-lg,
     0 10px 15px -3px rgba(0, 0, 0, 0.1),
     0 4px 6px -4px rgba(0, 0, 0, 0.1)
   );
   background: var(--sp-surface-0, #fff);
-  border: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08));
+  border: var(--sp-overlay-border-width, var(--sp-border-width-hairline, 1px)) solid var(--sp-overlay-border, var(--sp-border-strong));
   animation: sp-tp-slide-in var(--sp-duration-fast, 100ms)
     var(--sp-ease-out, ease-out) both;
 }
@@ -242,8 +242,8 @@
 
 .sp-tp__period-btn {
   padding: 4px 8px;
-  border-radius: 6px;
-  border: 1px solid var(--sp-border, rgba(0, 0, 0, 0.12));
+  border-radius: var(--sp-radius-md, 6px);
+  border: var(--sp-border-width-hairline, 1px) solid var(--sp-border-strong);
   background: var(--sp-surface-0, #fff);
   font-family: inherit;
   font-size: 11px;
@@ -281,7 +281,7 @@
   justify-content: space-between;
   margin-top: 12px;
   padding-top: 10px;
-  border-top: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08));
+  border-block-start: var(--sp-border-width-hairline, 1px) solid var(--sp-border);
 }
 
 .sp-tp__clear-btn,
