@@ -120,9 +120,12 @@ export function DocsSidebar({ activeHash }: DocsSidebarProps) {
       </SidebarContent>
 
       <SidebarFooter showBorders>
-        <div className="docs-sidebar-footer-controls">
-          <ThemeSwitcher />
-          <DocsI18nPicker />
+        <div className="docs-footer-appearance">
+          <span className="docs-footer-appearance__label">{docs.t('appearance')}</span>
+          <div className="docs-sidebar-footer-controls">
+            <ThemeSwitcher compact />
+            <DocsI18nPicker compact />
+          </div>
         </div>
       </SidebarFooter>
     </Sidebar>

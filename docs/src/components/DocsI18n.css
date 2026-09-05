@@ -23,6 +23,13 @@
   font-size: var(--sp-text-xs);
 }
 
+.docs-i18n-picker__trigger--compact {
+  width: 32px;
+  height: 32px;
+  min-height: 32px;
+  padding: 0;
+}
+
 .docs-i18n-picker__trigger:hover,
 .docs-i18n-picker__trigger[aria-expanded='true'],
 .docs-i18n-picker__close:hover {

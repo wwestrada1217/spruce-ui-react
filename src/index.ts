@@ -207,17 +207,18 @@ export { IconRegistryProvider, useIconRegistry, useIcons } from './icons/icon-re
 export { ALL_DEFAULT_ICONS, DEFAULT_ICONS } from './icons/default-icons.js';
 export type { IconDefinition } from './icons/collections/icon-definition.js';
 export { iconSet } from './icons/collections/icon-definition.js';
-export { NAVIGATION_ICONS } from './icons/collections/navigation.js';
-export { ACTION_ICONS } from './icons/collections/action.js';
-export { STATUS_ICONS } from './icons/collections/status.js';
-export { SOCIAL_ICONS } from './icons/collections/social.js';
-export { CONTENT_ICONS } from './icons/collections/content.js';
-export { EDITOR_ICONS } from './icons/collections/editor.js';
-export { LAYOUT_ICONS } from './icons/collections/layout.js';
-export { DATA_ICONS } from './icons/collections/data.js';
-export { DEVELOPMENT_ICONS } from './icons/collections/development.js';
-export { GENERAL_ICONS } from './icons/collections/general.js';
-export { DUOTONE_ICONS } from './icons/collections/duotone.js';
+export * from './icons/collections/navigation.js';
+export * from './icons/collections/action.js';
+export * from './icons/collections/status.js';
+export * from './icons/collections/social.js';
+export * from './icons/collections/content.js';
+export * from './icons/collections/editor.js';
+export * from './icons/collections/layout.js';
+export * from './icons/collections/data.js';
+export * from './icons/collections/development.js';
+export * from './icons/collections/general.js';
+export * from './icons/collections/duotone.js';
+export { FLAG_ICONS } from './icons/collections/flags.js';
 
 // ─── Kbd ──────────────────────────────────────────────────────────────────────
 export { Kbd } from './components/kbd/Kbd.js';

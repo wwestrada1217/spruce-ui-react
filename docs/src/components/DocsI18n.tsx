@@ -270,9 +270,10 @@ export function useDocsI18n(): DocsI18nContextValue {
 
 export interface DocsI18nPickerProps {
   className?: string;
+  compact?: boolean;
 }
 
-export function DocsI18nPicker({ className = '' }: DocsI18nPickerProps) {
+export function DocsI18nPicker({ className = '', compact = false }: DocsI18nPickerProps) {
   const docs = useDocsI18n();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -301,7 +302,7 @@ export function DocsI18nPicker({ className = '' }: DocsI18nPickerProps) {
     <div ref={rootRef} className={['docs-i18n-picker', className].filter(Boolean).join(' ')}>
       <button
         type="button"
-        className="docs-i18n-picker__trigger"
+        className={`docs-i18n-picker__trigger${compact ? ' docs-i18n-picker__trigger--compact' : ''}`}
         aria-expanded={open}
         aria-haspopup="dialog"
         aria-label={docs.t('languageSettings')}
@@ -309,7 +310,7 @@ export function DocsI18nPicker({ className = '' }: DocsI18nPickerProps) {
         onClick={() => setOpen((current) => !current)}
       >
         <Icon name="globe" size={16} aria-hidden="true" />
-        <span className="docs-i18n-picker__trigger-label">{docs.locale}</span>
+        {!compact && <span className="docs-i18n-picker__trigger-label">{docs.locale}</span>}
       </button>
 
       {open && (

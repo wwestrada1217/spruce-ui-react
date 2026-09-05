@@ -121,7 +121,12 @@ function ThemeThumb({ opt }: { opt?: ThemeOption }) {
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export function ThemeSwitcher() {
+export interface ThemeSwitcherProps {
+  /** Use the compact icon trigger used by the docs sidebar footer. */
+  compact?: boolean;
+}
+
+export function ThemeSwitcher({ compact = false }: ThemeSwitcherProps) {
   const {
     preference,
     setTheme,
@@ -237,19 +242,28 @@ export function ThemeSwitcher() {
         trigger={
           <button
             ref={triggerRef}
-            className="tsw__trigger"
+            className={`tsw__trigger${compact ? ' tsw__trigger--compact' : ''}`}
             aria-expanded={open}
             aria-haspopup="dialog"
             aria-label={`Open appearance settings. Current theme: ${activeMeta.label}`}
           >
-            <span className="tsw__swatch" style={{ background: activeMeta.color }} aria-hidden="true">
-              <Icon name="palette" size={14} />
-            </span>
-            <span className="tsw__trigger-info">
-              <span className="tsw__trigger-label">Appearance</span>
-              <span className="tsw__trigger-sub">{activeMeta.label}</span>
-            </span>
-            <Icon name="chevron-up" size={14} aria-hidden="true" />
+            {compact ? (
+              <>
+                <span className="tsw__trigger-swatch" style={{ background: activeMeta.color }} aria-hidden="true" />
+                <Icon name="palette" size={16} aria-hidden="true" />
+              </>
+            ) : (
+              <>
+                <span className="tsw__swatch" style={{ background: activeMeta.color }} aria-hidden="true">
+                  <Icon name="palette" size={14} />
+                </span>
+                <span className="tsw__trigger-info">
+                  <span className="tsw__trigger-label">Appearance</span>
+                  <span className="tsw__trigger-sub">{activeMeta.label}</span>
+                </span>
+                <Icon name="chevron-up" size={14} aria-hidden="true" />
+              </>
+            )}
           </button>
         }
       >
