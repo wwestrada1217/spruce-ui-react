@@ -73,6 +73,7 @@ describe('P1-13 layout and behavior parity', () => {
     render(<DockManager layout={layout}><DockPanel panelId="a" title="Alpha">Alpha</DockPanel><DockPanel panelId="b" title="Beta">Beta</DockPanel></DockManager>)
     const split = document.querySelector('.sp-dock-split') as HTMLElement
     expect(split).toHaveClass('sp-splitter')
+    expect(split).toHaveClass('sp-splitter--thin')
     Object.defineProperty(split, 'offsetWidth', { configurable: true, value: 1000 })
     const splitter = screen.getByRole('separator', { name: 'Resize split' })
     expect(splitter).toHaveClass('sp-splitter__gutter')

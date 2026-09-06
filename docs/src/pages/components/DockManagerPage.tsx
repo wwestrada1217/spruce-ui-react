@@ -331,7 +331,7 @@ export function DockManagerPage() {
 
     <section id="api" className="demo-section"><h2>API</h2><div className="api-table-wrap"><table className="api-table"><thead><tr><th>Surface</th><th>API</th><th>Purpose</th></tr></thead><tbody>
       <tr><td><code>DockManager</code></td><td><code>layout, onLayoutChange, storageKey</code></td><td>Controlled state and JSON persistence.</td></tr>
-      <tr><td><code>DockManager</code></td><td><code>thinSplitters, dense, tabsAtBottom</code></td><td>Chrome density and tab placement.</td></tr>
+      <tr><td><code>DockManager</code></td><td><code>thinSplitters, dense, tabsAtBottom</code></td><td>Thin splitters (enabled by default), chrome density, and tab placement.</td></tr>
       <tr><td><code>DockPanel</code></td><td><code>panelId, title, icon, closeable, badge</code></td><td>Panel identity and header metadata.</td></tr>
       <tr><td><code>DockPanel</code></td><td><code>allowedDockZones, showHeader</code></td><td>Restrict movement or create a fixed document surface.</td></tr>
       <tr><td><code>DockPanelTools</code></td><td>children</td><td>Interactive controls projected into the active header.</td></tr>

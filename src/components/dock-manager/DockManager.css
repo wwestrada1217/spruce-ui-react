@@ -22,6 +22,8 @@
 .sp-dock-split > .sp-splitter__pane { position: relative; display: flex; min-width: 0; min-height: 0; overflow: hidden; }
 .sp-dock-split > .sp-splitter__pane > * { flex: 1 1 auto; min-width: 0; min-height: 0; }
 .sp-dock-split > .sp-splitter__gutter { position: relative; z-index: 2; flex: 0 0 auto; touch-action: none; background: var(--sp-dock-splitter-bg, var(--sp-splitter-gutter-bg, var(--sp-border))); }
+.sp-dock-split.sp-splitter--thin.sp-splitter--horizontal > .sp-splitter__gutter::before { width: 2px; }
+.sp-dock-split.sp-splitter--thin.sp-splitter--vertical > .sp-splitter__gutter::before { height: 2px; }
 .sp-dock-split > .sp-splitter__gutter:hover { background: var(--sp-dock-splitter-hover, var(--sp-splitter-gutter-hover-bg, var(--sp-primary))); }
 .sp-dock-split > .sp-splitter__gutter:focus-visible { outline: 2px solid var(--sp-dock-primary, var(--sp-focus-ring-color, var(--sp-primary))); outline-offset: -1px; }
 
@@ -32,13 +34,13 @@
 .sp-dock-float__header,
 .sp-dock-peek__header { font-size: var(--sp-dock-header-font-size, var(--sp-font-size-sm)); line-height: 1.2; }
 .sp-dock-panel-view__header,
-.sp-dock-stack__header { display: flex; align-items: center; gap: var(--sp-space-2); min-height: 30px; padding: var(--sp-space-1) var(--sp-space-2); border-block-end: 1px solid var(--sp-dock-header-border, var(--sp-border)); background: var(--sp-dock-header-bg, var(--sp-surface-50)); cursor: grab; user-select: none; }
+.sp-dock-stack__header { display: flex; align-items: center; gap: var(--sp-space-1); min-height: 30px; padding: var(--sp-space-1) var(--sp-space-2); border-block-end: 1px solid var(--sp-dock-header-border, var(--sp-border)); background: var(--sp-dock-header-bg, var(--sp-surface-50)); cursor: grab; user-select: none; }
 .sp-dock-panel-view__header:active,
 .sp-dock-stack__header:active { cursor: grabbing; }
 .sp-dock-panel-view__drag-handle { display: inline-flex; color: var(--sp-text-muted); opacity: .55; flex: 0 0 auto; }
 .sp-dock-panel-view__icon { flex: 0 0 auto; }
 .sp-dock-panel-view__title,
-.sp-dock-panel-view__title-text { display: inline-flex; align-items: center; gap: var(--sp-space-2); min-width: 0; flex: 1; overflow: hidden; color: inherit; font: inherit; font-weight: var(--sp-font-weight-medium, 500); text-align: start; text-overflow: ellipsis; white-space: nowrap; }
+.sp-dock-panel-view__title-text { display: inline-flex; align-items: center; gap: var(--sp-space-1); min-width: 0; flex: 1; overflow: hidden; color: inherit; font: inherit; font-weight: var(--sp-font-weight-medium, 500); text-align: start; text-overflow: ellipsis; white-space: nowrap; }
 .sp-dock-panel-view__title { padding: 0; border: 0; background: transparent; cursor: pointer; }
 .sp-dock-panel-view__title:focus-visible,
 .sp-dock-stack__tab:focus-visible,
@@ -57,7 +59,7 @@
 .sp-dock-stack__tabs--bottom { order: 2; border-block-start: 1px solid var(--sp-dock-tabs-border, var(--sp-border)); border-block-end: 0; }
 .sp-dock-stack__tab-wrap,
 .sp-dock-float__tab-wrap { display: inline-flex; align-items: center; flex: 0 0 auto; }
-.sp-dock-stack__tab { display: inline-flex; align-items: center; gap: var(--sp-space-1); padding: var(--sp-space-2) var(--sp-space-2); border: 0; border-block-end: 2px solid transparent; background: transparent; color: var(--sp-text-muted); font: inherit; white-space: nowrap; cursor: pointer; }
+.sp-dock-stack__tab { display: inline-flex; align-items: center; gap: var(--sp-space-1); padding: var(--sp-space-1) var(--sp-space-2); border: 0; border-block-end: 2px solid transparent; background: transparent; color: var(--sp-text-muted); font: inherit; font-size: var(--sp-dock-tab-font-size, var(--sp-font-size-xs)); line-height: 1.2; white-space: nowrap; cursor: pointer; }
 .sp-dock-stack__tab[aria-selected="true"] { border-block-end-color: var(--sp-dock-primary, var(--sp-primary)); color: var(--sp-text-color); }
 .sp-dock-stack__content { position: relative; display: flex; flex: 1 1 auto; min-width: 0; min-height: 0; overflow: hidden; }
 .sp-dock-stack__panel { display: flex; flex: 1 1 auto; min-width: 0; min-height: 0; overflow: hidden; }
@@ -100,7 +102,7 @@
 .sp-dock-float__drag-handle { display: inline-flex; color: var(--sp-text-muted); opacity: .55; }
 .sp-dock-float__title { display: inline-flex; align-items: center; gap: var(--sp-space-1); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sp-dock-float__tabs { display: flex; flex: 1; min-width: 0; overflow-x: auto; }
-.sp-dock-float__tab { display: inline-flex; align-items: center; gap: var(--sp-space-1); padding: var(--sp-space-1) var(--sp-space-2); border: 0; border-block-end: 2px solid transparent; background: transparent; color: var(--sp-text-muted); font: inherit; white-space: nowrap; cursor: pointer; }
+.sp-dock-float__tab { display: inline-flex; align-items: center; gap: var(--sp-space-1); padding: var(--sp-space-1) var(--sp-space-2); border: 0; border-block-end: 2px solid transparent; background: transparent; color: var(--sp-text-muted); font: inherit; font-size: var(--sp-dock-tab-font-size, var(--sp-font-size-xs)); line-height: 1.2; white-space: nowrap; cursor: pointer; }
 .sp-dock-float__tab[aria-selected="true"] { border-block-end-color: var(--sp-dock-primary, var(--sp-primary)); color: var(--sp-text-color); }
 .sp-dock-float__content { position: relative; display: flex; flex: 1 1 auto; min-width: 0; min-height: 0; overflow: hidden; }
 .sp-dock-float__panel { display: flex; flex: 1 1 auto; min-width: 0; min-height: 0; overflow: auto; }
@@ -122,7 +124,7 @@
 .sp-dock-peek--top { inset-block: 0 auto; height: min(360px, 80%); }
 .sp-dock-peek--bottom { inset-block: auto 0; height: min(360px, 80%); }
 .sp-dock-peek__body { display: flex; flex-direction: column; width: 100%; height: 100%; min-width: 0; min-height: 0; }
-.sp-dock-peek__header { display: flex; align-items: center; gap: var(--sp-space-2); min-height: 30px; padding: var(--sp-space-1) var(--sp-space-2); border-block-end: 1px solid var(--sp-border); background: var(--sp-surface-50); }
+.sp-dock-peek__header { display: flex; align-items: center; gap: var(--sp-space-1); min-height: 30px; padding: var(--sp-space-1) var(--sp-space-2); border-block-end: 1px solid var(--sp-border); background: var(--sp-surface-50); }
 .sp-dock-peek__title { flex: 1; min-width: 0; overflow: hidden; color: var(--sp-text-color); text-overflow: ellipsis; white-space: nowrap; font-weight: var(--sp-font-weight-medium, 500); }
 .sp-dock-peek__tools,
 .sp-dock-peek__actions { display: inline-flex; align-items: center; gap: var(--sp-space-1); }

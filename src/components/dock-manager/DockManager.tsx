@@ -286,6 +286,7 @@ export interface DockManagerHandle {
 export interface DockManagerProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
   layout?: DockLayout | null;
   storageKey?: string | null;
+  /** Use a thin visual splitter while preserving the resize hit area. Defaults to true. */
   thinSplitters?: boolean;
   dense?: boolean;
   tabsAtBottom?: boolean;
@@ -719,7 +720,7 @@ function NodeView({ node, panels, tabsAtBottom, source, activeZone, canDrop, onD
   return <Splitter
     className={['sp-dock-split', `sp-dock-split--${node.direction}`].join(' ')}
     orientation={node.direction === 'h' ? 'horizontal' : 'vertical'}
-    gutterSize={thinSplitters ? 2 : 8}
+    gutterSize={thinSplitters ? 4 : 8}
     sizes={node.sizes}
     thin={thinSplitters}
     keyIncrement={5}
@@ -769,7 +770,7 @@ function FloatView({ float, panels, onBringToFront, onMoveStart, onResizeStart, 
 }
 
 export const DockManager = forwardRef(function DockManager(
-  { layout: controlledLayout = null, storageKey = null, thinSplitters = false, dense = false, tabsAtBottom = false, onLayoutChange, onPanelActivate, children, className, ...props }: DockManagerProps,
+  { layout: controlledLayout = null, storageKey = null, thinSplitters = true, dense = false, tabsAtBottom = false, onLayoutChange, onPanelActivate, children, className, ...props }: DockManagerProps,
   ref: ForwardedRef<DockManagerHandle>,
 ) {
   const { direction, t } = useI18n();
