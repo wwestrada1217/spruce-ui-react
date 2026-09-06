@@ -162,7 +162,7 @@ export function AppShellBlockPage() {
         <p className="docs-desc">
           Application Shell layout block combining a collapsible, responsive Sidebar on the left,
           a top AppHeader with aligned height (52px), and an independently scrollable main content container.
-          When in mobile size, the sidebar transforms into an off-canvas drawer controlled by a hamburger menu in the app header.
+          When in mobile size, the sidebar transforms into an off-canvas drawer controlled by the sidebar icon in the AppHeader.
         </p>
 
         {/* ── Interactive Demo ─────────────────────────────────────────── */}

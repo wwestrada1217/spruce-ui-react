@@ -129,7 +129,7 @@ function AppShellInner({
     return () => mq.removeEventListener('change', handler);
   }, [breakpoint]);
 
-  const showHamburger = allowResponsive && isSmallScreen && !!sidebar;
+  const showHamburger = allowResponsive && isSmallScreen && !!sidebar && !header;
 
   const rootCls = ['sp-app-shell', className].filter(Boolean).join(' ');
   const mainCls = ['sp-app-shell__main', padded && 'sp-app-shell__main--padded']
