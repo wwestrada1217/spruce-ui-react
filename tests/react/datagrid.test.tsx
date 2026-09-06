@@ -27,6 +27,10 @@ const columns: readonly DatagridColumn<Person>[] = [
   { key: 'age', header: 'Age', resizable: false, sortable: false, editable: true },
 ];
 
+const filterColumns: readonly DatagridColumn<Person>[] = [
+  { key: 'name', header: 'Name', filterable: true, filterVariant: 'dynamic', filterDataType: 'text' },
+];
+
 function ControlledRowDetailsGrid() {
   const [expandedRows, setExpandedRows] = useState<readonly Person[]>([]);
 
@@ -73,6 +77,25 @@ function ControlledGroupingGrid({ initialGroupBy = ['age'] }: { initialGroupBy?:
 }
 
 describe('Datagrid', () => {
+  it('uses Spruce controls for the dynamic filter popover', async () => {
+    const { container, getByRole, getByLabelText, queryByRole, user } = renderWithSpruce(
+      <Datagrid<Person> ariaLabel="People" rows={rows} columns={filterColumns} />,
+    );
+
+    await user.click(getByRole('button', { name: 'Filter Name' }));
+
+    expect(getByRole('button', { name: 'Condition' })).toBeInTheDocument();
+    expect(getByLabelText('Value')).toBeInTheDocument();
+    expect(container.querySelector('select')).not.toBeInTheDocument();
+    expect(queryByRole('button', { name: 'Clear' })).toBeInTheDocument();
+    expect(queryByRole('button', { name: 'Apply' })).toBeInTheDocument();
+
+    await user.click(getByRole('button', { name: 'Condition' }));
+    await user.click(getByRole('option', { name: 'Between' }));
+
+    expect(getByLabelText('And')).toBeInTheDocument();
+  });
+
   it('renders the typed grid contract and supports keyboard cell navigation', async () => {
     const { container, getByRole, getAllByRole, user } = renderWithSpruce(
       <Datagrid<Person> ariaLabel="People" rows={rows} columns={columns} editMode="cell" />,

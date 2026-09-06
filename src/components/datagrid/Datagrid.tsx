@@ -21,8 +21,11 @@ import { createPortal } from 'react-dom';
 import { Button } from '../button/Button.js';
 import { Checkbox } from '../checkbox/Checkbox.js';
 import { Dropdown, type DropdownItem } from '../dropdown/Dropdown.js';
+import { Field } from '../field/Field.js';
 import { Icon } from '../../icons/Icon.js';
+import { Input } from '../input/Input.js';
 import { Popover } from '../popover/Popover.js';
+import { Select, type SelectOption } from '../select/Select.js';
 import { useI18n } from '../../i18n/i18n-context.js';
 import {
   createDatagridDataContextAdapter,
@@ -575,6 +578,22 @@ function evaluateDynamicCondition(
       return true;
   }
 }
+
+const DATAGRID_DYNAMIC_FILTER_OPERATOR_OPTIONS: readonly SelectOption[] = [
+  { value: 'contains', label: 'Contains' },
+  { value: 'notContains', label: 'Does not contain' },
+  { value: 'startsWith', label: 'Starts with' },
+  { value: 'endsWith', label: 'Ends with' },
+  { value: 'equals', label: 'Equals' },
+  { value: 'notEquals', label: 'Not equal' },
+  { value: 'greaterThan', label: 'Greater than' },
+  { value: 'greaterThanOrEqual', label: 'Greater than or equal' },
+  { value: 'lessThan', label: 'Less than' },
+  { value: 'lessThanOrEqual', label: 'Less than or equal' },
+  { value: 'between', label: 'Between' },
+  { value: 'isEmpty', label: 'Is empty' },
+  { value: 'isNotEmpty', label: 'Is not empty' },
+];
 
 function computeAggregate<T extends object>(
   aggregate: DatagridAggregate<T>,
@@ -2208,7 +2227,8 @@ function DatagridInner<T extends object = Record<string, unknown>>(
       const target = e.target as HTMLElement;
       if (
         !target.closest('.sp-datagrid__filter-panel') &&
-        !target.closest('.sp-datagrid__filter-trigger')
+        !target.closest('.sp-datagrid__filter-trigger') &&
+        !target.closest('.sp-select__dropdown')
       ) {
         setActiveFilterPopover(null);
       }
@@ -4212,98 +4232,89 @@ function DatagridInner<T extends object = Record<string, unknown>>(
             <div className="sp-datagrid__filter-panel">
               <div className="sp-datagrid__filter-header">
                 <h3>Filter {col.header}</h3>
-                <button
-                  type="button"
-                  className="sp-btn sp-btn--sm"
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  iconOnly
+                  iconLeft="x"
+                  aria-label="Close filter"
                   onClick={() => setActiveFilterPopover(null)}
-                >
-                  <Icon name="x" size={12} />
-                </button>
+                />
               </div>
 
               {isDynamic ? (
                 <div className="sp-datagrid__dynamic-filter-fields">
-                  <div className="sp-datagrid__dynamic-filter-field">
-                    <span>Condition</span>
-                    <select
-                      className="sp-select"
-                      defaultValue={existingFilter?.condition?.operator ?? 'contains'}
-                      onChange={(e) => {
-                        const op = e.target.value as DatagridDynamicFilterOperator;
-                        const next = activeColumnFilters.filter((f) => f.key !== col.key);
-                        next.push({
-                          key: col.key,
-                          column: col,
-                          values: [],
-                          condition: { operator: op, value: existingFilter?.condition?.value },
-                        });
-                        setInternalColumnFilters(next);
-                        onFilterChange?.(next);
-                      }}
-                    >
-                      <option value="contains">Contains</option>
-                      <option value="notContains">Does not contain</option>
-                      <option value="startsWith">Starts with</option>
-                      <option value="endsWith">Ends with</option>
-                      <option value="equals">Equals</option>
-                      <option value="notEquals">Not equal</option>
-                      <option value="greaterThan">Greater than</option>
-                      <option value="greaterThanOrEqual">Greater than or equal</option>
-                      <option value="lessThan">Less than</option>
-                      <option value="lessThanOrEqual">Less than or equal</option>
-                      <option value="between">Between</option>
-                      <option value="isEmpty">Is empty</option>
-                      <option value="isNotEmpty">Is not empty</option>
-                    </select>
-                  </div>
-                  <div className="sp-datagrid__dynamic-filter-field">
-                    <span>Value</span>
-                    <input
-                      type="text"
-                      className="sp-input"
-                      defaultValue={String(existingFilter?.condition?.value ?? '')}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        const next = activeColumnFilters.filter((f) => f.key !== col.key);
-                        next.push({
-                          key: col.key,
-                          column: col,
-                          values: [],
-                          condition: {
-                            operator: existingFilter?.condition?.operator ?? 'contains',
-                            value: val,
-                          },
-                        });
-                        setInternalColumnFilters(next);
-                        onFilterChange?.(next);
-                      }}
-                    />
-                  </div>
-                  {(existingFilter?.condition?.operator ?? 'contains') === 'between' && (
-                    <div className="sp-datagrid__dynamic-filter-field">
-                      <span>And</span>
-                      <input
-                        type="text"
-                        className="sp-input"
-                        defaultValue={String(existingFilter?.condition?.valueTo ?? '')}
-                        onChange={(event) => {
-                          const next = activeColumnFilters.filter((filter) => filter.key !== col.key);
-                          next.push({
-                            key: col.key,
-                            column: col,
-                            values: [],
-                            condition: {
-                              operator: 'between',
-                              value: existingFilter?.condition?.value,
-                              valueTo: event.target.value,
-                            },
-                          });
-                          setInternalColumnFilters(next);
-                          onFilterChange?.(next);
-                        }}
-                      />
-                    </div>
-                  )}
+                  {(() => {
+                    const operator = existingFilter?.condition?.operator ?? 'contains';
+                    const value = String(existingFilter?.condition?.value ?? '');
+                    const valueTo = String(existingFilter?.condition?.valueTo ?? '');
+                    const updateCondition = (condition: DatagridDynamicFilterCondition) => {
+                      const next = activeColumnFilters.filter((f) => f.key !== col.key);
+                      next.push({
+                        key: col.key,
+                        column: col,
+                        values: [],
+                        condition,
+                      });
+                      setInternalColumnFilters(next);
+                      onFilterChange?.(next);
+                    };
+
+                    return (
+                      <>
+                        <Field
+                          className="sp-datagrid__dynamic-filter-field"
+                          label="Condition"
+                          labelFor="sp-datagrid-filter-condition"
+                        >
+                          <Select
+                            id="sp-datagrid-filter-condition"
+                            options={DATAGRID_DYNAMIC_FILTER_OPERATOR_OPTIONS}
+                            value={operator}
+                            size="sm"
+                            ariaLabel="Condition"
+                            onChange={(next) => {
+                              const nextOperator = typeof next === 'string' ? next : next[0];
+                              if (!nextOperator) return;
+                              updateCondition({
+                                operator: nextOperator as DatagridDynamicFilterOperator,
+                                value,
+                                valueTo: nextOperator === 'between' ? valueTo : undefined,
+                              });
+                            }}
+                          />
+                        </Field>
+                        <Field
+                          className="sp-datagrid__dynamic-filter-field"
+                          label="Value"
+                          labelFor="sp-datagrid-filter-value"
+                        >
+                          <Input
+                            id="sp-datagrid-filter-value"
+                            value={value}
+                            size="sm"
+                            ariaLabel="Value"
+                            onChange={(next) => updateCondition({ operator, value: next, valueTo: operator === 'between' ? valueTo : undefined })}
+                          />
+                        </Field>
+                        {operator === 'between' && (
+                          <Field
+                            className="sp-datagrid__dynamic-filter-field"
+                            label="And"
+                            labelFor="sp-datagrid-filter-value-to"
+                          >
+                            <Input
+                              id="sp-datagrid-filter-value-to"
+                              value={valueTo}
+                              size="sm"
+                              ariaLabel="And"
+                              onChange={(next) => updateCondition({ operator, value, valueTo: next })}
+                            />
+                          </Field>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
               ) : (
                 <>
@@ -4345,9 +4356,9 @@ function DatagridInner<T extends object = Record<string, unknown>>(
               )}
 
               <div className="sp-datagrid__filter-actions">
-                <button
-                  type="button"
-                  className="sp-btn sp-btn--sm sp-btn--secondary"
+                <Button
+                  size="sm"
+                  variant="secondary"
                   onClick={() => {
                     const next = activeColumnFilters.filter((f) => f.key !== col.key);
                     setInternalColumnFilters(next);
@@ -4356,14 +4367,10 @@ function DatagridInner<T extends object = Record<string, unknown>>(
                   }}
                 >
                   Clear
-                </button>
-                <button
-                  type="button"
-                  className="sp-btn sp-btn--sm sp-btn--primary"
-                  onClick={() => setActiveFilterPopover(null)}
-                >
+                </Button>
+                <Button size="sm" variant="primary" onClick={() => setActiveFilterPopover(null)}>
                   Apply
-                </button>
+                </Button>
               </div>
             </div>
           </div>,
