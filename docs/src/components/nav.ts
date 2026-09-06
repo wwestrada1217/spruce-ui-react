@@ -106,7 +106,6 @@ const RAW_NAV_SECTIONS: NavSection[] = [
       { icon: 'sliders-horizontal', label: 'Property Panel',     route: '#/components/property-panel' },
       { icon: 'file-text',          label: 'PDF Viewer',         route: '#/components/pdf-viewer'      },
       { icon: 'file-diff',          label: 'Text Diff',          route: '#/components/text-diff'       },
-      { icon: 'credit-card',        label: 'Plan Cards',         route: '#/components/plan-cards'      },
     ],
   },
   {
@@ -178,9 +177,7 @@ const RAW_NAV_SECTIONS: NavSection[] = [
       { icon: 'columns',        label: 'Masonry',             route: '#/components/masonry'         },
       { icon: 'grip-vertical',  label: 'Splitter',          route: '#/components/splitter'         },
       { icon: 'sidebar-left',   label: 'Sidebar',           route: '#/components/sidebar'          },
-      { icon: 'building',       label: 'Company Switcher',  route: '#/components/company-switcher' },
       { icon: 'credit-card',    label: 'App Header',        route: '#/components/app-header'       },
-      { icon: 'layout',         label: 'App Shell',         route: '#/components/app-shell'        },
       { icon: 'panel-right',    label: 'Drawer',            route: '#/components/drawer'           },
       { icon: 'maximize',       label: 'Modal',             route: '#/components/modal'            },
       { icon: 'minimize',       label: 'Window',            route: '#/components/window'           },

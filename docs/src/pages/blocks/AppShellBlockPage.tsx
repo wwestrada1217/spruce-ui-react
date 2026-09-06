@@ -8,7 +8,6 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   AppShell,
-  AppShellHamburger,
   Sidebar,
   SidebarContent,
   SidebarHeader,
@@ -30,7 +29,6 @@ import { CodePreview } from '../../components/CodePreview';
 
 const FULL_SHELL_CODE = `import {
   AppShell,
-  AppShellHamburger,
   Sidebar,
   SidebarContent,
   SidebarHeader,
@@ -100,7 +98,6 @@ export function ApplicationShellDemo() {
       header={
         <AppHeader
           height={52}
-          logo={<AppShellHamburger />}
           title="Overview Dashboard"
           subtitle="Project Workspace & Stats"
           actions={
@@ -289,7 +286,6 @@ export function AppShellBlockPage() {
               header={
                 <AppHeader
                   height={52}
-                  logo={<AppShellHamburger />}
                   title="Overview Dashboard"
                   subtitle="Project Workspace & Stats"
                   actions={

@@ -183,8 +183,6 @@ export { SidebarWorkspaceSwitcher } from './components/sidebar/SidebarWorkspaceS
 export type { SidebarWorkspaceSwitcherProps, WorkspaceOption } from './components/sidebar/SidebarWorkspaceSwitcher.js';
 export { SidebarNewsletterSubscribeForm } from './components/sidebar/SidebarNewsletterSubscribeForm.js';
 export type { SidebarNewsletterSubscribeFormProps } from './components/sidebar/SidebarNewsletterSubscribeForm.js';
-export { CompanySwitcher } from './components/sidebar/CompanySwitcher.js';
-export type { CompanySwitcherProps, CompanyOption } from './components/sidebar/CompanySwitcher.js';
 
 // ─── AppShell ─────────────────────────────────────────────────────────────────
 export { AppShell, AppShellHamburger } from './components/app-shell/AppShell.js';
@@ -802,15 +800,6 @@ export type {
   TextDiffSegment,
   SpTextDiffProps,
 } from './components/text-diff/TextDiff.js';
-export { PlanCards } from './components/plan-cards/PlanCards.js';
-export type {
-  PlanCardsProps,
-  PlanCardModel,
-  PlanCardFeatureGroup,
-  SpPlanCardsProps,
-  SpPlanCardModel,
-  SpPlanCardFeatureGroup,
-} from './components/plan-cards/PlanCards.js';
 export {
   EntitlementsProvider,
   useEntitlements,

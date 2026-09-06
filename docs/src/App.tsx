@@ -94,7 +94,6 @@ import { KanbanPage } from './pages/components/KanbanPage'
 import { TreePage } from './pages/components/TreePage'
 import { InplaceEditorPage } from './pages/components/InplaceEditorPage'
 import { AppHeaderPage } from './pages/components/AppHeaderPage'
-import { CompanySwitcherPage } from './pages/components/CompanySwitcherPage'
 import { NavMenuPage } from './pages/components/NavMenuPage'
 import { PagerPage } from './pages/components/PagerPage'
 import { FabPage } from './pages/components/FabPage'
@@ -202,7 +201,6 @@ import { CommentThreadPage } from './pages/components/CommentThreadPage'
 import { PropertyPanelPage } from './pages/components/PropertyPanelPage'
 import { PdfViewerPage } from './pages/components/PdfViewerPage'
 import { TextDiffPage } from './pages/components/TextDiffPage'
-import { PlanCardsPage } from './pages/components/PlanCardsPage'
 import { getRouteHash } from './components/nav'
 import { useDocsI18n } from './components/DocsI18n'
 
@@ -336,7 +334,6 @@ function renderPage(hash: string): React.ReactElement {
     case '#/components/tree':               return <TreePage />
     case '#/components/inplace-editor':     return <InplaceEditorPage />
     case '#/components/app-header':         return <AppHeaderPage />
-    case '#/components/company-switcher':   return <CompanySwitcherPage />
     case '#/components/nav-menu':           return <NavMenuPage />
     case '#/components/pager':              return <PagerPage />
     case '#/components/fab':                return <FabPage />
@@ -351,7 +348,6 @@ function renderPage(hash: string): React.ReactElement {
     case '#/components/property-panel':      return <PropertyPanelPage />
     case '#/components/pdf-viewer':          return <PdfViewerPage />
     case '#/components/text-diff':           return <TextDiffPage />
-    case '#/components/plan-cards':          return <PlanCardsPage />
     case '#/components/filter-expression':  return <FilterExpressionPage />
     case '#/components/list':               return <ListPage />
     case '#/components/terminal':           return <TerminalPage />
@@ -371,7 +367,7 @@ function renderPage(hash: string): React.ReactElement {
     case '#/components/diff-editor':        return <DiffEditorPage />
     case '#/components/signature-pad':      return <SignaturePadPage />
     case '#/blocks/app-shell':
-    case '#/components/app-shell':          return <AppShellBlockPage />
+      return <AppShellBlockPage />
     case '#/blocks/dashboard':               return <DashboardBlockPage />
     case '#/blocks/authentication':          return <AuthenticationBlockPage />
     case '#/blocks/settings':                return <SettingsBlockPage />

@@ -14,10 +14,8 @@ export interface DocsPageMetadata {
 }
 
 const SYMBOLS: Record<string, readonly string[]> = {
-  '#/components/app-shell': ['AppShell'],
   '#/components/barcode-qr': ['Barcode', 'QrCode'],
   '#/components/breadcrumbs': ['Breadcrumb'],
-  '#/components/company-switcher': ['CompanySwitcher'],
   '#/components/datagridex': ['Datagridex'],
   '#/components/datetime-picker': ['DatetimePicker'],
   '#/components/daterange-picker': ['DateRangePicker'],

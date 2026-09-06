@@ -2,7 +2,6 @@ import { describe, expect, it, vi } from 'vitest';
 import { useState } from 'react';
 import {
   AppHeader,
-  CompanySwitcher,
   Sidebar,
   SidebarAccountSwitcher,
   SidebarContent,
@@ -66,16 +65,6 @@ describe('P1.0-08 shell and sidebar parity', () => {
     await view.user.click(label);
     expect(changed).toHaveBeenCalledWith(false);
     expect(label).toHaveAttribute('aria-expanded', 'false');
-  });
-
-  it('selects companies with listbox semantics and does not re-emit the active option', async () => {
-    const changed = vi.fn();
-    const view = renderWithSpruce(<CompanySwitcher companies={[{ id: 'one', name: 'One', code: 'ONE' }, { id: 'two', name: 'Two', role: 'member' }]} activeCompanyId="one" onCompanyChange={changed} />);
-    await view.user.click(view.getByRole('button', { name: 'Company switcher' }));
-    expect(view.getByRole('listbox', { name: 'Company' })).toBeInTheDocument();
-    await view.user.click(view.getByRole('option', { name: /Two/ }));
-    expect(changed).toHaveBeenCalledWith('two');
-    expect(changed).toHaveBeenCalledTimes(1);
   });
 
   it('controls workspace, account, popover, and newsletter callbacks', async () => {

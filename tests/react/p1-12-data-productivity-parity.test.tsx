@@ -9,7 +9,6 @@ import {
   FeatureGate,
   FeatureLocked,
   PdfViewer,
-  PlanCards,
   PropertyPanel,
   Table,
   TextDiff,
@@ -104,20 +103,12 @@ describe('P1.0-12 data and productivity parity', () => {
     expect(view.getByRole('status')).toHaveTextContent(/no pdf/i);
   });
 
-  it('computes a semantic text diff and supports plan selection/loading', async () => {
-    const selected = vi.fn();
+  it('computes a semantic text diff', () => {
     const view = renderWithSpruce(
-      <>
-        <TextDiff oldText="Ship Friday" newText="Ship Monday" showSummary />
-        <PlanCards plans={[{ name: 'Growth', recommended: true, ctaLabel: 'Choose Growth' }]} onPlanSelect={selected} />
-      </>,
+      <TextDiff oldText="Ship Friday" newText="Ship Monday" showSummary />,
     );
     expect(view.container.querySelectorAll('.sp-text-diff__part--delete')).toHaveLength(1);
     expect(view.container.querySelectorAll('.sp-text-diff__part--insert')).toHaveLength(1);
-    await view.user.click(view.getByRole('button', { name: 'Choose Growth' }));
-    expect(selected).toHaveBeenCalledWith(expect.objectContaining({ name: 'Growth' }));
-    view.rerender(<PlanCards loading skeletonCount={2} />);
-    expect(view.container.querySelectorAll('.sp-plan--skeleton')).toHaveLength(2);
   });
 
   it('fails closed until entitlements are loaded and renders the locked state', () => {
