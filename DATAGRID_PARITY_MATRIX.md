@@ -1,6 +1,6 @@
-# Datagridex Angular → React parity matrix
+# Datagrid Angular → React parity matrix
 
-Source baseline: `spruce-ng/projects/spruce-ui/datagridex` and `projects/docs/src/app/pages/components/datagridex-page.ts`. React target: `src/components/datagridex`, its docs route, and `tests/react/datagridex.test.tsx`.
+Source baseline: `spruce-ng/projects/spruce-ui/datagrid` and `projects/docs/src/app/pages/components/datagrid-page.ts`. React target: `src/components/datagrid`, its docs route, and `tests/react/datagrid.test.tsx`.
 
 The Angular inputs and outputs below are represented as typed React props/callbacks. React keeps state controlled where Angular exposes a model, and uses render props/slot components where Angular uses templates. Framework-specific dependency injection, signals, and directives are intentionally not part of the React contract.
 
@@ -86,7 +86,7 @@ The Angular inputs and outputs below are represented as typed React props/callba
 | row reorder | `onRowOrderChange` |
 | DataContext save complete/error | `onDataContextSaveComplete`, `onDataContextSaveError` |
 
-The `DatagridexHandle` exposes the Angular public actions as typed imperative methods: sorting, value/condition filtering, detail expansion, paging, selection, DataContext CRUD/save/discard, sizing, visibility/grouping, and edit lifecycle controls.
+The `DatagridHandle` exposes the Angular public actions as typed imperative methods: sorting, value/condition filtering, detail expansion, paging, selection, DataContext CRUD/save/discard, sizing, visibility/grouping, and edit lifecycle controls.
 
 ## Accessibility, i18n, RTL, and themes
 

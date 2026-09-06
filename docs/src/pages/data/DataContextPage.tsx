@@ -358,7 +358,7 @@ export function DataContextPage() {
         <section id="adapters" className="demo-section" aria-labelledby="adapters-heading">
           <h2 id="adapters-heading">Adapters &amp; Integration Boundaries</h2>
           <p className="section-desc">
-            The core data classes are framework-neutral. <code>Datagridex</code> consumes a
+            The core data classes are framework-neutral. <code>Datagrid</code> consumes a
             <code>DataContext</code> through its data-context adapter, while form integrations consume
             <code>FormModel</code> or the <code>NodeStore</code> form bridge. React hooks only subscribe
             to those classes; they do not change their CRUD, validation, undo, cursor, or sync behavior.
@@ -367,7 +367,7 @@ export function DataContextPage() {
           <ul className="docs-list">
             <li><code>createDetailDataSource</code> adapts a parent-id loader to the detail read contract.</li>
             <li><code>useDataContextFormModel</code>, <code>useNodeStore</code>, and <code>useFormBridge</code> are the React subscription layer.</li>
-            <li><code>FormBuilder</code> can bind to the bridge model without importing Angular signals; Datagridex remains responsible for rendering and row interaction.</li>
+            <li><code>FormBuilder</code> can bind to the bridge model without importing Angular signals; Datagrid remains responsible for rendering and row interaction.</li>
           </ul>
         </section>
 

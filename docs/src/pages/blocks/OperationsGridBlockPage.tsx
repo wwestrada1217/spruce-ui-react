@@ -2,11 +2,11 @@ import { useMemo, useState } from 'react';
 import {
   Badge,
   Button,
-  Datagridex,
+  Datagrid,
   Input,
   Sparkline,
 } from 'spruce-react';
-import type { BadgeVariant, DatagridexColumn, DatagridexProps } from 'spruce-react';
+import type { BadgeVariant, DatagridColumn, DatagridProps } from 'spruce-react';
 import { CodePreview } from '../../components/CodePreview';
 import { BlockPageLayout, type BlockPageSection } from './BlockPageLayout';
 
@@ -59,7 +59,7 @@ const INITIAL_ROWS: QueueRecord[] = [
   { id: 'Q-1068', customer: 'Acorn Public Sector', region: 'US-South', owner: 'Noah Bell', priority: 'High', status: 'Needs Review', ageHours: 29, riskScore: 78, channel: 'Manual', nextStep: 'Check pricing override memo' },
 ];
 
-const COLUMNS: readonly DatagridexColumn<QueueRecord>[] = [
+const COLUMNS: readonly DatagridColumn<QueueRecord>[] = [
   { key: 'id', header: 'Queue ID', width: 124, pinned: 'left', sortable: true, filterable: true },
   { key: 'customer', header: 'Customer', width: 180, sortable: true, filterable: true },
   { key: 'region', header: 'Region', width: 120, sortable: true, filterable: true },
@@ -111,10 +111,10 @@ function riskTrendValues(row: QueueRecord): number[] {
   ];
 }
 
-const OPS_CODE = `import { Badge, Button, Datagridex, Input, Sparkline } from 'spruce-react';
+const OPS_CODE = `import { Badge, Button, Datagrid, Input, Sparkline } from 'spruce-react';
 
 <Input value={searchTerm} onChange={setSearchTerm} iconLeft="search" />
-<Datagridex
+<Datagrid
   rows={filteredRows}
   columns={columns}
   selectionMode="multiple"
@@ -187,7 +187,7 @@ export function OperationsGridBlockPage() {
     ? 'Owner + status routing'
     : owners.size === 1 ? `Single-owner batch: ${selectedRows[0].owner}` : 'Cross-owner escalation batch';
 
-  const cellTemplates: NonNullable<DatagridexProps<QueueRecord>['cellTemplates']> = {
+  const cellTemplates: NonNullable<DatagridProps<QueueRecord>['cellTemplates']> = {
     id: ({ value }) => <strong>{String(value)}</strong>,
     priority: ({ value }) => <span style={{ color: priorityColor(String(value) as QueuePriority), fontWeight: 700 }}>{String(value)}</span>,
     status: ({ value }) => <Badge variant={statusVariant(String(value) as QueueStatus)} size="sm">{String(value)}</Badge>,
@@ -199,7 +199,7 @@ export function OperationsGridBlockPage() {
   return (
     <BlockPageLayout
       title="Operations Grid"
-      description="A queue-management block built around Datagridex for triage, bulk review, and analyst handoff. It showcases pinned columns, filtering, selection, toolbar actions, and pagination inside an application-ready shell."
+      description="A queue-management block built around Datagrid for triage, bulk review, and analyst handoff. It showcases pinned columns, filtering, selection, toolbar actions, and pagination inside an application-ready shell."
       sections={SECTIONS}
     >
       <section id="queue-workbench" className="demo-section" aria-labelledby="queue-workbench-heading">
@@ -226,7 +226,7 @@ export function OperationsGridBlockPage() {
           </div>
 
           <div className="sp-block-ops__grid">
-            <Datagridex<QueueRecord>
+            <Datagrid<QueueRecord>
               ariaLabel="Shipment exception queue"
               rows={filteredRows}
               columns={COLUMNS}
@@ -286,7 +286,7 @@ export function OperationsGridBlockPage() {
 
       <section id="code" className="demo-section" aria-labelledby="operations-code-heading">
         <h2 id="operations-code-heading">Source Code</h2>
-        <CodePreview code={OPS_CODE} language="typescript" codeOnly title="Datagridex operations block" />
+        <CodePreview code={OPS_CODE} language="typescript" codeOnly title="Datagrid operations block" />
       </section>
     </BlockPageLayout>
   );

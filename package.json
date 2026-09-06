@@ -57,7 +57,7 @@
     "test:type": "tsc -p tests/tsconfig.json --noEmit",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
-    "test:legacy": "node --experimental-strip-types --test tests/tokens.test.mjs tests/theme.test.mjs tests/i18n.test.mjs tests/datagridex.test.mjs tests/core-data.test.mjs",
+    "test:legacy": "node --experimental-strip-types --test tests/tokens.test.mjs tests/theme.test.mjs tests/i18n.test.mjs tests/datagrid.test.mjs tests/core-data.test.mjs",
     "test:ci": "npm run test:type && npm run test:unit && npm run test:legacy",
     "test": "npm run build && npm run test:ci"
   },

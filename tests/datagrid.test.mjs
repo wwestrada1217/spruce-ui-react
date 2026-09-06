@@ -1,15 +1,15 @@
 import { strict as assert } from 'node:assert'
 import { readFileSync } from 'node:fs'
 import test from 'node:test'
-import { createDatagridexDataContextAdapter } from '../src/components/datagridex/datagridex-data-context.ts'
+import { createDatagridDataContextAdapter } from '../src/components/datagrid/datagrid-data-context.ts'
 
-test('exports Datagridex and its DataContext adapter', () => {
-  assert.equal(typeof createDatagridexDataContextAdapter, 'function')
-  assert.match(readFileSync(new URL('../src/components/datagridex/Datagridex.tsx', import.meta.url), 'utf8'), /export const Datagridex = forwardRef/)
+test('exports Datagrid and its DataContext adapter', () => {
+  assert.equal(typeof createDatagridDataContextAdapter, 'function')
+  assert.match(readFileSync(new URL('../src/components/datagrid/Datagrid.tsx', import.meta.url), 'utf8'), /export const Datagrid = forwardRef/)
 })
 
 test('renders accessible grid semantics and labeled keyboard controls', () => {
-  const source = readFileSync(new URL('../src/components/datagridex/Datagridex.tsx', import.meta.url), 'utf8')
+  const source = readFileSync(new URL('../src/components/datagrid/Datagrid.tsx', import.meta.url), 'utf8')
   assert.match(source, /role="grid"/)
   assert.match(source, /aria-label=\{ariaLabel\}/)
   assert.match(source, /aria-label=\{`\$\{t\('sortAscending'\)\} \$\{column\.header\}/)
@@ -34,7 +34,7 @@ test('adapts structural DataContext state and write-through operations', () => {
     save: async () => undefined,
     skip: () => true,
   }
-  const adapter = createDatagridexDataContextAdapter(context, { stateDisplay: 'row-and-cell' })
+  const adapter = createDatagridDataContextAdapter(context, { stateDisplay: 'row-and-cell' })
 
   assert.equal(adapter.recordId(rows[0]), '1')
   assert.equal(adapter.recordState(rows[0]), 'modified')

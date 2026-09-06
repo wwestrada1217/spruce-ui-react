@@ -8,6 +8,8 @@ import {
   Button,
   Icon,
   Datagrid,
+  type DatagridCellTemplateContext,
+  type DatagridColumn,
 } from 'spruce-react';
 import { CodePreview } from '../../components/CodePreview';
 
@@ -60,22 +62,25 @@ export function DashboardBlockPage() {
     { id: 'ORD-9477', customer: 'Vortex Dynamics', amount: '$3,120.00', status: 'Completed', date: '2026-07-25' },
   ];
 
-  const columns = [
-    { field: 'id', header: 'Order ID', width: 120 },
-    { field: 'customer', header: 'Customer', flex: 1 },
-    { field: 'amount', header: 'Amount', width: 130 },
+  const columns: DatagridColumn<typeof recentOrders[number]>[] = [
+    { key: 'id', header: 'Order ID', width: 120 },
+    { key: 'customer', header: 'Customer', flex: 1 },
+    { key: 'amount', header: 'Amount', width: 130 },
     {
-      field: 'status',
+      key: 'status',
       header: 'Status',
       width: 140,
-      render: (val: unknown) => {
-        const v = String(val);
-        const variant = v === 'Completed' ? 'success' : v === 'Processing' ? 'info' : 'warning';
-        return <Badge variant={variant}>{v}</Badge>;
-      },
     },
-    { field: 'date', header: 'Date', width: 120 },
+    { key: 'date', header: 'Date', width: 120 },
   ];
+
+  const cellTemplates = {
+    status: ({ value }: DatagridCellTemplateContext<typeof recentOrders[number]>) => {
+      const v = String(value);
+      const variant = v === 'Completed' ? 'success' : v === 'Processing' ? 'info' : 'warning';
+      return <Badge variant={variant}>{v}</Badge>;
+    },
+  };
 
   const DASHBOARD_CODE = `import { Card, StatCard, BarChart, LineChart, Badge, Datagrid } from 'spruce-react';
 
@@ -154,7 +159,7 @@ export function DashboardExample() {
             <Card>
               <div style={{ fontWeight: 600, marginBottom: 4 }}>Recent Orders</div>
               <div style={{ fontSize: 13, color: 'var(--sp-text-subtle)', marginBottom: 16 }}>Latest transaction activity</div>
-              <Datagrid rowData={recentOrders} columns={columns} style={{ height: 240 }} />
+              <Datagrid rows={recentOrders} columns={columns} fixedHeight={240} cellTemplates={cellTemplates} />
             </Card>
           </div>
         </section>

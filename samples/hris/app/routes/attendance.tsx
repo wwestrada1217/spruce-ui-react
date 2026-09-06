@@ -5,7 +5,7 @@
  * The full license information can be found in LICENSE in the root directory of this project.
  */
 
-import { Card, StatCard, Badge, Avatar, Datagrid, type ColumnDef } from 'spruce-react';
+import { Card, StatCard, Badge, Avatar, Datagrid, type DatagridCellTemplateContext, type DatagridColumn } from 'spruce-react';
 
 interface AttendanceLog {
   employee: string;
@@ -25,30 +25,33 @@ export default function Attendance() {
     { employee: 'Jim Halpert', department: 'Sales', clockIn: '08:50 AM', clockOut: '05:25 PM', workHours: '8h 35m', status: 'On Time' },
   ];
 
-  const columns: ColumnDef<AttendanceLog>[] = [
+  const columns: DatagridColumn<AttendanceLog>[] = [
     {
-      field: 'employee',
-      headerName: 'Employee',
-      cellRenderer: (_val, row) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <Avatar name={row.employee} size="sm" />
-          <span style={{ fontWeight: 600, fontSize: 13 }}>{row.employee}</span>
-        </div>
-      ),
+      key: 'employee',
+      header: 'Employee',
     },
-    { field: 'department', headerName: 'Department' },
-    { field: 'clockIn', headerName: 'Clock In' },
-    { field: 'clockOut', headerName: 'Clock Out' },
-    { field: 'workHours', headerName: 'Hours Worked' },
+    { key: 'department', header: 'Department' },
+    { key: 'clockIn', header: 'Clock In' },
+    { key: 'clockOut', header: 'Clock Out' },
+    { key: 'workHours', header: 'Hours Worked' },
     {
-      field: 'status',
-      headerName: 'Status',
-      cellRenderer: (_val, row) => {
-        const variant = row.status === 'On Time' ? 'success' : row.status === 'Remote' ? 'info' : row.status === 'Late' ? 'warning' : 'danger';
-        return <Badge variant={variant}>{row.status}</Badge>;
-      },
+      key: 'status',
+      header: 'Status',
     },
   ];
+
+  const cellTemplates = {
+    employee: ({ row }: DatagridCellTemplateContext<AttendanceLog>) => (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <Avatar name={row.employee} size="sm" />
+        <span style={{ fontWeight: 600, fontSize: 13 }}>{row.employee}</span>
+      </div>
+    ),
+    status: ({ row }: DatagridCellTemplateContext<AttendanceLog>) => {
+      const variant = row.status === 'On Time' ? 'success' : row.status === 'Remote' ? 'info' : row.status === 'Late' ? 'warning' : 'danger';
+      return <Badge variant={variant}>{row.status}</Badge>;
+    },
+  };
 
   return (
     <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -61,7 +64,7 @@ export default function Attendance() {
       <Card>
         <div style={{ padding: 20 }}>
           <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 600 }}>Daily Clock-in / Timesheet Log</h3>
-          <Datagrid columns={columns} rowData={logs} autoHeightRow options={{ pagination: true, pageSize: 10 }} />
+          <Datagrid columns={columns} rows={logs} autoHeight pagination pageSize={10} cellTemplates={cellTemplates} />
         </div>
       </Card>
     </div>

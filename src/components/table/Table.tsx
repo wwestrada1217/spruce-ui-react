@@ -55,7 +55,7 @@ function renderValue(value: unknown): ReactNode {
   return String(value);
 }
 
-/** A small, semantic table for simple datasets that do not need Datagridex. */
+/** A small, semantic table for simple datasets that do not need Datagrid. */
 export function Table<T extends object>({
   rows = [],
   columns = [],

@@ -13,7 +13,8 @@ import {
   Avatar,
   Button,
   Datagrid,
-  type ColumnDef,
+  type DatagridCellTemplateContext,
+  type DatagridColumn,
 } from 'spruce-react';
 
 interface LeaveRequest {
@@ -40,60 +41,63 @@ export default function TimeOff() {
     );
   }
 
-  const columns: ColumnDef<LeaveRequest>[] = [
+  const columns: DatagridColumn<LeaveRequest>[] = [
     {
-      field: 'employee',
-      headerName: 'Employee',
-      cellRenderer: (_val, row) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <Avatar name={row.employee} size="sm" />
-          <span style={{ fontWeight: 600, fontSize: 13 }}>{row.employee}</span>
-        </div>
-      ),
+      key: 'employee',
+      header: 'Employee',
     },
     {
-      field: 'type',
-      headerName: 'Leave Type',
-      cellRenderer: (_val, row) => <Badge variant="primary">{row.type}</Badge>,
+      key: 'type',
+      header: 'Leave Type',
     },
     {
-      field: 'dates',
-      headerName: 'Requested Dates',
-      cellRenderer: (_val, row) => <span style={{ fontSize: 12 }}>{row.dates} ({row.days} days)</span>,
+      key: 'dates',
+      header: 'Requested Dates',
     },
     {
-      field: 'reason',
-      headerName: 'Reason',
+      key: 'reason',
+      header: 'Reason',
     },
     {
-      field: 'status',
-      headerName: 'Status',
-      cellRenderer: (_val, row) => {
-        const variant = row.status === 'Approved' ? 'success' : row.status === 'Pending' ? 'warning' : 'danger';
-        return <Badge variant={variant}>{row.status}</Badge>;
-      },
+      key: 'status',
+      header: 'Status',
     },
     {
-      field: 'actions',
-      headerName: 'Approval Actions',
-      cellRenderer: (_val, row) => (
-        <div style={{ display: 'flex', gap: 6 }}>
-          {row.status === 'Pending' ? (
-            <>
-              <Button size="sm" variant="success" iconLeft="check" onClick={() => handleAction(row.id, 'Approved')}>
-                Approve
-              </Button>
-              <Button size="sm" variant="danger" iconLeft="x" onClick={() => handleAction(row.id, 'Rejected')}>
-                Reject
-              </Button>
-            </>
-          ) : (
-            <span style={{ fontSize: 12, color: 'var(--sp-text-subtle, #94a3b8)' }}>No action required</span>
-          )}
-        </div>
-      ),
+      key: 'actions',
+      header: 'Approval Actions',
     },
   ];
+
+  const cellTemplates = {
+    employee: ({ row }: DatagridCellTemplateContext<LeaveRequest>) => (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <Avatar name={row.employee} size="sm" />
+        <span style={{ fontWeight: 600, fontSize: 13 }}>{row.employee}</span>
+      </div>
+    ),
+    type: ({ row }: DatagridCellTemplateContext<LeaveRequest>) => <Badge variant="primary">{row.type}</Badge>,
+    dates: ({ row }: DatagridCellTemplateContext<LeaveRequest>) => <span style={{ fontSize: 12 }}>{row.dates} ({row.days} days)</span>,
+    status: ({ row }: DatagridCellTemplateContext<LeaveRequest>) => {
+      const variant = row.status === 'Approved' ? 'success' : row.status === 'Pending' ? 'warning' : 'danger';
+      return <Badge variant={variant}>{row.status}</Badge>;
+    },
+    actions: ({ row }: DatagridCellTemplateContext<LeaveRequest>) => (
+      <div style={{ display: 'flex', gap: 6 }}>
+        {row.status === 'Pending' ? (
+          <>
+            <Button size="sm" variant="success" iconLeft="check" onClick={() => handleAction(row.id, 'Approved')}>
+              Approve
+            </Button>
+            <Button size="sm" variant="danger" iconLeft="x" onClick={() => handleAction(row.id, 'Rejected')}>
+              Reject
+            </Button>
+          </>
+        ) : (
+          <span style={{ fontSize: 12, color: 'var(--sp-text-subtle, #94a3b8)' }}>No action required</span>
+        )}
+      </div>
+    ),
+  };
 
   return (
     <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -109,7 +113,7 @@ export default function TimeOff() {
       <Card>
         <div style={{ padding: 20 }}>
           <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 600 }}>Leave Requests & Approvals</h3>
-          <Datagrid columns={columns} rowData={requests} autoHeightRow options={{ pagination: true, pageSize: 10 }} />
+          <Datagrid columns={columns} rows={requests} autoHeight pagination pageSize={10} cellTemplates={cellTemplates} />
         </div>
       </Card>
     </div>

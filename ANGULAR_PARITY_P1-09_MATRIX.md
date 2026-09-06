@@ -44,11 +44,10 @@ and composition.
 
 ### Scope exclusions
 
-- Legacy Angular `datagrid` is excluded by the audit; `datagridex` is the
+- Legacy Angular grid is excluded by the audit; React `Datagrid` is the
   canonical data-grid track.
 - Angular `Textarea` and `SignaturePad` already have the shared form
   contract and belong to the form parity batches.
 - Angular Code Editor, Block Editor, and Inplace Editor do not expose the
   P1-09 shared chrome fields in their named source; their remaining behavior is
   covered by later editor parity work.
-

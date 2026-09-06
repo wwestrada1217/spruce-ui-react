@@ -1,2499 +1,4382 @@
-/*
- * Copyright (c) 2026-2027 Sprucestack. All Rights Reserved.
- * The term "Sprucestack" refers to Sprucestack Inc. and/or its subsidiaries.
- * This software is released under Apache license.
- * The full license information can be found in LICENSE in the root directory of this project.
- */
-
-import {
-  useState,
-  useEffect,
-  useRef,
-  useCallback,
-  useMemo,
-  type HTMLAttributes,
-  type ReactNode,
-} from 'react';
-import { Icon } from '../../icons/Icon';
-import { Popover } from '../popover/Popover';
-import { CellEditor } from './CellEditor';
-import { ColumnPanel } from './ColumnPanel';
-import { GridColumnFilter } from './GridColumnFilter';
-import { useI18n } from '../../i18n/i18n-context.js';
-import {
-  type ColumnDef,
-  type ColumnFilter,
-  type ColumnGroupSpan,
-  type ColumnState,
-  type DisplayRow,
-  type DisplayRowKind,
-  type GridDensity,
-  type GridOptions,
-  type GroupRowMeta,
-  type PaginationState,
-  type PinPosition,
-  type ServerSideParams,
-  type SortDirection,
-  type SortEntry,
-  type CellEditEvent,
-  type CellEditorConfig,
-  type RowEditEvent,
-  DEFAULT_DENSITY,
-  DEFAULT_OVERSCAN,
-  DENSITY_METRICS,
-  NEW_ROW_ID,
-} from './grid-types';
-import {
-  applyFilters,
-  buildColumnState,
-  computeAggregate,
-  getCellValue,
-  sortRows,
-  sortMultiRows,
-} from './grid-utils';
+/* eslint-disable react-refresh/only-export-components */
 import './Datagrid.css';
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+import {
+  forwardRef,
+  Fragment,
+  useCallback,
+  useEffect,
+  useId,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ForwardedRef,
+  type KeyboardEvent,
+  type ReactElement,
+  type ReactNode,
+} from 'react';
+import { createPortal } from 'react-dom';
+import { Button } from '../button/Button.js';
+import { Checkbox } from '../checkbox/Checkbox.js';
+import { Dropdown, type DropdownItem } from '../dropdown/Dropdown.js';
+import { Icon } from '../../icons/Icon.js';
+import { Popover } from '../popover/Popover.js';
+import { useI18n } from '../../i18n/i18n-context.js';
+import {
+  createDatagridDataContextAdapter,
+  type DatagridDataContextAdapter,
+} from './datagrid-data-context.js';
+import type {
+  DatagridAggregate,
+  DatagridAggregateScope,
+  DatagridCellEditor as DatagridCellEditorRenderer,
+  DatagridCellEditCommit,
+  DatagridCellTemplate as DatagridCellTemplateRenderer,
+  DatagridColumn,
+  DatagridColumnMenuItem,
+  DatagridColumnFilter,
+  DatagridColumnGroup,
+  DatagridColumnGroupOrderChange,
+  DatagridColumnGroupResize,
+  DatagridColumnOrderChange,
+  DatagridColumnPin,
+  DatagridColumnResize,
+  DatagridColumnVisibilityChange,
+  DatagridDataContext,
+  DatagridDataContextOptions,
+  DatagridDetailPane as DatagridDetailPaneRenderer,
+  DatagridDynamicFilterCondition,
+  DatagridDynamicFilterOperator,
+  DatagridEditCancel,
+  DatagridEditLabels,
+  DatagridEditMode,
+  DatagridFilterChange,
+  DatagridFilterIndicatorVisibility,
+  DatagridFilterMode,
+  DatagridGroupBy,
+  DatagridGroupSort,
+  DatagridGroupSortDirection,
+  DatagridHandle,
+  DatagridLeadingRowActions as DatagridLeadingRowActionsRenderer,
+  DatagridNewRowCommit,
+  DatagridNewRowFactory,
+  DatagridPageChange,
+  DatagridPaginationType,
+  DatagridRowClassName,
+  DatagridRowDetail as DatagridRowDetailRenderer,
+  DatagridRowDetailExpandable,
+  DatagridRowEditCommit,
+  DatagridRowLabel,
+  DatagridRowOrderChange,
+  DatagridRowStyle,
+  DatagridRowTemplate as DatagridRowTemplateRenderer,
+  DatagridSelectionChange,
+  DatagridSelectionMode,
+  DatagridSort,
+  DatagridSortChange,
+  DatagridSortDirection,
+  DatagridSortIndicatorVisibility,
+  DatagridSortMode,
+  DatagridSortsChange,
+  DatagridTrackBy,
+  DatagridValidationError,
+  DatagridValidationEvent,
+  DatagridVirtualPageRequest,
+} from './datagrid-types.js';
 
-function rowId<T>(row: T): unknown {
-  return (row as Record<string, unknown>)['id'] ?? row;
+export type * from './datagrid-types.js';
+export { DatagridDataContextAdapter, createDatagridDataContextAdapter } from './datagrid-data-context.js';
+export type { DatagridDataContextAdapter as DatagridDataContextAdapterType } from './datagrid-data-context.js';
+
+export interface DatagridCellTemplateProps<T extends object = Record<string, unknown>> {
+  readonly columnKey?: string;
+  readonly column?: string;
+  readonly children: DatagridCellTemplateRenderer<T>;
+}
+export function DatagridCellTemplate<T extends object = Record<string, unknown>>(props: DatagridCellTemplateProps<T>): ReactElement | null {
+  void props;
+  return null;
 }
 
-function applyValueToRow<T>(row: T, field: string, value: unknown): T {
-  const parts = field.split('.');
-  if (parts.length === 1) return { ...(row as object), [field]: value } as T;
-  const clone: Record<string, unknown> = { ...(row as object) };
-  let cursor: Record<string, unknown> = clone;
-  for (let i = 0; i < parts.length - 1; i++) {
-    cursor[parts[i]] = { ...(cursor[parts[i]] as object) };
-    cursor = cursor[parts[i]] as Record<string, unknown>;
+export interface DatagridCellEditorProps<T extends object = Record<string, unknown>> {
+  readonly columnKey?: string;
+  readonly column?: string;
+  readonly children: DatagridCellEditorRenderer<T>;
+}
+export function DatagridCellEditor<T extends object = Record<string, unknown>>(props: DatagridCellEditorProps<T>): ReactElement | null {
+  void props;
+  return null;
+}
+
+export interface DatagridRowDetailProps<T extends object = Record<string, unknown>> {
+  readonly children: DatagridRowDetailRenderer<T>;
+}
+export function DatagridRowDetail<T extends object = Record<string, unknown>>(props: DatagridRowDetailProps<T>): ReactElement | null {
+  void props;
+  return null;
+}
+
+export interface DatagridDetailPaneProps<T extends object = Record<string, unknown>> {
+  readonly children: DatagridDetailPaneRenderer<T>;
+}
+export function DatagridDetailPane<T extends object = Record<string, unknown>>(props: DatagridDetailPaneProps<T>): ReactElement | null {
+  void props;
+  return null;
+}
+
+export interface DatagridLeadingRowActionsProps<T extends object = Record<string, unknown>> {
+  readonly children: DatagridLeadingRowActionsRenderer<T>;
+}
+export function DatagridLeadingRowActions<T extends object = Record<string, unknown>>(props: DatagridLeadingRowActionsProps<T>): ReactElement | null {
+  void props;
+  return null;
+}
+
+export interface DatagridRowTemplateProps<T extends object = Record<string, unknown>> {
+  readonly children: DatagridRowTemplateRenderer<T>;
+}
+export function DatagridRowTemplate<T extends object = Record<string, unknown>>(props: DatagridRowTemplateProps<T>): ReactElement | null {
+  void props;
+  return null;
+}
+
+export interface DatagridProps<T extends object = Record<string, unknown>> {
+  readonly children?: ReactNode;
+  readonly data?: readonly T[];
+  readonly rows?: readonly T[];
+  readonly columns?: readonly DatagridColumn<T>[];
+  readonly columnGroups?: readonly DatagridColumnGroup[];
+  readonly trackBy?: DatagridTrackBy<T> | keyof T;
+  readonly rowLabel?: DatagridRowLabel<T> | keyof T;
+  readonly locale?: string;
+  readonly emptyMessage?: string;
+  readonly filterEmptyMessage?: string;
+  readonly emptyStateDescription?: string | null;
+  readonly filterEmptyStateDescription?: string | null;
+  readonly autoColumnWidth?: boolean;
+  readonly reorderable?: boolean;
+  readonly defaultColumnWidth?: number;
+  readonly sortMode?: DatagridSortMode;
+  readonly sortIndicatorVisibility?: DatagridSortIndicatorVisibility;
+  readonly multiSort?: boolean;
+  readonly sorts?: readonly DatagridSort[];
+  readonly filterMode?: DatagridFilterMode;
+  readonly filterIndicatorVisibility?: DatagridFilterIndicatorVisibility;
+  readonly searchQuery?: string;
+  readonly searchFilter?: (row: T, query: string) => boolean;
+  readonly columnFilters?: readonly DatagridColumnFilter<T>[];
+  readonly columnOrder?: readonly string[];
+  readonly columnGroupOrder?: readonly string[];
+  readonly columnVisibility?: readonly string[];
+  readonly hiddenColumns?: readonly string[];
+  readonly columnPins?: Readonly<Record<string, DatagridColumnPin | null | undefined>>;
+  readonly groupBy?: readonly string[];
+  readonly groupSorts?: readonly DatagridGroupSort[];
+  readonly expandAllGroups?: boolean;
+  readonly stickyGroupHeaders?: boolean;
+  readonly indentGroupedRows?: boolean;
+  readonly selectionMode?: DatagridSelectionMode;
+  readonly selection?: readonly T[];
+  readonly fitColumnsToWidth?: boolean;
+  readonly stripedRows?: boolean;
+  readonly showVerticalLines?: boolean;
+  readonly showRowNumbers?: boolean;
+  readonly rowHeight?: number;
+  readonly headerHeight?: number;
+  readonly autoHeight?: boolean;
+  readonly fixedHeight?: number | string;
+  readonly paginate?: boolean;
+  readonly pagination?: boolean;
+  readonly pageSize?: number;
+  readonly page?: number;
+  readonly paginationType?: DatagridPaginationType;
+  readonly paginationRowsOptions?: readonly number[];
+  readonly pageSizeOptions?: readonly number[];
+  readonly virtualScroll?: boolean;
+  readonly virtualScrollHeight?: number;
+  readonly virtualRowHeight?: number;
+  readonly virtualOverscan?: number;
+  readonly columnVirtualization?: boolean;
+  readonly columnVirtualizationOverscan?: number;
+  readonly virtualPaging?: boolean;
+  readonly virtualPage?: number;
+  readonly virtualTotalRows?: number;
+  readonly virtualHasPreviousPage?: boolean;
+  readonly virtualHasNextPage?: boolean;
+  readonly virtualPagingLoading?: boolean;
+  readonly virtualPageThreshold?: number;
+  readonly virtualPageRequest?: (request: DatagridVirtualPageRequest) => void;
+  readonly onVirtualPageRequest?: (request: DatagridVirtualPageRequest) => void;
+  readonly onPageSizeChange?: (pageSize: number) => void;
+  readonly editMode?: DatagridEditMode;
+  readonly editOnType?: boolean;
+  readonly editLabels?: Partial<DatagridEditLabels>;
+  readonly isRowEditable?: (row: T) => boolean;
+  readonly isCellEditable?: (row: T, column: DatagridColumn<T>) => boolean;
+  readonly isCellReadonly?: (row: T, column: DatagridColumn<T>) => boolean;
+  readonly allowNewRow?: boolean;
+  readonly enableNewRow?: boolean;
+  readonly newRowPrompt?: string;
+  readonly newRowLabel?: string;
+  readonly newRowFactory?: DatagridNewRowFactory<T>;
+  readonly preventInvalidCommit?: boolean;
+  readonly onCellValidationFailed?: (event: DatagridValidationEvent<T>) => void;
+  readonly onRowValidationFailed?: (events: readonly DatagridValidationEvent<T>[]) => void;
+  readonly reorderableRows?: boolean;
+  readonly rowReorder?: boolean;
+  readonly rowReorderable?: (row: T) => boolean;
+  readonly rowDetailExpandable?: DatagridRowDetailExpandable<T>;
+  readonly rowClassName?: DatagridRowClassName<T>;
+  readonly rowStyle?: DatagridRowStyle<T>;
+  readonly showGroupToolbar?: boolean;
+  readonly groupSorting?: boolean;
+  readonly groupsExpandedByDefault?: boolean;
+  readonly showColumnSelector?: boolean;
+  readonly columnSelector?: boolean;
+  readonly showStatusbar?: boolean;
+  readonly statusbar?: boolean;
+  readonly statusbarAriaLabel?: string;
+  readonly statusbarShowRowCount?: boolean;
+  readonly statusbarShowSelectedRowCount?: boolean;
+  readonly statusbarMergePagination?: boolean;
+  readonly toolbar?: boolean;
+  readonly toolbarAriaLabel?: string;
+  readonly toolbarShowColumnSelector?: boolean;
+  readonly toolbarShowGroupedColumns?: boolean;
+  readonly searchable?: boolean;
+  readonly searchTerm?: string;
+  readonly selectedRows?: readonly T[];
+  readonly onSelectedRowsChange?: (rows: readonly T[]) => void;
+  readonly expandedRows?: readonly T[] | readonly unknown[];
+  readonly onExpandedRowsChange?: (rows: readonly T[]) => void;
+  readonly onDetailPaneRowChange?: (row: T | null) => void;
+  readonly footer?: boolean;
+  readonly footerLabel?: string;
+  readonly columnMenu?: boolean;
+  readonly columnSelectorLabel?: string;
+  readonly hiddenColumnKeys?: readonly string[];
+  readonly groupSelection?: boolean;
+  readonly rowNumbers?: boolean;
+  readonly detailPaneWidth?: number;
+  readonly rowDetailHeight?: number;
+  readonly leadingRowActionsWidth?: number;
+  readonly validateOnInput?: boolean;
+  readonly rowClass?: DatagridRowClassName<T>;
+  readonly editOnClick?: boolean;
+  readonly statusbarStart?: ReactNode | ((context: { totalRows: number; selectedRows: readonly T[] }) => ReactNode);
+  readonly statusbarEnd?: ReactNode | ((context: { totalRows: number; selectedRows: readonly T[] }) => ReactNode);
+  readonly toolbarStart?: ReactNode;
+  readonly toolbarEnd?: ReactNode;
+  readonly emptyTitle?: string;
+  readonly emptyDescription?: string;
+  readonly emptyIcon?: string;
+  readonly emptyState?: ReactNode;
+  readonly loading?: boolean;
+  readonly loadingMessage?: string;
+  readonly detailPaneTitle?: string | ((row: T) => string);
+  readonly cellTemplates?: Partial<Record<string, DatagridCellTemplateRenderer<T>>>;
+  readonly cellEditors?: Partial<Record<string, DatagridCellEditorRenderer<T>>>;
+  readonly rowDetail?: DatagridRowDetailRenderer<T>;
+  readonly rowDetails?: boolean | DatagridRowDetailRenderer<T>;
+  readonly detailPane?: boolean | DatagridDetailPaneRenderer<T>;
+  readonly detailPaneRenderer?: DatagridDetailPaneRenderer<T>;
+  readonly detailPaneRow?: T | null;
+  readonly leadingRowActions?: DatagridLeadingRowActionsRenderer<T>;
+  readonly rowTemplate?: DatagridRowTemplateRenderer<T>;
+  readonly dataContext?: DatagridDataContext<T>;
+  readonly dataContextOptions?: DatagridDataContextOptions<T>;
+
+  readonly onSortChange?: (event: DatagridSortChange) => void;
+  readonly onSortsChange?: (sorts: DatagridSortsChange) => void;
+  readonly onFilterChange?: (filters: DatagridFilterChange<T>) => void;
+  readonly onSearchQueryChange?: (query: string) => void;
+  readonly onColumnResize?: (event: DatagridColumnResize) => void;
+  readonly onColumnGroupResize?: (event: DatagridColumnGroupResize) => void;
+  readonly onColumnOrderChange?: (order: DatagridColumnOrderChange) => void;
+  readonly onColumnGroupOrderChange?: (order: DatagridColumnGroupOrderChange) => void;
+  readonly onColumnVisibilityChange?: (event: DatagridColumnVisibilityChange) => void;
+  readonly onGroupByChange?: (groupBy: DatagridGroupBy) => void;
+  readonly onGroupSortsChange?: (groupSorts: readonly DatagridGroupSort[]) => void;
+  readonly onSelectionChange?: (event: DatagridSelectionChange<T>) => void;
+  readonly onPageChange?: (event: DatagridPageChange) => void;
+  readonly onRowOrderChange?: (event: DatagridRowOrderChange<T>) => void;
+  readonly onCellEditCommit?: (event: DatagridCellEditCommit<T>) => void;
+  readonly onRowEditCommit?: (event: DatagridRowEditCommit<T>) => void;
+  readonly onNewRowCommit?: (event: DatagridNewRowCommit<T>) => void;
+  readonly onEditCancel?: (event: DatagridEditCancel<T>) => void;
+  readonly onValidationError?: (event: DatagridValidationEvent<T>) => void;
+  readonly onDataContextSaveComplete?: () => void;
+  readonly onDataContextSaveError?: (error: unknown) => void;
+
+  readonly className?: string;
+  readonly style?: CSSProperties;
+  readonly ariaLabel?: string;
+  readonly ariaLabelledBy?: string;
+}
+
+const DEFAULT_COLUMN_WIDTH = 160;
+const DEFAULT_MIN_COLUMN_WIDTH = 72;
+const DEFAULT_MAX_COLUMN_WIDTH = 480;
+const DEFAULT_VIRTUAL_OVERSCAN = 6;
+const DEFAULT_COLUMN_VIRTUALIZATION_OVERSCAN = 320;
+const DEFAULT_ROW_DETAIL_HEIGHT = 112;
+const DEFAULT_ROW_NUMBER_WIDTH = 52;
+const DEFAULT_ROW_ACTIONS_WIDTH = 156;
+const DEFAULT_PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
+
+interface DatagridPinnedColumnOffset {
+  readonly left?: number;
+  readonly right?: number;
+}
+
+const DEFAULT_EDIT_LABELS: DatagridEditLabels = {
+  actions: 'Actions',
+  edit: 'Edit',
+  save: 'Save',
+  cancel: 'Cancel',
+};
+
+function getCellValue<T extends object>(row: T, column: DatagridColumn<T>): unknown {
+  if (column.valueGetter) {
+    return column.valueGetter(row);
   }
-  cursor[parts[parts.length - 1]] = value;
-  return clone as T;
+  return (row as Record<string, unknown>)[column.key];
 }
 
-type RowDraft<T> = Map<string, { oldValue: unknown; newValue: unknown; row: T }>;
-
-// ── Component ────────────────────────────────────────────────────────────────
-
-export interface DatagridProps<T = unknown> extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
-  columns: ColumnDef<T>[];
-  rowData?: T[];
-  options?: GridOptions<T>;
-  /** Automatically adjust row height to fit cell content without clipping. */
-  autoRowHeight?: boolean;
-  /** Alias for autoRowHeight. Automatically adjust row height to fit cell content. */
-  autoHeightRow?: boolean;
+function formatCellValue<T extends object>(
+  row: T,
+  rowIndex: number,
+  column: DatagridColumn<T>,
+  locale = 'en-US',
+): string {
+  const value = getCellValue(row, column);
+  if (column.valueFormatter) {
+    return column.valueFormatter({ value, row, rowIndex, column });
+  }
+  if (value === null || value === undefined) return '';
+  if (typeof value === 'object' && value instanceof Date) {
+    return new Intl.DateTimeFormat(locale).format(value);
+  }
+  if (typeof value === 'number') return new Intl.NumberFormat(locale).format(value);
+  if (typeof value === 'boolean') return value ? 'True' : 'False';
+  return String(value);
 }
 
-export function Datagrid<T = unknown>({
-  columns,
-  rowData = [],
-  options = {},
-  autoRowHeight,
-  autoHeightRow,
-  className,
-  ...rest
-}: DatagridProps<T>) {
-  const { t } = useI18n();
-  const opts = options;
-  const density: GridDensity = opts.density ?? DEFAULT_DENSITY;
-  const metrics = DENSITY_METRICS[density];
+function resolveRowSpan<T extends object>(
+  rows: readonly T[],
+  rowIndex: number,
+  column: DatagridColumn<T>,
+): number {
+  if (!column.rowSpan) return 1;
+  const row = rows[rowIndex];
+  if (!row) return 1;
+  const value = getCellValue(row, column);
+  const configuredSpan =
+    typeof column.rowSpan === 'function'
+      ? column.rowSpan({
+          value,
+          row,
+          rowIndex,
+          column,
+          rows,
+        })
+      : column.rowSpan;
+  return Math.max(1, Math.floor(Number(configuredSpan) || 1));
+}
 
-  // ── Refs ──────────────────────────────────────────────────────────────────
-  const scrollRef = useRef<HTMLDivElement>(null);
+function isRowSpanCovered<T extends object>(
+  rows: readonly T[],
+  rowIndex: number,
+  column: DatagridColumn<T>,
+): boolean {
+  for (let startIndex = 0; startIndex < rowIndex; startIndex += 1) {
+    if (startIndex + resolveRowSpan(rows, startIndex, column) > rowIndex) return true;
+  }
+  return false;
+}
 
-  // ── Core state ────────────────────────────────────────────────────────────
-  const [columnStates, setColumnStates] = useState<ColumnState[]>(() =>
-    buildColumnState(columns),
-  );
-  const [sortColumns, setSortColumns] = useState<SortEntry[]>([]);
-  const [loading, setLoading] = useState(opts.loading ?? false);
-  const [selectedIds, setSelectedIds] = useState<Set<unknown>>(new Set());
-  const lastSelIdxRef = useRef(-1);
-  const [scrollTop, setScrollTop] = useState(0);
-  const [viewportHeight, setViewportHeight] = useState(500);
+function validateValue<T extends object>(
+  value: unknown,
+  row: T,
+  column: DatagridColumn<T>,
+): readonly DatagridValidationError[] {
+  const errors: DatagridValidationError[] = [];
+  const rules = column.rules;
 
-  // ── Edit state ────────────────────────────────────────────────────────────
-  const [activeCellEdit, setActiveCellEdit] = useState<{
-    rowId: unknown;
-    field: string;
-    triggerKey: string | null;
-  } | null>(null);
-  const [activeEditRowId, setActiveEditRowId] = useState<unknown | null>(null);
-  const rowDraftsRef = useRef(new Map<unknown, RowDraft<T>>());
-  const [editedRows, setEditedRows] = useState<Map<unknown, T>>(new Map());
+  const isBlank =
+    value === null ||
+    value === undefined ||
+    (typeof value === 'string' && value.trim() === '') ||
+    (Array.isArray(value) && value.length === 0);
 
-  // ── New row state ──────────────────────────────────────────────────────────
-  const [newRowDraft, setNewRowDraft] = useState<Record<string, unknown>>({});
-  const [newRowField, setNewRowField] = useState<string | null>(null);
-  const [newRowTriggerKey, setNewRowTriggerKey] = useState<string | null>(null);
-  const [newRowActive, setNewRowActive] = useState(false);
+  const requiredRule = rules?.required ?? column.required;
+  if (requiredRule) {
+    if (isBlank) {
+      const msg =
+        typeof requiredRule === 'string'
+          ? requiredRule
+          : rules?.requiredMessage ?? `${column.header} is required.`;
+      errors.push({ rule: 'required', message: msg });
+    }
+  }
 
-  // ── Filter state ──────────────────────────────────────────────────────────
-  const [activeFilters, setActiveFilters] = useState<Record<string, ColumnFilter>>({});
+  if (!isBlank) {
+    const minRule = rules?.min ?? column.min;
+    if (minRule !== undefined) {
+      if (typeof value === 'number' && typeof minRule === 'number' && value < minRule) {
+        errors.push({ rule: 'min', message: `Must be at least ${minRule}.` });
+      } else if (value instanceof Date && minRule instanceof Date && value < minRule) {
+        errors.push({ rule: 'min', message: `Must be on or after ${minRule.toLocaleDateString()}.` });
+      }
+    }
 
-  // ── Pagination state ──────────────────────────────────────────────────────
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSizeOverride, setPageSizeOverride] = useState<number | null>(null);
-  const [serverTotal, setServerTotal] = useState(0);
+    const maxRule = rules?.max ?? column.max;
+    if (maxRule !== undefined) {
+      if (typeof value === 'number' && typeof maxRule === 'number' && value > maxRule) {
+        errors.push({ rule: 'max', message: `Must be at most ${maxRule}.` });
+      } else if (value instanceof Date && maxRule instanceof Date && value > maxRule) {
+        errors.push({ rule: 'max', message: `Must be on or before ${maxRule.toLocaleDateString()}.` });
+      }
+    }
 
-  // ── Row drag state ────────────────────────────────────────────────────────
-  const [dragRowIdx, setDragRowIdx] = useState<number | null>(null);
-  const [dropRowIdx, setDropRowIdx] = useState<number | null>(null);
-  const [dropPosition, setDropPosition] = useState<'above' | 'below'>('below');
-  const [rowDragGhostY, setRowDragGhostY] = useState<number | null>(null);
-  const [localRowOrder, setLocalRowOrder] = useState<T[]>([]);
+    const minLength = rules?.minLength ?? column.minLength;
+    if (minLength !== undefined && typeof value === 'string' && value.length < minLength) {
+      errors.push({ rule: 'minLength', message: `Must be at least ${minLength} characters.` });
+    }
 
-  // ── Grouping / Tree / Detail state ────────────────────────────────────────
-  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
-  const [expandedTreeIds, setExpandedTreeIds] = useState<Set<unknown>>(new Set());
-  const [openDetailIds, setOpenDetailIds] = useState<Set<unknown>>(new Set());
+    const maxLength = rules?.maxLength ?? column.maxLength;
+    if (maxLength !== undefined && typeof value === 'string' && value.length > maxLength) {
+      errors.push({ rule: 'maxLength', message: `Must be at most ${maxLength} characters.` });
+    }
 
-  // ── Column panel / Header drag state ──────────────────────────────────────
-  const [columnPanelOpen, setColumnPanelOpen] = useState(false);
-  const [hdrDragSrc, setHdrDragSrc] = useState<string | null>(null);
-  const [hdrDragOver, setHdrDragOver] = useState<string | null>(null);
-  const [hdrDragOverPos, setHdrDragOverPos] = useState<'left' | 'right'>('right');
+    const pattern = rules?.pattern ?? column.pattern;
+    if (pattern !== undefined && typeof value === 'string') {
+      const regex = typeof pattern === 'string' ? new RegExp(pattern) : pattern;
+      if (!regex.test(value)) {
+        errors.push({
+          rule: 'pattern',
+          message: rules?.patternMessage ?? 'Invalid format.',
+        });
+      }
+    }
+  }
 
-  // ── Infinite scroll ───────────────────────────────────────────────────────
-  const [infiniteLoading, setInfiniteLoading] = useState(false);
-  const [infiniteExhausted, setInfiniteExhausted] = useState(false);
+  const validators = [
+    ...(column.validator ? (Array.isArray(column.validator) ? column.validator : [column.validator]) : []),
+    ...(column.validators ?? []),
+    ...(rules?.custom ? (Array.isArray(rules.custom) ? rules.custom : [rules.custom]) : []),
+  ];
 
-  // ── Column map ────────────────────────────────────────────────────────────
-  const columnMap = useMemo(() => {
-    const m = new Map<string, ColumnDef<T>>();
-    columns.forEach((c) => m.set(c.field, c));
-    return m;
-  }, [columns]);
-
-  // ── Sync columns when prop changes ────────────────────────────────────────
-  useEffect(() => {
-    setColumnStates((prev) => {
-      if (prev.length === 0) return buildColumnState(columns);
-      const existingMap = new Map(prev.map((s) => [s.field, s]));
-      return columns.map(
-        (col, i) =>
-          existingMap.get(col.field) ?? {
-            field: col.field,
-            width: col.width ?? 150,
-            visible: col.visible ?? true,
-            sortDirection: null as SortDirection,
-            order: i,
-            pinned: col.pinned ?? null,
-          },
-      );
-    });
-  }, [columns]);
-
-  // ── Sync loading from opts ────────────────────────────────────────────────
-  useEffect(() => {
-    setLoading(opts.loading ?? false);
-  }, [opts.loading]);
-
-  // ── Scroll + Resize ───────────────────────────────────────────────────────
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    let raf = 0;
-    const onScroll = () => {
-      if (raf) return;
-      raf = requestAnimationFrame(() => {
-        raf = 0;
-        setScrollTop(el.scrollTop);
-        setViewportHeight(el.clientHeight);
-        if (opts.infiniteScroll && !infiniteLoading && !infiniteExhausted) {
-          const threshold = opts.infiniteScrollThreshold ?? 120;
-          const distFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
-          if (distFromBottom <= threshold) {
-            triggerLoadMore();
+  for (const v of validators) {
+    if (typeof v === 'function') {
+      const res = v(value, row, column);
+      if (typeof res === 'string') {
+        errors.push({ rule: 'custom', message: res });
+      } else if (res === false) {
+        errors.push({ rule: 'custom', message: 'Invalid value.' });
+      } else if (Array.isArray(res)) {
+        for (const item of res) {
+          if (typeof item === 'string') {
+            errors.push({ rule: 'custom', message: item });
+          } else if (item && typeof item === 'object') {
+            errors.push(item);
           }
         }
-      });
-    };
-    el.addEventListener('scroll', onScroll, { passive: true });
-    const ro = new ResizeObserver(() => setViewportHeight(el.clientHeight));
-    ro.observe(el);
-    setViewportHeight(el.clientHeight);
-    return () => {
-      el.removeEventListener('scroll', onScroll);
-      if (raf) cancelAnimationFrame(raf);
-      ro.disconnect();
-    };
-  }, [opts.infiniteScroll, infiniteLoading, infiniteExhausted]);
+      }
+    } else if (v && typeof v === 'object' && typeof v.validator === 'function') {
+      const res = v.validator(value, row, column);
+      if (typeof res === 'string') {
+        errors.push({ rule: v.name ?? 'custom', message: res });
+      } else if (res === false) {
+        errors.push({ rule: v.name ?? 'custom', message: v.message ?? 'Invalid value.' });
+      } else if (Array.isArray(res)) {
+        for (const item of res) {
+          if (typeof item === 'string') {
+            errors.push({ rule: v.name ?? 'custom', message: item });
+          } else if (item && typeof item === 'object') {
+            errors.push(item);
+          }
+        }
+      }
+    }
+  }
 
-  // ── Computed: ordered visible columns ─────────────────────────────────────
-  const orderedVisible = useMemo(
-    () =>
-      [...columnStates]
-        .filter((s) => s.visible)
-        .sort((a, b) => a.order - b.order)
-        .map((s) => columnMap.get(s.field)!)
-        .filter(Boolean),
-    [columnStates, columnMap],
-  );
+  return errors;
+}
 
-  const getColPin = useCallback(
-    (col: ColumnDef<T>): PinPosition =>
-      columnStates.find((s) => s.field === col.field)?.pinned ?? col.pinned ?? null,
-    [columnStates],
-  );
+function evaluateDynamicCondition(
+  value: unknown,
+  condition: DatagridDynamicFilterCondition,
+  dataType: 'text' | 'number' | 'date' | 'boolean' = 'text',
+): boolean {
+  const { operator, value: condVal, valueTo } = condition;
+  if (operator === 'isEmpty') {
+    return value === null || value === undefined || (typeof value === 'string' && value.trim() === '');
+  }
+  if (operator === 'isNotEmpty') {
+    return value !== null && value !== undefined && !(typeof value === 'string' && value.trim() === '');
+  }
+  if (value === null || value === undefined) return false;
 
-  const leftPinnedCols = useMemo(
-    () => orderedVisible.filter((c) => getColPin(c) === 'left'),
-    [orderedVisible, getColPin],
-  );
-  const centerCols = useMemo(
-    () => orderedVisible.filter((c) => !getColPin(c)),
-    [orderedVisible, getColPin],
-  );
-  const rightPinnedCols = useMemo(
-    () => orderedVisible.filter((c) => getColPin(c) === 'right'),
-    [orderedVisible, getColPin],
-  );
-  const visibleColumns = useMemo(
-    () => [...leftPinnedCols, ...centerCols, ...rightPinnedCols],
-    [leftPinnedCols, centerCols, rightPinnedCols],
-  );
+  const normalizedValue = dataType === 'number'
+    ? Number(value)
+    : dataType === 'date'
+      ? new Date(String(value)).getTime()
+      : dataType === 'boolean'
+        ? Boolean(value)
+        : value;
+  const normalizedCondition = dataType === 'number'
+    ? Number(condVal)
+    : dataType === 'date'
+      ? new Date(String(condVal)).getTime()
+      : dataType === 'boolean'
+        ? String(condVal).toLowerCase() === 'true'
+        : condVal;
+  const normalizedTo = dataType === 'number'
+    ? Number(valueTo)
+    : dataType === 'date'
+      ? new Date(String(valueTo)).getTime()
+      : valueTo;
+  const strVal = String(normalizedValue).toLowerCase();
+  const condStr = normalizedCondition !== undefined && normalizedCondition !== null ? String(normalizedCondition).toLowerCase() : '';
 
-  const getColWidth = useCallback(
-    (col: ColumnDef<T>): number =>
-      columnStates.find((s) => s.field === col.field)?.width ?? col.width ?? 150,
-    [columnStates],
-  );
+  switch (operator) {
+    case 'contains':
+      return strVal.includes(condStr);
+    case 'notContains':
+      return !strVal.includes(condStr);
+    case 'startsWith':
+      return strVal.startsWith(condStr);
+    case 'endsWith':
+      return strVal.endsWith(condStr);
+    case 'equals':
+      if (dataType === 'number' || dataType === 'date') {
+        return normalizedValue === normalizedCondition;
+      }
+      return strVal === condStr;
+    case 'notEquals':
+      if (dataType === 'number' || dataType === 'date') {
+        return normalizedValue !== normalizedCondition;
+      }
+      return strVal !== condStr;
+    case 'greaterThan':
+      return Number(normalizedValue) > Number(normalizedCondition);
+    case 'greaterThanOrEqual':
+      return Number(normalizedValue) >= Number(normalizedCondition);
+    case 'lessThan':
+      return Number(normalizedValue) < Number(normalizedCondition);
+    case 'lessThanOrEqual':
+      return Number(normalizedValue) <= Number(normalizedCondition);
+    case 'between':
+      return Number(normalizedValue) >= Number(normalizedCondition) && Number(normalizedValue) <= Number(normalizedTo);
+    default:
+      return true;
+  }
+}
 
-  const hasPinnedLeft = leftPinnedCols.length > 0;
-  const hasPinnedRight = rightPinnedCols.length > 0;
-  const leftPinnedWidth = leftPinnedCols.reduce((w, c) => w + getColWidth(c), 0);
-  const rightPinnedWidth = rightPinnedCols.reduce((w, c) => w + getColWidth(c), 0);
+function computeAggregate<T extends object>(
+  aggregate: DatagridAggregate<T>,
+  values: readonly unknown[],
+  rows: readonly T[],
+  column: DatagridColumn<T>,
+  scope: DatagridAggregateScope,
+): { label: string; value: unknown; formatted: string } {
+  const aggType = typeof aggregate === 'string' ? aggregate : aggregate.type;
+  const customFn = typeof aggregate === 'object' && aggregate.type === 'custom' ? aggregate.aggregate : null;
+  const valueFormatter = typeof aggregate === 'object' ? aggregate.valueFormatter : undefined;
+  const customLabel = typeof aggregate === 'object' ? aggregate.label : undefined;
 
-  // ── Computed: metrics ─────────────────────────────────────────────────────
-  const rowHeight = opts.rowHeight ?? metrics.rowHeight;
-  const headerHeight = opts.headerHeight ?? metrics.headerHeight;
-  const isAutoRowHeight = !!(opts.autoRowHeight || opts.autoHeightRow || autoRowHeight || autoHeightRow);
-  const fixedRowHeight = isAutoRowHeight ? null : rowHeight;
-  const showToolbar = opts.showToolbar ?? false;
-  const hasExpandColumn = !!(opts.treeChildrenField || opts.detailRenderer);
-  const hasInlineFilters = visibleColumns.some(
-    (col) => col.filterable && (col.filterMode ?? opts.filterMode ?? 'popover') === 'inline',
-  );
-  const hasAggregates =
-    opts.showAggregates === true && visibleColumns.some((c) => c.aggregate != null);
-  const hasGroupedHeaders = visibleColumns.some((c) => !!c.headerGroup);
+  let calculated: unknown = '';
+  let defaultLabel = '';
 
-  // ── Selection computed ────────────────────────────────────────────────────
-  const pageSize = pageSizeOverride ?? opts.pageSize ?? 50;
+  const numValues = values
+    .map((v) => (typeof v === 'number' ? v : Number(v)))
+    .filter((n) => !Number.isNaN(n));
 
-  // ── Merged rows (with local edits + drag reorder) ─────────────────────────
-  const mergedRows = useMemo(() => {
-    const base = localRowOrder.length > 0 ? localRowOrder : rowData;
-    if (editedRows.size === 0) return base;
-    return base.map((r) => {
-      const id = rowId(r);
-      return editedRows.has(id) ? editedRows.get(id)! : r;
+  switch (aggType) {
+    case 'sum':
+      calculated = numValues.reduce((acc, v) => acc + v, 0);
+      defaultLabel = 'Sum';
+      break;
+    case 'count':
+      calculated = values.length;
+      defaultLabel = 'Count';
+      break;
+    case 'avg':
+      calculated = numValues.length ? numValues.reduce((acc, v) => acc + v, 0) / numValues.length : 0;
+      defaultLabel = 'Avg';
+      break;
+    case 'min':
+      calculated = numValues.length ? Math.min(...numValues) : '';
+      defaultLabel = 'Min';
+      break;
+    case 'max':
+      calculated = numValues.length ? Math.max(...numValues) : '';
+      defaultLabel = 'Max';
+      break;
+    case 'custom':
+      if (customFn) {
+        calculated = customFn({ values, rows, column, scope });
+      }
+      defaultLabel = 'Total';
+      break;
+  }
+
+  const label = customLabel ?? defaultLabel;
+  let formatted = String(calculated);
+  if (valueFormatter) {
+    formatted = valueFormatter({
+      value: calculated,
+      values,
+      rows,
+      column,
+      scope,
     });
-  }, [rowData, localRowOrder, editedRows]);
+  } else if (typeof calculated === 'number' && !Number.isInteger(calculated)) {
+    formatted = calculated.toFixed(2);
+  }
 
-  // ── Sorted + Filtered ─────────────────────────────────────────────────────
-  const filteredSortedRows = useMemo(() => {
-    const sorts = sortColumns;
-    let sorted: T[];
-    if (sorts.length <= 1) {
-      const field = sorts[0]?.field ?? '';
-      const dir = sorts[0]?.direction ?? null;
-      const col = field ? columnMap.get(field) : null;
-      sorted = sortRows(mergedRows, field, dir, col?.comparator);
-    } else {
-      const comparators = new Map<
-        string,
-        (a: unknown, b: unknown, rowA: T, rowB: T) => number
-      >();
-      for (const s of sorts) {
-        const col = columnMap.get(s.field);
-        if (col?.comparator) comparators.set(s.field, col.comparator);
-      }
-      sorted = sortMultiRows(
-        mergedRows,
-        sorts,
-        comparators.size > 0 ? comparators : undefined,
-      );
+  return { label, value: calculated, formatted };
+}
+
+interface GroupNode<T extends object> {
+  key: string;
+  groupField: string;
+  groupValue: unknown;
+  groupPath: readonly string[];
+  rows: readonly T[];
+  subgroups: readonly GroupNode<T>[];
+  expanded: boolean;
+}
+
+function buildGroupHierarchy<T extends object>(
+  rows: readonly T[],
+  groupBy: readonly string[],
+  groupSorts: readonly DatagridGroupSort[],
+  columns: readonly DatagridColumn<T>[],
+  expandedMap: ReadonlyMap<string, boolean>,
+  defaultExpanded: boolean,
+  depth = 0,
+  parentPath: readonly string[] = [],
+): readonly GroupNode<T>[] {
+  if (depth >= groupBy.length) {
+    return [];
+  }
+  const groupField = groupBy[depth];
+  const col = columns.find((c) => c.key === groupField);
+  const groupsMap = new Map<string, { value: unknown; rows: T[] }>();
+
+  for (const row of rows) {
+    const val = col ? getCellValue(row, col) : (row as Record<string, unknown>)[groupField];
+    const key = String(val ?? '');
+    if (!groupsMap.has(key)) {
+      groupsMap.set(key, { value: val, rows: [] });
     }
-    return applyFilters(sorted, activeFilters);
-  }, [mergedRows, sortColumns, activeFilters, columnMap]);
+    groupsMap.get(key)!.rows.push(row);
+  }
 
-  // ── Paged rows ────────────────────────────────────────────────────────────
-  const pagedRows = useMemo(() => {
-    if (!opts.pagination || opts.serverSide) return filteredSortedRows;
-    const p = currentPage;
-    return filteredSortedRows.slice((p - 1) * pageSize, p * pageSize);
-  }, [filteredSortedRows, opts.pagination, opts.serverSide, currentPage, pageSize]);
+  const sortDirection = groupSorts.find((gs) => gs.key === groupField)?.direction ?? 'asc';
+  const sortedEntries = [...groupsMap.entries()].sort(([a], [b]) => {
+    const cmp = a.localeCompare(b, undefined, { numeric: true });
+    return sortDirection === 'desc' ? -cmp : cmp;
+  });
 
-  const sortedRows = pagedRows;
-  const totalRows = opts.serverSide ? serverTotal : filteredSortedRows.length;
-  const totalPages = Math.max(1, Math.ceil(totalRows / pageSize));
+  return sortedEntries.map(([strVal, groupData]) => {
+    const groupPath = [...parentPath, strVal];
+    const pathKey = groupPath.join(' > ');
+    const isExpanded = expandedMap.has(pathKey) ? expandedMap.get(pathKey)! : defaultExpanded;
 
-  // ── Selection computed ────────────────────────────────────────────────────
-  const allSelected =
-    sortedRows.length > 0 && sortedRows.every((r) => selectedIds.has(rowId(r)));
-  const someSelected =
-    sortedRows.some((r) => selectedIds.has(rowId(r))) && !allSelected;
-  const activeFilterCount = Object.keys(activeFilters).length;
+    const subgroups = buildGroupHierarchy(
+      groupData.rows,
+      groupBy,
+      groupSorts,
+      columns,
+      expandedMap,
+      defaultExpanded,
+      depth + 1,
+      groupPath,
+    );
 
-  // ── Display rows ──────────────────────────────────────────────────────────
-  const displayRows = useMemo((): DisplayRow<T>[] => {
-    const groupBy = opts.groupByField;
-    const treeField = opts.treeChildrenField;
-    let result: DisplayRow<T>[];
+    return {
+      key: pathKey,
+      groupField,
+      groupValue: groupData.value,
+      groupPath,
+      rows: groupData.rows,
+      subgroups,
+      expanded: isExpanded,
+    };
+  });
+}
 
-    if (groupBy) {
-      result = buildGroupedRows(sortedRows, groupBy);
-    } else if (treeField) {
-      result = buildTreeRows(sortedRows, treeField, 0);
-    } else {
-      result = sortedRows.map((data, i) => makeDataRow(data, i, 0, false));
-    }
-
-    // Inject detail rows
-    if (opts.detailRenderer && openDetailIds.size > 0) {
-      result = injectDetailRows(result);
-    }
-
-    // Inject new-row sentinel
-    if (opts.newRowPosition && opts.editMode) {
-      const sentinel: DisplayRow<T> = {
-        kind: 'new-row',
-        data: {} as T,
-        absIdx: 0,
-        depth: 0,
-        hasChildren: false,
-        expanded: false,
-        treeId: NEW_ROW_ID,
-        isGroup: false,
-      };
-      if (opts.newRowPosition === 'top') {
-        result = [sentinel, ...result].map((r, i) => ({ ...r, absIdx: i }));
+function flattenGroupNodes<T extends object>(
+  nodes: readonly GroupNode<T>[],
+  flatList: ({ type: 'group'; node: GroupNode<T>; depth: number } | { type: 'row'; row: T })[] = [],
+  depth = 0,
+): ({ type: 'group'; node: GroupNode<T>; depth: number } | { type: 'row'; row: T })[] {
+  for (const node of nodes) {
+    flatList.push({ type: 'group', node, depth });
+    if (node.expanded) {
+      if (node.subgroups.length > 0) {
+        flattenGroupNodes(node.subgroups, flatList, depth + 1);
       } else {
-        result = [...result, sentinel].map((r, i) => ({ ...r, absIdx: i }));
+        for (const row of node.rows) {
+          flatList.push({ type: 'row', row });
+        }
+      }
+    }
+  }
+  return flatList;
+}
+
+function resolveTrackBy<T extends object>(
+  trackBy: DatagridTrackBy<T> | keyof T | undefined,
+  row: T,
+  index: number,
+): unknown {
+  if (typeof trackBy === 'function') {
+    return trackBy(row, index);
+  }
+  if (trackBy) {
+    return (row as Record<string, unknown>)[String(trackBy)];
+  }
+  return (row as Record<string, unknown>)['id'] ?? (row as Record<string, unknown>)['key'] ?? index;
+}
+
+function normalizeClassName(
+  value:
+    | string
+    | readonly string[]
+    | Readonly<Record<string, boolean>>
+    | null
+    | undefined,
+): string {
+  if (typeof value === 'string') return value;
+  if (Array.isArray(value)) return value.filter(Boolean).join(' ');
+  return value
+    ? Object.entries(value)
+        .filter(([, enabled]) => enabled)
+        .map(([name]) => name)
+        .join(' ')
+    : '';
+}
+
+function toDropdownItems(items: readonly DatagridColumnMenuItem[]): DropdownItem[] {
+  return items.flatMap((item) => [
+    ...(item.separator ? [{ separator: true }] : []),
+    {
+      label: item.label,
+      icon: item.icon,
+      disabled: item.disabled,
+      command: item.command,
+      children: item.children ? toDropdownItems(item.children) : undefined,
+    },
+  ]);
+}
+
+function editorValueFor<T extends object>(
+  value: unknown,
+  row: T,
+  column: DatagridColumn<T>,
+): unknown {
+  if (column.editorValueFormatter) return column.editorValueFormatter(value, row);
+  if ((column.editorType === 'date' || value instanceof Date) && value instanceof Date) {
+    return value.toISOString().slice(0, 10);
+  }
+  return value;
+}
+
+function parsedEditorValue<T extends object>(value: unknown, row: T, column: DatagridColumn<T>): unknown {
+  if (column.valueParser) return column.valueParser(value, row);
+  if ((column.editorType === 'date' || getCellValue(row, column) instanceof Date) && typeof value === 'string') {
+    if (value === '') return null;
+    const parsed = new Date(`${value}T00:00:00`);
+    return Number.isNaN(parsed.getTime()) ? value : parsed;
+  }
+  if (column.editorType === 'number') {
+    if (value === '' || value === null || value === undefined) return null;
+    const parsed = Number(value);
+    return Number.isNaN(parsed) ? value : parsed;
+  }
+  return value;
+}
+
+function normalizeChoiceOptions(
+  options: unknown,
+  displayField = 'label',
+  valueField = 'value',
+): readonly { label: string; value: unknown; disabled?: boolean }[] {
+  if (!Array.isArray(options)) return [];
+  return options.map((option) => {
+    if (option && typeof option === 'object') {
+      const record = option as Record<string, unknown>;
+      const value = record[valueField] ?? record.value;
+      const label = record[displayField] ?? record.label ?? value;
+      return {
+        label: String(label ?? ''),
+        value,
+        disabled: record.disabled === true,
+      };
+    }
+    return { label: String(option ?? ''), value: option };
+  });
+}
+
+function filterValueKey(value: unknown): string {
+  if (value instanceof Date) return `date:${value.toISOString()}`;
+  if (value === null) return 'null';
+  if (value === undefined) return 'undefined';
+  return `${typeof value}:${String(value)}`;
+}
+
+function DatagridInner<T extends object = Record<string, unknown>>(
+  props: DatagridProps<T>,
+  ref: ForwardedRef<DatagridHandle<T>>,
+): ReactElement {
+  const {
+    data: dataProp,
+    rows: rowsProp,
+    columns: columnsProp = [],
+    columnGroups: columnGroupsProp = [],
+    trackBy,
+    rowLabel,
+    locale: localeProp,
+    emptyMessage,
+    filterEmptyMessage,
+    emptyStateDescription,
+    filterEmptyStateDescription = 'Try changing or clearing the active filters.',
+    autoColumnWidth = true,
+    reorderable = true,
+    defaultColumnWidth = DEFAULT_COLUMN_WIDTH,
+    sortMode = 'client',
+    sortIndicatorVisibility = 'hover',
+    multiSort = false,
+    sorts: sortsProp,
+    filterMode = 'client',
+    filterIndicatorVisibility = 'hover',
+    searchQuery: searchQueryProp,
+    searchFilter,
+    columnFilters: columnFiltersProp,
+    columnOrder: columnOrderProp,
+    columnGroupOrder: columnGroupOrderProp,
+    columnVisibility: columnVisibilityProp,
+    hiddenColumns: hiddenColumnsProp,
+    columnPins: columnPinsProp,
+    groupBy: groupByProp,
+    groupSorts: groupSortsProp,
+    expandAllGroups = true,
+    stickyGroupHeaders = false,
+    indentGroupedRows = true,
+    selectionMode = 'none',
+    selection: selectionProp,
+    fitColumnsToWidth = false,
+    stripedRows = false,
+    showVerticalLines = false,
+    showRowNumbers: showRowNumbersProp = false,
+    rowNumbers = false,
+    rowHeight,
+    headerHeight,
+    autoHeight = true,
+    fixedHeight,
+    paginate: paginateProp,
+    pagination: paginationProp,
+    pageSize: pageSizeProp,
+    page: pageProp,
+    paginationType = 'compact',
+    paginationRowsOptions = DEFAULT_PAGE_SIZE_OPTIONS,
+    pageSizeOptions,
+    virtualScroll = false,
+    virtualScrollHeight = 400,
+    virtualRowHeight = 32,
+    virtualOverscan = DEFAULT_VIRTUAL_OVERSCAN,
+    columnVirtualization = false,
+    columnVirtualizationOverscan = DEFAULT_COLUMN_VIRTUALIZATION_OVERSCAN,
+    virtualPaging = false,
+    virtualPage = 1,
+    virtualTotalRows,
+    virtualHasPreviousPage,
+    virtualHasNextPage,
+    virtualPagingLoading = false,
+    virtualPageRequest,
+    onVirtualPageRequest,
+    onPageSizeChange,
+    editMode = 'none',
+    editOnType = false,
+    editLabels: customEditLabels,
+    isRowEditable,
+    isCellEditable,
+    isCellReadonly,
+    allowNewRow: allowNewRowProp = false,
+    enableNewRow,
+    newRowPrompt,
+    newRowLabel,
+    newRowFactory,
+    preventInvalidCommit = true,
+    onCellValidationFailed,
+    onRowValidationFailed,
+    reorderableRows: reorderableRowsProp,
+    rowReorder: rowReorderProp,
+    rowReorderable,
+    rowDetailExpandable,
+    rowClassName,
+    rowStyle,
+    showGroupToolbar = false,
+    showColumnSelector = false,
+    showStatusbar = false,
+    statusbarStart,
+    statusbarEnd,
+    toolbarStart,
+    toolbarEnd,
+    emptyTitle,
+    emptyDescription,
+    emptyIcon = 'search',
+    emptyState,
+    loading = false,
+    loadingMessage: loadingMessageProp,
+    toolbar = false,
+    searchable = false,
+    columnSelector = false,
+    statusbar = false,
+    statusbarAriaLabel,
+    statusbarShowRowCount = true,
+    statusbarShowSelectedRowCount = true,
+    statusbarMergePagination = false,
+    footer = false,
+    footerLabel,
+    toolbarAriaLabel,
+    toolbarShowColumnSelector = true,
+    toolbarShowGroupedColumns = true,
+    groupSorting = false,
+    groupsExpandedByDefault,
+    columnMenu = false,
+    columnSelectorLabel,
+    hiddenColumnKeys,
+    groupSelection = false,
+    detailPaneWidth = 320,
+    rowDetailHeight = DEFAULT_ROW_DETAIL_HEIGHT,
+    leadingRowActionsWidth = 40,
+    validateOnInput = true,
+    rowClass,
+    rowNumbers: rowNumbersAlias,
+    searchTerm,
+    editOnClick = false,
+    selectedRows,
+    onSelectedRowsChange,
+    expandedRows,
+    onExpandedRowsChange,
+    onDetailPaneRowChange,
+    detailPaneTitle,
+    cellTemplates = {},
+    cellEditors = {},
+    rowDetail: rowDetailProp,
+    rowDetails: rowDetailsProp,
+    detailPane,
+    detailPaneRenderer,
+    detailPaneRow,
+    leadingRowActions,
+    rowTemplate,
+    dataContext,
+    dataContextOptions,
+    onSortChange,
+    onSortsChange,
+    onFilterChange,
+    onSearchQueryChange,
+    onColumnResize,
+    onColumnGroupResize,
+    onColumnOrderChange,
+    onColumnGroupOrderChange,
+    onColumnVisibilityChange,
+    onGroupByChange,
+    onGroupSortsChange,
+    onSelectionChange,
+    onPageChange,
+    onRowOrderChange,
+    onCellEditCommit,
+    onRowEditCommit,
+    onNewRowCommit,
+    onEditCancel,
+    onValidationError,
+    onDataContextSaveComplete,
+    onDataContextSaveError,
+    className = '',
+    style,
+    ariaLabel: ariaLabelProp,
+    ariaLabelledBy,
+  } = props;
+
+  const { t, locale: i18nLocale } = useI18n();
+  const isPaginated = virtualPaging || (paginateProp ?? paginationProp ?? false);
+  const isRowReorder = reorderableRowsProp ?? rowReorderProp ?? false;
+  const allowNewRow = enableNewRow ?? allowNewRowProp;
+  const showRowNumbers = rowNumbersAlias ?? rowNumbers ?? showRowNumbersProp;
+  const activeSearchTermProp = searchQueryProp ?? searchTerm;
+  const defaultGroupsExpanded = groupsExpandedByDefault ?? expandAllGroups;
+  const effectiveLocale = localeProp ?? i18nLocale;
+  const effectivePageSizeOptions = pageSizeOptions ?? paginationRowsOptions;
+  const rowDetail = rowDetailProp ?? (typeof rowDetailsProp === 'function' ? rowDetailsProp : undefined);
+  const effectiveDetailPaneRenderer =
+    typeof detailPane === 'function'
+      ? detailPane
+      : detailPaneRenderer;
+  const isShowColumnSelector = showColumnSelector || columnSelector;
+  const showColumnSelectorInToolbar = isShowColumnSelector && toolbarShowColumnSelector;
+  const isShowStatusbar = showStatusbar || statusbar;
+  const isShowGroupToolbar = (showGroupToolbar || groupSorting) && toolbarShowGroupedColumns;
+
+  const ariaLabel = ariaLabelProp ?? t('dataGrid') ?? 'Data Grid';
+  const gridId = useId();
+
+  // Data Context Adapter
+  const dataContextAdapter = useMemo<DatagridDataContextAdapter<T> | null>(() => {
+    if (!dataContext) return null;
+    return createDatagridDataContextAdapter(dataContext, dataContextOptions);
+  }, [dataContext, dataContextOptions]);
+
+  // Raw source rows
+  const rawRows: readonly T[] = useMemo(() => {
+    if (dataContextAdapter) {
+      return dataContextAdapter.rows;
+    }
+    return dataProp ?? rowsProp ?? [];
+  }, [dataContextAdapter, dataProp, rowsProp]);
+
+  // Local controllable states
+  const [internalSearchQuery, setInternalSearchQuery] = useState('');
+  const activeSearchQuery = activeSearchTermProp !== undefined ? activeSearchTermProp : internalSearchQuery;
+
+  const [internalSorts, setInternalSorts] = useState<readonly DatagridSort[]>([]);
+  const activeSorts = sortsProp !== undefined ? sortsProp : internalSorts;
+
+  const [internalColumnFilters, setInternalColumnFilters] = useState<readonly DatagridColumnFilter<T>[]>([]);
+  const activeColumnFilters = columnFiltersProp !== undefined ? columnFiltersProp : internalColumnFilters;
+  const hasActiveFilters = activeSearchQuery.trim().length > 0 || activeColumnFilters.length > 0;
+  const resolvedFilterEmptyDescription =
+    filterEmptyStateDescription ?? filterEmptyMessage ?? emptyDescription ?? 'Try changing or clearing the active filters.';
+  const resolvedEmptyTitle =
+    hasActiveFilters ? filterEmptyMessage ?? t('noMatchingRows') : emptyMessage ?? emptyTitle ?? t('noRowsToDisplay');
+  const resolvedEmptyDescription = hasActiveFilters
+    ? resolvedFilterEmptyDescription
+    : emptyStateDescription ?? emptyDescription;
+  const statusbarEnabled = isShowStatusbar || (statusbarMergePagination && isPaginated);
+  const resolvedEditLabels: DatagridEditLabels = {
+    actions: customEditLabels?.actions ?? t('actions') ?? DEFAULT_EDIT_LABELS.actions,
+    edit: customEditLabels?.edit ?? t('edit') ?? DEFAULT_EDIT_LABELS.edit,
+    save: customEditLabels?.save ?? t('save') ?? DEFAULT_EDIT_LABELS.save,
+    cancel: customEditLabels?.cancel ?? t('cancel') ?? DEFAULT_EDIT_LABELS.cancel,
+  };
+  const resolvedLoadingMessage = loadingMessageProp ?? t('loadingData');
+  const resolvedNewRowPrompt = newRowLabel ?? newRowPrompt ?? t('newRow');
+
+  const [internalColumnOrder, setInternalColumnOrder] = useState<readonly string[]>(() =>
+    columnsProp.map((c) => c.key),
+  );
+  const activeColumnOrder = columnOrderProp !== undefined ? columnOrderProp : internalColumnOrder;
+
+  const [internalColumnGroupOrder, setInternalColumnGroupOrder] = useState<readonly string[]>(() =>
+    columnGroupsProp.map((group) => group.key),
+  );
+  const activeColumnGroupOrder =
+    columnGroupOrderProp !== undefined ? columnGroupOrderProp : internalColumnGroupOrder;
+
+  const [internalHiddenColumns, setInternalHiddenColumns] = useState<ReadonlySet<string>>(() => {
+    if (columnVisibilityProp) {
+      const visSet = new Set(columnVisibilityProp);
+      return new Set(columnsProp.filter((c) => !visSet.has(c.key)).map((c) => c.key));
+    }
+    if (hiddenColumnsProp || hiddenColumnKeys) {
+      return new Set([...(hiddenColumnsProp ?? []), ...(hiddenColumnKeys ?? [])]);
+    }
+    return new Set();
+  });
+
+  const [internalGroupBy, setInternalGroupBy] = useState<readonly string[]>([]);
+  const activeGroupBy = groupByProp !== undefined ? groupByProp : internalGroupBy;
+
+  const [internalGroupSorts, setInternalGroupSorts] = useState<readonly DatagridGroupSort[]>([]);
+  const activeGroupSorts = groupSortsProp !== undefined ? groupSortsProp : internalGroupSorts;
+
+  const [groupExpandedMap, setGroupExpandedMap] = useState<Map<string, boolean>>(new Map());
+
+  const [internalSelection, setInternalSelection] = useState<readonly T[]>([]);
+  const activeSelection = selectionProp !== undefined ? selectionProp : (selectedRows !== undefined ? selectedRows : internalSelection);
+
+  const [internalPage, setInternalPage] = useState(pageProp ?? 1);
+  const activePage = virtualPaging ? Math.max(1, virtualPage) : pageProp !== undefined ? pageProp : internalPage;
+
+  const [internalPageSize, setInternalPageSize] = useState(pageSizeProp ?? 25);
+  const activePageSize = pageSizeProp !== undefined ? pageSizeProp : internalPageSize;
+
+  const [columnWidths, setColumnWidths] = useState<Map<string, number | 'auto'>>(new Map());
+  const [internalExpandedRowDetails, setInternalExpandedRowDetails] = useState<Set<unknown>>(new Set());
+  const expandedRowDetails = useMemo(() => {
+    if (expandedRows === undefined) return internalExpandedRowDetails;
+
+    const controlledRows = new Set<unknown>(expandedRows);
+    const expandedIds = new Set<unknown>();
+    rawRows.forEach((row, index) => {
+      const rowId = resolveTrackBy(trackBy, row, index);
+      if (controlledRows.has(row) || controlledRows.has(rowId)) expandedIds.add(rowId);
+    });
+    return expandedIds;
+  }, [expandedRows, internalExpandedRowDetails, rawRows, trackBy]);
+  const [internalDetailPaneRow, setInternalDetailPaneRow] = useState<T | null>(null);
+  const activeDetailPaneRow = detailPaneRow !== undefined ? detailPaneRow : internalDetailPaneRow;
+  const setActiveDetailPaneRow = useCallback(
+    (next: T | null) => {
+      setInternalDetailPaneRow(next);
+      onDetailPaneRowChange?.(next);
+    },
+    [onDetailPaneRowChange],
+  );
+
+  const updateExpandedRowDetails = useCallback(
+    (next: Set<unknown>) => {
+      setInternalExpandedRowDetails(next);
+      const nextRows = rawRows.filter((row, index) => next.has(resolveTrackBy(trackBy, row, index)));
+      onExpandedRowsChange?.(nextRows);
+    },
+    [onExpandedRowsChange, rawRows, trackBy],
+  );
+
+  // Edit states
+  const [editingCell, setEditingCell] = useState<{ rowIndex: number; key: string } | null>(null);
+  const [editingRowIndex, setEditingRowIndex] = useState<number | null>(null);
+  const [rowDrafts, setRowDrafts] = useState<Map<string, unknown>>(new Map());
+  const [newRowDraft, setNewRowDraft] = useState<T | null>(null);
+  const [newRowEditing, setNewRowEditing] = useState(false);
+  const [cellDraftValue, setCellDraftValue] = useState<unknown>(undefined);
+  const [cellValidationErrors, setCellValidationErrors] = useState<readonly DatagridValidationError[]>([]);
+
+  // Drag states
+  const [draggedColumnKey, setDraggedColumnKey] = useState<string | null>(null);
+  const [columnDropTarget, setColumnDropTarget] = useState<{ key: string; position: 'before' | 'after' } | null>(null);
+  const [draggedColumnGroupKey, setDraggedColumnGroupKey] = useState<string | null>(null);
+  const [columnGroupDropTarget, setColumnGroupDropTarget] = useState<{ key: string; position: 'before' | 'after' } | null>(null);
+  const [draggedSelectorColumnKey, setDraggedSelectorColumnKey] = useState<string | null>(null);
+  const [selectorDropTarget, setSelectorDropTarget] = useState<{ key: string; position: 'before' | 'after' } | null>(null);
+  const [dragGhostPos, setDragGhostPos] = useState<{ x: number; y: number } | null>(null);
+  const [draggedRowIndex, setDraggedRowIndex] = useState<number | null>(null);
+  const [rowDropTarget, setRowDropTarget] = useState<{ index: number; position: 'before' | 'after' } | null>(null);
+  const [isGroupToolbarDragOver, setIsGroupToolbarDragOver] = useState(false);
+  const [draggedToolbarGroupKey, setDraggedToolbarGroupKey] = useState<string | null>(null);
+  const [toolbarGroupDropTarget, setToolbarGroupDropTarget] = useState<{
+    key: string;
+    position: 'before' | 'after';
+  } | null>(null);
+
+  // Popovers & menus
+  const [activeFilterPopover, setActiveFilterPopover] = useState<{
+    key: string;
+    triggerRect: DOMRect;
+  } | null>(null);
+  const [activeColumnMenu, setActiveColumnMenu] = useState<{
+    key: string;
+  } | null>(null);
+  const [showColumnSelectorPopover, setShowColumnSelectorPopover] = useState<{
+    source: 'toolbar' | 'statusbar';
+  } | null>(null);
+
+  // Error badge floating position
+  const [floatingError, setFloatingError] = useState<{
+    message: string;
+    rect: DOMRect;
+  } | null>(null);
+
+  const [virtualScrollTop, setVirtualScrollTop] = useState(0);
+  const [virtualViewportHeight, setVirtualViewportHeight] = useState(virtualScrollHeight);
+  const [horizontalScrollLeft, setHorizontalScrollLeft] = useState(0);
+  const [horizontalViewportWidth, setHorizontalViewportWidth] = useState(0);
+
+  const gridContainerRef = useRef<HTMLDivElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const [pinnedColumnOffsets, setPinnedColumnOffsets] = useState<ReadonlyMap<string, DatagridPinnedColumnOffset>>(new Map());
+
+  const effectiveSelectionMode: DatagridSelectionMode =
+    selectionMode === 'none' && dataContextAdapter?.synchronizeSelection ? 'single' : selectionMode;
+  const effectiveVirtualRowHeight = Math.max(1, rowHeight ?? virtualRowHeight);
+  const virtualizationEnabled = virtualScroll && activeGroupBy.length === 0 && !isPaginated;
+
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport || (!virtualScroll && !columnVirtualization)) {
+      return;
+    }
+
+    const updateViewportHeight = () => {
+      setVirtualViewportHeight(viewport.clientHeight || virtualScrollHeight);
+      setHorizontalViewportWidth(viewport.clientWidth);
+    };
+    const handleScroll = () => {
+      setVirtualScrollTop(viewport.scrollTop);
+      setHorizontalScrollLeft(viewport.scrollLeft);
+    };
+    updateViewportHeight();
+    viewport.addEventListener('scroll', handleScroll, { passive: true });
+    const observer = typeof ResizeObserver !== 'undefined'
+      ? new ResizeObserver(updateViewportHeight)
+      : null;
+    observer?.observe(viewport);
+    return () => {
+      viewport.removeEventListener('scroll', handleScroll);
+      observer?.disconnect();
+    };
+  }, [columnVirtualization, virtualScroll, virtualScrollHeight]);
+
+  // Column order & pinned setup
+  const orderedColumns = useMemo(() => {
+    const colMap = new Map(columnsProp.map((col) => [col.key, col]));
+    const list: DatagridColumn<T>[] = [];
+    for (const key of activeColumnOrder) {
+      const col = colMap.get(key);
+      if (col && !internalHiddenColumns.has(key)) {
+        list.push(col);
+      }
+    }
+    // Any remaining columns not in order list
+    for (const col of columnsProp) {
+      if (!internalHiddenColumns.has(col.key) && !list.some((c) => c.key === col.key)) {
+        list.push(col);
+      }
+    }
+    return list;
+  }, [columnsProp, activeColumnOrder, internalHiddenColumns]);
+
+  const orderedColumnGroups = useMemo(() => {
+    const groupsByKey = new Map(columnGroupsProp.map((group) => [group.key, group]));
+    const ordered = activeColumnGroupOrder.flatMap((key) => {
+      const group = groupsByKey.get(key);
+      if (!group) return [];
+      groupsByKey.delete(key);
+      return [group];
+    });
+    return [...ordered, ...columnGroupsProp.filter((group) => groupsByKey.has(group.key))];
+  }, [activeColumnGroupOrder, columnGroupsProp]);
+
+  const selectorColumns = useMemo(
+    () => [...columnsProp].sort((left, right) => activeColumnOrder.indexOf(left.key) - activeColumnOrder.indexOf(right.key)),
+    [activeColumnOrder, columnsProp],
+  );
+
+  // Pinned column partitions: left, center, right
+  const { leftPinned, rightPinned, visibleColumns } = useMemo(() => {
+    const left: DatagridColumn<T>[] = [];
+    const center: DatagridColumn<T>[] = [];
+    const right: DatagridColumn<T>[] = [];
+
+    for (const col of orderedColumns) {
+      const pin = columnPinsProp?.[col.key] ?? col.pinned;
+      if (pin === 'left') {
+        left.push(col);
+      } else if (pin === 'right') {
+        right.push(col);
+      } else {
+        center.push(col);
       }
     }
 
-    return result;
+    return {
+      leftPinned: left,
+      rightPinned: right,
+      visibleColumns: [...left, ...center, ...right],
+    };
+  }, [orderedColumns, columnPinsProp]);
+
+  const hasPinnedColumns = leftPinned.length > 0 || rightPinned.length > 0;
+  const hasActiveRowSpans = visibleColumns.some((column) => column.rowSpan !== undefined);
+  const hasLeadingRowActions = Boolean(leadingRowActions || effectiveDetailPaneRenderer);
+  const showRowEditActions =
+    editMode === 'row' && visibleColumns.some((column) => column.editable === true || typeof column.editable === 'function');
+
+  const columnVirtualLayout = useMemo(() => {
+    const centerColumns = visibleColumns.filter((column) => {
+      const pin = columnPinsProp?.[column.key] ?? column.pinned;
+      return pin !== 'left' && pin !== 'right';
+    });
+    const widthFor = (column: DatagridColumn<T>) => {
+      const configured = columnWidths.get(column.key) ?? column.width;
+      const width = typeof configured === 'number'
+        ? configured
+        : typeof configured === 'string' && configured.endsWith('%')
+          ? defaultColumnWidth
+          : defaultColumnWidth;
+      return Math.min(column.maxWidth ?? Number.POSITIVE_INFINITY, Math.max(column.minWidth ?? DEFAULT_MIN_COLUMN_WIDTH, width));
+    };
+    if (!columnVirtualization || centerColumns.length === 0 || horizontalViewportWidth <= 0) {
+      return { columns: visibleColumns, beforeWidth: 0, afterWidth: 0 };
+    }
+    const leftPinnedWidth = leftPinned.reduce((total, column) => total + widthFor(column), 0);
+    const rightPinnedWidth = rightPinned.reduce((total, column) => total + widthFor(column), 0);
+    const viewportWidth = Math.max(1, horizontalViewportWidth - leftPinnedWidth - rightPinnedWidth);
+    const overscan = Math.max(0, columnVirtualizationOverscan);
+    const offsets = [0];
+    for (const column of centerColumns) offsets.push((offsets.at(-1) ?? 0) + widthFor(column));
+    const targetStart = Math.max(0, horizontalScrollLeft - leftPinnedWidth - overscan);
+    const targetEnd = horizontalScrollLeft - leftPinnedWidth + viewportWidth + overscan;
+    let start = 0;
+    while (start < centerColumns.length && (offsets[start + 1] ?? 0) <= targetStart) start += 1;
+    let end = start;
+    while (end < centerColumns.length && (offsets[end] ?? 0) < targetEnd) end += 1;
+    end = Math.max(start + 1, Math.min(centerColumns.length, end));
+    return {
+      columns: [...leftPinned, ...centerColumns.slice(start, end), ...rightPinned],
+      beforeWidth: offsets[start] ?? 0,
+      afterWidth: Math.max(0, (offsets.at(-1) ?? 0) - (offsets[end] ?? offsets.at(-1) ?? 0)),
+    };
+  }, [columnVirtualization, columnVirtualizationOverscan, columnPinsProp, columnWidths, defaultColumnWidth, horizontalScrollLeft, horizontalViewportWidth, leftPinned, rightPinned, visibleColumns]);
+  const renderedColumns = columnVirtualLayout.columns;
+
+  // Filtered rows
+  const filteredRows = useMemo(() => {
+    let list = rawRows;
+
+    // Search query filter
+    if (activeSearchQuery.trim() !== '') {
+      const q = activeSearchQuery.toLowerCase();
+      if (searchFilter) {
+        list = list.filter((r) => searchFilter(r, activeSearchQuery));
+      } else {
+        list = list.filter((row) =>
+          visibleColumns.some((col) => {
+            const formatted = formatCellValue(row, 0, col, effectiveLocale).toLocaleLowerCase(effectiveLocale);
+            return formatted.includes(q);
+          }),
+        );
+      }
+    }
+
+    // Column distinct & dynamic filters
+    if (filterMode === 'client') {
+      for (const filter of activeColumnFilters) {
+        const col = visibleColumns.find((c) => c.key === filter.key);
+        if (!col) continue;
+
+        if (filter.values && filter.values.length > 0) {
+          list = list.filter((row) => {
+            const val = getCellValue(row, col);
+            if (col.filterPredicate) {
+              return col.filterPredicate(val, filter.values, row);
+            }
+            return filter.values.some((candidate) => filterValueKey(candidate) === filterValueKey(val));
+          });
+        }
+
+        if (filter.condition) {
+          list = list.filter((row) => {
+            const val = getCellValue(row, col);
+            return evaluateDynamicCondition(val, filter.condition!, col.filterDataType ?? 'text');
+          });
+        }
+      }
+    }
+
+    return list;
+  }, [rawRows, activeSearchQuery, searchFilter, visibleColumns, filterMode, activeColumnFilters, effectiveLocale]);
+
+  // Sorted rows
+  const sortedRows = useMemo(() => {
+    if (sortMode !== 'client' || activeSorts.length === 0) {
+      return filteredRows;
+    }
+
+    const list = [...filteredRows];
+    list.sort((a, b) => {
+      for (const sort of activeSorts) {
+        const col = visibleColumns.find((c) => c.key === sort.key);
+        if (!col) continue;
+
+        const valA = getCellValue(a, col);
+        const valB = getCellValue(b, col);
+
+        let cmp = 0;
+        if (col.sortComparator) {
+          cmp = col.sortComparator(valA, valB, a, b);
+        } else if (typeof valA === 'number' && typeof valB === 'number') {
+          cmp = valA - valB;
+        } else if (valA instanceof Date && valB instanceof Date) {
+          cmp = valA.getTime() - valB.getTime();
+        } else {
+          cmp = String(valA ?? '').localeCompare(String(valB ?? ''), effectiveLocale, {
+            numeric: true,
+            sensitivity: 'base',
+          });
+        }
+
+        if (cmp !== 0) {
+          return sort.direction === 'desc' ? -cmp : cmp;
+        }
+      }
+      return 0;
+    });
+
+    return list;
+  }, [filteredRows, sortMode, activeSorts, visibleColumns, effectiveLocale]);
+
+  // Grouped rows
+  const groupedHierarchy = useMemo(() => {
+    if (activeGroupBy.length === 0) return [];
+    return buildGroupHierarchy(
+      sortedRows,
+      activeGroupBy,
+      activeGroupSorts,
+      visibleColumns,
+      groupExpandedMap,
+      defaultGroupsExpanded,
+    );
+  }, [sortedRows, activeGroupBy, activeGroupSorts, visibleColumns, groupExpandedMap, defaultGroupsExpanded]);
+
+  const flattenedRows = useMemo(() => {
+    if (activeGroupBy.length === 0) {
+      return sortedRows.map((row) => ({ type: 'row' as const, row }));
+    }
+    return flattenGroupNodes(groupedHierarchy);
+  }, [activeGroupBy, sortedRows, groupedHierarchy]);
+
+  // Paged rows
+  const totalRowsCount = virtualPaging
+    ? virtualTotalRows ?? (Math.max(0, activePage - 1) * activePageSize + sortedRows.length)
+    : sortedRows.length;
+  const totalPages = virtualPaging
+    ? virtualTotalRows === undefined
+      ? Math.max(activePage, activePage + (virtualHasNextPage === true ? 1 : 0))
+      : Math.max(1, Math.ceil(virtualTotalRows / activePageSize))
+    : Math.max(1, Math.ceil(totalRowsCount / activePageSize));
+  const canVirtualPrevious =
+    !virtualPagingLoading && (virtualHasPreviousPage ?? activePage > 1);
+  const canVirtualNext =
+    !virtualPagingLoading &&
+    (virtualHasNextPage ??
+      (virtualTotalRows !== undefined
+        ? activePage * activePageSize < virtualTotalRows
+        : sortedRows.length >= activePageSize));
+
+  const displayRows = useMemo(() => {
+    if (virtualPaging) {
+      return sortedRows.map((row) => ({ type: 'row' as const, row }));
+    }
+    if (!isPaginated || activeGroupBy.length > 0 || virtualScroll) {
+      return flattenedRows;
+    }
+    const startIndex = (activePage - 1) * activePageSize;
+    return flattenedRows.slice(startIndex, startIndex + activePageSize);
+  }, [virtualPaging, isPaginated, activeGroupBy, flattenedRows, activePage, activePageSize, sortedRows, virtualScroll]);
+
+  const virtualStartIndex = virtualizationEnabled
+    ? Math.max(0, Math.floor(virtualScrollTop / effectiveVirtualRowHeight) - Math.max(0, virtualOverscan))
+    : 0;
+  const virtualEndIndex = virtualizationEnabled
+    ? Math.min(
+        displayRows.length,
+        Math.ceil((virtualScrollTop + virtualViewportHeight) / effectiveVirtualRowHeight) +
+          Math.max(0, virtualOverscan),
+      )
+    : displayRows.length;
+  const renderedDisplayRows = virtualizationEnabled
+    ? displayRows.slice(virtualStartIndex, Math.max(virtualStartIndex, virtualEndIndex))
+    : displayRows;
+  const virtualTopSpacer = virtualizationEnabled ? virtualStartIndex * effectiveVirtualRowHeight : 0;
+  const virtualBottomSpacer = virtualizationEnabled
+    ? Math.max(0, (displayRows.length - virtualEndIndex) * effectiveVirtualRowHeight)
+    : 0;
+  const rowReorderingEnabled =
+    isRowReorder &&
+    !isPaginated &&
+    !virtualPaging &&
+    !virtualScroll &&
+    activeGroupBy.length === 0 &&
+    activeSorts.length === 0 &&
+    activeSearchQuery.trim().length === 0 &&
+    activeColumnFilters.length === 0;
+
+  // Column width calculations & CSS Grid template
+  const gridTemplateColumns = useMemo(() => {
+    const parts: string[] = [];
+
+    // Leading toggles / detail / selection / numbers
+    if (rowDetail) parts.push('40px');
+    if (hasLeadingRowActions) parts.push(`${Math.max(32, leadingRowActionsWidth)}px`);
+    if (isRowReorder) parts.push('32px');
+    if (effectiveSelectionMode !== 'none') parts.push('40px');
+    if (showRowNumbers) parts.push(`${DEFAULT_ROW_NUMBER_WIDTH}px`);
+
+    if (columnVirtualization && columnVirtualLayout.beforeWidth > 0) {
+      parts.push(`${columnVirtualLayout.beforeWidth}px`);
+    }
+
+    for (const col of renderedColumns) {
+      const explicitWidth = columnWidths.get(col.key) ?? col.width;
+      if (explicitWidth !== undefined) {
+        if (typeof explicitWidth === 'number') {
+          const bounded = Math.min(col.maxWidth ?? DEFAULT_MAX_COLUMN_WIDTH, Math.max(col.minWidth ?? DEFAULT_MIN_COLUMN_WIDTH, explicitWidth));
+          parts.push(`${bounded}px`);
+        } else if (explicitWidth === 'auto') {
+          parts.push('minmax(min-content, max-content)');
+        } else {
+          parts.push(explicitWidth);
+        }
+      } else if (col.flex !== undefined) {
+        const minW = col.minWidth ? `${col.minWidth}px` : 'min-content';
+        parts.push(`minmax(${minW}, ${col.flex}fr)`);
+      } else {
+        const minW = col.minWidth !== undefined
+          ? `${col.minWidth}px`
+          : autoColumnWidth
+            ? 'min-content'
+            : `${defaultColumnWidth}px`;
+        if (autoColumnWidth) {
+          parts.push(`minmax(${minW}, ${fitColumnsToWidth ? '1fr' : col.maxWidth ? `${col.maxWidth}px` : 'max-content'})`);
+        } else {
+          const width = Math.min(col.maxWidth ?? defaultColumnWidth, Math.max(col.minWidth ?? DEFAULT_MIN_COLUMN_WIDTH, defaultColumnWidth));
+          parts.push(`${width}px`);
+        }
+      }
+    }
+
+    if (columnVirtualization && columnVirtualLayout.afterWidth > 0) {
+      parts.push(`${columnVirtualLayout.afterWidth}px`);
+    }
+
+    if (showRowEditActions) {
+      parts.push('max-content');
+    }
+
+    if (!fitColumnsToWidth) {
+      parts.push('minmax(0, 1fr)');
+    }
+
+    return parts.join(' ');
   }, [
-    sortedRows,
-    opts.groupByField,
-    opts.treeChildrenField,
-    opts.detailRenderer,
-    opts.newRowPosition,
-    opts.editMode,
-    openDetailIds,
-    collapsedGroups,
-    expandedTreeIds,
+    rowDetail,
+    hasLeadingRowActions,
+    leadingRowActionsWidth,
+    isRowReorder,
+    effectiveSelectionMode,
+    autoColumnWidth,
+    defaultColumnWidth,
+    showRowNumbers,
+    renderedColumns,
+    columnVirtualization,
+    columnVirtualLayout,
+    columnWidths,
+    fitColumnsToWidth,
+    showRowEditActions,
   ]);
 
-  // ── Virtual scroll ────────────────────────────────────────────────────────
-  const vsStart = useMemo(() => {
-    if (!opts.virtualScroll) return 0;
-    const overscan = opts.overscanCount ?? DEFAULT_OVERSCAN;
-    return Math.max(0, Math.floor(scrollTop / rowHeight) - overscan);
-  }, [opts.virtualScroll, scrollTop, rowHeight, opts.overscanCount]);
-
-  const vsEnd = useMemo(() => {
-    const len = displayRows.length;
-    if (!opts.virtualScroll) return len;
-    const overscan = opts.overscanCount ?? DEFAULT_OVERSCAN;
-    return Math.min(len, Math.ceil((scrollTop + viewportHeight) / rowHeight) + overscan);
-  }, [opts.virtualScroll, displayRows.length, scrollTop, viewportHeight, rowHeight, opts.overscanCount]);
-
-  const renderedRows = useMemo(
-    () => displayRows.slice(vsStart, vsEnd),
-    [displayRows, vsStart, vsEnd],
-  );
-  const virtualOffset = opts.virtualScroll ? vsStart * rowHeight : 0;
-  const virtualTotalHeight = opts.virtualScroll ? displayRows.length * rowHeight : null;
-
-  // ── Total columns width ───────────────────────────────────────────────────
-  const totalColumnsWidth = useMemo(() => {
-    let w = opts.selectionMode && opts.selectionMode !== 'none' ? 44 : 0;
-    if (opts.editMode === 'row') w += 80;
-    if (opts.rowDraggable) w += 36;
-    if (hasExpandColumn) w += 36;
-    visibleColumns.forEach((col) => {
-      w += getColWidth(col);
-    });
-    return w;
-  }, [visibleColumns, getColWidth, opts.selectionMode, opts.editMode, opts.rowDraggable, hasExpandColumn]);
-
-  // ── Control column offsets for pinning ────────────────────────────────────
-  const shouldPinControls = opts.pinControlColumns === true;
-  const ctrlColLeftExpand = shouldPinControls ? 0 : null;
-  const ctrlColLeftDrag = shouldPinControls ? (hasExpandColumn ? 36 : 0) : null;
-  const ctrlColLeftActions = useMemo(() => {
-    if (!shouldPinControls) return null;
-    let o = 0;
-    if (hasExpandColumn) o += 36;
-    if (opts.rowDraggable) o += 36;
-    return o;
-  }, [shouldPinControls, hasExpandColumn, opts.rowDraggable]);
-  const ctrlColLeftCheckbox = useMemo(() => {
-    if (!shouldPinControls) return null;
-    let o = 0;
-    if (hasExpandColumn) o += 36;
-    if (opts.rowDraggable) o += 36;
-    if (opts.editMode === 'row') o += 80;
-    return o;
-  }, [shouldPinControls, hasExpandColumn, opts.rowDraggable, opts.editMode]);
-
-  const controlColsWidth = useMemo(() => {
-    let w = 0;
-    if (hasExpandColumn) w += 36;
-    if (opts.rowDraggable) w += 36;
-    if (opts.editMode === 'row') w += 80;
-    if (opts.selectionMode && opts.selectionMode !== 'none') w += 44;
-    return w;
-  }, [hasExpandColumn, opts.rowDraggable, opts.editMode, opts.selectionMode]);
-
-  // ── Pinned left/right offset calculator ───────────────────────────────────
-  const getPinnedLeft = useCallback(
-    (col: ColumnDef<T>): number | null => {
-      const pin = getColPin(col);
-      if (pin === 'left') {
-        let offset = controlColsWidth;
-        for (const c of leftPinnedCols) {
-          if (c.field === col.field) break;
-          offset += getColWidth(c);
-        }
-        return offset;
-      }
-      return null;
-    },
-    [getColPin, controlColsWidth, leftPinnedCols, getColWidth],
-  );
-
-  const getPinnedRight = useCallback(
-    (col: ColumnDef<T>): number | null => {
-      const pin = getColPin(col);
-      if (pin === 'right') {
-        let offset = 0;
-        for (const c of [...rightPinnedCols].reverse()) {
-          if (c.field === col.field) break;
-          offset += getColWidth(c);
-        }
-        return offset;
-      }
-      return null;
-    },
-    [getColPin, rightPinnedCols, getColWidth],
-  );
-
-  // ── Group header spans ────────────────────────────────────────────────────
-  const buildGroupSpans = useCallback(
-    (cols: ColumnDef<T>[]): ColumnGroupSpan<T>[] => {
-      if (!cols.length) return [];
-      const spans: ColumnGroupSpan<T>[] = [];
-      let i = 0;
-      while (i < cols.length) {
-        const col = cols[i];
-        const grp = col.headerGroup ?? null;
-        if (!grp) {
-          spans.push({
-            groupName: null,
-            columns: [col],
-            totalWidth: getColWidth(col),
-            isGroup: false,
-          });
-          i++;
-        } else {
-          const groupCols: ColumnDef<T>[] = [col];
-          let j = i + 1;
-          while (j < cols.length && cols[j].headerGroup === grp) {
-            groupCols.push(cols[j]);
-            j++;
-          }
-          spans.push({
-            groupName: grp,
-            columns: groupCols,
-            totalWidth: groupCols.reduce((w, c) => w + getColWidth(c), 0),
-            isGroup: groupCols.length > 1,
-            headerGroupClass: col.headerGroupClass,
-          });
-          i = j;
-        }
-      }
-      return spans;
-    },
-    [getColWidth],
-  );
-
-  // ── Pagination ────────────────────────────────────────────────────────────
-  const pageNumbers = useMemo(() => {
-    const total = totalPages;
-    const current = currentPage;
-    const delta = 2;
-    const pages: (number | '...')[] = [];
-    for (let i = 1; i <= total; i++) {
-      if (i === 1 || i === total || (i >= current - delta && i <= current + delta)) {
-        pages.push(i);
-      } else if (pages[pages.length - 1] !== '...') {
-        pages.push('...');
-      }
-    }
-    return pages;
-  }, [totalPages, currentPage]);
-
-  const goToPage = useCallback(
-    (p: number) => {
-      const clamped = Math.max(1, Math.min(p, totalPages));
-      setCurrentPage(clamped);
-      const state: PaginationState = { page: clamped, pageSize, total: totalRows };
-      opts.onPageChange?.(state);
-      scrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-    },
-    [totalPages, pageSize, totalRows, opts.onPageChange],
-  );
-
-  // ── Server-side fetch ─────────────────────────────────────────────────────
+  // Measure the rendered tracks so sticky columns remain anchored when column widths,
+  // responsive layout, or row actions change.
   useEffect(() => {
-    if (!opts.serverSide || !opts.fetchRows) return;
-    const params: ServerSideParams = {
-      page: currentPage,
-      pageSize,
-      sortField: sortColumns[0]?.field ?? null,
-      sortDir: sortColumns[0]?.direction ?? null,
-      sorts: sortColumns,
-      filters: activeFilters,
+    const grid = gridContainerRef.current;
+    if (!grid || !hasPinnedColumns) {
+      return;
+    }
+
+    const measure = () => {
+      const headerCells = new Map(
+        Array.from(
+          grid.querySelectorAll<HTMLElement>('.sp-datagrid__header-row [data-sp-datagrid-column]'),
+        ).flatMap((cell) => {
+          const key = cell.dataset.spDatagridColumn;
+          return key ? [[key, cell] as const] : [];
+        }),
+      );
+      const widthFor = (column: DatagridColumn<T>) => {
+        const renderedWidth = headerCells.get(column.key)?.getBoundingClientRect().width ?? 0;
+        if (renderedWidth > 0) return renderedWidth;
+
+        const configured = columnWidths.get(column.key) ?? column.width;
+        const width = typeof configured === 'number' ? configured : defaultColumnWidth;
+        return Math.min(
+          column.maxWidth ?? DEFAULT_MAX_COLUMN_WIDTH,
+          Math.max(column.minWidth ?? DEFAULT_MIN_COLUMN_WIDTH, width),
+        );
+      };
+
+      const next = new Map<string, DatagridPinnedColumnOffset>();
+      let left =
+        (rowDetail ? 40 : 0) +
+        (hasLeadingRowActions ? Math.max(32, leadingRowActionsWidth) : 0) +
+        (isRowReorder ? 32 : 0) +
+        (effectiveSelectionMode !== 'none' ? 40 : 0) +
+        (showRowNumbers ? DEFAULT_ROW_NUMBER_WIDTH : 0);
+
+      for (const column of visibleColumns) {
+        const pin = columnPinsProp?.[column.key] ?? column.pinned;
+        if (pin === 'left') {
+          next.set(column.key, { left });
+          left += widthFor(column);
+        }
+      }
+
+      const actionsHeader = grid.querySelector<HTMLElement>('.sp-datagrid__actions-header');
+      let right = showRowEditActions
+        ? actionsHeader?.getBoundingClientRect().width || DEFAULT_ROW_ACTIONS_WIDTH
+        : 0;
+      for (const column of [...visibleColumns].reverse()) {
+        const pin = columnPinsProp?.[column.key] ?? column.pinned;
+        if (pin === 'right') {
+          next.set(column.key, { right });
+          right += widthFor(column);
+        }
+      }
+
+      setPinnedColumnOffsets((previous) => {
+        const unchanged =
+          previous.size === next.size &&
+          [...next].every(([key, offset]) => {
+            const current = previous.get(key);
+            return current?.left === offset.left && current?.right === offset.right;
+          });
+        return unchanged ? previous : next;
+      });
     };
-    setLoading(true);
-    opts
-      .fetchRows(params)
-      .then((result) => {
-        setLocalRowOrder(result.rows as T[]);
-        setServerTotal(result.total);
-      })
-      .catch((e) => console.error('Server fetch error', e))
-      .finally(() => setLoading(false));
-  }, [opts.serverSide, opts.fetchRows, currentPage, pageSize, sortColumns, activeFilters]);
 
-  // ── Sort ──────────────────────────────────────────────────────────────────
-  const applySortColumns = useCallback(
-    (entries: SortEntry[]) => {
-      setSortColumns(entries);
-      const sortMap = new Map(entries.map((s) => [s.field, s.direction as SortDirection]));
-      setColumnStates((s) =>
-        s.map((cs) => ({ ...cs, sortDirection: sortMap.get(cs.field) ?? null })),
-      );
-    },
-    [],
-  );
+    measure();
+    if (typeof ResizeObserver === 'undefined') return;
 
-  const onHeaderClick = useCallback(
-    (col: ColumnDef<T>, event?: React.MouseEvent) => {
-      if (!col.sortable) return;
-      const multi = event?.ctrlKey || event?.metaKey;
-      const cols = sortColumns;
-      const existing = cols.find((s) => s.field === col.field);
-      let next: SortEntry[];
-
-      if (multi) {
-        if (!existing) {
-          next = [...cols, { field: col.field, direction: 'asc' }];
-        } else if (existing.direction === 'asc') {
-          next = cols.map((s) =>
-            s.field === col.field ? { ...s, direction: 'desc' as const } : s,
-          );
-        } else {
-          next = cols.filter((s) => s.field !== col.field);
-        }
-      } else {
-        const cur = existing?.direction ?? null;
-        const dir: SortDirection = cur === null ? 'asc' : cur === 'asc' ? 'desc' : null;
-        next = dir ? [{ field: col.field, direction: dir }] : [];
-      }
-
-      applySortColumns(next);
-      if (opts.pagination) setCurrentPage(1);
-      const sortDir = next.find((s) => s.field === col.field)?.direction ?? null;
-      opts.onSortChange?.({ field: col.field, direction: sortDir });
-    },
-    [sortColumns, applySortColumns, opts.pagination, opts.onSortChange],
-  );
-
-  const getSortDir = useCallback(
-    (f: string): SortDirection => sortColumns.find((s) => s.field === f)?.direction ?? null,
-    [sortColumns],
-  );
-
-  const getSortIndex = useCallback(
-    (f: string): number => {
-      const idx = sortColumns.findIndex((s) => s.field === f);
-      return idx >= 0 ? idx + 1 : 0;
-    },
-    [sortColumns],
-  );
-
-  const isMultiSort = sortColumns.length > 1;
-
-  // ── Selection ─────────────────────────────────────────────────────────────
-  const isSelected = useCallback(
-    (row: T): boolean => selectedIds.has(rowId(row)),
-    [selectedIds],
-  );
-
-  const toggleSelectAll = useCallback(() => {
-    if (allSelected) {
-      setSelectedIds(new Set());
-    } else {
-      setSelectedIds(new Set(sortedRows.map((r) => rowId(r))));
-    }
-  }, [allSelected, sortedRows]);
-
-  const onCheckboxClick = useCallback(
-    (e: React.MouseEvent, row: T, index: number) => {
-      e.stopPropagation();
-      const mode = opts.selectionMode ?? 'none';
-      if (mode === 'none') return;
-      const id = rowId(row);
-      if (mode === 'single') {
-        setSelectedIds((s) => {
-          const n = new Set(s);
-          if (n.has(id)) n.delete(id);
-          else {
-            n.clear();
-            n.add(id);
-          }
-          return n;
-        });
-      } else {
-        setSelectedIds((s) => {
-          const n = new Set(s);
-          n.has(id) ? n.delete(id) : n.add(id);
-          return n;
-        });
-      }
-      lastSelIdxRef.current = index;
-    },
-    [opts.selectionMode],
-  );
-
-  const handleRowClick = useCallback(
-    (e: React.MouseEvent, row: T, index: number) => {
-      const mode = opts.selectionMode ?? 'none';
-      if (mode !== 'none') {
-        const id = rowId(row);
-        if (mode === 'single') {
-          setSelectedIds((s) => {
-            const n = new Set<unknown>();
-            if (!s.has(id)) n.add(id);
-            return n;
-          });
-          lastSelIdxRef.current = index;
-        } else if (e.shiftKey && lastSelIdxRef.current >= 0) {
-          const lo = Math.min(lastSelIdxRef.current, index);
-          const hi = Math.max(lastSelIdxRef.current, index);
-          setSelectedIds((s) => {
-            const n = new Set(s);
-            for (let i = lo; i <= hi; i++)
-              if (sortedRows[i]) n.add(rowId(sortedRows[i]));
-            return n;
-          });
-        } else if (e.ctrlKey || e.metaKey) {
-          setSelectedIds((s) => {
-            const n = new Set(s);
-            n.has(id) ? n.delete(id) : n.add(id);
-            return n;
-          });
-          lastSelIdxRef.current = index;
-        } else {
-          setSelectedIds((s) => {
-            if (s.size === 1 && s.has(id)) return new Set();
-            return new Set([id]);
-          });
-          lastSelIdxRef.current = index;
-        }
-      }
-      opts.onRowClick?.(row, index);
-    },
-    [opts.selectionMode, opts.onRowClick, sortedRows],
-  );
-
-  // ── Selection change effect ───────────────────────────────────────────────
-  useEffect(() => {
-    const sel = sortedRows.filter((r) => selectedIds.has(rowId(r)));
-    opts.onSelectionChange?.(sel);
-  }, [selectedIds]);
-
-  // ── Filter ────────────────────────────────────────────────────────────────
-  const getFilterMode = useCallback(
-    (col: ColumnDef<T>): 'inline' | 'popover' =>
-      col.filterMode ?? opts.filterMode ?? 'popover',
-    [opts.filterMode],
-  );
-
-  const hasFilter = useCallback(
-    (field: string): boolean => field in activeFilters,
-    [activeFilters],
-  );
-
-  const getFilter = useCallback(
-    (field: string): ColumnFilter | null => activeFilters[field] ?? null,
-    [activeFilters],
-  );
-
-  const onFilterApply = useCallback(
-    (field: string, filter: ColumnFilter) => {
-      setActiveFilters((f) => ({ ...f, [field]: filter }));
-      if (opts.pagination) setCurrentPage(1);
-    },
-    [opts.pagination],
-  );
-
-  const onFilterClear = useCallback((field: string) => {
-    setActiveFilters((f) => {
-      const n = { ...f };
-      delete n[field];
-      return n;
+    const observer = new ResizeObserver(measure);
+    observer.observe(grid);
+    grid.querySelectorAll<HTMLElement>('.sp-datagrid__header-row [data-sp-datagrid-column]').forEach((cell) => {
+      observer.observe(cell);
     });
-  }, []);
+    const actionsHeader = grid.querySelector<HTMLElement>('.sp-datagrid__actions-header');
+    if (actionsHeader) observer.observe(actionsHeader);
+    return () => observer.disconnect();
+  }, [
+    columnPinsProp,
+    columnWidths,
+    defaultColumnWidth,
+    effectiveSelectionMode,
+    hasLeadingRowActions,
+    hasPinnedColumns,
+    isRowReorder,
+    leadingRowActionsWidth,
+    rowDetail,
+    showRowEditActions,
+    showRowNumbers,
+    visibleColumns,
+  ]);
 
-  const clearAllFilters = useCallback(() => {
-    setActiveFilters({});
-  }, []);
+  const pinnedColumnStyle = (key: string, pin: DatagridColumnPin | undefined): CSSProperties | undefined => {
+    const offset = pinnedColumnOffsets.get(key);
+    if (pin === 'left' && offset?.left !== undefined) return { insetInlineStart: offset.left };
+    if (pin === 'right' && offset?.right !== undefined) return { insetInlineEnd: offset.right };
+    return undefined;
+  };
 
-  const onInlineFilterInput = useCallback(
-    (field: string, value: string) => {
-      if (value === '') onFilterClear(field);
-      else onFilterApply(field, { operator: 'contains', value });
+  const ariaColumnOffset =
+    (rowDetail ? 1 : 0) +
+    (hasLeadingRowActions ? 1 : 0) +
+    (isRowReorder ? 1 : 0) +
+    (effectiveSelectionMode !== 'none' ? 1 : 0) +
+    (showRowNumbers ? 1 : 0);
+  const ariaColumnCount = ariaColumnOffset + visibleColumns.length + (showRowEditActions ? 1 : 0);
+
+  const gridColumnFor = (column: DatagridColumn<T>): string => {
+    if (columnVirtualization) {
+      const renderedIndex = renderedColumns.indexOf(column);
+      const beforeSpacerOffset = columnVirtualLayout.beforeWidth > 0 ? 1 : 0;
+      return String(ariaColumnOffset + beforeSpacerOffset + renderedIndex + 1);
+    }
+    return String(visibleColumns.indexOf(column) + ariaColumnOffset + 1);
+  };
+
+  // Aggregates calculation for footer
+  const footerAggregates = useMemo(() => {
+    const map = new Map<string, { label: string; value: unknown; formatted: string }>();
+    for (const col of visibleColumns) {
+      if (col.aggregate) {
+        const values = sortedRows.map((r) => getCellValue(r, col));
+        map.set(col.key, computeAggregate(col.aggregate, values, sortedRows, col, 'footer'));
+      }
+    }
+    return map;
+  }, [visibleColumns, sortedRows]);
+
+  const hasFooterAggregates = footer || footerAggregates.size > 0;
+  const footerLabelColumnKey = visibleColumns.find((column) => !footerAggregates.has(column.key))?.key;
+
+  // Selection handlers
+  const handleToggleSelectAll = useCallback(() => {
+    if (effectiveSelectionMode !== 'multiple') return;
+    const allSelected = sortedRows.length > 0 && activeSelection.length === sortedRows.length;
+    const nextSelection = allSelected ? [] : [...sortedRows];
+    setInternalSelection(nextSelection);
+    onSelectionChange?.({
+      selectedRows: nextSelection,
+      changedRow: null,
+      selected: !allSelected,
+    });
+    onSelectedRowsChange?.(nextSelection);
+  }, [effectiveSelectionMode, sortedRows, activeSelection, onSelectionChange, onSelectedRowsChange]);
+
+  const handleToggleRowSelection = useCallback(
+    (row: T) => {
+      if (effectiveSelectionMode === 'single') {
+        const isCurrent = activeSelection.length === 1 && activeSelection[0] === row;
+        const next = isCurrent ? [] : [row];
+        setInternalSelection(next);
+        onSelectionChange?.({
+          selectedRows: next,
+          changedRow: row,
+          selected: !isCurrent,
+        });
+        onSelectedRowsChange?.(next);
+        if (dataContextAdapter) {
+          dataContextAdapter.navigateTo(row);
+        }
+      } else if (effectiveSelectionMode === 'multiple') {
+        const exists = activeSelection.includes(row);
+        const next = exists ? activeSelection.filter((r) => r !== row) : [...activeSelection, row];
+        setInternalSelection(next);
+        onSelectionChange?.({
+          selectedRows: next,
+          changedRow: row,
+          selected: !exists,
+        });
+        onSelectedRowsChange?.(next);
+      }
     },
-    [onFilterClear, onFilterApply],
+    [effectiveSelectionMode, activeSelection, onSelectionChange, onSelectedRowsChange, dataContextAdapter],
   );
 
-  // ── Filter change effect ──────────────────────────────────────────────────
-  useEffect(() => {
-    opts.onFilterChange?.(activeFilters);
-  }, [activeFilters]);
-
-  // ── Column state change effect ────────────────────────────────────────────
-  useEffect(() => {
-    opts.onColumnStateChange?.(columnStates);
-  }, [columnStates]);
-
-  // ── Column resize ─────────────────────────────────────────────────────────
-  const onColResize = useCallback((field: string, w: number) => {
-    setColumnStates((s) => s.map((cs) => (cs.field === field ? { ...cs, width: w } : cs)));
-  }, []);
-
-  // ── Column visibility ─────────────────────────────────────────────────────
-  const onVisibilityChange = useCallback(
-    (c: { field: string; visible: boolean }) => {
-      setColumnStates((s) =>
-        s.map((cs) => (cs.field === c.field ? { ...cs, visible: c.visible } : cs)),
-      );
+  const handleToggleGroupSelection = useCallback(
+    (rows: readonly T[]) => {
+      if (!groupSelection || effectiveSelectionMode !== 'multiple') return;
+      const selectedCount = rows.filter((row) => activeSelection.includes(row)).length;
+      const selecting = selectedCount !== rows.length;
+      const next = selecting
+        ? [...activeSelection, ...rows.filter((row) => !activeSelection.includes(row))]
+        : activeSelection.filter((row) => !rows.includes(row));
+      setInternalSelection(next);
+      onSelectionChange?.({
+        selectedRows: next,
+        changedRow: null,
+        selected: selecting,
+      });
+      onSelectedRowsChange?.(next);
     },
-    [],
+    [activeSelection, effectiveSelectionMode, groupSelection, onSelectedRowsChange, onSelectionChange],
   );
 
-  // ── Column reorder ────────────────────────────────────────────────────────
-  const applyColReorder = useCallback(
-    (fields: string[]) => {
-      setColumnStates((s) =>
-        s.map((cs) => ({ ...cs, order: fields.indexOf(cs.field) })),
-      );
-      opts.onColReorder?.(fields);
+  // Sorting handlers
+  const handleSortColumn = useCallback(
+    (key: string) => {
+      const col = visibleColumns.find((c) => c.key === key);
+      if (!col || col.sortable === false) return;
+
+      let nextSorts: DatagridSort[] = [];
+      const existing = activeSorts.find((s) => s.key === key);
+
+      let nextDir: DatagridSortDirection = 'asc';
+      if (existing) {
+        if (existing.direction === 'asc') nextDir = 'desc';
+        else if (existing.direction === 'desc') nextDir = null;
+      }
+
+      if (multiSort) {
+        if (nextDir === null) {
+          nextSorts = activeSorts.filter((s) => s.key !== key);
+        } else if (existing) {
+          nextSorts = activeSorts.map((s) => (s.key === key ? { key, direction: nextDir as 'asc' | 'desc' } : s));
+        } else {
+          nextSorts = [...activeSorts, { key, direction: nextDir }];
+        }
+      } else {
+        if (nextDir !== null) {
+          nextSorts = [{ key, direction: nextDir }];
+        }
+      }
+
+      setInternalSorts(nextSorts);
+      onSortChange?.({ key, direction: nextDir });
+      onSortsChange?.(nextSorts);
     },
-    [opts.onColReorder],
-  );
-
-  const onHdrDragStart = useCallback(
-    (e: React.DragEvent, field: string) => {
-      if (!opts.colReorder) return;
-      setHdrDragSrc(field);
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', field);
-    },
-    [opts.colReorder],
-  );
-
-  const onHdrDragOver = useCallback(
-    (e: React.DragEvent, field: string) => {
-      if (!hdrDragSrc || hdrDragSrc === field) return;
-      e.preventDefault();
-      setHdrDragOver(field);
-      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-      setHdrDragOverPos(e.clientX < rect.left + rect.width / 2 ? 'left' : 'right');
-    },
-    [hdrDragSrc],
-  );
-
-  const onHdrDrop = useCallback(
-    (e: React.DragEvent, field: string) => {
-      e.preventDefault();
-      const src = e.dataTransfer?.getData('text/plain');
-      setHdrDragOver(null);
-      setHdrDragSrc(null);
-      if (!src || src === field) return;
-      const fields = [...columnStates]
-        .sort((a, b) => a.order - b.order)
-        .map((s) => s.field);
-      const from = fields.indexOf(src);
-      if (from === -1) return;
-      fields.splice(from, 1);
-      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-      const isBefore = e.clientX < rect.left + rect.width / 2;
-      const to = fields.indexOf(field);
-      if (to === -1) return;
-      fields.splice(isBefore ? to : to + 1, 0, src);
-      applyColReorder(fields);
-    },
-    [columnStates, applyColReorder],
-  );
-
-  // ── Cell editing ──────────────────────────────────────────────────────────
-  const isCellEditing = useCallback(
-    (row: T, field: string): boolean => {
-      const a = activeCellEdit;
-      return a !== null && a.rowId === rowId(row) && a.field === field;
-    },
-    [activeCellEdit],
-  );
-
-  const isRowEditing = useCallback(
-    (row: T): boolean => activeEditRowId === rowId(row),
-    [activeEditRowId],
-  );
-
-  const getEditorConfig = useCallback(
-    (field: string): CellEditorConfig => columnMap.get(field)?.editor ?? {},
-    [columnMap],
+    [visibleColumns, activeSorts, multiSort, onSortChange, onSortsChange],
   );
 
   const startCellEdit = useCallback(
-    (row: T, field: string, triggerKey: string | null) => {
-      setActiveCellEdit({ rowId: rowId(row), field, triggerKey });
+    (rowIndex: number, key: string, initialValue?: unknown, targetRow?: T) => {
+      const row = targetRow ?? sortedRows[rowIndex];
+      const column = visibleColumns.find((candidate) => candidate.key === key);
+      if (!row || !column || editMode !== 'cell') return;
+      const editable = isRowEditable ? isRowEditable(row) : true;
+      const cellEditable =
+        editable &&
+        (typeof column.editable === 'function' ? column.editable(row) : column.editable === true) &&
+        (!isCellEditable || isCellEditable(row, column)) &&
+        !(column.readonly === true || (typeof column.readonly === 'function' && column.readonly(row))) &&
+        !(isCellReadonly?.(row, column));
+      if (!cellEditable) return;
+      setEditingCell({ rowIndex, key });
+      setCellDraftValue(editorValueFor(initialValue ?? getCellValue(row, column), row, column));
+      setCellValidationErrors([]);
     },
-    [],
+    [sortedRows, visibleColumns, editMode, isRowEditable, isCellEditable, isCellReadonly],
   );
 
-  const onCellEditCommit = useCallback(
-    (row: T, field: string, newValue: unknown) => {
-      const oldValue = getCellValue(row, field);
-      const id = rowId(row);
-      const event: CellEditEvent<T> = {
-        field,
+  const commitCellDraft = useCallback(
+    (row: T, rowIndex: number, column: DatagridColumn<T>, draft: unknown): boolean => {
+      const value = parsedEditorValue(draft, row, column);
+      const errors = validateValue(value, row, column);
+      if (errors.length > 0) {
+        setCellValidationErrors(errors);
+        const event = { row, rowIndex, column, key: column.key, value, errors };
+        onValidationError?.(event);
+        onCellValidationFailed?.(event);
+        if (preventInvalidCommit) return false;
+      }
+
+      onCellEditCommit?.({
         row,
-        oldValue,
-        newValue,
-        accept: () => {
-          setEditedRows((m) => {
-            const n = new Map(m);
-            const base = n.get(id) ?? row;
-            n.set(id, applyValueToRow(base, field, newValue));
-            return n;
-          });
-          opts.onCellEdit?.(event);
-        },
-        cancel: () => {},
-      };
-      event.accept();
-      setActiveCellEdit(null);
-    },
-    [opts.onCellEdit],
-  );
-
-  const onCellEditCancel = useCallback(() => {
-    setActiveCellEdit(null);
-  }, []);
-
-  const onCellClick = useCallback(
-    (e: React.MouseEvent, value: unknown, field: string, row: T) => {
-      e.stopPropagation();
-      opts.onCellClick?.(value, field, row);
-      if (opts.editMode === 'cell' && opts.editTrigger === 'click') {
-        const col = columnMap.get(field);
-        if (col?.editable) startCellEdit(row, field, null);
-      }
-    },
-    [opts.editMode, opts.editTrigger, opts.onCellClick, columnMap, startCellEdit],
-  );
-
-  const onCellDblClick = useCallback(
-    (e: React.MouseEvent, field: string, row: T) => {
-      e.stopPropagation();
-      if (
-        opts.editMode === 'cell' &&
-        (opts.editTrigger ?? 'dblclick') === 'dblclick'
-      ) {
-        const col = columnMap.get(field);
-        if (col?.editable) startCellEdit(row, field, null);
-      }
-    },
-    [opts.editMode, opts.editTrigger, columnMap, startCellEdit],
-  );
-
-  const onRowDblClick = useCallback(
-    (e: React.MouseEvent, row: T, index: number) => {
-      opts.onRowDblClick?.(row, index);
-      if (opts.editMode === 'row') {
-        setActiveEditRowId(rowId(row));
-        if (!rowDraftsRef.current.has(rowId(row))) {
-          const draft: RowDraft<T> = new Map();
-          columns.forEach((col) => {
-            if (col.editable) {
-              const v = getCellValue(row, col.field);
-              draft.set(col.field, { oldValue: v, newValue: v, row });
-            }
-          });
-          rowDraftsRef.current.set(rowId(row), draft);
-        }
-      }
-    },
-    [opts.editMode, opts.onRowDblClick, columns],
-  );
-
-  const commitRowEdit = useCallback(
-    (row: T) => {
-      const id = rowId(row);
-      const draft = rowDraftsRef.current.get(id);
-      if (!draft) return;
-      const changes: Record<string, { oldValue: unknown; newValue: unknown }> = {};
-      draft.forEach((v, f) => {
-        changes[f] = { oldValue: v.oldValue, newValue: v.newValue };
+        rowIndex,
+        column,
+        key: column.key,
+        previousValue: getCellValue(row, column),
+        value,
       });
-      const event: RowEditEvent<T> = {
-        row,
-        changes,
-        accept: () => {
-          setEditedRows((m) => {
-            const n = new Map(m);
-            let updated = n.get(id) ?? row;
-            draft.forEach((v, f) => {
-              updated = applyValueToRow(updated, f, v.newValue);
-            });
-            n.set(id, updated);
-            return n;
-          });
-          rowDraftsRef.current.delete(id);
-          setActiveEditRowId(null);
-          opts.onRowEdit?.(event);
-        },
-        cancel: () => {
-          rowDraftsRef.current.delete(id);
-          setActiveEditRowId(null);
-        },
-      };
-      event.accept();
+      dataContextAdapter?.patch(row, { [column.key]: value });
+      setEditingCell(null);
+      setCellDraftValue(undefined);
+      setCellValidationErrors([]);
+      return true;
     },
-    [opts.onRowEdit],
+    [dataContextAdapter, onCellEditCommit, onCellValidationFailed, onValidationError, preventInvalidCommit],
   );
 
-  const cancelRowEdit = useCallback((row: T) => {
-    rowDraftsRef.current.delete(rowId(row));
-    setActiveEditRowId(null);
-  }, []);
-
-  const onRowDraftChange = useCallback(
-    (row: T, field: string, newValue: unknown) => {
-      const id = rowId(row);
-      const draft = rowDraftsRef.current.get(id);
-      if (!draft) return;
-      const existing = draft.get(field);
-      draft.set(
-        field,
-        existing
-          ? { ...existing, newValue }
-          : { oldValue: getCellValue(row, field), newValue, row },
-      );
+  const startRowEdit = useCallback(
+    (rowIndex: number, targetRow?: T) => {
+      const row = targetRow ?? sortedRows[rowIndex];
+      if (!row || editMode !== 'row' || (isRowEditable && !isRowEditable(row))) return;
+      const drafts = new Map<string, unknown>();
+      for (const column of visibleColumns) {
+        drafts.set(column.key, editorValueFor(getCellValue(row, column), row, column));
+      }
+      setEditingRowIndex(rowIndex);
+      setRowDrafts(drafts);
     },
-    [],
+    [sortedRows, editMode, isRowEditable, visibleColumns],
   );
 
-  // ── Keyboard navigation ───────────────────────────────────────────────────
-  const onCellKeydown = useCallback(
-    (e: React.KeyboardEvent, row: T, field: string) => {
-      if (isCellEditing(row, field)) return;
+  const commitRowDraft = useCallback(
+    (row: T, rowIndex: number, drafts: ReadonlyMap<string, unknown>): boolean => {
+      const changes: Record<string, unknown> = {};
+      const validationEvents: DatagridValidationEvent<T>[] = [];
+      for (const column of visibleColumns) {
+        const editable =
+          (typeof column.editable === 'function' ? column.editable(row) : column.editable === true) &&
+          !(column.readonly === true || (typeof column.readonly === 'function' && column.readonly(row))) &&
+          !(isCellReadonly?.(row, column));
+        if (!editable || !drafts.has(column.key)) continue;
+        const value = parsedEditorValue(drafts.get(column.key), row, column);
+        const errors = validateValue(value, row, column);
+        if (errors.length > 0) {
+          const event = { row, rowIndex, column, key: column.key, value, errors };
+          validationEvents.push(event);
+          onValidationError?.(event);
+        }
+        changes[column.key] = value;
+      }
+      if (validationEvents.length > 0) {
+        onRowValidationFailed?.(validationEvents);
+        if (preventInvalidCommit) return false;
+      }
+      onRowEditCommit?.({ row, rowIndex, changes });
+      dataContextAdapter?.patch(row, changes);
+      setEditingRowIndex(null);
+      setRowDrafts(new Map());
+      return true;
+    },
+    [dataContextAdapter, isCellReadonly, onRowEditCommit, onRowValidationFailed, onValidationError, preventInvalidCommit, visibleColumns],
+  );
 
-      if (opts.keyboardNav && activeCellEdit === null) {
-        if (
-          ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'].includes(
-            e.key,
-          )
-        ) {
-          e.preventDefault();
-          const cols = visibleColumns;
-          const rows = sortedRows;
-          const colIdx = cols.findIndex((c) => c.field === field);
-          const rowIdx = rows.findIndex((r) => rowId(r) === rowId(row));
-          let nc = colIdx,
-            nr = rowIdx;
-          if (e.key === 'ArrowRight' || (e.key === 'Tab' && !e.shiftKey)) {
-            if (colIdx < cols.length - 1) nc = colIdx + 1;
-            else if (rowIdx < rows.length - 1) {
-              nc = 0;
-              nr = rowIdx + 1;
-            }
-          } else if (e.key === 'ArrowLeft' || (e.key === 'Tab' && e.shiftKey)) {
-            if (colIdx > 0) nc = colIdx - 1;
-            else if (rowIdx > 0) {
-              nc = cols.length - 1;
-              nr = rowIdx - 1;
-            }
-          } else if (e.key === 'ArrowDown' || e.key === 'Enter') {
-            if (rowIdx < rows.length - 1) nr = rowIdx + 1;
-          } else if (e.key === 'ArrowUp') {
-            if (rowIdx > 0) nr = rowIdx - 1;
-          }
-          if (nc !== colIdx || nr !== rowIdx) {
-            const nRow = rows[nr];
-            const nField = cols[nc]?.field;
-            if (nRow && nField) {
-              queueMicrotask(() => {
-                const sel = `[data-cell-id="${String(rowId(nRow))}-${nField}"]`;
-                scrollRef.current?.querySelector<HTMLElement>(sel)?.focus();
-              });
-            }
-          }
+  const saveDataContextChanges = useCallback(() => {
+    if (!dataContextAdapter) return;
+    void dataContextAdapter.context.save().then(
+      () => onDataContextSaveComplete?.(),
+      (error: unknown) => onDataContextSaveError?.(error),
+    );
+  }, [dataContextAdapter, onDataContextSaveComplete, onDataContextSaveError]);
+
+  const createNewRowDraft = useCallback((): T => ({
+    ...((newRowFactory?.() ?? {}) as T),
+    ...(dataContextAdapter?.newRowDefaults ?? {}),
+  }), [dataContextAdapter, newRowFactory]);
+
+  const beginNewRowEdit = useCallback(() => {
+    setNewRowDraft((current) => current ?? createNewRowDraft());
+    setNewRowEditing(true);
+  }, [createNewRowDraft]);
+
+  const commitNewRowCell = useCallback(
+    (column: DatagridColumn<T>, value: unknown) => {
+      const draft = newRowDraft ?? createNewRowDraft();
+      const parsed = parsedEditorValue(value, draft, column);
+      const rowIndex = sortedRows.length;
+      const errors = validateValue(parsed, draft, column);
+      if (errors.length > 0) {
+        setCellValidationErrors(errors);
+        const event = { row: draft, rowIndex, column, key: column.key, value: parsed, errors };
+        onValidationError?.(event);
+        onCellValidationFailed?.(event);
+        if (preventInvalidCommit) return;
+      }
+      const nextRow = { ...draft, [column.key]: parsed } as T;
+      if (dataContextAdapter) {
+        dataContextAdapter.add(nextRow);
+      } else {
+        onNewRowCommit?.({
+          row: nextRow,
+          rowIndex,
+          column,
+          key: column.key,
+          value: parsed,
+        });
+      }
+      setNewRowDraft(createNewRowDraft());
+      setCellValidationErrors([]);
+      setNewRowEditing(false);
+    },
+    [createNewRowDraft, dataContextAdapter, newRowDraft, onCellValidationFailed, onNewRowCommit, onValidationError, preventInvalidCommit, sortedRows.length],
+  );
+
+  // Imperative handle
+  useImperativeHandle(
+    ref,
+    () => ({
+      sortBy(key: string, direction: DatagridSortDirection) {
+        const next = direction ? [{ key, direction }] : [];
+        setInternalSorts(next);
+        onSortChange?.({ key, direction });
+        onSortsChange?.(next);
+      },
+      filterBy(key: string, values: readonly unknown[]) {
+        const col = visibleColumns.find((c) => c.key === key);
+        if (!col) return;
+        const next = activeColumnFilters.filter((f) => f.key !== key);
+        if (values.length > 0) {
+          next.push({ key, column: col, values });
+        }
+        setInternalColumnFilters(next);
+        onFilterChange?.(next);
+      },
+      filterByCondition(key: string, condition: DatagridDynamicFilterCondition | null) {
+        const col = visibleColumns.find((c) => c.key === key);
+        if (!col) return;
+        const next = activeColumnFilters.filter((f) => f.key !== key);
+        if (condition) {
+          next.push({ key, column: col, values: [], condition });
+        }
+        setInternalColumnFilters(next);
+        onFilterChange?.(next);
+      },
+      setRowDetailExpanded(row: T, expanded: boolean) {
+        const id = resolveTrackBy(trackBy, row, 0);
+        {
+          const next = new Set(expandedRowDetails);
+          if (expanded) next.add(id);
+          else next.delete(id);
+          updateExpandedRowDetails(next);
+        }
+      },
+      toggleRowDetails(row: T) {
+        const id = resolveTrackBy(trackBy, row, 0);
+        {
+          const next = new Set(expandedRowDetails);
+          if (next.has(id)) next.delete(id);
+          else next.add(id);
+          updateExpandedRowDetails(next);
+        }
+      },
+      clearFilters() {
+        setInternalColumnFilters([]);
+        setInternalSearchQuery('');
+        onFilterChange?.([]);
+        onSearchQueryChange?.('');
+      },
+      goToPage(page: number) {
+        const bounded = Math.max(1, Math.min(page, totalPages));
+        if (virtualPaging) {
+          const direction: 'previous' | 'next' = bounded < activePage ? 'previous' : 'next';
+          const request = { page: bounded, pageSize: activePageSize, direction, trigger: 'api' as const };
+          (onVirtualPageRequest ?? virtualPageRequest)?.(request);
           return;
         }
-      }
+        setInternalPage(bounded);
+        onPageChange?.({
+          page: bounded,
+          pageSize: activePageSize,
+          totalRows: totalRowsCount,
+          totalPages,
+        });
+      },
+      previousPage() {
+        if (activePage > 1 && (!virtualPaging || virtualHasPreviousPage !== false)) {
+          const bounded = activePage - 1;
+          if (virtualPaging) {
+            const request = { page: bounded, pageSize: activePageSize, direction: 'previous' as const, trigger: 'api' as const };
+            (onVirtualPageRequest ?? virtualPageRequest)?.(request);
+            return;
+          }
+          setInternalPage(bounded);
+          onPageChange?.({
+            page: bounded,
+            pageSize: activePageSize,
+            totalRows: totalRowsCount,
+            totalPages,
+          });
+        }
+      },
+      nextPage() {
+        if (activePage < totalPages || (virtualPaging && virtualHasNextPage !== false)) {
+          const bounded = activePage + 1;
+          if (virtualPaging) {
+            const request = { page: bounded, pageSize: activePageSize, direction: 'next' as const, trigger: 'api' as const };
+            (onVirtualPageRequest ?? virtualPageRequest)?.(request);
+            return;
+          }
+          setInternalPage(bounded);
+          onPageChange?.({
+            page: bounded,
+            pageSize: activePageSize,
+            totalRows: totalRowsCount,
+            totalPages,
+          });
+        }
+      },
+      clearSelection() {
+        setInternalSelection([]);
+        onSelectionChange?.({
+          selectedRows: [],
+          changedRow: null,
+          selected: false,
+        });
+        onSelectedRowsChange?.([]);
+      },
+      addDataContextRow() {
+        if (dataContextAdapter) {
+          const added = dataContextAdapter.add({});
+          if (added) {
+            setInternalSelection([added]);
+          }
+        }
+      },
+      deleteDataContextSelection() {
+        if (dataContextAdapter && activeSelection.length > 0) {
+          dataContextAdapter.delete(activeSelection);
+          setInternalSelection([]);
+        }
+      },
+      saveDataContextChanges() {
+        saveDataContextChanges();
+      },
+      discardDataContextChanges() {
+        if (dataContextAdapter) {
+          dataContextAdapter.discardChanges();
+        }
+      },
+      autoSizeColumn(key: string) {
+        setColumnWidths((prev) => {
+          const next = new Map(prev);
+          next.set(key, 'auto');
+          return next;
+        });
+      },
+      autoSizeColumns() {
+        setColumnWidths(new Map(visibleColumns.map((c) => [c.key, 'auto'])));
+      },
+      resetColumnOrder() {
+        const order = columnsProp.map((c) => c.key);
+        setInternalColumnOrder(order);
+        onColumnOrderChange?.(order);
+      },
+      setColumnVisible(key: string, visible: boolean) {
+        setInternalHiddenColumns((prev) => {
+          const next = new Set(prev);
+          if (visible) next.delete(key);
+          else next.add(key);
+          const visibleKeys = columnsProp.filter((c) => !next.has(c.key)).map((c) => c.key);
+          const hiddenKeys = [...next];
+          onColumnVisibilityChange?.({ visibleKeys, hiddenKeys });
+          return next;
+        });
+      },
+      setGrouping(keys: readonly string[]) {
+        setInternalGroupBy(keys);
+        onGroupByChange?.(keys);
+      },
+      clearGrouping() {
+        setInternalGroupBy([]);
+        onGroupByChange?.([]);
+      },
+      startCellEdit(rowIndex: number, key: string) {
+        startCellEdit(rowIndex, key);
+      },
+      startRowEdit(rowIndex: number) {
+        startRowEdit(rowIndex);
+      },
+      commitCellEdit() {
+        if (!editingCell) return;
+        const { rowIndex, key } = editingCell;
+        const targetRow = sortedRows[rowIndex];
+        const col = visibleColumns.find((c) => c.key === key);
+        if (!targetRow || !col) return;
 
-      if (opts.editOnType && opts.editMode === 'cell') {
-        const col = columnMap.get(field);
-        if (!col?.editable) return;
-        if (e.ctrlKey || e.metaKey || e.altKey || e.key.length > 1) return;
-        e.preventDefault();
-        startCellEdit(row, field, e.key === 'Backspace' ? '' : e.key);
-      }
-    },
+        commitCellDraft(targetRow, rowIndex, col, cellDraftValue);
+      },
+      commitRowEdit() {
+        if (editingRowIndex === null) return;
+        const targetRow = sortedRows[editingRowIndex];
+        if (!targetRow) return;
+
+        commitRowDraft(targetRow, editingRowIndex, rowDrafts);
+      },
+      cancelEditing() {
+        if (editingCell) {
+          const targetRow = sortedRows[editingCell.rowIndex];
+          if (targetRow) {
+            onEditCancel?.({
+              mode: 'cell',
+              row: targetRow,
+              rowIndex: editingCell.rowIndex,
+              key: editingCell.key,
+            });
+          }
+          setEditingCell(null);
+          setCellDraftValue(undefined);
+          setCellValidationErrors([]);
+        }
+        if (editingRowIndex !== null) {
+          const targetRow = sortedRows[editingRowIndex];
+          if (targetRow) {
+            onEditCancel?.({
+              mode: 'row',
+              row: targetRow,
+              rowIndex: editingRowIndex,
+            });
+          }
+          setEditingRowIndex(null);
+          setRowDrafts(new Map());
+        }
+      },
+    }),
     [
-      isCellEditing,
-      opts.keyboardNav,
-      opts.editOnType,
-      opts.editMode,
-      activeCellEdit,
       visibleColumns,
+      activeColumnFilters,
+      trackBy,
+      totalPages,
+      activePage,
+      activePageSize,
+      totalRowsCount,
       sortedRows,
-      columnMap,
+      dataContextAdapter,
+      columnsProp,
+      editingCell,
+      cellDraftValue,
+      editingRowIndex,
+      rowDrafts,
+      onSortChange,
+      onSortsChange,
+      onFilterChange,
+      onSearchQueryChange,
+      onPageChange,
+      onSelectionChange,
+      onColumnOrderChange,
+      onColumnVisibilityChange,
+      onGroupByChange,
+      onEditCancel,
+      onSelectedRowsChange,
+      onVirtualPageRequest,
+      virtualPageRequest,
+      virtualPaging,
+      virtualHasPreviousPage,
+      virtualHasNextPage,
       startCellEdit,
+      startRowEdit,
+      commitCellDraft,
+      commitRowDraft,
+      saveDataContextChanges,
+      activeSelection,
+      expandedRowDetails,
+      updateExpandedRowDetails,
     ],
   );
 
-  // ── Cell navigate (Tab from editor) ───────────────────────────────────────
-  const onCellEditNavigate = useCallback(
-    (row: T, field: string, dir: 'next' | 'prev') => {
-      const cols = visibleColumns;
-      const rows = sortedRows;
-      const colIdx = cols.findIndex((c) => c.field === field);
-      const rowIdx = rows.findIndex((r) => rowId(r) === rowId(row));
-      let nc = colIdx,
-        nr = rowIdx;
-      if (dir === 'next') {
-        if (colIdx < cols.length - 1) nc = colIdx + 1;
-        else if (rowIdx < rows.length - 1) {
-          nc = 0;
-          nr = rowIdx + 1;
-        }
-      } else {
-        if (colIdx > 0) nc = colIdx - 1;
-        else if (rowIdx > 0) {
-          nc = cols.length - 1;
-          nr = rowIdx - 1;
-        }
-      }
-      const nRow = rows[nr];
-      const nField = cols[nc]?.field;
-      if (!nRow || !nField) return;
-      if (opts.autoEditOnNavigate) {
-        const col = columnMap.get(nField);
-        if (col?.editable) {
-          queueMicrotask(() => startCellEdit(nRow, nField, null));
-          return;
-        }
-      }
-      queueMicrotask(() => {
-        const sel = `[data-cell-id="${String(rowId(nRow))}-${nField}"]`;
-        scrollRef.current?.querySelector<HTMLElement>(sel)?.focus();
-      });
-    },
-    [visibleColumns, sortedRows, opts.autoEditOnNavigate, columnMap, startCellEdit],
-  );
-
-  // ── Cell enter commit ─────────────────────────────────────────────────────
-  const onCellEditEnter = useCallback(
-    (row: T, field: string) => {
-      queueMicrotask(() => {
-        const sel = `[data-cell-id="${String(rowId(row))}-${field}"]`;
-        scrollRef.current?.querySelector<HTMLElement>(sel)?.focus();
-      });
-    },
-    [],
-  );
-
-  // ── Row drag ──────────────────────────────────────────────────────────────
-  const onRowMouseDown = useCallback(
-    (e: React.MouseEvent, absIdx: number) => {
-      if (e.button !== 0) return;
-      e.preventDefault();
-      e.stopPropagation();
-      setDragRowIdx(absIdx);
-      setDropRowIdx(absIdx);
-      setDropPosition('below');
-      setRowDragGhostY(null);
-
-      document.body.style.userSelect = 'none';
-      document.body.style.cursor = 'grabbing';
-
-      const container = scrollRef.current;
-
-      const updateFromClientY = (clientY: number) => {
-        if (!container) return;
-        const containerRect = container.getBoundingClientRect();
-        const relY = clientY - containerRect.top + container.scrollTop;
-        const rows = displayRows;
-        const clampedIdx = Math.max(
-          0,
-          Math.min(rows.length - 1, Math.floor(relY / rowHeight)),
-        );
-        const rowTopY = clampedIdx * rowHeight;
-        const isAbove = relY < rowTopY + rowHeight / 2;
-        setDropPosition(isAbove ? 'above' : 'below');
-        setDropRowIdx(clampedIdx);
-        setRowDragGhostY(isAbove ? rowTopY : rowTopY + rowHeight);
-      };
-
-      const mm = (ev: MouseEvent) => updateFromClientY(ev.clientY);
-      const mu = () => {
-        // Commit drop
-        const from = absIdx;
-        const to = dropRowIdx;
-        if (from !== null && to !== null && from !== to) {
-          const rows = [...sortedRows];
-          const dragged = rows.splice(from, 1)[0];
-          const adjustedTo = to > from ? to - 1 : to;
-          const insertAt = dropPosition === 'below' ? adjustedTo + 1 : adjustedTo;
-          rows.splice(Math.max(0, Math.min(rows.length, insertAt)), 0, dragged);
-          setLocalRowOrder(rows);
-          opts.onRowDrop?.(from, to, rows);
-        }
-        // Cleanup
-        document.removeEventListener('mousemove', mm);
-        document.removeEventListener('mouseup', mu);
-        document.body.style.userSelect = '';
-        document.body.style.cursor = '';
-        setDragRowIdx(null);
-        setDropRowIdx(null);
-        setRowDragGhostY(null);
-      };
-      document.addEventListener('mousemove', mm, { passive: true });
-      document.addEventListener('mouseup', mu, { once: true });
-    },
-    [displayRows, rowHeight, sortedRows, opts.onRowDrop],
-  );
-
-  // ── Grouping ──────────────────────────────────────────────────────────────
-  const toggleGroup = useCallback((groupKey: string) => {
-    setCollapsedGroups((s) => {
-      const next = new Set(s);
-      next.has(groupKey) ? next.delete(groupKey) : next.add(groupKey);
-      return next;
-    });
-  }, []);
-
-  // ── Tree ──────────────────────────────────────────────────────────────────
-  const toggleTreeRow = useCallback((treeId: unknown) => {
-    setExpandedTreeIds((s) => {
-      const next = new Set(s);
-      next.has(treeId) ? next.delete(treeId) : next.add(treeId);
-      return next;
-    });
-  }, []);
-
-  const expandAll = useCallback(() => {
-    const field = opts.treeChildrenField;
-    if (!field) return;
-    const ids = new Set<unknown>();
-    const collect = (rows: T[]) => {
-      rows.forEach((r) => {
-        const children = (r as Record<string, unknown>)[field] as T[] | undefined;
-        if (children?.length) {
-          ids.add(rowId(r));
-          collect(children);
-        }
-      });
-    };
-    collect(mergedRows);
-    setExpandedTreeIds(ids);
-  }, [opts.treeChildrenField, mergedRows]);
-
-  const collapseAll = useCallback(() => {
-    setExpandedTreeIds(new Set());
-  }, []);
-
-  // ── Detail panel ──────────────────────────────────────────────────────────
-  const isDetailOpen = useCallback(
-    (row: T): boolean => openDetailIds.has(rowId(row)),
-    [openDetailIds],
-  );
-
-  const toggleDetail = useCallback(
-    (row: T) => {
-      const id = rowId(row);
-      const multi = opts.detailMulti ?? false;
-      setOpenDetailIds((s) => {
-        const next = new Set(multi ? s : new Set<unknown>());
-        if (s.has(id)) {
-          next.delete(id);
-          opts.onDetailClose?.(row);
-        } else {
-          next.add(id);
-          opts.onDetailOpen?.(row);
-        }
-        return next;
-      });
-    },
-    [opts.detailMulti, opts.onDetailClose, opts.onDetailOpen],
-  );
-
-  // ── Infinite scroll ───────────────────────────────────────────────────────
-  const triggerLoadMore = useCallback(async () => {
-    const onLoadMore = opts.onLoadMore;
-    if (!onLoadMore || infiniteLoading || infiniteExhausted) return;
-    setInfiniteLoading(true);
-    try {
-      const currentCount = rowData.length;
-      const result = await onLoadMore(currentCount);
-      if (!result || result.length === 0) {
-        setInfiniteExhausted(true);
-      }
-    } catch (e) {
-      console.error('Infinite scroll load error', e);
-    } finally {
-      setInfiniteLoading(false);
-    }
-  }, [opts.onLoadMore, infiniteLoading, infiniteExhausted, rowData.length]);
-
-  // ── New row ───────────────────────────────────────────────────────────────
-  const startNewRowEdit = useCallback(
-    (field: string, triggerKey: string | null = null) => {
-      setNewRowTriggerKey(triggerKey);
-      setNewRowField(field);
-    },
-    [],
-  );
-
-  const onNewRowCellCommit = useCallback(
-    (field: string, value: unknown) => {
-      const updatedDraft = { ...newRowDraft, [field]: value };
-      setNewRowDraft(updatedDraft);
-      setNewRowActive(true);
-      setNewRowField(null);
-      setNewRowTriggerKey(null);
-
-      const commitMode = opts.newRowCommit ?? 'onLeave';
-      if (commitMode === 'immediate' && opts.editMode === 'cell') {
-        fireNewRow(updatedDraft);
-      }
-    },
-    [newRowDraft, opts.newRowCommit, opts.editMode],
-  );
-
-  const fireNewRow = useCallback(
-    (draft: Record<string, unknown>) => {
-      const hasData = Object.values(draft).some(
-        (v) => v !== null && v !== undefined && v !== '',
-      );
-      if (!hasData) {
-        setNewRowDraft({});
-        setNewRowActive(false);
-        setNewRowField(null);
-        return;
-      }
-      opts.onNewRow?.(draft);
-      setNewRowDraft({});
-      setNewRowActive(false);
-      setNewRowField(null);
-    },
-    [opts.onNewRow],
-  );
-
-  const commitNewRow = useCallback(() => {
-    if (Object.keys(newRowDraft).length === 0) return;
-    fireNewRow(newRowDraft);
-  }, [newRowDraft, fireNewRow]);
-
-  const cancelNewRow = useCallback(() => {
-    setNewRowDraft({});
-    setNewRowActive(false);
-    setNewRowField(null);
-  }, []);
-
-  // ── Aggregates ────────────────────────────────────────────────────────────
-  const getAggregateValue = useCallback(
-    (col: ColumnDef<T>): string => {
-      if (!col.aggregate) return '';
-      return computeAggregate(filteredSortedRows, col.field, col);
-    },
-    [filteredSortedRows],
-  );
-
-  // ── Display row builders ──────────────────────────────────────────────────
-  function makeDataRow(
-    data: T,
-    absIdx: number,
-    depth: number,
-    hasChildren: boolean,
-  ): DisplayRow<T> {
-    return {
-      kind: 'data',
-      data,
-      absIdx,
-      depth,
-      hasChildren,
-      expanded: false,
-      treeId: rowId(data),
-      isGroup: false,
-    };
-  }
-
-  function buildGroupedRows(rows: T[], groupField: string): DisplayRow<T>[] {
-    const groups = new Map<string, T[]>();
-    rows.forEach((r) => {
-      const key = String(getCellValue(r, groupField) ?? '(blank)');
-      if (!groups.has(key)) groups.set(key, []);
-      groups.get(key)!.push(r);
-    });
-    const result: DisplayRow<T>[] = [];
-    let absIdx = 0;
-    groups.forEach((children, key) => {
-      const meta: GroupRowMeta = {
-        isGroup: true,
-        groupKey: key,
-        groupField,
-        depth: 0,
-        rowCount: children.length,
-        collapsed: collapsedGroups.has(key),
-        children,
-      };
-      result.push({
-        kind: 'group',
-        data: meta as unknown,
-        absIdx: absIdx++,
-        depth: 0,
-        hasChildren: true,
-        expanded: !collapsedGroups.has(key),
-        treeId: null,
-        isGroup: true,
-      });
-      if (!collapsedGroups.has(key)) {
-        children.forEach((child) =>
-          result.push(makeDataRow(child, absIdx++, 0, false)),
-        );
-      }
-    });
-    return result;
-  }
-
-  function buildTreeRows(
-    rows: T[],
-    childField: string,
-    depth: number,
-  ): DisplayRow<T>[] {
-    const result: DisplayRow<T>[] = [];
-    const expandedByDefault = opts.treeExpandedByDefault ?? false;
-    let absIdx = 0;
-
-    const walk = (list: T[], d: number) => {
-      list.forEach((row) => {
-        const id = rowId(row);
-        const children = (row as Record<string, unknown>)[childField] as
-          | T[]
-          | undefined;
-        const hasKids = !!children?.length;
-        const isExpanded = expandedTreeIds.has(id) || (expandedByDefault && hasKids);
-        result.push({
-          kind: 'tree' as DisplayRowKind,
-          data: row,
-          absIdx: absIdx++,
-          depth: d,
-          hasChildren: hasKids,
-          expanded: isExpanded,
-          treeId: id,
-          isGroup: false,
-        });
-        if (hasKids && isExpanded) {
-          walk(children!, d + 1);
-        }
-      });
-    };
-    walk(rows, depth);
-    return result;
-  }
-
-  function injectDetailRows(rows: DisplayRow<T>[]): DisplayRow<T>[] {
-    const result: DisplayRow<T>[] = [];
-    let absIdx = 0;
-    for (const dr of rows) {
-      dr.absIdx = absIdx++;
-      result.push(dr);
-      if (!dr.isGroup && dr.kind !== 'group') {
-        const row = dr.data as T;
-        if (openDetailIds.has(rowId(row))) {
-          result.push({
-            kind: 'detail' as DisplayRowKind,
-            data: row,
-            absIdx: absIdx++,
-            depth: dr.depth,
-            hasChildren: false,
-            expanded: true,
-            treeId: null,
-            isGroup: false,
-          });
-        }
+  // Auto-close popovers on click outside
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      const target = e.target as HTMLElement;
+      if (
+        !target.closest('.sp-datagrid__filter-panel') &&
+        !target.closest('.sp-datagrid__filter-trigger')
+      ) {
+        setActiveFilterPopover(null);
       }
     }
-    return result;
-  }
+    document.addEventListener('pointerdown', handleClickOutside);
+    return () => document.removeEventListener('pointerdown', handleClickOutside);
+  }, []);
 
-  // ── Cell style helpers ────────────────────────────────────────────────────
-  const getCellStyle = useCallback(
-    (row: T, col: ColumnDef<T>): React.CSSProperties => {
-      const layout: React.CSSProperties = opts.autoFit
-        ? { flex: col.flex ?? 1, minWidth: col.minWidth ?? 60 }
-        : { width: getColWidth(col), minWidth: col.minWidth ?? 60 };
-      const custom = col.cellStyleFn
-        ? col.cellStyleFn(getCellValue(row, col.field), row)
-        : {};
-      const pinnedLeft = getPinnedLeft(col);
-      const pinnedRight = getPinnedRight(col);
-      return {
-        ...layout,
-        ...custom,
-        ...(pinnedLeft != null ? { left: pinnedLeft, position: 'sticky' as const, zIndex: 10 } : {}),
-        ...(pinnedRight != null ? { right: pinnedRight, position: 'sticky' as const, zIndex: 10 } : {}),
-      };
-    },
-    [opts.autoFit, getColWidth, getPinnedLeft, getPinnedRight],
-  );
+  // Keyboard navigation on grid
+  const handleGridKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft' || e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      const focusedCell = document.activeElement?.closest('[role="gridcell"], [role="columnheader"]');
+      if (!focusedCell) return;
 
-  const getHeaderStyle = useCallback(
-    (col: ColumnDef<T>): React.CSSProperties => {
-      const layout: React.CSSProperties = opts.autoFit
-        ? { flex: col.flex ?? 1, minWidth: col.minWidth ?? 60 }
-        : { width: getColWidth(col), minWidth: col.minWidth ?? 60 };
-      const pinnedLeft = getPinnedLeft(col);
-      const pinnedRight = getPinnedRight(col);
-      return {
-        ...layout,
-        ...(pinnedLeft != null ? { left: pinnedLeft, position: 'sticky' as const, zIndex: 20 } : {}),
-        ...(pinnedRight != null ? { right: pinnedRight, position: 'sticky' as const, zIndex: 20 } : {}),
-      };
-    },
-    [opts.autoFit, getColWidth, getPinnedLeft, getPinnedRight],
-  );
+      const cells = Array.from(
+        gridContainerRef.current?.querySelectorAll<HTMLElement>(
+          '[role="gridcell"], [role="columnheader"]',
+        ) ?? [],
+      ).filter((c) => {
+        if (c.hidden || c.closest('[aria-hidden="true"]')) return false;
+        const computedStyle = window.getComputedStyle(c);
+        return computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden';
+      });
 
-  const getCellClasses = useCallback(
-    (col: ColumnDef<T>, row?: T): string => {
-      const cls = ['sp-grid-cell'];
-      if (col.cellClass) {
-        const cc = Array.isArray(col.cellClass) ? col.cellClass : [col.cellClass];
-        cls.push(...cc);
+      const currIdx = cells.indexOf(focusedCell as HTMLElement);
+      if (currIdx === -1) return;
+
+      let nextIdx = currIdx;
+      if (e.key === 'ArrowRight') nextIdx = currIdx + 1;
+      if (e.key === 'ArrowLeft') nextIdx = currIdx - 1;
+      if (e.key === 'ArrowDown') {
+        const nextRow = (focusedCell.closest('[role="row"]')?.nextElementSibling) as HTMLElement | null;
+        if (nextRow) {
+          const rowCells = Array.from(nextRow.querySelectorAll<HTMLElement>('[role="gridcell"]'));
+          const colIdx = Array.from(focusedCell.parentElement?.children ?? []).indexOf(focusedCell);
+          if (rowCells[colIdx]) {
+            rowCells[colIdx].focus();
+            e.preventDefault();
+            return;
+          }
+        }
       }
-      if (row !== undefined) {
-        const dynamicCellClass = opts.getCellClass?.(row, col.field, col);
-        if (dynamicCellClass) {
-          cls.push(
-            ...(Array.isArray(dynamicCellClass) ? dynamicCellClass : [dynamicCellClass]),
+      if (e.key === 'ArrowUp') {
+        const prevRow = (focusedCell.closest('[role="row"]')?.previousElementSibling) as HTMLElement | null;
+        if (prevRow) {
+          const rowCells = Array.from(
+            prevRow.querySelectorAll<HTMLElement>('[role="gridcell"], [role="columnheader"]'),
           );
+          const colIdx = Array.from(focusedCell.parentElement?.children ?? []).indexOf(focusedCell);
+          if (rowCells[colIdx]) {
+            rowCells[colIdx].focus();
+            e.preventDefault();
+            return;
+          }
         }
       }
-      if (col.editable) cls.push('sp-grid-cell--editable');
-      if (col.wrapText) cls.push('sp-grid-cell--wrap');
-      const pin = getColPin(col);
-      if (pin === 'left') cls.push('sp-grid-cell--pinned-left');
-      if (pin === 'right') cls.push('sp-grid-cell--pinned-right');
-      return cls.join(' ');
-    },
-    [opts.getCellClass, getColPin],
-  );
 
-  const getFormattedValue = useCallback(
-    (row: T, col: ColumnDef<T>): string => {
-      const raw = getCellValue(row, col.field);
-      return col.valueFormatter ? col.valueFormatter(raw, row) : raw == null ? '' : String(raw);
-    },
-    [],
-  );
-
-  // ── Resize handle ─────────────────────────────────────────────────────────
-  const ResizeHandle = useCallback(
-    ({ field, currentWidth, minWidth = 60, maxWidth = 2000 }: {
-      field: string;
-      currentWidth: number;
-      minWidth?: number;
-      maxWidth?: number;
-    }) => {
-      const onMouseDown = (e: React.MouseEvent) => {
+      if (nextIdx >= 0 && nextIdx < cells.length) {
+        cells[nextIdx].focus();
         e.preventDefault();
-        e.stopPropagation();
-        const startX = e.clientX;
-        const startW = currentWidth;
-
-        const onMove = (ev: MouseEvent) => {
-          const delta = ev.clientX - startX;
-          const newW = Math.max(minWidth, Math.min(maxWidth, startW + delta));
-          onColResize(field, newW);
-        };
-        const onUp = () => {
-          document.removeEventListener('mousemove', onMove);
-          document.removeEventListener('mouseup', onUp);
-        };
-        document.addEventListener('mousemove', onMove);
-        document.addEventListener('mouseup', onUp);
-      };
-
-      return (
-        <span
-          className="sp-grid-resize-handle"
-          onMouseDown={onMouseDown}
-          onDoubleClick={(e) => {
-            e.stopPropagation();
-          }}
-          onClick={(e) => e.stopPropagation()}
-        />
-      );
-    },
-    [onColResize],
-  );
-
-  // ── Render: Header cell ───────────────────────────────────────────────────
-  const renderHeaderCell = (col: ColumnDef<T>) => {
-    const headerClasses = [
-      'sp-grid-header-cell',
-      col.sortable ? 'sortable' : '',
-      opts.colReorder ? 'col-draggable' : '',
-      hdrDragSrc === col.field ? 'is-dragging-src' : '',
-      hdrDragOver === col.field && hdrDragOverPos === 'left' ? 'drop-left' : '',
-      hdrDragOver === col.field && hdrDragOverPos === 'right' ? 'drop-right' : '',
-      ...(col.headerClass ? (Array.isArray(col.headerClass) ? col.headerClass : [col.headerClass]) : []),
-      getColPin(col) === 'left' ? 'sp-grid-header-cell--pinned-left' : '',
-      getColPin(col) === 'right' ? 'sp-grid-header-cell--pinned-right' : '',
-    ]
-      .filter(Boolean)
-      .join(' ');
-
-    return (
-      <div
-        key={col.field}
-        className={headerClasses}
-        style={getHeaderStyle(col)}
-        draggable={opts.colReorder ?? false}
-        onDragStart={(e) => onHdrDragStart(e, col.field)}
-        onDragOver={(e) => onHdrDragOver(e, col.field)}
-        onDragLeave={() => setHdrDragOver(null)}
-        onDrop={(e) => onHdrDrop(e, col.field)}
-        onDragEnd={() => {
-          setHdrDragSrc(null);
-          setHdrDragOver(null);
-        }}
-        onClick={(e) => onHeaderClick(col, e)}
-      >
-        <div className="sp-grid-header-cell__inner">
-          {col.headerRenderer ? (
-            col.headerRenderer(col.headerName ?? col.field, col)
-          ) : (
-            <>
-              <span className="sp-grid-header-cell__label">
-                {col.headerName ?? col.field}
-              </span>
-              {col.editable && opts.editMode && (
-                <span className="sp-grid-header-cell__edit-hint" title={t('editable')}>
-                  <Icon name="edit" size={12} />
-                </span>
-              )}
-              {col.sortable && (
-                <span
-                  className={`sp-grid-sort-icon${getSortDir(col.field) !== null ? ' active' : ''}`}
-                >
-                  {getSortDir(col.field) === 'asc' ? (
-                    <Icon name="sort-asc" size={14} />
-                  ) : getSortDir(col.field) === 'desc' ? (
-                    <Icon name="sort-desc" size={14} />
-                  ) : (
-                    <Icon name="arrow-up-down" size={14} />
-                  )}
-                  {isMultiSort && getSortIndex(col.field) > 0 && (
-                    <span className="sp-grid-sort-index">
-                      {getSortIndex(col.field)}
-                    </span>
-                  )}
-                </span>
-              )}
-              {col.filterable && getFilterMode(col) === 'popover' && (
-                <Popover
-                  placement="bottom-start"
-                  offset={4}
-                  trigger={
-                    <span
-                      className={`sp-grid-header-cell__filter-btn${hasFilter(col.field) ? ' active' : ''}`}
-                      onClick={(e) => e.stopPropagation()}
-                      title={t('filter')}
-                    >
-                      <Icon name="filter" size={12} />
-                    </span>
-                  }
-                >
-                  <GridColumnFilter
-                    field={col.field}
-                    headerName={col.headerName ?? col.field}
-                    current={getFilter(col.field)}
-                    onFilterChange={(f) => onFilterApply(col.field, f)}
-                    onClear={() => onFilterClear(col.field)}
-                    onClose={() => {}}
-                  />
-                </Popover>
-              )}
-            </>
-          )}
-        </div>
-        {col.resizable !== false && (
-          <ResizeHandle
-            field={col.field}
-            currentWidth={getColWidth(col)}
-            minWidth={col.minWidth}
-            maxWidth={col.maxWidth}
-          />
-        )}
-      </div>
-    );
-  };
-
-  // ── Render: Data cell ─────────────────────────────────────────────────────
-  const renderDataCell = (col: ColumnDef<T>, row: T, absIdx: number, depth: number) => {
-    const editing = isCellEditing(row, col.field);
-    const rowEditMode = isRowEditing(row);
-
-    return (
-      <div
-        key={col.field}
-        className={getCellClasses(col, row)}
-        style={getCellStyle(row, col)}
-        data-cell-id={`${String(rowId(row))}-${col.field}`}
-        tabIndex={opts.keyboardNav || (col.editable && opts.editMode === 'cell') ? 0 : -1}
-        onClick={(e) => onCellClick(e, getCellValue(row, col.field), col.field, row)}
-        onDoubleClick={(e) => onCellDblClick(e, col.field, row)}
-        onKeyDown={(e) => onCellKeydown(e, row, col.field)}
-        role="gridcell"
-      >
-        {opts.editMode === 'cell' && col.editable && editing ? (
-          <CellEditor
-            initialValue={getCellValue(row, col.field)}
-            config={getEditorConfig(col.field)}
-            initialKey={activeCellEdit?.triggerKey ?? null}
-            customRenderer={col.editorRenderer}
-            row={row}
-            field={col.field}
-            onCommit={(v) => onCellEditCommit(row, col.field, v)}
-            onCancel={onCellEditCancel}
-            onNavigate={(_v, dir) => onCellEditNavigate(row, col.field, dir)}
-            onEnterCommit={() => onCellEditEnter(row, col.field)}
-          />
-        ) : opts.editMode === 'row' && col.editable && rowEditMode ? (
-          <CellEditor
-            initialValue={getCellValue(row, col.field)}
-            config={getEditorConfig(col.field)}
-            initialKey={null}
-            row={row}
-            field={col.field}
-            onCommit={(v) => onRowDraftChange(row, col.field, v)}
-            onCancel={() => {}}
-            onNavigate={() => {}}
-          />
-        ) : (
-          <>
-            {opts.treeChildrenField &&
-              col.field === centerCols[0]?.field &&
-              depth > 0 && (
-                <span
-                  className="sp-grid-tree-indent"
-                  style={{ width: depth * 20 }}
-                />
-              )}
-            {col.cellRenderer ? (
-              col.cellRenderer(getCellValue(row, col.field), row)
-            ) : (
-              <span className="sp-grid-cell__text">
-                {getFormattedValue(row, col)}
-              </span>
-            )}
-            {col.editable && opts.editMode && !rowEditMode && (
-              <span className="sp-grid-cell__edit-indicator">
-                <Icon name="edit" size={12} />
-              </span>
-            )}
-          </>
-        )}
-      </div>
-    );
-  };
-
-  // ── Render: Row ───────────────────────────────────────────────────────────
-  const renderRow = (dr: DisplayRow<T>) => {
-    const row = dr.data as T;
-    const absIdx = dr.absIdx;
-    const depth = dr.depth;
-    const hasChildren = dr.hasChildren;
-    const expanded = dr.expanded;
-    const treeId = dr.treeId;
-
-    const rowClasses = [
-      'sp-grid-row',
-      opts.striped && absIdx % 2 !== 0 ? 'sp-grid-row--odd' : '',
-      isSelected(row) ? 'sp-grid-row--selected' : '',
-      isRowEditing(row) ? 'sp-grid-row--editing' : '',
-      opts.detailRenderer && isDetailOpen(row) ? 'sp-grid-row--detail-open' : '',
-      dragRowIdx === absIdx ? 'sp-grid-row--dragging' : '',
-      opts.getRowClass ? opts.getRowClass(row) : '',
-    ]
-      .filter(Boolean)
-      .join(' ');
-
-    return (
-      <div
-        key={`row-${absIdx}`}
-        className={rowClasses}
-        style={{
-          height: isRowEditing(row) ? undefined : (fixedRowHeight ?? undefined),
-          minHeight: rowHeight,
-        }}
-        onClick={(e) => handleRowClick(e, row, absIdx)}
-        onDoubleClick={(e) => onRowDblClick(e, row, absIdx)}
-        role="row"
-      >
-        {/* Expand column */}
-        {hasExpandColumn && (
-          <div
-            className={`sp-grid-cell sp-grid-cell--expand${shouldPinControls ? ' sp-grid-cell--control-pinned' : ''}`}
-            style={{ width: 36, minWidth: 36, flexShrink: 0, ...(ctrlColLeftExpand != null ? { left: ctrlColLeftExpand } : {}) }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {opts.treeChildrenField && hasChildren && (
-              <button
-                className={`sp-grid-expand-btn${expanded ? ' expanded' : ''}`}
-                onClick={() => toggleTreeRow(treeId)}
-                title={t('toggleChildren')}
-              >
-                <Icon name="chevron-down" size={14} />
-              </button>
-            )}
-            {opts.detailRenderer && (
-              <button
-                className={`sp-grid-expand-btn${isDetailOpen(row) ? ' expanded' : ''}`}
-                onClick={() => toggleDetail(row)}
-                title={t('toggleDetails')}
-              >
-                <Icon name="chevron-down" size={14} />
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* Drag handle */}
-        {opts.rowDraggable && (
-          <div
-            className={`sp-grid-cell sp-grid-cell--drag${shouldPinControls ? ' sp-grid-cell--control-pinned' : ''}`}
-            style={{ width: 36, minWidth: 36, flexShrink: 0, ...(ctrlColLeftDrag != null ? { left: ctrlColLeftDrag } : {}) }}
-            onMouseDown={(e) => onRowMouseDown(e, absIdx)}
-            onClick={(e) => e.stopPropagation()}
-            title={t('dragToReorder')}
-          >
-            <Icon name="grip-vertical" size={14} />
-          </div>
-        )}
-
-        {/* Row edit actions */}
-        {opts.editMode === 'row' && (
-          <div
-            className={`sp-grid-cell sp-grid-cell--actions${shouldPinControls ? ' sp-grid-cell--control-pinned' : ''}`}
-            style={{ width: 80, minWidth: 80, flexShrink: 0, ...(ctrlColLeftActions != null ? { left: ctrlColLeftActions } : {}) }}
-          >
-            {isRowEditing(row) ? (
-              <>
-                <button
-                  className="sp-grid-edit-btn sp-grid-edit-btn--save"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    commitRowEdit(row);
-                  }}
-                  title={t('save')}
-                >
-                  <Icon name="check" size={12} />
-                </button>
-                <button
-                  className="sp-grid-edit-btn sp-grid-edit-btn--cancel"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    cancelRowEdit(row);
-                  }}
-                  title={t('cancel')}
-                >
-                  <Icon name="x" size={12} />
-                </button>
-              </>
-            ) : (
-              <button
-                className="sp-grid-edit-btn sp-grid-edit-btn--edit"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onRowDblClick(e as unknown as React.MouseEvent, row, absIdx);
-                }}
-                title={t('edit')}
-              >
-                <Icon name="edit" size={12} />
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* Checkbox */}
-        {opts.selectionMode && opts.selectionMode !== 'none' && (
-          <div
-            className={`sp-grid-cell sp-grid-cell--checkbox${shouldPinControls ? ' sp-grid-cell--control-pinned' : ''}`}
-            style={{ width: 44, minWidth: 44, flexShrink: 0, ...(ctrlColLeftCheckbox != null ? { left: ctrlColLeftCheckbox } : {}) }}
-            onClick={(e) => onCheckboxClick(e, row, absIdx)}
-          >
-            <span
-              className={`sp-grid-checkbox${isSelected(row) ? ' checked' : ''}`}
-              role="checkbox"
-              aria-checked={isSelected(row)}
-            >
-              {isSelected(row) && <Icon name="check" size={10} />}
-            </span>
-          </div>
-        )}
-
-        {/* Data cells */}
-        {leftPinnedCols.map((col) => renderDataCell(col, row, absIdx, depth))}
-        {centerCols.map((col) => renderDataCell(col, row, absIdx, depth))}
-        {rightPinnedCols.map((col) => renderDataCell(col, row, absIdx, depth))}
-      </div>
-    );
-  };
-
-  // ── Render: Group row ─────────────────────────────────────────────────────
-  const renderGroupRow = (dr: DisplayRow<T>) => {
-    const meta = dr.data as GroupRowMeta;
-    return (
-      <div
-        key={`group-${meta.groupKey}`}
-        className="sp-grid-group-row"
-        style={{ minHeight: rowHeight }}
-        onClick={() => toggleGroup(meta.groupKey)}
-      >
-        <div className="sp-grid-group-row__content">
-          <span className={`sp-grid-group-row__chevron${meta.collapsed ? ' collapsed' : ''}`}>
-            <Icon name="chevron-down" size={14} />
-          </span>
-          {opts.groupRowRenderer ? (
-            opts.groupRowRenderer(meta)
-          ) : (
-            <>
-              <span className="sp-grid-group-row__key">{meta.groupKey}</span>
-              <span className="sp-grid-group-row__count">
-                {meta.rowCount} row{meta.rowCount !== 1 ? 's' : ''}
-              </span>
-            </>
-          )}
-        </div>
-      </div>
-    );
-  };
-
-  // ── Render: Detail row ────────────────────────────────────────────────────
-  const renderDetailRow = (dr: DisplayRow<T>) => {
-    const row = dr.data as T;
-    return (
-      <div
-        key={`detail-${dr.absIdx}`}
-        className="sp-grid-detail-row"
-        style={{ height: opts.detailHeight ?? undefined }}
-      >
-        <div className="sp-grid-detail-row__inner">
-          {opts.detailRenderer?.({
-            row,
-            index: dr.absIdx,
-            close: () => {
-              setOpenDetailIds((s) => {
-                const n = new Set(s);
-                n.delete(rowId(row));
-                return n;
-              });
-            },
-          })}
-        </div>
-      </div>
-    );
-  };
-
-  // ── Render: New row ───────────────────────────────────────────────────────
-  const renderNewRow = (dr: DisplayRow<T>) => {
-    return (
-      <div
-        key="new-row"
-        className={`sp-grid-row sp-grid-row--new-row${newRowActive ? ' sp-grid-row--new-row-active' : ''}`}
-        style={{
-          height: fixedRowHeight ?? undefined,
-          minHeight: rowHeight,
-        }}
-        role="row"
-        aria-label={t('addNewRow')}
-      >
-        {hasExpandColumn && (
-          <div className="sp-grid-cell" style={{ width: 36, minWidth: 36, flexShrink: 0 }} />
-        )}
-        {opts.rowDraggable && (
-          <div className="sp-grid-cell" style={{ width: 36, minWidth: 36, flexShrink: 0 }} />
-        )}
-        {opts.editMode === 'row' && (
-          <div className="sp-grid-cell sp-grid-cell--actions" style={{ width: 80, minWidth: 80, flexShrink: 0 }}>
-            {newRowActive && (
-              <>
-                <button
-                  className="sp-grid-edit-btn sp-grid-edit-btn--save"
-                  onClick={commitNewRow}
-                  title={t('addRow')}
-                >
-                  <Icon name="check" size={12} />
-                </button>
-                <button
-                  className="sp-grid-edit-btn sp-grid-edit-btn--cancel"
-                  onClick={cancelNewRow}
-                  title={t('discard')}
-                >
-                  <Icon name="x" size={12} />
-                </button>
-              </>
-            )}
-          </div>
-        )}
-        {opts.selectionMode && opts.selectionMode !== 'none' && (
-          <div className="sp-grid-cell sp-grid-cell--checkbox" style={{ width: 44, minWidth: 44, flexShrink: 0 }} />
-        )}
-        {visibleColumns.map((col) => {
-          const isEditing = newRowField === col.field;
-          const cellStyle: React.CSSProperties = opts.autoFit
-            ? { flex: col.flex ?? 1, minWidth: col.minWidth ?? 60 }
-            : { width: getColWidth(col), minWidth: col.minWidth ?? 60 };
-          const pinnedLeft = getPinnedLeft(col);
-          const pinnedRight = getPinnedRight(col);
-          if (pinnedLeft != null) Object.assign(cellStyle, { left: pinnedLeft, position: 'sticky', zIndex: 10 });
-          if (pinnedRight != null) Object.assign(cellStyle, { right: pinnedRight, position: 'sticky', zIndex: 10 });
-
-          return (
-            <div
-              key={col.field}
-              className={getCellClasses(col)}
-              style={cellStyle}
-              data-cell-id={`${NEW_ROW_ID}-${col.field}`}
-              tabIndex={opts.keyboardNav || (col.editable && opts.editMode === 'cell') ? 0 : -1}
-              onClick={(e) => {
-                e.stopPropagation();
-                if (col.editable) startNewRowEdit(col.field);
-              }}
-              role="gridcell"
-            >
-              {col.editable && isEditing ? (
-                <CellEditor
-                  initialValue={newRowDraft[col.field] ?? null}
-                  config={getEditorConfig(col.field)}
-                  initialKey={newRowTriggerKey}
-                  row={null as unknown as T}
-                  field={col.field}
-                  onCommit={(v) => onNewRowCellCommit(col.field, v)}
-                  onCancel={() => {
-                    setNewRowField(null);
-                    setNewRowTriggerKey(null);
-                  }}
-                  onNavigate={() => {}}
-                />
-              ) : (
-                <>
-                  {newRowDraft[col.field] != null && newRowDraft[col.field] !== '' ? (
-                    <span className="sp-grid-cell__text">{String(newRowDraft[col.field])}</span>
-                  ) : col.editable ? (
-                    <span className="sp-grid-new-row__empty-indicator" />
-                  ) : null}
-                </>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
-
-  // ── Render: Row dispatch ──────────────────────────────────────────────────
-  const renderDisplayRow = (dr: DisplayRow<T>) => {
-    switch (dr.kind) {
-      case 'group':
-        return renderGroupRow(dr);
-      case 'detail':
-        return renderDetailRow(dr);
-      case 'new-row':
-        return renderNewRow(dr);
-      default:
-        return renderRow(dr);
+      }
     }
   };
 
-  // ── Root classes ──────────────────────────────────────────────────────────
-  const rootClasses = [
-    'sp-grid-root',
-    opts.autoFit ? 'sp-grid--autofit' : '',
-    isAutoRowHeight ? 'sp-grid--auto-row-height' : '',
-    `sp-grid--density-${density}`,
-    (opts.selectionMode && opts.selectionMode !== 'none') || opts.rowHover
-      ? 'sp-grid--selectable'
-      : '',
-    loading ? 'sp-grid--loading' : '',
-    opts.editMode === 'cell' ? 'sp-grid--cell-edit' : '',
-    opts.editMode === 'row' ? 'sp-grid--row-edit' : '',
-    opts.keyboardNav ? 'sp-grid--keynav' : '',
-    opts.borderless ? 'sp-grid--borderless' : '',
-    opts.rowDraggable ? 'sp-grid--row-draggable' : '',
-    hasPinnedLeft || hasPinnedRight ? 'sp-grid--has-pinned' : '',
-    opts.treeChildrenField ? 'sp-grid--has-tree' : '',
-    opts.detailRenderer ? 'sp-grid--has-detail' : '',
-    hasGroupedHeaders ? 'sp-grid--has-col-groups' : '',
-    hasInlineFilters ? 'sp-grid--has-inline-filters' : '',
-    opts.newRowPosition && opts.editMode ? 'sp-grid--has-new-row' : '',
-    className ?? '',
+  // Host CSS classes
+  const hostClasses = [
+    'sp-datagrid',
+    autoHeight
+      ? 'sp-datagrid-host--auto-height sp-datagrid--auto-height'
+      : 'sp-datagrid-host--fixed-height sp-datagrid--fixed-height',
+    loading ? 'sp-datagrid-host--loading' : '',
+    fitColumnsToWidth ? 'sp-datagrid--fit-columns-to-width' : '',
+    !showVerticalLines ? 'sp-datagrid--without-vertical-lines' : '',
+    hasPinnedColumns ? 'sp-datagrid--has-pinned-columns' : '',
+    sortIndicatorVisibility === 'always' ? 'sp-datagrid--sort-indicators-always' : '',
+    filterIndicatorVisibility === 'always' ? 'sp-datagrid--filter-indicators-always' : '',
+    virtualizationEnabled ? 'sp-datagrid--virtual' : '',
+    hasActiveRowSpans ? 'sp-datagrid--row-spanning' : '',
+    columnVirtualization ? 'sp-datagrid--column-virtualization' : '',
+    autoColumnWidth ? 'sp-datagrid--auto-column-width' : 'sp-datagrid--fixed-columns',
+    reorderable ? '' : 'sp-datagrid--columns-not-reorderable',
+    className,
   ]
     .filter(Boolean)
     .join(' ');
 
-  // ── CSS variables ─────────────────────────────────────────────────────────
-  const cssVars: React.CSSProperties = {
-    '--grid-row-h': `${rowHeight}px`,
-    '--grid-header-h': `${headerHeight}px`,
-    '--grid-filter-h': `${metrics.filterHeight}px`,
-    '--grid-aggregate-h': `${metrics.aggregateHeight}px`,
-    '--grid-toolbar-h': `${metrics.toolbarHeight}px`,
-    '--grid-footer-h': `${metrics.footerHeight}px`,
-    '--grid-pagination-h': `${metrics.paginationHeight}px`,
-    '--grid-cell-padding-x': `${metrics.cellPaddingX}px`,
-    '--grid-auto-cell-padding-y': `${metrics.autoCellPaddingY}px`,
-  } as React.CSSProperties;
+  const hostStyle: CSSProperties = {
+    ...(fixedHeight ? { height: fixedHeight } : {}),
+    ...({
+      '--sp-datagrid-row-height': `${effectiveVirtualRowHeight}px`,
+      '--sp-datagrid-virtual-scroll-height': `${Math.max(effectiveVirtualRowHeight * 2, virtualScrollHeight)}px`,
+      '--sp-datagrid-detail-pane-width': `${Math.max(240, detailPaneWidth)}px`,
+      '--sp-datagrid-row-detail-height': `${Math.max(rowDetailHeight, effectiveVirtualRowHeight)}px`,
+      '--sp-datagrid-column-virtualization-overscan': `${Math.max(0, columnVirtualizationOverscan)}px`,
+    } as CSSProperties),
+    ...(headerHeight ? ({ '--sp-datagrid-header-height': `${headerHeight}px` } as CSSProperties) : {}),
+    ...style,
+  };
+
+  const columnMenuItemsFor = (column: DatagridColumn<T>): DropdownItem[] => {
+    const items: DropdownItem[] = [];
+    if (column.sortable !== false) {
+      items.push(
+        {
+          label: 'Sort Ascending',
+          icon: 'arrow-up',
+          command: () => handleSortColumn(column.key),
+        },
+        {
+          label: 'Sort Descending',
+          icon: 'arrow-down',
+          command: () => {
+            const next = [{ key: column.key, direction: 'desc' as const }];
+            setInternalSorts(next);
+            onSortChange?.({ key: column.key, direction: 'desc' });
+          },
+        },
+        { separator: true },
+      );
+    }
+    items.push(
+      {
+        label: 'Auto-size Column',
+        command: () => setColumnWidths((prev) => new Map(prev).set(column.key, 'auto')),
+      },
+      {
+        label: `Group by ${column.header}`,
+        command: () => {
+          if (!activeGroupBy.includes(column.key)) {
+            const next = [...activeGroupBy, column.key];
+            setInternalGroupBy(next);
+            onGroupByChange?.(next);
+          }
+        },
+      },
+      {
+        label: 'Hide Column',
+        command: () => {
+          setInternalHiddenColumns((prev) => {
+            const next = new Set(prev);
+            next.add(column.key);
+            return next;
+          });
+        },
+      },
+      ...toDropdownItems(column.menuItems ?? []),
+    );
+    return items;
+  };
+
+  const renderColumnSelectorContent = () => (
+    <>
+      <div className="sp-datagrid__column-selector-header">
+        <h3>{columnSelectorLabel ?? t('columns')}</h3>
+        <p>Show, hide, and reorder columns</p>
+      </div>
+      <div className="sp-datagrid__column-selector-list">
+        {selectorColumns.map((column) => {
+          const isVis = !internalHiddenColumns.has(column.key);
+          return (
+            <div
+              key={column.key}
+              className={[
+                'sp-datagrid__column-selector-item',
+                draggedSelectorColumnKey === column.key ? 'sp-datagrid__column-selector-item--dragging' : '',
+                selectorDropTarget?.key === column.key && selectorDropTarget.position === 'before' ? 'sp-datagrid__column-selector-item--drop-before' : '',
+                selectorDropTarget?.key === column.key && selectorDropTarget.position === 'after' ? 'sp-datagrid__column-selector-item--drop-after' : '',
+              ].filter(Boolean).join(' ')}
+              draggable={reorderable && column.reorderable !== false}
+              onDragStart={() => setDraggedSelectorColumnKey(column.key)}
+              onDragEnd={() => {
+                setDraggedSelectorColumnKey(null);
+                setSelectorDropTarget(null);
+              }}
+              onDragOver={(event) => {
+                if (!draggedSelectorColumnKey || draggedSelectorColumnKey === column.key) return;
+                event.preventDefault();
+                const rect = event.currentTarget.getBoundingClientRect();
+                setSelectorDropTarget({ key: column.key, position: event.clientY < rect.top + rect.height / 2 ? 'before' : 'after' });
+              }}
+              onDrop={(event) => {
+                event.preventDefault();
+                if (draggedSelectorColumnKey && selectorDropTarget) {
+                  const next = activeColumnOrder.filter((key) => key !== draggedSelectorColumnKey);
+                  const target = next.indexOf(selectorDropTarget.key);
+                  next.splice(selectorDropTarget.position === 'after' ? target + 1 : target, 0, draggedSelectorColumnKey);
+                  setInternalColumnOrder(next);
+                  onColumnOrderChange?.(next);
+                }
+                setDraggedSelectorColumnKey(null);
+                setSelectorDropTarget(null);
+              }}
+            >
+              <span className="sp-datagrid__column-selector-handle">
+                <Icon name="grip-vertical" size={14} />
+              </span>
+              <Checkbox
+                checked={isVis}
+                onChange={(checked) => {
+                  setInternalHiddenColumns((prev) => {
+                    const next = new Set(prev);
+                    if (checked) next.delete(column.key);
+                    else next.add(column.key);
+                    onColumnVisibilityChange?.({
+                      visibleKeys: columnsProp.filter((item) => !next.has(item.key)).map((item) => item.key),
+                      hiddenKeys: [...next],
+                    });
+                    return next;
+                  });
+                }}
+              >
+                {column.header}
+              </Checkbox>
+            </div>
+          );
+        })}
+      </div>
+      <div className="sp-datagrid__filter-actions">
+        <Button
+          size="sm"
+          variant="primary"
+          onClick={() => setShowColumnSelectorPopover(null)}
+        >
+          Done
+        </Button>
+      </div>
+    </>
+  );
 
   return (
-    <div className={rootClasses} style={cssVars} {...rest}>
-      {/* ── Toolbar ──────────────────────────────────────────────────────── */}
-      {showToolbar && (
-        <div className="sp-grid-toolbar">
-          <div className="sp-grid-toolbar__left">
-            {opts.toolbarButtons?.map((btn) => (
-              <button
-                key={btn.label}
-                className={`sp-grid-toolbar__action-btn${btn.variant === 'danger' ? ' sp-grid-toolbar__action-btn--danger' : ''}`}
-                disabled={typeof btn.disabled === 'function' ? btn.disabled() : btn.disabled ?? false}
-                title={btn.title ?? btn.label}
-                onClick={() => btn.action()}
-              >
-                {btn.icon && <Icon name={btn.icon} size={12} />}
-                {btn.label}
-              </button>
-            ))}
-            {activeFilterCount > 0 && (
-              <span className="sp-grid-toolbar__filter-badge">
-                <Icon name="filter" size={14} />
-                {activeFilterCount} filter{activeFilterCount !== 1 ? 's' : ''}
+    <div
+      ref={gridContainerRef}
+      className={hostClasses}
+      style={hostStyle}
+      data-testid="datagrid-host"
+    >
+      {/* Optional Top Toolbar */}
+      {(toolbar || toolbarStart || toolbarEnd || searchable || dataContextAdapter?.toolbarActions || isShowColumnSelector) && (
+        <div className="sp-datagrid__toolbar" role="toolbar" aria-label={toolbarAriaLabel ?? t('dataGridTools')}>
+          <div className="sp-datagrid__toolbar-start">
+            {toolbarStart}
+            {searchable && (
+              <div className="sp-input-group sp-datagrid__search-group" style={{ maxWidth: '240px' }}>
+                <input
+                  type="search"
+                  className="sp-input sp-input--sm"
+                  aria-label={t('search')}
+                  placeholder={t('search')}
+                  value={activeSearchQuery}
+                  onChange={(e) => {
+                    setInternalSearchQuery(e.target.value);
+                    onSearchQueryChange?.(e.target.value);
+                  }}
+                />
+              </div>
+            )}
+            {dataContextAdapter?.toolbarActions && (
+              <div className="sp-datagrid__toolbar-actions" style={{ display: 'flex', gap: '4px' }}>
                 <button
-                  className="sp-grid-toolbar__filter-clear"
-                  onClick={clearAllFilters}
+                  type="button"
+                  className="sp-btn sp-btn--sm sp-btn--secondary"
+                  onClick={() => {
+                    const added = dataContextAdapter.add({});
+                    if (added) setInternalSelection([added]);
+                  }}
                 >
-                  <Icon name="x" size={12} />
+                  <Icon name="plus" size={14} /> {t('add')}
                 </button>
-              </span>
-            )}
-            {opts.groupByField && (
-              <span className="sp-grid-toolbar__group-badge">
-                <Icon name="network" size={14} />
-                {t('group')} <strong>{opts.groupByField}</strong>
-              </span>
-            )}
-            {opts.treeChildrenField && (
-              <span className="sp-grid-toolbar__tree-badge">
-                <Icon name="git-fork" size={14} />
-                {t('treeView')}
-                <button className="sp-grid-toolbar__tree-btn" onClick={expandAll} title={t('expandAll')}>
-                  <Icon name="plus" size={12} />
+                <button
+                  type="button"
+                  className="sp-btn sp-btn--sm sp-btn--secondary"
+                  disabled={activeSelection.length === 0}
+                  onClick={() => {
+                    dataContextAdapter.delete(activeSelection);
+                    setInternalSelection([]);
+                  }}
+                >
+                  <Icon name="trash" size={14} /> {t('delete')}
                 </button>
-                <button className="sp-grid-toolbar__tree-btn" onClick={collapseAll} title={t('collapseAll')}>
-                  <Icon name="minus" size={12} />
+                <button
+                  type="button"
+                  className="sp-btn sp-btn--sm sp-btn--secondary"
+                  disabled={!dataContextAdapter.dirty}
+                  onClick={() => dataContextAdapter.discardChanges()}
+                >
+                  {t('discard')}
                 </button>
-              </span>
+                <button
+                  type="button"
+                  className="sp-btn sp-btn--sm sp-btn--primary"
+                  disabled={!dataContextAdapter.dirty || (dataContextAdapter.blockInvalidSave && !dataContextAdapter.valid())}
+                  onClick={saveDataContextChanges}
+                >
+                  <Icon name="check" size={14} /> {t('save')}
+                </button>
+              </div>
             )}
           </div>
-          <div className="sp-grid-toolbar__spacer" />
-          <div className="sp-grid-toolbar__right">
-            <Popover
-              placement="bottom-end"
-              offset={6}
-              trigger={
-                <button
-                  className={`sp-grid-toolbar__btn${columnPanelOpen ? ' active' : ''}`}
-                  title={t('columns')}
-                >
-                  <Icon name="columns" size={14} />
-                  {t('columns')}
-                </button>
-              }
-            >
-              <ColumnPanel
-                columns={columns}
-                columnStates={columnStates}
-                reorder={opts.colReorder ?? false}
-                onVisibilityChange={onVisibilityChange}
-                onReorderChange={applyColReorder}
-              />
-            </Popover>
+          <div className="sp-datagrid__toolbar-end">
+            {toolbarEnd}
+            {showColumnSelectorInToolbar && (
+              <Popover
+                trigger={(
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    iconLeft="columns"
+                    className="sp-datagrid__column-selector-trigger"
+                  >
+                    {columnSelectorLabel ?? t('columns')}
+                  </Button>
+                )}
+                open={showColumnSelectorPopover?.source === 'toolbar'}
+                onOpenChange={(open) => setShowColumnSelectorPopover(open ? { source: 'toolbar' } : null)}
+                placement="bottom-end"
+                panelClassName="sp-datagrid__column-selector-popover"
+                panelAriaLabel={columnSelectorLabel ?? t('columns')}
+                padding="0"
+              >
+                <div className="sp-datagrid__column-selector-panel">
+                  {renderColumnSelectorContent()}
+                </div>
+              </Popover>
+            )}
           </div>
         </div>
       )}
 
-      {/* ── Scroll viewport ──────────────────────────────────────────────── */}
-      <div className="sp-grid-container" ref={scrollRef}>
+      {/* Grouping Toolbar */}
+      {(isShowGroupToolbar || activeGroupBy.length > 0) && (
         <div
-          className="sp-grid-scroll-inner"
-          style={{ minWidth: opts.autoFit ? undefined : totalColumnsWidth }}
+          className={`sp-datagrid__group-toolbar ${
+            isGroupToolbarDragOver ? 'sp-datagrid__group-toolbar--drop-active' : ''
+          }`}
+          onDragOver={(e) => {
+            if (draggedToolbarGroupKey) return;
+            const columnKey = draggedColumnKey ?? e.dataTransfer.getData('text/plain');
+            if (columnKey && columnsProp.some((column) => column.key === columnKey) && !activeGroupBy.includes(columnKey)) {
+              e.preventDefault();
+              setIsGroupToolbarDragOver(true);
+            }
+          }}
+          onDragLeave={() => setIsGroupToolbarDragOver(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            if (draggedToolbarGroupKey) return;
+            setIsGroupToolbarDragOver(false);
+            const columnKey = draggedColumnKey ?? e.dataTransfer.getData('text/plain');
+            if (columnKey && columnsProp.some((column) => column.key === columnKey) && !activeGroupBy.includes(columnKey)) {
+              const next = [...activeGroupBy, columnKey];
+              setInternalGroupBy(next);
+              onGroupByChange?.(next);
+            }
+            setDraggedColumnKey(null);
+          }}
         >
-          {/* Header */}
-          <div className="sp-grid-header">
-            {hasExpandColumn && (
-              <div className="sp-grid-header-cell sp-grid-header-cell--expand" style={{ width: 36, minWidth: 36 }} />
+          <div className="sp-datagrid__toolbar-group-list">
+            {activeGroupBy.length === 0 ? (
+              <span className="sp-datagrid__toolbar-group-empty">
+                Drag column headers here to group
+              </span>
+            ) : (
+              activeGroupBy.map((gKey) => {
+                const col = columnsProp.find((c) => c.key === gKey);
+                const sortDir = activeGroupSorts.find((gs) => gs.key === gKey)?.direction ?? 'asc';
+                return (
+                  <div
+                    key={gKey}
+                    className={[
+                      'sp-datagrid__toolbar-group',
+                      draggedToolbarGroupKey === gKey ? 'sp-datagrid__toolbar-group--dragging' : '',
+                      toolbarGroupDropTarget?.key === gKey && toolbarGroupDropTarget.position === 'before'
+                        ? 'sp-datagrid__toolbar-group--drop-before'
+                        : '',
+                      toolbarGroupDropTarget?.key === gKey && toolbarGroupDropTarget.position === 'after'
+                        ? 'sp-datagrid__toolbar-group--drop-after'
+                        : '',
+                    ].filter(Boolean).join(' ')}
+                    onDragOver={(event) => {
+                      if (!draggedToolbarGroupKey || draggedToolbarGroupKey === gKey) {
+                        setToolbarGroupDropTarget(null);
+                        return;
+                      }
+                      event.preventDefault();
+                      event.dataTransfer.dropEffect = 'move';
+                      const rect = event.currentTarget.getBoundingClientRect();
+                      setToolbarGroupDropTarget({
+                        key: gKey,
+                        position: event.clientX > rect.left + rect.width / 2 ? 'after' : 'before',
+                      });
+                    }}
+                    onDrop={(event) => {
+                      event.preventDefault();
+                      const sourceKey = draggedToolbarGroupKey;
+                      const dropTarget = toolbarGroupDropTarget;
+                      if (sourceKey && dropTarget?.key === gKey && sourceKey !== gKey) {
+                        const next = activeGroupBy.filter((key) => key !== sourceKey);
+                        const targetIndex = next.indexOf(gKey);
+                        next.splice(targetIndex + (dropTarget.position === 'after' ? 1 : 0), 0, sourceKey);
+                        setInternalGroupBy(next);
+                        onGroupByChange?.(next);
+                      }
+                      setDraggedToolbarGroupKey(null);
+                      setToolbarGroupDropTarget(null);
+                    }}
+                  >
+                    <button
+                      type="button"
+                      className="sp-datagrid__toolbar-group-button"
+                      draggable
+                      aria-label={`${col?.header ?? gKey} grouping. Drag to reorder.`}
+                      onDragStart={(event) => {
+                        event.dataTransfer.effectAllowed = 'move';
+                        event.dataTransfer.setData('text/plain', gKey);
+                        setDraggedToolbarGroupKey(gKey);
+                      }}
+                      onDragEnd={() => {
+                        setDraggedToolbarGroupKey(null);
+                        setToolbarGroupDropTarget(null);
+                      }}
+                      onClick={() => {
+                        const nextDir = sortDir === 'asc' ? 'desc' : 'asc';
+                        const nextSorts = [
+                          ...activeGroupSorts.filter((gs) => gs.key !== gKey),
+                          { key: gKey, direction: nextDir as DatagridGroupSortDirection },
+                        ];
+                        setInternalGroupSorts(nextSorts);
+                        onGroupSortsChange?.(nextSorts);
+                      }}
+                    >
+                      {col?.header ?? gKey}
+                      <Icon
+                        name={sortDir === 'asc' ? 'arrow-up' : 'arrow-down'}
+                        size={12}
+                        className="sp-datagrid__toolbar-group-sort"
+                      />
+                    </button>
+                    <div className="sp-datagrid__toolbar-group-remove">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        iconOnly
+                        iconLeft="x"
+                        aria-label={`Remove grouping by ${col?.header ?? gKey}`}
+                        onClick={() => {
+                          const next = activeGroupBy.filter((k) => k !== gKey);
+                          setInternalGroupBy(next);
+                          onGroupByChange?.(next);
+                        }}
+                      />
+                    </div>
+                  </div>
+                );
+              })
             )}
-            {opts.rowDraggable && (
-              <div className="sp-grid-header-cell sp-grid-header-cell--drag" style={{ width: 36, minWidth: 36 }} />
-            )}
-            {opts.editMode === 'row' && (
-              <div className="sp-grid-header-cell sp-grid-header-cell--actions" style={{ width: 80, minWidth: 80 }} />
-            )}
-            {opts.selectionMode === 'multi' && (
-              <div className="sp-grid-header-cell sp-grid-header-cell--checkbox" style={{ width: 44, minWidth: 44 }}>
-                <span
-                  className={`sp-grid-checkbox${allSelected ? ' checked' : ''}${someSelected ? ' indeterminate' : ''}`}
-                  onClick={toggleSelectAll}
-                  role="checkbox"
-                  aria-checked={allSelected ? 'true' : someSelected ? 'mixed' : 'false'}
-                >
-                  {allSelected && <Icon name="check" size={10} />}
-                </span>
+          </div>
+        </div>
+      )}
+
+      {/* Grid Viewport */}
+      <div className="sp-datagrid__body">
+        <div ref={viewportRef} className="sp-datagrid__viewport">
+          <div
+            className="sp-datagrid__grid sp-datagrid-matrix"
+            style={{ gridTemplateColumns }}
+            role="grid"
+            aria-label={ariaLabel}
+            aria-labelledby={ariaLabelledBy}
+            aria-busy={loading || virtualPagingLoading ? true : undefined}
+            aria-rowcount={totalRowsCount}
+            aria-colcount={ariaColumnCount}
+            aria-multiselectable={effectiveSelectionMode === 'multiple' ? true : undefined}
+            onKeyDown={handleGridKeyDown}
+            tabIndex={0}
+          >
+            {/* Column Group Header Row */}
+            {orderedColumnGroups.length > 0 && (
+              <div className="sp-datagrid__row sp-datagrid__column-group-row" role="row" aria-rowindex={1}>
+                {rowDetail && <div className="sp-datagrid__column-group-cell sp-datagrid__column-group-cell--empty" />}
+                {hasLeadingRowActions && <div className="sp-datagrid__column-group-cell sp-datagrid__column-group-cell--empty" />}
+                {isRowReorder && <div className="sp-datagrid__column-group-cell sp-datagrid__column-group-cell--empty" />}
+                {effectiveSelectionMode !== 'none' && <div className="sp-datagrid__column-group-cell sp-datagrid__column-group-cell--empty" />}
+                {showRowNumbers && <div className="sp-datagrid__column-group-cell sp-datagrid__column-group-cell--empty" />}
+
+                {orderedColumnGroups.map((cg) => {
+                  const span = cg.columnKeys.filter((k) => !internalHiddenColumns.has(k)).length;
+                  if (span === 0) return null;
+                  return (
+                    <div
+                      key={cg.key}
+                      className={[
+                        'sp-datagrid__column-group-cell',
+                        reorderable && cg.reorderable !== false ? 'sp-datagrid__column-group-cell--reorderable' : '',
+                        draggedColumnGroupKey === cg.key ? 'sp-datagrid__column-group-cell--dragging' : '',
+                        columnGroupDropTarget?.key === cg.key && columnGroupDropTarget.position === 'before' ? 'sp-datagrid__column-group-cell--drop-before' : '',
+                        columnGroupDropTarget?.key === cg.key && columnGroupDropTarget.position === 'after' ? 'sp-datagrid__column-group-cell--drop-after' : '',
+                      ].filter(Boolean).join(' ')}
+                      style={{ gridColumn: `span ${span}` }}
+                      draggable={reorderable && cg.reorderable !== false}
+                      onDragStart={() => setDraggedColumnGroupKey(cg.key)}
+                      onDragEnd={() => {
+                        setDraggedColumnGroupKey(null);
+                        setColumnGroupDropTarget(null);
+                      }}
+                      onDragOver={(event) => {
+                        if (!draggedColumnGroupKey || draggedColumnGroupKey === cg.key) return;
+                        event.preventDefault();
+                        const rect = event.currentTarget.getBoundingClientRect();
+                        setColumnGroupDropTarget({
+                          key: cg.key,
+                          position: event.clientX < rect.left + rect.width / 2 ? 'before' : 'after',
+                        });
+                      }}
+                      onDrop={(event) => {
+                        event.preventDefault();
+                        if (draggedColumnGroupKey && columnGroupDropTarget) {
+                          const next = activeColumnGroupOrder.filter((key) => key !== draggedColumnGroupKey);
+                          const target = next.indexOf(columnGroupDropTarget.key);
+                          next.splice(columnGroupDropTarget.position === 'after' ? target + 1 : target, 0, draggedColumnGroupKey);
+                          setInternalColumnGroupOrder(next);
+                          onColumnGroupOrderChange?.(next);
+                        }
+                        setDraggedColumnGroupKey(null);
+                        setColumnGroupDropTarget(null);
+                      }}
+                    >
+                      <span className="sp-datagrid__column-group-label">{cg.header}</span>
+                      {cg.resizable !== false && (
+                        <div
+                          className="sp-datagrid__column-group-resize-handle"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            const startX = e.clientX;
+                            const startWidth = e.currentTarget.parentElement?.getBoundingClientRect().width ?? 150;
+                            const handleMouseMove = (moveEvent: MouseEvent) => {
+                              const diff = moveEvent.clientX - startX;
+                              const width = Math.max(50, startWidth + diff);
+                              const firstColumn = cg.columnKeys[0];
+                              if (firstColumn) {
+                                setColumnWidths((previous) => new Map(previous).set(firstColumn, width));
+                              }
+                              onColumnGroupResize?.({
+                                key: cg.key,
+                                width,
+                                columnKey: firstColumn ?? '',
+                                columnWidth: width,
+                              });
+                            };
+                            const handleMouseUp = () => {
+                              window.removeEventListener('mousemove', handleMouseMove);
+                              window.removeEventListener('mouseup', handleMouseUp);
+                            };
+                            window.addEventListener('mousemove', handleMouseMove);
+                            window.addEventListener('mouseup', handleMouseUp);
+                          }}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+                {showRowEditActions && <div className="sp-datagrid__column-group-cell sp-datagrid__column-group-cell--empty" />}
               </div>
             )}
-            {opts.selectionMode === 'single' && (
-              <div className="sp-grid-header-cell sp-grid-header-cell--checkbox" style={{ width: 44, minWidth: 44 }} />
-            )}
-            {leftPinnedCols.map(renderHeaderCell)}
-            {centerCols.map(renderHeaderCell)}
-            {rightPinnedCols.map(renderHeaderCell)}
-          </div>
 
-          {/* Inline filter row */}
-          {hasInlineFilters && (
-            <div className="sp-grid-filter-row">
-              {hasExpandColumn && <div className="sp-grid-filter-cell sp-grid-filter-cell--spacer" style={{ width: 36, minWidth: 36 }} />}
-              {opts.rowDraggable && <div className="sp-grid-filter-cell sp-grid-filter-cell--spacer" style={{ width: 36, minWidth: 36 }} />}
-              {opts.editMode === 'row' && <div className="sp-grid-filter-cell sp-grid-filter-cell--spacer" style={{ width: 80, minWidth: 80 }} />}
-              {opts.selectionMode && opts.selectionMode !== 'none' && (
-                <div className="sp-grid-filter-cell sp-grid-filter-cell--spacer" style={{ width: 44, minWidth: 44 }} />
+            {/* Column Header Row */}
+            <div
+              className={`sp-datagrid__row sp-datagrid__header-row ${
+                orderedColumnGroups.length > 0 ? 'sp-datagrid__header-row--with-column-groups' : ''
+              }`}
+              role="row"
+              aria-rowindex={orderedColumnGroups.length > 0 ? 2 : 1}
+            >
+              {rowDetail && (
+                <div className="sp-datagrid__header-cell sp-datagrid__row-detail-toggle-cell" role="columnheader">
+                  <span className="sp-datagrid__visually-hidden">Row Details</span>
+                </div>
               )}
-              {visibleColumns.map((col) => (
-                <div
-                  key={col.field}
-                  className="sp-grid-filter-cell"
-                  style={
-                    opts.autoFit
-                      ? { flex: col.flex ?? 1, minWidth: col.minWidth ?? 60 }
-                      : { width: getColWidth(col), minWidth: col.minWidth ?? 60 }
-                  }
-                >
-                  {col.filterable && getFilterMode(col) === 'inline' && (
-                    <>
-                      <input
-                        className="sp-grid-filter-inline"
-                        type="text"
-                        placeholder={t('filterValue')}
-                        defaultValue={String(getFilter(col.field)?.value ?? '')}
-                        onChange={(e) => onInlineFilterInput(col.field, e.target.value)}
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                      {hasFilter(col.field) && (
-                        <button
-                          className="sp-grid-filter-inline-clear"
-                          onClick={(e) => {
-                            onFilterClear(col.field);
-                            e.stopPropagation();
-                          }}
-                        >
-                          <Icon name="x" size={12} />
-                        </button>
-                      )}
-                    </>
+              {hasLeadingRowActions && (
+                <div className="sp-datagrid__header-cell sp-datagrid__leading-row-actions-cell" role="columnheader">
+                  <span className="sp-datagrid__visually-hidden">Actions</span>
+                </div>
+              )}
+              {isRowReorder && (
+                <div className="sp-datagrid__header-cell sp-datagrid__row-drag-header" role="columnheader">
+                  <span className="sp-datagrid__visually-hidden">Row Reorder</span>
+                </div>
+              )}
+              {effectiveSelectionMode !== 'none' && (
+                <div className="sp-datagrid__header-cell sp-datagrid__selection-cell" role="columnheader" aria-label={`${t('selectAllRowsOnPage')}`}>
+                  {effectiveSelectionMode === 'multiple' && (
+                    <Checkbox
+                      ariaLabel={`${t('selectAllRowsOnPage')}`}
+                      checked={sortedRows.length > 0 && activeSelection.length === sortedRows.length}
+                      indeterminate={activeSelection.length > 0 && activeSelection.length < sortedRows.length}
+                      onChange={handleToggleSelectAll}
+                    />
                   )}
                 </div>
-              ))}
-            </div>
-          )}
+              )}
+              {showRowNumbers && (
+                <div className="sp-datagrid__header-cell sp-datagrid__row-number-cell" role="columnheader">
+                  #
+                </div>
+              )}
 
-          {/* Body */}
-          <div className="sp-grid-body">
-            {/* Row drag ghost line */}
-            {rowDragGhostY !== null && dragRowIdx !== null && (
-              <div
-                className="sp-grid-row-drag-ghost"
-                style={{ transform: `translateY(${rowDragGhostY}px)` }}
-              />
-            )}
+              {/* Column Headers */}
+              {columnVirtualization && columnVirtualLayout.beforeWidth > 0 && (
+                <div className="sp-datagrid__column-virtual-spacer" aria-hidden="true" />
+              )}
+              {renderedColumns.map((column, colIdx) => {
+                const col = column;
+                const sortItem = activeSorts.find((s) => s.key === col.key);
+                const isSorted = !!sortItem;
+                const sortPriority = multiSort && activeSorts.length > 1 ? activeSorts.findIndex((s) => s.key === col.key) + 1 : 0;
+                const filterItem = activeColumnFilters.find((f) => f.key === col.key);
+                const isFiltered = !!filterItem;
+                const pin = columnPinsProp?.[col.key] ?? col.pinned;
 
-            {opts.virtualScroll && virtualTotalHeight != null ? (
-              <div
-                className="sp-grid-virtual-spacer"
-                style={{ height: virtualTotalHeight, '--vs-row-h': `${rowHeight}px` } as React.CSSProperties}
-              >
+                const headerCellClasses = [
+                  'sp-datagrid__header-cell',
+                  reorderable && col.reorderable !== false ? 'sp-datagrid__header-cell--reorderable' : '',
+                  pin ? 'sp-datagrid__pinned-cell' : '',
+                  pin === 'left' ? 'sp-datagrid__pinned-cell--left sp-datagrid__header-cell--pinned-left' : '',
+                  pin === 'right' ? 'sp-datagrid__pinned-cell--right sp-datagrid__header-cell--pinned-right' : '',
+                  colIdx === leftPinned.length - 1 ? 'sp-datagrid__pinned-cell--boundary' : '',
+                  colIdx === renderedColumns.length - rightPinned.length ? 'sp-datagrid__pinned-cell--boundary' : '',
+                  draggedColumnKey === col.key ? 'sp-datagrid__header-cell--dragging' : '',
+                  columnDropTarget?.key === col.key && columnDropTarget.position === 'before' ? 'sp-datagrid__header-cell--drop-before' : '',
+                  columnDropTarget?.key === col.key && columnDropTarget.position === 'after' ? 'sp-datagrid__header-cell--drop-after' : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ');
+
+                return (
+                  <div
+                    key={col.key}
+                    className={headerCellClasses}
+                    role="columnheader"
+                    data-sp-datagrid-column={col.key}
+                    aria-colindex={visibleColumns.indexOf(col) + ariaColumnOffset + 1}
+                    aria-sort={
+                      sortItem?.direction === 'asc'
+                        ? 'ascending'
+                        : sortItem?.direction === 'desc'
+                        ? 'descending'
+                        : 'none'
+                    }
+                    draggable={reorderable && col.reorderable !== false}
+                    style={pinnedColumnStyle(col.key, pin)}
+                    onDragStart={(e) => {
+                      e.dataTransfer.effectAllowed = 'move';
+                      e.dataTransfer.setData('text/plain', col.key);
+                      setDraggedColumnKey(col.key);
+                      setDragGhostPos({ x: e.clientX, y: e.clientY });
+                    }}
+                    onDrag={(e) => {
+                      if (e.clientX !== 0 && e.clientY !== 0) {
+                        setDragGhostPos({ x: e.clientX, y: e.clientY });
+                      }
+                    }}
+                    onDragEnd={() => {
+                      setDraggedColumnKey(null);
+                      setColumnDropTarget(null);
+                      setDragGhostPos(null);
+                    }}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      if (draggedColumnKey && draggedColumnKey !== col.key) {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const midX = rect.left + rect.width / 2;
+                        setColumnDropTarget({
+                          key: col.key,
+                          position: e.clientX < midX ? 'before' : 'after',
+                        });
+                      }
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      if (draggedColumnKey && columnDropTarget) {
+                        const nextOrder = [...activeColumnOrder];
+                        const fromIdx = nextOrder.indexOf(draggedColumnKey);
+                        if (fromIdx !== -1) {
+                          nextOrder.splice(fromIdx, 1);
+                          let toIdx = nextOrder.indexOf(columnDropTarget.key);
+                          if (columnDropTarget.position === 'after') toIdx += 1;
+                          nextOrder.splice(toIdx, 0, draggedColumnKey);
+                          setInternalColumnOrder(nextOrder);
+                          onColumnOrderChange?.(nextOrder);
+                        }
+                      }
+                      setDraggedColumnKey(null);
+                      setColumnDropTarget(null);
+                    }}
+                    tabIndex={0}
+                  >
+                    {/* Sort Button */}
+                    <button
+                      type="button"
+                      className="sp-datagrid__sort-button"
+                      aria-label={`${t('sortAscending')} ${column.header}`}
+                      onClick={() => handleSortColumn(col.key)}
+                      disabled={col.sortable === false}
+                    >
+                      <span className="sp-datagrid__header-label">{col.header}</span>
+                      {col.sortable !== false && (
+                        <span
+                          className={`sp-datagrid__sort-indicator ${
+                            isSorted ? 'sp-datagrid__sort-indicator--active' : ''
+                          }`}
+                        >
+                          <Icon
+                            name={
+                              sortItem?.direction === 'desc'
+                                ? 'arrow-down'
+                                : sortItem?.direction === 'asc'
+                                ? 'arrow-up'
+                                : 'arrow-down-up'
+                            }
+                            size={12}
+                          />
+                        </span>
+                      )}
+                      {sortPriority > 0 && (
+                        <span className="sp-datagrid__sort-priority">{sortPriority}</span>
+                      )}
+                    </button>
+
+                    {/* Filter Trigger */}
+                    {col.filterable === true && (
+                      <button
+                        type="button"
+                        className={`sp-datagrid__filter-trigger ${
+                          isFiltered ? 'sp-datagrid__filter-trigger--active' : ''
+                        }`}
+                        aria-label={`${t('filter')} ${column.header}`}
+                        onClick={(e) => {
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setActiveFilterPopover({ key: col.key, triggerRect: rect });
+                        }}
+                      >
+                        <Icon name="filter" size={12} />
+                      </button>
+                    )}
+
+                    {/* Column Menu */}
+                    {(columnMenu || col.menuItems) && (
+                      <div className="sp-datagrid__column-menu">
+                        <Dropdown
+                          trigger={(
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              iconOnly
+                              iconLeft="more-vertical"
+                              className="sp-datagrid__column-menu-trigger"
+                              aria-label={`Column menu for ${col.header}`}
+                            />
+                          )}
+                          items={columnMenuItemsFor(col)}
+                          placement="bottom-end"
+                          minWidth={220}
+                          open={activeColumnMenu?.key === col.key}
+                          onOpenChange={(open) => setActiveColumnMenu(open ? { key: col.key } : null)}
+                        />
+                      </div>
+                    )}
+
+                    {/* Column Resize Handle */}
+                    {col.resizable !== false && (
+                      <div
+                        className="sp-datagrid__resize-handle"
+                        tabIndex={0}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          const startX = e.clientX;
+                          const initialWidth =
+                            typeof columnWidths.get(col.key) === 'number'
+                              ? (columnWidths.get(col.key) as number)
+                              : e.currentTarget.parentElement?.getBoundingClientRect().width ?? 120;
+
+                          const handleMouseMove = (moveEvent: MouseEvent) => {
+                            const diff = moveEvent.clientX - startX;
+                            const newW = Math.min(
+                              col.maxWidth ?? Number.POSITIVE_INFINITY,
+                              Math.max(col.minWidth ?? DEFAULT_MIN_COLUMN_WIDTH, initialWidth + diff),
+                            );
+                            setColumnWidths((prev) => new Map(prev).set(col.key, newW));
+                            onColumnResize?.({ key: col.key, width: newW });
+                          };
+
+                          const handleMouseUp = () => {
+                            window.removeEventListener('mousemove', handleMouseMove);
+                            window.removeEventListener('mouseup', handleMouseUp);
+                          };
+
+                          window.addEventListener('mousemove', handleMouseMove);
+                          window.addEventListener('mouseup', handleMouseUp);
+                        }}
+                        onDoubleClick={() => {
+                          setColumnWidths((prev) => new Map(prev).set(col.key, 'auto'));
+                          onColumnResize?.({ key: col.key, width: 'auto' });
+                        }}
+                        onKeyDown={(event) => {
+                          const current =
+                            typeof columnWidths.get(col.key) === 'number'
+                              ? Number(columnWidths.get(col.key))
+                              : col.width && typeof col.width === 'number'
+                                ? col.width
+                                : defaultColumnWidth;
+                          const step = event.shiftKey ? 32 : 8;
+                          let next: number | null = null;
+                          if (event.key === 'ArrowLeft') next = current - step;
+                          if (event.key === 'ArrowRight') next = current + step;
+                          if (event.key === 'Home') next = col.minWidth ?? DEFAULT_MIN_COLUMN_WIDTH;
+                          if (event.key === 'End') next = col.maxWidth ?? current;
+                          if (next === null) return;
+                          event.preventDefault();
+                          const bounded = Math.min(col.maxWidth ?? Number.POSITIVE_INFINITY, Math.max(col.minWidth ?? DEFAULT_MIN_COLUMN_WIDTH, next));
+                          setColumnWidths((prev) => new Map(prev).set(col.key, bounded));
+                          onColumnResize?.({ key: col.key, width: bounded });
+                        }}
+                      />
+                    )}
+                  </div>
+                );
+              })}
+
+              {columnVirtualization && columnVirtualLayout.afterWidth > 0 && (
+                <div className="sp-datagrid__column-virtual-spacer" aria-hidden="true" />
+              )}
+              {showRowEditActions && (
+                <div className="sp-datagrid__header-cell sp-datagrid__actions-header" role="columnheader">
+                  {resolvedEditLabels.actions}
+                </div>
+              )}
+              {!fitColumnsToWidth && (
                 <div
-                  className="sp-grid-virtual-window"
-                  style={{ transform: `translateY(${virtualOffset}px)` }}
-                >
-                  {renderedRows.map(renderDisplayRow)}
+                  className="sp-datagrid__header-cell sp-datagrid__header-cell--filler"
+                  role="columnheader"
+                  aria-hidden="true"
+                />
+              )}
+            </div>
+
+            {/* Body Rows */}
+            {displayRows.length === 0 && !loading && (
+              <div className="sp-datagrid__empty-row" role="row">
+                <div className="sp-datagrid__empty-cell" role="gridcell" style={{ gridColumn: '1 / -1' }}>
+                  {emptyState ?? (
+                    <div className="sp-datagrid__empty-state">
+                      <Icon name={emptyIcon} size={32} />
+                      <div className="sp-datagrid__empty-state-copy">
+                        <strong>{resolvedEmptyTitle}</strong>
+                        {resolvedEmptyDescription && <p>{resolvedEmptyDescription}</p>}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-            ) : (
-              <>
-                {loading && opts.loadingMode === 'skeleton' ? (
-                  <div className="sp-grid-skeleton-body">
-                    {Array.from({ length: Math.ceil(viewportHeight / rowHeight) + 1 }, (_, i) => (
-                      <div key={i} className="sp-grid-skeleton-row" style={{ height: rowHeight }}>
-                        {visibleColumns.map((col) => (
-                          <div
-                            key={col.field}
-                            className="sp-grid-skeleton-cell"
-                            style={
-                              opts.autoFit
-                                ? { flex: col.flex ?? 1, minWidth: col.minWidth ?? 60 }
-                                : { width: getColWidth(col), minWidth: col.minWidth ?? 60 }
-                            }
-                          >
-                            <div className="sp-grid-skeleton-shimmer" />
-                          </div>
-                        ))}
-                      </div>
-                    ))}
+            )}
+
+            {virtualTopSpacer > 0 && (
+              <div
+                className="sp-datagrid__virtual-spacer"
+                aria-hidden="true"
+                style={{ blockSize: `${virtualTopSpacer}px` }}
+              />
+            )}
+            {renderedDisplayRows.map((item, itemIdx) => {
+              const absoluteItemIdx = itemIdx + virtualStartIndex;
+              if (item.type === 'group') {
+                const node = item.node;
+                return (
+                  <div
+                    key={`group-${node.key}`}
+                    className={`sp-datagrid__row sp-datagrid__group-row ${
+                      stickyGroupHeaders ? 'sp-datagrid__group-row--sticky' : ''
+                    }`}
+                    role="row"
+                    aria-rowindex={absoluteItemIdx + (orderedColumnGroups.length > 0 ? 3 : 2)}
+                    aria-expanded={node.expanded}
+                  >
+                    <div
+                      className={`sp-datagrid__group-cell ${
+                        groupSelection && effectiveSelectionMode === 'multiple'
+                          ? 'sp-datagrid__group-cell--with-selection'
+                          : ''
+                      }`}
+                      style={{
+                        gridColumn: '1 / -1',
+                        paddingInlineStart: indentGroupedRows
+                          ? `calc(var(--sp-datagrid-cell-padding-inline) + ${item.depth * 20}px)`
+                          : undefined,
+                      }}
+                    >
+                      {groupSelection && effectiveSelectionMode === 'multiple' && (
+                        <Checkbox
+                          className="sp-datagrid__group-selection"
+                          ariaLabel={`Select group ${node.groupField}: ${String(node.groupValue ?? '')}`}
+                          checked={node.rows.length > 0 && node.rows.every((row) => activeSelection.includes(row))}
+                          indeterminate={(() => {
+                            const selectedCount = node.rows.filter((row) => activeSelection.includes(row)).length;
+                            return selectedCount > 0 && selectedCount < node.rows.length;
+                          })()}
+                          onChange={() => handleToggleGroupSelection(node.rows)}
+                        />
+                      )}
+                      <button
+                        type="button"
+                        className="sp-datagrid__group-toggle"
+                        onClick={() => {
+                          setGroupExpandedMap((prev) => {
+                            const next = new Map(prev);
+                            next.set(node.key, !node.expanded);
+                            return next;
+                          });
+                        }}
+                      >
+                        <Icon name={node.expanded ? 'chevron-down' : 'chevron-right'} size={14} />
+                        <span className="sp-datagrid__group-label">
+                          <strong>{node.groupField}:</strong> {String(node.groupValue ?? '')}
+                        </span>
+                        <span className="sp-datagrid__group-count">{node.rows.length}</span>
+                      </button>
+                    </div>
                   </div>
-                ) : (
-                  <div className="sp-grid-rows-container">
-                    {displayRows.map(renderDisplayRow)}
-                    {displayRows.length === 0 && !loading && (
-                      <div className="sp-grid-empty">
-                        <Icon name="table" size={24} />
-                        <span>{opts.emptyMessage ?? t('noData')}</span>
+                );
+              }
+
+              const row = item.row;
+              const sourceRowIndex = sortedRows.indexOf(row);
+              const rowIndex = virtualPaging
+                ? (activePage - 1) * activePageSize + Math.max(0, sourceRowIndex)
+                : isPaginated
+                  ? (activePage - 1) * activePageSize + Math.max(0, sourceRowIndex)
+                  : Math.max(0, sourceRowIndex === -1 ? absoluteItemIdx : sourceRowIndex);
+              const rowId = resolveTrackBy(trackBy, row, rowIndex);
+              const isSelected = activeSelection.includes(row);
+              const isRowDetailOpen = expandedRowDetails.has(rowId);
+              const isEditingThisRow = editingRowIndex === rowIndex;
+              const canEditRow = isRowEditable ? isRowEditable(row) : true;
+
+              // DataContext row markers
+              const rowState = dataContextAdapter?.recordState(row);
+              const isRowInvalid = dataContextAdapter?.rowInvalid(row);
+
+              const customClass = normalizeClassName(
+                typeof rowClass === 'function' ? rowClass(row, rowIndex) : rowClass ??
+                  (typeof rowClassName === 'function' ? rowClassName(row, rowIndex) : rowClassName),
+              );
+
+              let customRowStyle: CSSProperties | undefined = undefined;
+              if (typeof rowStyle === 'function') {
+                const res = rowStyle(row, rowIndex);
+                if (typeof res === 'object' && res !== null) customRowStyle = res;
+              } else if (typeof rowStyle === 'object' && rowStyle !== null) {
+                customRowStyle = rowStyle;
+              }
+
+              const rowClasses = [
+                'sp-datagrid__row',
+                'sp-datagrid__body-row',
+                stripedRows && rowIndex % 2 === 1 ? 'sp-datagrid__body-row--striped' : '',
+                isSelected ? 'sp-datagrid__body-row--selected' : '',
+                isEditingThisRow ? 'sp-datagrid__body-row--editing' : '',
+                rowReorderingEnabled && (!rowReorderable || rowReorderable(row)) ? 'sp-datagrid__body-row--reorderable' : '',
+                draggedRowIndex === rowIndex ? 'sp-datagrid__body-row--dragging' : '',
+                rowDropTarget?.index === rowIndex && rowDropTarget.position === 'before' ? 'sp-datagrid__body-row--drop-before' : '',
+                rowDropTarget?.index === rowIndex && rowDropTarget.position === 'after' ? 'sp-datagrid__body-row--drop-after' : '',
+                rowState === 'added' && dataContextAdapter?.showRowState() ? 'sp-datagrid__body-row--state-added' : '',
+                rowState === 'modified' && dataContextAdapter?.showRowState() ? 'sp-datagrid__body-row--state-modified' : '',
+                isRowInvalid && dataContextAdapter?.showRowValidation() ? 'sp-datagrid__body-row--validation-error' : '',
+                customClass,
+              ]
+                .filter(Boolean)
+                .join(' ');
+
+              // Full custom row template projection
+              if (rowTemplate) {
+                return (
+                  <Fragment key={String(rowId)}>
+                    {rowTemplate({
+                      $implicit: row,
+                      row,
+                      rowIndex,
+                      columns: visibleColumns,
+                      isEditing: isEditingThisRow,
+                      isSelected,
+                      isExpanded: isRowDetailOpen,
+                    })}
+                  </Fragment>
+                );
+              }
+
+              return (
+                <Fragment key={String(rowId)}>
+                  <div
+                    className={rowClasses}
+                    role="row"
+                    aria-rowindex={absoluteItemIdx + (orderedColumnGroups.length > 0 ? 3 : 2)}
+                    aria-selected={isSelected}
+                    aria-label={rowLabel
+                      ? typeof rowLabel === 'function'
+                        ? rowLabel(row, rowIndex)
+                        : String((row as Record<string, unknown>)[String(rowLabel)] ?? '')
+                      : `Row ${rowIndex + 1}`}
+                    style={customRowStyle}
+                    draggable={rowReorderingEnabled && (!rowReorderable || rowReorderable(row))}
+                    onDragStart={() => setDraggedRowIndex(rowIndex)}
+                    onDragEnd={() => {
+                      setDraggedRowIndex(null);
+                      setRowDropTarget(null);
+                    }}
+                    onDragOver={(e) => {
+                      if (draggedRowIndex !== null && draggedRowIndex !== rowIndex) {
+                        e.preventDefault();
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const midY = rect.top + rect.height / 2;
+                        setRowDropTarget({
+                          index: rowIndex,
+                          position: e.clientY < midY ? 'before' : 'after',
+                        });
+                      }
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      if (draggedRowIndex !== null && rowDropTarget) {
+                        const nextRows = [...sortedRows];
+                        const [moved] = nextRows.splice(draggedRowIndex, 1);
+                        let targetIdx = rowDropTarget.index;
+                        if (rowDropTarget.position === 'after') targetIdx += 1;
+                        nextRows.splice(targetIdx, 0, moved);
+                        onRowOrderChange?.({
+                          row: moved,
+                          fromIndex: draggedRowIndex,
+                          toIndex: targetIdx,
+                          rows: nextRows,
+                        });
+                      }
+                      setDraggedRowIndex(null);
+                      setRowDropTarget(null);
+                    }}
+                  >
+                    {/* Row Detail Toggle */}
+                    {rowDetail && (
+                      <div className="sp-datagrid__cell sp-datagrid__row-detail-toggle-cell" role="gridcell">
+                        {(!rowDetailExpandable || rowDetailExpandable(row, rowIndex)) && (
+                          <button
+                            type="button"
+                            className="sp-datagrid__row-detail-toggle"
+                            aria-label="Toggle row details"
+                            aria-expanded={isRowDetailOpen}
+                            onClick={() => {
+                              {
+                                const next = new Set(expandedRowDetails);
+                                if (next.has(rowId)) next.delete(rowId);
+                                else next.add(rowId);
+                                updateExpandedRowDetails(next);
+                              }
+                            }}
+                          >
+                            <Icon name={isRowDetailOpen ? 'chevron-down' : 'chevron-right'} size={14} />
+                          </button>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Leading Row Actions */}
+                    {hasLeadingRowActions && (
+                      <div className="sp-datagrid__cell sp-datagrid__leading-row-actions-cell" role="gridcell">
+                        {leadingRowActions ? leadingRowActions({
+                          $implicit: row,
+                          row,
+                          rowIndex,
+                          detailPaneOpen: activeDetailPaneRow === row,
+                          toggleDetailPane: () => {
+                            setActiveDetailPaneRow(activeDetailPaneRow === row ? null : row);
+                          },
+                        }) : (
+                          <button
+                            type="button"
+                            className="sp-btn sp-btn--sm sp-datagrid__detail-pane-toggle"
+                            aria-label={`${activeDetailPaneRow === row ? 'Close' : 'Open'} details for ${String(resolveTrackBy(trackBy, row, rowIndex))}`}
+                            aria-pressed={activeDetailPaneRow === row}
+                            onClick={() => setActiveDetailPaneRow(activeDetailPaneRow === row ? null : row)}
+                          >
+                            <Icon name="info" size={14} />
+                          </button>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Row Reorder Grip */}
+                    {isRowReorder && (
+                      <div className="sp-datagrid__cell sp-datagrid__row-drag-cell" role="gridcell">
+                        <button
+                          type="button"
+                          className="sp-datagrid__row-drag-handle"
+                          aria-label={`Drag handle: Row ${rowIndex + 1}`}
+                          disabled={!rowReorderingEnabled || (rowReorderable !== undefined && !rowReorderable(row))}
+                          style={{ border: 'none', background: 'transparent' }}
+                        >
+                          <Icon name="grip-vertical" size={14} />
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Row Selection Cell */}
+                    {effectiveSelectionMode !== 'none' && (
+                      <div className="sp-datagrid__cell sp-datagrid__selection-cell" role="gridcell">
+                        {effectiveSelectionMode === 'single' ? (
+                          <label className="sp-datagrid__radio">
+                            <input
+                              type="radio"
+                              name={`${gridId}-selection`}
+                              className="sp-datagrid__radio-input"
+                              aria-label={`Select row ${rowIndex + 1}`}
+                              checked={isSelected}
+                              onChange={() => handleToggleRowSelection(row)}
+                            />
+                            <span className="sp-datagrid__radio-circle">
+                              <span className="sp-datagrid__radio-dot" />
+                            </span>
+                          </label>
+                        ) : (
+                          <Checkbox
+                            ariaLabel={`Select row ${rowIndex + 1}`}
+                            checked={isSelected}
+                            onChange={() => handleToggleRowSelection(row)}
+                          />
+                        )}
+                      </div>
+                    )}
+
+                    {/* Row Number */}
+                    {showRowNumbers && (
+                      <div className="sp-datagrid__cell sp-datagrid__row-number-cell" role="gridcell">
+                        {rowIndex + 1}
+                      </div>
+                    )}
+
+                    {/* Cells */}
+                    {columnVirtualization && columnVirtualLayout.beforeWidth > 0 && (
+                      <div className="sp-datagrid__column-virtual-spacer" aria-hidden="true" />
+                    )}
+                    {renderedColumns.map((col, colIdx) => {
+                      const sourceSpanIndex = sortedRows.indexOf(row);
+                      const rowSpanEnabled =
+                        Boolean(col.rowSpan) &&
+                        !virtualizationEnabled &&
+                        activeGroupBy.length === 0 &&
+                        !rowDetail;
+                      if (
+                        rowSpanEnabled &&
+                        sourceSpanIndex >= 0 &&
+                        isRowSpanCovered(sortedRows, sourceSpanIndex, col)
+                      ) {
+                        return null;
+                      }
+
+                      const cellVal = getCellValue(row, col);
+                      const formattedVal = formatCellValue(row, rowIndex, col, effectiveLocale);
+                      const isEditingCell =
+                        (editMode === 'cell' && editingCell?.rowIndex === rowIndex && editingCell?.key === col.key) ||
+                        (editMode === 'row' && isEditingThisRow && canEditRow);
+
+                      const isEditable =
+                        canEditRow &&
+                        (typeof col.editable === 'function' ? col.editable(row) : col.editable === true) &&
+                        (!isCellEditable || isCellEditable(row, col)) &&
+                        (editMode !== 'none');
+
+                      const isReadonly =
+                        col.readonly === true ||
+                        (typeof col.readonly === 'function' && col.readonly(row)) ||
+                        (isCellReadonly && isCellReadonly(row, col));
+
+                      const editorType =
+                        col.editorType ??
+                        (cellVal instanceof Date
+                          ? 'date'
+                          : typeof cellVal === 'number'
+                            ? 'number'
+                            : typeof cellVal === 'boolean'
+                              ? 'checkbox'
+                              : 'text');
+                      const draftValue = editMode === 'row' ? rowDrafts.get(col.key) : cellDraftValue;
+
+                      const pin = columnPinsProp?.[col.key] ?? col.pinned;
+
+                      const span = rowSpanEnabled && sourceSpanIndex >= 0
+                        ? resolveRowSpan(sortedRows, sourceSpanIndex, col)
+                        : 1;
+
+                      const cellState = dataContextAdapter?.cellState(row, col.key);
+                      const cellErrors = dataContextAdapter?.cellValidationErrors(row, col.key) ?? [];
+                      const isCellInvalid = cellErrors.length > 0 || (isEditingCell && cellValidationErrors.length > 0);
+
+                      const cellClasses = [
+                        'sp-datagrid__cell',
+                        col.align ? `sp-datagrid__cell--align-${col.align}` : '',
+                        col.wrap !== false ? 'sp-datagrid__cell--wrap' : '',
+                        isEditable ? 'sp-datagrid__cell--editable' : '',
+                        isReadonly ? 'sp-datagrid__cell--readonly' : '',
+                        isEditingCell ? 'sp-datagrid__cell--editing' : '',
+                        isCellInvalid ? 'sp-datagrid__cell--invalid' : '',
+                        span > 1 ? 'sp-datagrid__cell--row-span' : '',
+                        pin ? 'sp-datagrid__pinned-cell' : '',
+                        pin === 'left' ? 'sp-datagrid__pinned-cell--left' : '',
+                        pin === 'right' ? 'sp-datagrid__pinned-cell--right' : '',
+                        colIdx === leftPinned.length - 1 ? 'sp-datagrid__pinned-cell--boundary' : '',
+                        colIdx === renderedColumns.length - rightPinned.length ? 'sp-datagrid__pinned-cell--boundary' : '',
+                        cellState === 'added' && dataContextAdapter?.showCellState() ? 'sp-datagrid__cell--state-added' : '',
+                        cellState === 'modified' && dataContextAdapter?.showCellState() ? 'sp-datagrid__cell--state-modified' : '',
+                        isCellInvalid && dataContextAdapter?.showCellValidation() ? 'sp-datagrid__cell--validation-error' : '',
+                      ]
+                        .filter(Boolean)
+                        .join(' ');
+
+                      const customTemplate = cellTemplates[col.key];
+                      const customEditor = cellEditors[col.key];
+                      const choiceOptions = normalizeChoiceOptions(
+                        col.editorOptions?.options,
+                        col.editorOptions?.displayField,
+                        col.editorOptions?.valueField,
+                      );
+
+                      return (
+                        <div
+                          key={col.key}
+                          className={cellClasses}
+                          role="gridcell"
+                          aria-colindex={visibleColumns.indexOf(col) + ariaColumnOffset + 1}
+                          aria-rowspan={span > 1 ? span : undefined}
+                          aria-readonly={isReadonly ? true : undefined}
+                          aria-invalid={isCellInvalid ? true : undefined}
+                          data-sp-datagrid-cell={col.key}
+                          tabIndex={0}
+                          style={{
+                            ...pinnedColumnStyle(col.key, pin),
+                            gridColumn: gridColumnFor(col),
+                            ...(span > 1 ? { '--sp-datagrid-row-span': span } : {}),
+                          } as CSSProperties}
+                          onDoubleClick={() => {
+                            if (isEditable && !isReadonly && editMode === 'cell') {
+                              startCellEdit(rowIndex, col.key, cellVal, row);
+                            }
+                          }}
+                          onClick={() => {
+                            if (isEditable && !isReadonly && editMode === 'cell' && editOnClick) {
+                              startCellEdit(rowIndex, col.key, cellVal, row);
+                            }
+                          }}
+                          onKeyDown={(event) => {
+                            if (isEditingCell) return;
+                            if (isEditable && !isReadonly && editMode === 'cell') {
+                              if (event.key === 'Enter' || event.key === 'F2' || (event.key === ' ' && editorType === 'checkbox')) {
+                                event.preventDefault();
+                                startCellEdit(rowIndex, col.key, cellVal);
+                              } else if (
+                                editOnType &&
+                                !event.ctrlKey &&
+                                !event.metaKey &&
+                                !event.altKey &&
+                                (event.key.length === 1 || event.key === 'Backspace' || event.key === 'Delete')
+                              ) {
+                                event.preventDefault();
+                                startCellEdit(rowIndex, col.key, event.key === 'Backspace' || event.key === 'Delete' ? '' : event.key, row);
+                              }
+                            }
+                          }}
+                          onMouseEnter={(e) => {
+                            if (isCellInvalid) {
+                              const rect = e.currentTarget.getBoundingClientRect();
+                              const msg = cellErrors.map((err) => err.message).join(' ') || cellValidationErrors.map((err) => err.message).join(' ');
+                              setFloatingError({ message: msg, rect });
+                            }
+                          }}
+                          onMouseLeave={() => setFloatingError(null)}
+                        >
+                          {/* Corner triangle state indicator */}
+                          {cellState && dataContextAdapter?.showCellState() && (
+                            <span className="sp-datagrid__state-indicator" />
+                          )}
+
+                          {/* Corner triangle validation indicator */}
+                          {isCellInvalid && dataContextAdapter?.showCellValidation() && (
+                            <span className="sp-datagrid__validation-indicator" />
+                          )}
+
+                          {/* Readonly lock indicator glyph */}
+                          {isReadonly && (
+                            <span className="sp-datagrid__readonly-indicator">
+                              <Icon name="lock" size={12} />
+                            </span>
+                          )}
+
+                          {/* Editing control or Cell Template */}
+                          {isEditingCell ? (
+                            customEditor ? (
+                              customEditor({
+                                $implicit: draftValue,
+                                originalValue: cellVal,
+                                value: draftValue,
+                                row,
+                                rowIndex,
+                                column: col,
+                                invalid: isCellInvalid,
+                                errors: cellValidationErrors,
+                                firstError: cellValidationErrors[0]?.message ?? null,
+                                update: (newVal) => {
+                                  if (editMode === 'row') {
+                                    setRowDrafts((prev) => new Map(prev).set(col.key, newVal));
+                                  } else {
+                                    setCellDraftValue(newVal);
+                                  }
+                                },
+                                commit: () => {
+                                  if (editMode === 'row') {
+                                    // Row save handled by row save button
+                                  } else {
+                                    // Cell commit
+                                    commitCellDraft(row, rowIndex, col, draftValue);
+                                  }
+                                },
+                                cancel: () => {
+                                  setEditingCell(null);
+                                },
+                              })
+                            ) : editorType === 'checkbox' ? (
+                              <Checkbox
+                                className="sp-datagrid__editor-control--checkbox"
+                                checked={Boolean(draftValue)}
+                                onChange={(val) => {
+                                  if (editMode === 'row') {
+                                    setRowDrafts((prev) => new Map(prev).set(col.key, val));
+                                  } else {
+                                    setCellDraftValue(val);
+                                    commitCellDraft(row, rowIndex, col, val);
+                                  }
+                                }}
+                              />
+                            ) : editorType === 'select' || editorType === 'combobox' || editorType === 'grid-combobox' ? (
+                              <select
+                                className="sp-datagrid__editor"
+                                value={col.editorOptions?.multiple === true
+                                  ? (Array.isArray(draftValue) ? draftValue.map((value) => String(value)) : [])
+                                  : String(draftValue ?? '')}
+                                autoFocus
+                                multiple={col.editorOptions?.multiple === true}
+                                onChange={(event) => {
+                                  const value = event.currentTarget.multiple
+                                    ? Array.from(event.currentTarget.selectedOptions).map((option) => {
+                                        const match = choiceOptions.find((candidate) => String(candidate.value) === option.value);
+                                        return col.editorOptions?.useDisplayValue || col.editorOptions?.saveDisplayField
+                                          ? match?.label ?? option.value
+                                          : match?.value ?? option.value;
+                                      })
+                                    : (() => {
+                                        const match = choiceOptions.find((candidate) => String(candidate.value) === event.currentTarget.value);
+                                        return col.editorOptions?.useDisplayValue || col.editorOptions?.saveDisplayField
+                                          ? match?.label ?? event.currentTarget.value
+                                          : match?.value ?? event.currentTarget.value;
+                                      })();
+                                  if (editMode === 'row') {
+                                    setRowDrafts((prev) => new Map(prev).set(col.key, value));
+                                  } else {
+                                    setCellDraftValue(value);
+                                    commitCellDraft(row, rowIndex, col, value);
+                                  }
+                                }}
+                                onKeyDown={(event) => {
+                                  if (event.key === 'Escape') {
+                                    setEditingCell(null);
+                                    setCellDraftValue(undefined);
+                                  } else if (event.key === 'Enter' && editMode === 'cell') {
+                                    event.preventDefault();
+                                    commitCellDraft(row, rowIndex, col, event.currentTarget.value);
+                                  }
+                                }}
+                              >
+                                {col.editorOptions?.placeholder && <option value="">{col.editorOptions.placeholder}</option>}
+                                {choiceOptions.map((option) => (
+                                  <option key={String(option.value)} value={String(option.value)} disabled={option.disabled}>
+                                    {option.label}
+                                  </option>
+                                ))}
+                              </select>
+                            ) : (
+                              <input
+                                type={editorType === 'number' ? 'number' : editorType === 'date' ? 'date' : 'text'}
+                                className={`sp-datagrid__editor${isCellInvalid ? ' sp-datagrid__editor--invalid' : ''}`}
+                                aria-invalid={isCellInvalid ? true : undefined}
+                                min={col.editorOptions?.minDate}
+                                max={col.editorOptions?.maxDate}
+                                value={String(draftValue ?? '')}
+                                autoFocus
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  if (editMode === 'row') {
+                                    setRowDrafts((prev) => new Map(prev).set(col.key, val));
+                                  } else {
+                                    setCellDraftValue(val);
+                                    if (validateOnInput) setCellValidationErrors(validateValue(val, row, col));
+                                  }
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    if (editMode === 'cell') {
+                                      e.preventDefault();
+                                      commitCellDraft(row, rowIndex, col, e.currentTarget.value);
+                                    }
+                                  } else if (e.key === 'Escape') {
+                                    setEditingCell(null);
+                                    setCellDraftValue(undefined);
+                                  }
+                                }}
+                                onBlur={(event) => {
+                                  if (editMode === 'cell') commitCellDraft(row, rowIndex, col, event.currentTarget.value);
+                                }}
+                              />
+                            )
+                          ) : editorType === 'checkbox' ? (
+                            <Checkbox
+                              className="sp-datagrid__cell-checkbox"
+                              ariaLabel={`${col.header} for ${rowLabel
+                                ? typeof rowLabel === 'function'
+                                  ? rowLabel(row, rowIndex)
+                                  : String((row as Record<string, unknown>)[String(rowLabel)] ?? '')
+                                : `row ${rowIndex + 1}`}`}
+                              checked={Boolean(cellVal)}
+                              disabled={!isEditable || isReadonly}
+                              onChange={(checked) => commitCellDraft(row, rowIndex, col, checked)}
+                            />
+                          ) : customTemplate ? (
+                            customTemplate({
+                              $implicit: cellVal,
+                              value: cellVal,
+                              formattedValue: formattedVal,
+                              row,
+                              rowIndex,
+                              column: col,
+                            })
+                          ) : (
+                            formattedVal
+                          )}
+                        </div>
+                      );
+                    })}
+                    {columnVirtualization && columnVirtualLayout.afterWidth > 0 && (
+                      <div className="sp-datagrid__column-virtual-spacer" aria-hidden="true" />
+                    )}
+
+                    {/* Row Edit Save / Cancel Action Column */}
+                    {showRowEditActions && (
+                      <div className="sp-datagrid__cell sp-datagrid__row-action-cell" role="gridcell">
+                        {isEditingThisRow ? (
+                          <>
+                            <button
+                              type="button"
+                              className="sp-btn sp-btn--sm sp-btn--primary"
+                              onClick={() => {
+                                commitRowDraft(row, rowIndex, rowDrafts);
+                              }}
+                            >
+                              {resolvedEditLabels.save}
+                            </button>
+                            <button
+                              type="button"
+                              className="sp-btn sp-btn--sm sp-btn--secondary"
+                              onClick={() => {
+                                onEditCancel?.({ mode: 'row', row, rowIndex });
+                                setEditingRowIndex(null);
+                              }}
+                            >
+                              {resolvedEditLabels.cancel}
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            type="button"
+                            className="sp-btn sp-btn--sm sp-btn--secondary"
+                            onClick={() => {
+                              startRowEdit(rowIndex, row);
+                            }}
+                          >
+                            {resolvedEditLabels.edit}
+                          </button>
+                        )}
                       </div>
                     )}
                   </div>
-                )}
-              </>
+
+                  {/* Expandable Row Detail */}
+                  {rowDetail && isRowDetailOpen && (
+                    <div className="sp-datagrid__row sp-datagrid__row-detail-row" role="row">
+                      <div className="sp-datagrid__row-detail-cell sp-datagrid__row-detail-enter">
+                        <div className="sp-datagrid__row-detail-content">
+                          {rowDetail({ $implicit: row, row, rowIndex })}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </Fragment>
+              );
+            })}
+            {virtualBottomSpacer > 0 && (
+              <div
+                className="sp-datagrid__virtual-spacer"
+                aria-hidden="true"
+                style={{ blockSize: `${virtualBottomSpacer}px` }}
+              />
             )}
 
-            {/* Infinite scroll sentinel */}
-            {opts.infiniteScroll && (
-              <div className="sp-grid-infinite-sentinel">
-                {infiniteLoading && (
-                  <div className="sp-grid-infinite-loading">
-                    <div className="sp-grid-spinner sp-grid-spinner--sm">
-                      <div className="sp-grid-spinner__ring" />
-                      <div className="sp-grid-spinner__ring sp-grid-spinner__ring--delay" />
+            {/* Optional New Row Prompt Row */}
+            {allowNewRow && (
+              <div className="sp-datagrid__row sp-datagrid__body-row sp-datagrid__body-row--new" role="row">
+                {rowDetail && <div className="sp-datagrid__cell sp-datagrid__row-detail-toggle-cell" role="gridcell" />}
+                {hasLeadingRowActions && <div className="sp-datagrid__cell sp-datagrid__leading-row-actions-cell" role="gridcell" />}
+                {isRowReorder && <div className="sp-datagrid__cell sp-datagrid__row-drag-cell" role="gridcell" />}
+                {effectiveSelectionMode !== 'none' && <div className="sp-datagrid__cell sp-datagrid__selection-cell" role="gridcell" />}
+                {showRowNumbers && <div className="sp-datagrid__cell sp-datagrid__row-number-cell" role="gridcell" />}
+                {!newRowEditing ? (
+                  <div
+                    className="sp-datagrid__cell"
+                    role="gridcell"
+                    style={{ gridColumn: `span ${Math.max(1, renderedColumns.length + (columnVirtualLayout.beforeWidth > 0 ? 1 : 0) + (columnVirtualLayout.afterWidth > 0 ? 1 : 0))}`, cursor: 'pointer' }}
+                    onClick={beginNewRowEdit}
+                  >
+                    <span className="sp-datagrid__new-row-prompt">
+                      <Icon name="plus" size={14} /> {resolvedNewRowPrompt}
+                    </span>
+                  </div>
+                ) : (
+                  renderedColumns.map((column) => {
+                    const draft = newRowDraft ?? createNewRowDraft();
+                    const value = getCellValue(draft, column);
+                    const editorType = column.editorType ?? (value instanceof Date ? 'date' : typeof value === 'number' ? 'number' : typeof value === 'boolean' ? 'checkbox' : 'text');
+                    const options = normalizeChoiceOptions(
+                      column.editorOptions?.options,
+                      column.editorOptions?.displayField,
+                      column.editorOptions?.valueField,
+                    );
+                    const editable = typeof column.editable === 'function' ? column.editable(draft) : column.editable === true;
+                    if (!editable) {
+                      return <div key={column.key} className="sp-datagrid__cell" role="gridcell">{formatCellValue(draft, sortedRows.length, column, effectiveLocale)}</div>;
+                    }
+                    const updateDraft = (nextValue: unknown) => setNewRowDraft({ ...draft, [column.key]: nextValue } as T);
+                    return (
+                      <div key={column.key} className="sp-datagrid__cell sp-datagrid__cell--editing sp-datagrid__cell--editable" role="gridcell">
+                        {editorType === 'checkbox' ? (
+                          <Checkbox
+                            className="sp-datagrid__editor-control--checkbox"
+                            checked={Boolean(value)}
+                            onChange={(checked) => commitNewRowCell(column, checked)}
+                          />
+                        ) : editorType === 'select' || editorType === 'combobox' || editorType === 'grid-combobox' ? (
+                          <select
+                            className="sp-datagrid__editor"
+                            value={String(value ?? '')}
+                            autoFocus={column.key === visibleColumns.find((candidate) => candidate.editable === true)?.key}
+                            onChange={(event) => commitNewRowCell(column, event.target.value)}
+                          >
+                            {column.editorOptions?.placeholder && <option value="">{column.editorOptions.placeholder}</option>}
+                            {options.map((option) => <option key={String(option.value)} value={String(option.value)} disabled={option.disabled}>{option.label}</option>)}
+                          </select>
+                        ) : (
+                          <input
+                            className="sp-datagrid__editor"
+                            type={editorType === 'number' ? 'number' : editorType === 'date' ? 'date' : 'text'}
+                            value={String(value ?? '')}
+                            autoFocus={column.key === visibleColumns.find((candidate) => candidate.editable === true)?.key}
+                            onChange={(event) => updateDraft(event.target.value)}
+                            onKeyDown={(event) => {
+                              if (event.key === 'Enter') commitNewRowCell(column, event.currentTarget.value);
+                              if (event.key === 'Escape') {
+                                setNewRowDraft(null);
+                                setNewRowEditing(false);
+                              }
+                            }}
+                            onBlur={(event) => commitNewRowCell(column, event.currentTarget.value)}
+                          />
+                        )}
+                      </div>
+                    );
+                  })
+                )}
+                {showRowEditActions && <div className="sp-datagrid__cell sp-datagrid__row-action-cell" role="gridcell" />}
+              </div>
+            )}
+
+            {/* Sticky Summary Footer Row */}
+            {hasFooterAggregates && (
+              <div className="sp-datagrid__row sp-datagrid__footer-row" role="row" aria-rowindex={renderedDisplayRows.length + (orderedColumnGroups.length > 0 ? 3 : 2)} aria-label={footerLabel ?? t('summary')}>
+                {rowDetail && <div className="sp-datagrid__footer-cell" />}
+                {hasLeadingRowActions && <div className="sp-datagrid__footer-cell" />}
+                {isRowReorder && <div className="sp-datagrid__footer-cell" />}
+                {effectiveSelectionMode !== 'none' && <div className="sp-datagrid__footer-cell" />}
+                {showRowNumbers && <div className="sp-datagrid__footer-cell" />}
+
+                {columnVirtualization && columnVirtualLayout.beforeWidth > 0 && (
+                  <div className="sp-datagrid__column-virtual-spacer" aria-hidden="true" />
+                )}
+                {renderedColumns.map((col, colIdx) => {
+                  const agg = footerAggregates.get(col.key);
+                  const pin = columnPinsProp?.[col.key] ?? col.pinned;
+                  return (
+                    <div
+                      key={col.key}
+                      className={[
+                        'sp-datagrid__footer-cell',
+                        pin ? 'sp-datagrid__pinned-cell' : '',
+                        pin === 'left' ? 'sp-datagrid__pinned-cell--left' : '',
+                        pin === 'right' ? 'sp-datagrid__pinned-cell--right' : '',
+                        colIdx === leftPinned.length - 1 ? 'sp-datagrid__pinned-cell--boundary' : '',
+                        colIdx === renderedColumns.length - rightPinned.length ? 'sp-datagrid__pinned-cell--boundary' : '',
+                      ].filter(Boolean).join(' ')}
+                      role="gridcell"
+                      aria-colindex={visibleColumns.indexOf(col) + ariaColumnOffset + 1}
+                      style={pinnedColumnStyle(col.key, pin)}
+                    >
+                      {agg && (
+                        <div className="sp-datagrid__aggregate">
+                          <span className="sp-datagrid__aggregate-label">{agg.label}:</span>
+                          <span className="sp-datagrid__aggregate-value">{agg.formatted}</span>
+                        </div>
+                      )}
+                      {!agg && col.key === footerLabelColumnKey && (
+                        <span className="sp-datagrid__footer-label">
+                          {footerLabel ?? t('summary')}
+                        </span>
+                      )}
                     </div>
-                    <span>{t('loadingMore')}</span>
-                  </div>
+                  );
+                })}
+
+                {columnVirtualization && columnVirtualLayout.afterWidth > 0 && (
+                  <div className="sp-datagrid__column-virtual-spacer" aria-hidden="true" />
                 )}
-                {infiniteExhausted && (
-                  <div className="sp-grid-infinite-end">
-                    <Icon name="check-circle" size={14} />
-                    All rows loaded
-                  </div>
-                )}
+
+                {showRowEditActions && <div className="sp-datagrid__footer-cell" />}
               </div>
             )}
           </div>
+        </div>
 
-          {/* Aggregate row */}
-          {hasAggregates && (
-            <div className="sp-grid-aggregate-row">
-              {hasExpandColumn && <div className="sp-grid-agg-cell" style={{ width: 36, minWidth: 36 }} />}
-              {opts.rowDraggable && <div className="sp-grid-agg-cell" style={{ width: 36, minWidth: 36 }} />}
-              {opts.editMode === 'row' && <div className="sp-grid-agg-cell" style={{ width: 80, minWidth: 80 }} />}
-              {opts.selectionMode && opts.selectionMode !== 'none' && (
-                <div className="sp-grid-agg-cell" style={{ width: 44, minWidth: 44 }} />
-              )}
-              {visibleColumns.map((col) => (
-                <div
-                  key={col.field}
-                  className="sp-grid-agg-cell"
-                  style={
-                    opts.autoFit
-                      ? { flex: col.flex ?? 1, minWidth: col.minWidth ?? 60 }
-                      : { width: getColWidth(col), minWidth: col.minWidth ?? 60 }
-                  }
+        {/* Slide-out Side Detail Pane */}
+        {effectiveDetailPaneRenderer && activeDetailPaneRow && (
+          <aside className="sp-datagrid__detail-pane sp-datagrid__detail-pane-enter">
+            <header className="sp-datagrid__detail-pane-header">
+              <strong>
+                {typeof detailPaneTitle === 'function'
+                  ? detailPaneTitle(activeDetailPaneRow)
+                  : detailPaneTitle ?? t('details')}
+              </strong>
+              <button
+                type="button"
+                className="sp-btn sp-btn--sm"
+                aria-label={t('close')}
+                onClick={() => setActiveDetailPaneRow(null)}
+              >
+                <Icon name="x" size={14} />
+              </button>
+            </header>
+            <div className="sp-datagrid__detail-pane-content">
+              {effectiveDetailPaneRenderer({
+                $implicit: activeDetailPaneRow,
+                row: activeDetailPaneRow,
+                rowIndex: sortedRows.indexOf(activeDetailPaneRow),
+                close: () => setActiveDetailPaneRow(null),
+              })}
+            </div>
+          </aside>
+        )}
+      </div>
+
+      {/* Pagination Bar */}
+      {isPaginated && (
+        <div
+          className={`sp-datagrid__pagination ${
+            paginationType === 'full' ? 'sp-datagrid__pagination--full' : ''
+          }`}
+        >
+          {paginationType === 'full' ? (
+            <div className="sp-datagrid__pagination-full">
+              <span className="sp-datagrid__pagination-page-info">
+                Page {activePage} of {totalPages} ({totalRowsCount} items)
+              </span>
+
+              <div className="sp-datagrid__pagination-nav-group">
+                <button
+                  type="button"
+                  className="sp-datagrid__page-nav-btn"
+                  aria-label="First page"
+                  disabled={virtualPaging ? !canVirtualPrevious : activePage <= 1}
+                  onClick={() => {
+                    setInternalPage(1);
+                    if (virtualPaging) {
+                      const request = { page: Math.max(1, activePage - 1), pageSize: activePageSize, direction: 'previous' as const, trigger: 'button' as const };
+                      (onVirtualPageRequest ?? virtualPageRequest)?.(request);
+                    } else {
+                      onPageChange?.({ page: 1, pageSize: activePageSize, totalRows: totalRowsCount, totalPages });
+                    }
+                  }}
                 >
-                  {col.aggregate && (
-                    <span className="sp-grid-agg-value">{getAggregateValue(col)}</span>
+                  <Icon name="chevrons-left" size={14} />
+                </button>
+                <button
+                  type="button"
+                  className="sp-datagrid__page-nav-btn"
+                  aria-label="Previous page"
+                  disabled={virtualPaging ? !canVirtualPrevious : activePage <= 1}
+                  onClick={() => {
+                    const p = activePage - 1;
+                    if (virtualPaging) {
+                      const request = { page: p, pageSize: activePageSize, direction: 'previous' as const, trigger: 'button' as const };
+                      (onVirtualPageRequest ?? virtualPageRequest)?.(request);
+                    } else {
+                      setInternalPage(p);
+                      onPageChange?.({ page: p, pageSize: activePageSize, totalRows: totalRowsCount, totalPages });
+                    }
+                  }}
+                >
+                  <Icon name="chevron-left" size={14} />
+                </button>
+
+                {/* Page number buttons */}
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pNum = i + 1;
+                  if (totalPages > 5 && activePage > 3) {
+                    pNum = Math.min(totalPages - 4, activePage - 2) + i;
+                  }
+                  return (
+                    <button
+                      key={pNum}
+                      type="button"
+                      className={`sp-datagrid__page-btn ${
+                        activePage === pNum ? 'sp-datagrid__page-btn--active' : ''
+                      }`}
+                      onClick={() => {
+                        if (virtualPaging) {
+                          const request = {
+                            page: pNum,
+                            pageSize: activePageSize,
+                            direction: pNum < activePage ? 'previous' as const : 'next' as const,
+                            trigger: 'button' as const,
+                          };
+                          (onVirtualPageRequest ?? virtualPageRequest)?.(request);
+                        } else {
+                          setInternalPage(pNum);
+                          onPageChange?.({ page: pNum, pageSize: activePageSize, totalRows: totalRowsCount, totalPages });
+                        }
+                      }}
+                    >
+                      {pNum}
+                    </button>
+                  );
+                })}
+
+                <button
+                  type="button"
+                  className="sp-datagrid__page-nav-btn"
+                  aria-label="Next page"
+                  disabled={virtualPaging ? !canVirtualNext : activePage >= totalPages}
+                  onClick={() => {
+                    const p = activePage + 1;
+                    if (virtualPaging) {
+                      onVirtualPageRequest?.({ page: p, pageSize: activePageSize, direction: 'next', trigger: 'button' });
+                      virtualPageRequest?.({ page: p, pageSize: activePageSize, direction: 'next', trigger: 'button' });
+                    } else {
+                      setInternalPage(p);
+                      onPageChange?.({ page: p, pageSize: activePageSize, totalRows: totalRowsCount, totalPages });
+                    }
+                  }}
+                >
+                  <Icon name="chevron-right" size={14} />
+                </button>
+                <button
+                  type="button"
+                  className="sp-datagrid__page-nav-btn"
+                  aria-label="Last page"
+                  disabled={virtualPaging || activePage >= totalPages}
+                  onClick={() => {
+                    if (!virtualPaging) {
+                      setInternalPage(totalPages);
+                      onPageChange?.({ page: totalPages, pageSize: activePageSize, totalRows: totalRowsCount, totalPages });
+                    }
+                  }}
+                >
+                  <Icon name="chevrons-right" size={14} />
+                </button>
+              </div>
+
+              {/* Rows Per Page Selector */}
+              <div className="sp-datagrid__pagination-rows-group">
+                <span className="sp-datagrid__pagination-rows-label">Rows</span>
+                <div className="sp-datagrid__pagination-rows-pills">
+                  {effectivePageSizeOptions.map((opt) => (
+                    <button
+                      key={opt}
+                      type="button"
+                      className={`sp-datagrid__rows-btn ${
+                        activePageSize === opt ? 'sp-datagrid__rows-btn--active' : ''
+                      }`}
+                      onClick={() => {
+                        setInternalPageSize(opt);
+                        onPageSizeChange?.(opt);
+                        setInternalPage(1);
+                      }}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              <p>
+                Showing {(activePage - 1) * activePageSize + 1}–
+                {Math.min(activePage * activePageSize, totalRowsCount)} of {totalRowsCount}
+              </p>
+              <div className="sp-datagrid__pagination-actions">
+                <select
+                  className="sp-datagrid__pagination-select"
+                  aria-label="Rows per page"
+                  value={activePageSize}
+                  onChange={(event) => {
+                    const opt = Number(event.target.value);
+                    setInternalPageSize(opt);
+                    onPageSizeChange?.(opt);
+                    setInternalPage(1);
+                  }}
+                >
+                  {effectivePageSizeOptions.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  aria-label="Previous page"
+                  disabled={virtualPaging ? !canVirtualPrevious : activePage <= 1}
+                  onClick={() => {
+                    const p = activePage - 1;
+                    if (virtualPaging) {
+                      const request = { page: p, pageSize: activePageSize, direction: 'previous' as const, trigger: 'button' as const };
+                      (onVirtualPageRequest ?? virtualPageRequest)?.(request);
+                    } else {
+                      setInternalPage(p);
+                      onPageChange?.({ page: p, pageSize: activePageSize, totalRows: totalRowsCount, totalPages });
+                    }
+                  }}
+                >
+                  Previous
+                </Button>
+                <span className="sp-datagrid__pagination-page-label">
+                  {activePage} / {totalPages}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  aria-label="Next page"
+                  disabled={virtualPaging ? !canVirtualNext : activePage >= totalPages}
+                  onClick={() => {
+                    const p = activePage + 1;
+                    if (virtualPaging) {
+                      onVirtualPageRequest?.({ page: p, pageSize: activePageSize, direction: 'next', trigger: 'button' });
+                      virtualPageRequest?.({ page: p, pageSize: activePageSize, direction: 'next', trigger: 'button' });
+                    } else {
+                      setInternalPage(p);
+                      onPageChange?.({ page: p, pageSize: activePageSize, totalRows: totalRowsCount, totalPages });
+                    }
+                  }}
+                >
+                  Next
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Status Bar */}
+      {statusbarEnabled && (
+        <div className="sp-datagrid__statusbar" role="status" aria-label={statusbarAriaLabel ?? t('dataGridStatus')}>
+          <div className="sp-datagrid__statusbar-start">
+            <div className="sp-datagrid__statusbar-values">
+              {statusbarShowRowCount && <span>{totalRowsCount} {t('rows').toLocaleLowerCase()}</span>}
+              {statusbarShowSelectedRowCount && activeSelection.length > 0 && <span>{activeSelection.length} selected</span>}
+            </div>
+            {typeof statusbarStart === 'function'
+              ? statusbarStart({ totalRows: totalRowsCount, selectedRows: activeSelection })
+              : statusbarStart}
+          </div>
+          <div className="sp-datagrid__statusbar-end">
+            {typeof statusbarEnd === 'function'
+              ? statusbarEnd({ totalRows: totalRowsCount, selectedRows: activeSelection })
+              : statusbarEnd}
+            {isShowColumnSelector && (
+              <div className="sp-datagrid__statusbar-column-selector">
+                <Popover
+                  trigger={(
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      iconOnly
+                      iconLeft="columns"
+                      aria-label={columnSelectorLabel ?? t('columns')}
+                    />
+                  )}
+                  open={showColumnSelectorPopover?.source === 'statusbar'}
+                  onOpenChange={(open) => setShowColumnSelectorPopover(open ? { source: 'statusbar' } : null)}
+                  placement="top-end"
+                  panelClassName="sp-datagrid__column-selector-popover"
+                  panelAriaLabel={columnSelectorLabel ?? t('columns')}
+                  padding="0"
+                >
+                  <div className="sp-datagrid__column-selector-panel">
+                    {renderColumnSelectorContent()}
+                  </div>
+                </Popover>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Loading Overlay */}
+      {loading && (
+        <div className="sp-datagrid__loading-overlay">
+          <div className="sp-datagrid__loading-spinner-wrap">
+            <Icon name="refresh-cw" size={24} className="sp-datagrid__loading-spinner" />
+            <span className="sp-datagrid__loading-message">{resolvedLoadingMessage}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Drag Ghost for Column Header Reorder */}
+      {draggedColumnKey && dragGhostPos && createPortal(
+        <div
+          className="sp-datagrid__drag-ghost"
+          style={{
+            transform: `translate3d(${dragGhostPos.x + 12}px, ${dragGhostPos.y + 12}px, 0)`,
+          }}
+        >
+          <div className="sp-datagrid__drag-ghost-surface">
+            <span className="sp-datagrid__drag-ghost-label">
+              {columnsProp.find((c) => c.key === draggedColumnKey)?.header ?? draggedColumnKey}
+            </span>
+          </div>
+        </div>,
+        document.body,
+      )}
+
+      {/* Floating Error Badge */}
+      {floatingError && createPortal(
+        <div
+          className="sp-datagrid__editor-error-badge"
+          style={{
+            top: floatingError.rect.bottom + 4,
+            left: floatingError.rect.left,
+          }}
+        >
+          <Icon name="alert-circle" size={12} />
+          <span>{floatingError.message}</span>
+        </div>,
+        document.body,
+      )}
+
+      {/* Distinct / Dynamic Filter Popover */}
+      {activeFilterPopover && (() => {
+        const col = visibleColumns.find((c) => c.key === activeFilterPopover.key);
+        if (!col) return null;
+
+        const isDynamic = col.filterVariant === 'dynamic';
+        const distinctValues = Array.from(
+          new Map(rawRows.map((row) => {
+            const value = getCellValue(row, col);
+            return [filterValueKey(value), value] as const;
+          })).values(),
+        );
+        const existingFilter = activeColumnFilters.find((f) => f.key === col.key);
+
+        return createPortal(
+          <div
+            className="sp-datagrid__filter-popover"
+            style={{
+              position: 'fixed',
+              top: activeFilterPopover.triggerRect.bottom + 6,
+              left: Math.max(10, Math.min(activeFilterPopover.triggerRect.left, window.innerWidth - 330)),
+              zIndex: 10000,
+              background: 'var(--sp-surface-0)',
+              border: '1px solid var(--sp-border)',
+              borderRadius: '8px',
+              boxShadow: 'var(--sp-shadow-lg)',
+            }}
+          >
+            <div className="sp-datagrid__filter-panel">
+              <div className="sp-datagrid__filter-header">
+                <h3>Filter {col.header}</h3>
+                <button
+                  type="button"
+                  className="sp-btn sp-btn--sm"
+                  onClick={() => setActiveFilterPopover(null)}
+                >
+                  <Icon name="x" size={12} />
+                </button>
+              </div>
+
+              {isDynamic ? (
+                <div className="sp-datagrid__dynamic-filter-fields">
+                  <div className="sp-datagrid__dynamic-filter-field">
+                    <span>Condition</span>
+                    <select
+                      className="sp-select"
+                      defaultValue={existingFilter?.condition?.operator ?? 'contains'}
+                      onChange={(e) => {
+                        const op = e.target.value as DatagridDynamicFilterOperator;
+                        const next = activeColumnFilters.filter((f) => f.key !== col.key);
+                        next.push({
+                          key: col.key,
+                          column: col,
+                          values: [],
+                          condition: { operator: op, value: existingFilter?.condition?.value },
+                        });
+                        setInternalColumnFilters(next);
+                        onFilterChange?.(next);
+                      }}
+                    >
+                      <option value="contains">Contains</option>
+                      <option value="notContains">Does not contain</option>
+                      <option value="startsWith">Starts with</option>
+                      <option value="endsWith">Ends with</option>
+                      <option value="equals">Equals</option>
+                      <option value="notEquals">Not equal</option>
+                      <option value="greaterThan">Greater than</option>
+                      <option value="greaterThanOrEqual">Greater than or equal</option>
+                      <option value="lessThan">Less than</option>
+                      <option value="lessThanOrEqual">Less than or equal</option>
+                      <option value="between">Between</option>
+                      <option value="isEmpty">Is empty</option>
+                      <option value="isNotEmpty">Is not empty</option>
+                    </select>
+                  </div>
+                  <div className="sp-datagrid__dynamic-filter-field">
+                    <span>Value</span>
+                    <input
+                      type="text"
+                      className="sp-input"
+                      defaultValue={String(existingFilter?.condition?.value ?? '')}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        const next = activeColumnFilters.filter((f) => f.key !== col.key);
+                        next.push({
+                          key: col.key,
+                          column: col,
+                          values: [],
+                          condition: {
+                            operator: existingFilter?.condition?.operator ?? 'contains',
+                            value: val,
+                          },
+                        });
+                        setInternalColumnFilters(next);
+                        onFilterChange?.(next);
+                      }}
+                    />
+                  </div>
+                  {(existingFilter?.condition?.operator ?? 'contains') === 'between' && (
+                    <div className="sp-datagrid__dynamic-filter-field">
+                      <span>And</span>
+                      <input
+                        type="text"
+                        className="sp-input"
+                        defaultValue={String(existingFilter?.condition?.valueTo ?? '')}
+                        onChange={(event) => {
+                          const next = activeColumnFilters.filter((filter) => filter.key !== col.key);
+                          next.push({
+                            key: col.key,
+                            column: col,
+                            values: [],
+                            condition: {
+                              operator: 'between',
+                              value: existingFilter?.condition?.value,
+                              valueTo: event.target.value,
+                            },
+                          });
+                          setInternalColumnFilters(next);
+                          onFilterChange?.(next);
+                        }}
+                      />
+                    </div>
                   )}
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Loading overlay */}
-      {loading && opts.loadingMode !== 'skeleton' && (
-        <div className="sp-grid-loading-overlay" role="status">
-          <div className="sp-grid-spinner">
-            <div className="sp-grid-spinner__ring" />
-            <div className="sp-grid-spinner__ring sp-grid-spinner__ring--delay" />
-          </div>
-          <span className="sp-grid-loading-text">
-            {opts.serverSide ? 'Fetching data\u2026' : 'Loading\u2026'}
-          </span>
-        </div>
-      )}
-
-      {/* Pagination */}
-      {opts.pagination && (
-        <div className="sp-grid-pagination">
-          <span className="sp-grid-pagination__info">
-            {opts.serverSide
-              ? `${((currentPage - 1) * pageSize + 1).toLocaleString()}\u2013${Math.min(currentPage * pageSize, totalRows).toLocaleString()} of ${totalRows.toLocaleString()}`
-              : `Page ${currentPage} of ${totalPages}`}
-          </span>
-          <div className="sp-grid-pagination__pages">
-            <button
-              className="sp-grid-pagination__btn"
-              disabled={currentPage === 1}
-              onClick={() => goToPage(1)}
-              aria-label={t('firstPage')}
-            >
-              <Icon name="chevrons-left" size={14} />
-            </button>
-            <button
-              className="sp-grid-pagination__btn"
-              disabled={currentPage === 1}
-              onClick={() => goToPage(currentPage - 1)}
-              aria-label={t('previousPage')}
-            >
-              <Icon name="chevron-left" size={14} />
-            </button>
-            {pageNumbers.map((p, i) =>
-              p === '...' ? (
-                <span key={`ellipsis-${i}`} className="sp-grid-pagination__ellipsis">
-                  \u2026
-                </span>
               ) : (
-                <button
-                  key={p}
-                  className={`sp-grid-pagination__page${p === currentPage ? ' active' : ''}`}
-                  onClick={() => goToPage(+p)}
-                >
-                  {p}
-                </button>
-              ),
-            )}
-            <button
-              className="sp-grid-pagination__btn"
-              disabled={currentPage === totalPages}
-              onClick={() => goToPage(currentPage + 1)}
-              aria-label={t('nextPage')}
-            >
-              <Icon name="chevron-right" size={14} />
-            </button>
-            <button
-              className="sp-grid-pagination__btn"
-              disabled={currentPage === totalPages}
-              onClick={() => goToPage(totalPages)}
-              aria-label={t('lastPage')}
-            >
-              <Icon name="chevrons-right" size={14} />
-            </button>
-          </div>
-          <div className="sp-grid-pagination__size">
-            <span className="sp-grid-pagination__size-label">{t('rows')}:</span>
-            {(opts.pageSizeOptions ?? [10, 25, 50, 100]).map((s) => (
-              <button
-                key={s}
-                className={`sp-grid-pagination__size-btn${s === pageSize ? ' active' : ''}`}
-                onClick={() => {
-                  setCurrentPage(1);
-                  setPageSizeOverride(s);
-                }}
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+                <>
+                  <div className="sp-datagrid__filter-options">
+                    {distinctValues.map((v, i) => {
+                      const str = v === null || v === undefined
+                        ? '(Blanks)'
+                        : col.filterValueFormatter
+                          ? col.filterValueFormatter(v, rawRows.find((row) => filterValueKey(getCellValue(row, col)) === filterValueKey(v)) ?? rawRows[0]!)
+                          : String(v);
+                      const isChecked = existingFilter
+                        ? existingFilter.values.some((candidate) => filterValueKey(candidate) === filterValueKey(v))
+                        : true;
+                      return (
+                        <Checkbox
+                          key={i}
+                          checked={isChecked}
+                          onChange={(checked) => {
+                            let nextVals: unknown[] = existingFilter ? [...existingFilter.values] : [...distinctValues];
+                            if (checked) {
+                              if (!nextVals.includes(v)) nextVals.push(v);
+                            } else {
+                              nextVals = nextVals.filter((item) => filterValueKey(item) !== filterValueKey(v));
+                            }
+                            const next = activeColumnFilters.filter((f) => f.key !== col.key);
+                            if (nextVals.length < distinctValues.length) {
+                              next.push({ key: col.key, column: col, values: nextVals });
+                            }
+                            setInternalColumnFilters(next);
+                            onFilterChange?.(next);
+                          }}
+                        >
+                          <span className="sp-datagrid__filter-option-label">{str}</span>
+                        </Checkbox>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
 
-      {/* Footer */}
-      <div className="sp-grid-footer">
-        <span className="sp-grid-footer__count">
-          {totalRows.toLocaleString()} row{totalRows !== 1 ? 's' : ''}
-          {opts.serverSide && (
-            <span className="sp-grid-footer__server-badge">server</span>
-          )}
-          {activeFilterCount > 0 && (
-            <span className="sp-grid-footer__filtered"> (filtered)</span>
-          )}
-        </span>
-        {opts.selectionMode !== 'none' && selectedIds.size > 0 && (
-          <span className="sp-grid-footer__badge sp-grid-footer__badge--selection">
-            <strong>{selectedIds.size}</strong> selected
-            <button
-              className="sp-grid-footer__clear"
-              onClick={() => setSelectedIds(new Set())}
-            >
-              <Icon name="x" size={12} />
-            </button>
-          </span>
-        )}
-        {sortColumns.length > 0 && (
-          <span className="sp-grid-footer__badge">
-            Sorted:{' '}
-            {sortColumns.map((s, i) => (
-              <span key={s.field}>
-                <strong>{s.field}</strong> {s.direction}
-                {i < sortColumns.length - 1 ? ', ' : ''}
-              </span>
-            ))}
-            <button
-              className="sp-grid-footer__clear"
-              onClick={() => applySortColumns([])}
-            >
-              <Icon name="x" size={12} />
-            </button>
-          </span>
-        )}
-        {opts.infiniteScroll && !infiniteExhausted && (
-          <span className="sp-grid-footer__infinite-hint">\u2193 Scroll for more</span>
-        )}
-        {opts.editMode && (
-          <span className="sp-grid-footer__edit-hint">
-            <Icon name="edit" size={12} />
-            {opts.editMode === 'cell'
-              ? `${(opts.editTrigger ?? 'dblclick') === 'dblclick' ? 'Dbl-click' : 'Click'} to edit`
-              : 'Dbl-click row to edit'}
-          </span>
-        )}
-        {opts.virtualScroll && (
-          <span className="sp-grid-footer__virtual-hint" style={{ marginLeft: 'auto' }}>
-            Virtual \u00B7 {renderedRows.length} rendered
-          </span>
-        )}
-      </div>
+              <div className="sp-datagrid__filter-actions">
+                <button
+                  type="button"
+                  className="sp-btn sp-btn--sm sp-btn--secondary"
+                  onClick={() => {
+                    const next = activeColumnFilters.filter((f) => f.key !== col.key);
+                    setInternalColumnFilters(next);
+                    onFilterChange?.(next);
+                    setActiveFilterPopover(null);
+                  }}
+                >
+                  Clear
+                </button>
+                <button
+                  type="button"
+                  className="sp-btn sp-btn--sm sp-btn--primary"
+                  onClick={() => setActiveFilterPopover(null)}
+                >
+                  Apply
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        );
+      })()}
+
     </div>
   );
 }
+
+export const Datagrid = forwardRef(DatagridInner) as <
+  T extends object = Record<string, unknown>,
+>(
+  props: DatagridProps<T> & { ref?: ForwardedRef<DatagridHandle<T>> },
+) => ReactElement;

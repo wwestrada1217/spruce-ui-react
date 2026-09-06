@@ -1,31 +1,31 @@
 import type {
-  DatagridexDataContext,
-  DatagridexDataContextOptions,
-  DatagridexDataContextStateDisplay,
-  DatagridexRecordState,
-  DatagridexTrackedRecord,
-  DatagridexValidationError,
-} from './datagridex-types.js';
+  DatagridDataContext,
+  DatagridDataContextOptions,
+  DatagridDataContextStateDisplay,
+  DatagridRecordState,
+  DatagridTrackedRecord,
+  DatagridValidationError,
+} from './datagrid-types.js';
 
 function read<T>(value: T | (() => T)): T {
   return typeof value === 'function' ? (value as () => T)() : value;
 }
 
-const EMPTY_ERRORS: ReadonlyMap<string, readonly DatagridexValidationError[]> = new Map();
+const EMPTY_ERRORS: ReadonlyMap<string, readonly DatagridValidationError[]> = new Map();
 
 /**
- * React-side adapter for the framework-neutral DataContext contract used by Datagridex.
+ * React-side adapter for the framework-neutral DataContext contract used by Datagrid.
  * It accepts the existing Spruce React DataContext as well as small structural adapters.
  */
-export class DatagridexDataContextAdapter<T extends object> {
-  readonly context: DatagridexDataContext<T>;
+export class DatagridDataContextAdapter<T extends object> {
+  readonly context: DatagridDataContext<T>;
   private readonly options: Required<
-    Omit<DatagridexDataContextOptions<T>, 'newRowDefaults'>
-  > & Pick<DatagridexDataContextOptions<T>, 'newRowDefaults'>;
+    Omit<DatagridDataContextOptions<T>, 'newRowDefaults'>
+  > & Pick<DatagridDataContextOptions<T>, 'newRowDefaults'>;
 
   constructor(
-    context: DatagridexDataContext<T>,
-    options: DatagridexDataContextOptions<T> = {},
+    context: DatagridDataContext<T>,
+    options: DatagridDataContextOptions<T> = {},
   ) {
     this.context = context;
     this.options = {
@@ -59,11 +59,11 @@ export class DatagridexDataContextAdapter<T extends object> {
     return this.options.toolbarActions;
   }
 
-  get stateDisplay(): DatagridexDataContextStateDisplay {
+  get stateDisplay(): DatagridDataContextStateDisplay {
     return this.options.stateDisplay;
   }
 
-  get validationDisplay(): DatagridexDataContextStateDisplay {
+  get validationDisplay(): DatagridDataContextStateDisplay {
     return this.options.validationDisplay;
   }
 
@@ -80,11 +80,11 @@ export class DatagridexDataContextAdapter<T extends object> {
     return String((row as Record<string, unknown>)[String(this.context.idField)]);
   }
 
-  record(row: T): DatagridexTrackedRecord<T> | null {
+  record(row: T): DatagridTrackedRecord<T> | null {
     return this.context.findRecord(this.recordId(row));
   }
 
-  recordState(row: T): DatagridexRecordState {
+  recordState(row: T): DatagridRecordState {
     const state = this.record(row)?.state.toLowerCase();
     if (state === 'new' || state === 'added') return 'added';
     if (state === 'modified') return 'modified';
@@ -92,7 +92,7 @@ export class DatagridexDataContextAdapter<T extends object> {
     return null;
   }
 
-  cellState(row: T, key: string): DatagridexRecordState {
+  cellState(row: T, key: string): DatagridRecordState {
     const record = this.record(row);
     if (record?.state.toLowerCase() === 'new' || record?.state.toLowerCase() === 'added') {
       return 'added';
@@ -126,7 +126,7 @@ export class DatagridexDataContextAdapter<T extends object> {
     return this.context.allValid === undefined ? true : read(this.context.allValid);
   }
 
-  rowValidationErrors(row: T): readonly DatagridexValidationError[] {
+  rowValidationErrors(row: T): readonly DatagridValidationError[] {
     const errors =
       this.context.allValidationErrors === undefined
         ? EMPTY_ERRORS
@@ -134,7 +134,7 @@ export class DatagridexDataContextAdapter<T extends object> {
     return errors.get(this.recordId(row)) ?? [];
   }
 
-  cellValidationErrors(row: T, key: string): readonly DatagridexValidationError[] {
+  cellValidationErrors(row: T, key: string): readonly DatagridValidationError[] {
     return this.rowValidationErrors(row).filter((error) => {
       const rule = error.rule ?? ('field' in error ? String(error.field) : undefined);
       return rule === key || rule === `field:${key}`;
@@ -190,9 +190,9 @@ export class DatagridexDataContextAdapter<T extends object> {
   }
 }
 
-export function createDatagridexDataContextAdapter<T extends object>(
-  context: DatagridexDataContext<T>,
-  options: DatagridexDataContextOptions<T> = {},
-): DatagridexDataContextAdapter<T> {
-  return new DatagridexDataContextAdapter(context, options);
+export function createDatagridDataContextAdapter<T extends object>(
+  context: DatagridDataContext<T>,
+  options: DatagridDataContextOptions<T> = {},
+): DatagridDataContextAdapter<T> {
+  return new DatagridDataContextAdapter(context, options);
 }

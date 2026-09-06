@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent } from '@testing-library/react';
-import { Datagridex, type DatagridexColumn } from '../../src/index.js';
+import { Datagrid, type DatagridColumn } from '../../src/index.js';
 import {
   expectFocused,
   expectNoA11yViolations,
@@ -22,7 +22,7 @@ const rows: readonly Person[] = [
   { id: 2, name: 'Grace', age: 28 },
 ];
 
-const columns: readonly DatagridexColumn<Person>[] = [
+const columns: readonly DatagridColumn<Person>[] = [
   { key: 'name', header: 'Name', resizable: false, sortable: false, editable: true },
   { key: 'age', header: 'Age', resizable: false, sortable: false, editable: true },
 ];
@@ -31,7 +31,7 @@ function ControlledRowDetailsGrid() {
   const [expandedRows, setExpandedRows] = useState<readonly Person[]>([]);
 
   return (
-    <Datagridex<Person>
+    <Datagrid<Person>
       rows={rows}
       columns={columns}
       rowDetails
@@ -46,7 +46,7 @@ function ControlledDetailPaneGrid() {
   const [detailPaneRow, setDetailPaneRow] = useState<Person | null>(rows[0]!);
 
   return (
-    <Datagridex<Person>
+    <Datagrid<Person>
       rows={rows}
       columns={columns}
       detailPane
@@ -61,7 +61,7 @@ function ControlledGroupingGrid({ initialGroupBy = ['age'] }: { initialGroupBy?:
   const [groupBy, setGroupBy] = useState<readonly string[]>(initialGroupBy);
 
   return (
-    <Datagridex<Person>
+    <Datagrid<Person>
       rows={rows}
       columns={columns}
       groupBy={groupBy}
@@ -72,14 +72,14 @@ function ControlledGroupingGrid({ initialGroupBy = ['age'] }: { initialGroupBy?:
   );
 }
 
-describe('Datagridex', () => {
+describe('Datagrid', () => {
   it('renders the typed grid contract and supports keyboard cell navigation', async () => {
     const { container, getByRole, getAllByRole, user } = renderWithSpruce(
-      <Datagridex<Person> ariaLabel="People" rows={rows} columns={columns} editMode="cell" />,
+      <Datagrid<Person> ariaLabel="People" rows={rows} columns={columns} editMode="cell" />,
     );
     const grid = getByRole('grid', { name: 'People' });
     expect(grid).toBeInTheDocument();
-    const dataRows = getAllByRole('row').filter((row: HTMLElement) => row.classList.contains('sp-datagridex__body-row'));
+    const dataRows = getAllByRole('row').filter((row: HTMLElement) => row.classList.contains('sp-datagrid__body-row'));
     const firstRowCells = getAllByRole('gridcell').filter((cell: HTMLElement) => cell.closest('[role="row"]') === dataRows[0]);
     const firstCell = firstRowCells[0]!;
     const secondCell = firstRowCells[1]!;
@@ -94,7 +94,7 @@ describe('Datagridex', () => {
 
   it('renders selected and indeterminate checkbox states', async () => {
     const { container, getAllByRole, user } = renderWithSpruce(
-      <Datagridex<Person> rows={rows} columns={columns} selectionMode="multiple" />,
+      <Datagrid<Person> rows={rows} columns={columns} selectionMode="multiple" />,
     );
     const checkboxes = getAllByRole('checkbox') as HTMLInputElement[];
     const headerCheckbox = checkboxes[0]!;
@@ -119,7 +119,7 @@ describe('Datagridex', () => {
 
   it('keeps grouped-row expansion controls separate from group selection', async () => {
     const { container, user } = renderWithSpruce(
-      <Datagridex<Person>
+      <Datagrid<Person>
         rows={rows}
         columns={columns}
         groupBy={['age']}
@@ -128,8 +128,8 @@ describe('Datagridex', () => {
         selectionMode="multiple"
       />,
     );
-    const groupCell = container.querySelector<HTMLElement>('.sp-datagridex__group-cell--with-selection');
-    const groupToggle = groupCell?.querySelector<HTMLButtonElement>('.sp-datagridex__group-toggle');
+    const groupCell = container.querySelector<HTMLElement>('.sp-datagrid__group-cell--with-selection');
+    const groupToggle = groupCell?.querySelector<HTMLButtonElement>('.sp-datagrid__group-toggle');
     const groupCheckbox = groupCell?.querySelector<HTMLInputElement>('input[type="checkbox"]');
 
     expect(groupCell).toBeInTheDocument();
@@ -157,7 +157,7 @@ describe('Datagridex', () => {
       <ControlledGroupingGrid initialGroupBy={[]} />,
     );
     const header = getByRole('columnheader', { name: 'Name' });
-    const toolbar = container.querySelector<HTMLElement>('.sp-datagridex__group-toolbar');
+    const toolbar = container.querySelector<HTMLElement>('.sp-datagrid__group-toolbar');
     const dataTransfer = {
       effectAllowed: '',
       getData: vi.fn().mockReturnValue('name'),
@@ -177,7 +177,7 @@ describe('Datagridex', () => {
       <ControlledGroupingGrid initialGroupBy={['name', 'age']} />,
     );
     const groupButtons = () => Array.from(
-      container.querySelectorAll<HTMLButtonElement>('.sp-datagridex__toolbar-group-button'),
+      container.querySelectorAll<HTMLButtonElement>('.sp-datagrid__toolbar-group-button'),
     );
     const dataTransfer = {
       dropEffect: '',
@@ -186,12 +186,12 @@ describe('Datagridex', () => {
       setData: vi.fn(),
     };
     const source = groupButtons()[1]!;
-    const target = groupButtons()[0]!.closest<HTMLElement>('.sp-datagridex__toolbar-group')!;
+    const target = groupButtons()[0]!.closest<HTMLElement>('.sp-datagrid__toolbar-group')!;
 
     fireEvent.dragStart(source, { dataTransfer });
-    expect(source.closest('.sp-datagridex__toolbar-group')).toHaveClass('sp-datagridex__toolbar-group--dragging');
+    expect(source.closest('.sp-datagrid__toolbar-group')).toHaveClass('sp-datagrid__toolbar-group--dragging');
     fireEvent.dragOver(target, { dataTransfer });
-    expect(target).toHaveClass('sp-datagridex__toolbar-group--drop-before');
+    expect(target).toHaveClass('sp-datagrid__toolbar-group--drop-before');
     fireEvent.drop(target, { dataTransfer });
 
     await waitFor(() => {
@@ -223,13 +223,13 @@ describe('Datagridex', () => {
   });
 
   it('shows validation feedback when an edited required cell is committed empty', async () => {
-    const editableColumns: readonly DatagridexColumn<Person>[] = [
+    const editableColumns: readonly DatagridColumn<Person>[] = [
       { key: 'name', header: 'Name', resizable: false, editable: true, required: 'Name is required.' },
       { key: 'age', header: 'Age', resizable: false, sortable: false },
     ];
     const onValidationFailed = vi.fn();
     const { getByRole, user } = renderWithSpruce(
-      <Datagridex<Person>
+      <Datagrid<Person>
         ariaLabel="Editable people"
         rows={rows}
         columns={editableColumns}
@@ -252,7 +252,7 @@ describe('Datagridex', () => {
 
   it('uses provider labels and logical pinned offsets in RTL', () => {
     const { getByRole, container } = renderWithSpruce(
-      <Datagridex<Person>
+      <Datagrid<Person>
         rows={rows}
         columns={columns}
         columnPins={{ name: 'right' }}
@@ -261,13 +261,13 @@ describe('Datagridex', () => {
     );
 
     expect(getByRole('grid', { name: 'شبكة الأشخاص' })).toBeInTheDocument();
-    expect(container.querySelector('.sp-datagridex__header-cell--pinned-right')).toBeInTheDocument();
+    expect(container.querySelector('.sp-datagrid__header-cell--pinned-right')).toBeInTheDocument();
     expect(document.documentElement).toHaveAttribute('dir', 'rtl');
   });
 
   it('applies sticky offsets to pinned headers and cells', async () => {
     const { container } = renderWithSpruce(
-      <Datagridex<Person>
+      <Datagrid<Person>
         rows={rows}
         columns={columns}
         selectionMode="multiple"
@@ -275,10 +275,10 @@ describe('Datagridex', () => {
       />,
     );
 
-    const nameHeader = container.querySelector<HTMLElement>('[data-sp-datagridex-column="name"]');
-    const ageHeader = container.querySelector<HTMLElement>('[data-sp-datagridex-column="age"]');
-    const nameCell = container.querySelector<HTMLElement>('[data-sp-datagridex-cell="name"]');
-    const ageCell = container.querySelector<HTMLElement>('[data-sp-datagridex-cell="age"]');
+    const nameHeader = container.querySelector<HTMLElement>('[data-sp-datagrid-column="name"]');
+    const ageHeader = container.querySelector<HTMLElement>('[data-sp-datagrid-column="age"]');
+    const nameCell = container.querySelector<HTMLElement>('[data-sp-datagrid-cell="name"]');
+    const ageCell = container.querySelector<HTMLElement>('[data-sp-datagrid-cell="age"]');
 
     await waitFor(() => {
       expect(nameHeader?.style.insetInlineStart).toBe('40px');
@@ -290,40 +290,40 @@ describe('Datagridex', () => {
 
   it('sizes default columns to intrinsic content', () => {
     const { container } = renderWithSpruce(
-      <Datagridex<Person> rows={rows} columns={columns} />,
+      <Datagrid<Person> rows={rows} columns={columns} />,
     );
 
-    expect(container.querySelector<HTMLElement>('.sp-datagridex__grid')?.style.gridTemplateColumns)
+    expect(container.querySelector<HTMLElement>('.sp-datagrid__grid')?.style.gridTemplateColumns)
       .toBe('minmax(min-content, max-content) minmax(min-content, max-content) minmax(0, 1fr)');
-    expect(container.querySelector('.sp-datagridex__header-cell--filler')).toBeInTheDocument();
+    expect(container.querySelector('.sp-datagrid__header-cell--filler')).toBeInTheDocument();
   });
 
   it('does not add a filler track when columns already fit the grid width', () => {
     const { container } = renderWithSpruce(
-      <Datagridex<Person> rows={rows} columns={columns} fitColumnsToWidth />,
+      <Datagrid<Person> rows={rows} columns={columns} fitColumnsToWidth />,
     );
 
-    expect(container.querySelector<HTMLElement>('.sp-datagridex__grid')?.style.gridTemplateColumns)
+    expect(container.querySelector<HTMLElement>('.sp-datagrid__grid')?.style.gridTemplateColumns)
       .toBe('minmax(min-content, 1fr) minmax(min-content, 1fr)');
-    expect(container.querySelector('.sp-datagridex__header-cell--filler')).not.toBeInTheDocument();
+    expect(container.querySelector('.sp-datagrid__header-cell--filler')).not.toBeInTheDocument();
   });
 
   it('preserves explicit column widths while filling remaining grid space', () => {
-    const fixedColumns: readonly DatagridexColumn<Person>[] = [
+    const fixedColumns: readonly DatagridColumn<Person>[] = [
       { key: 'name', header: 'Name', width: 120, resizable: false, sortable: false },
       { key: 'age', header: 'Age', width: 160, resizable: false, sortable: false },
     ];
     const { container } = renderWithSpruce(
-      <Datagridex<Person> rows={rows} columns={fixedColumns} />,
+      <Datagrid<Person> rows={rows} columns={fixedColumns} />,
     );
 
-    expect(container.querySelector<HTMLElement>('.sp-datagridex__grid')?.style.gridTemplateColumns)
+    expect(container.querySelector<HTMLElement>('.sp-datagrid__grid')?.style.gridTemplateColumns)
       .toBe('120px 160px minmax(0, 1fr)');
   });
 
   it('uses shared dropdown and popover overlays for column controls', async () => {
     const { getByRole, user } = renderWithSpruce(
-      <Datagridex<Person> rows={rows} columns={columns} toolbar columnMenu columnSelector />,
+      <Datagrid<Person> rows={rows} columns={columns} toolbar columnMenu columnSelector />,
     );
 
     const menuTrigger = getByRole('button', { name: 'Column menu for Name' });
@@ -333,20 +333,20 @@ describe('Datagridex', () => {
     await user.click(menuTrigger);
     await waitFor(() => expect(getByRole('menu')).toBeInTheDocument());
     expect(getByRole('button', { name: 'Auto-size Column' })).toBeInTheDocument();
-    expect(document.querySelector('.sp-datagridex__column-menu-panel')).not.toBeInTheDocument();
+    expect(document.querySelector('.sp-datagrid__column-menu-panel')).not.toBeInTheDocument();
 
     await user.click(getByRole('button', { name: 'Columns' }));
     await waitFor(() => expect(getByRole('dialog', { name: 'Columns' })).toBeInTheDocument());
-    expect(document.querySelector('.sp-popover-panel.sp-datagridex__column-selector-popover')).not.toBeNull();
+    expect(document.querySelector('.sp-popover-panel.sp-datagrid__column-selector-popover')).not.toBeNull();
   });
 
   it('renders row spans with accessible span metadata and omits covered cells', () => {
-    const spanColumns: readonly DatagridexColumn<Person>[] = [
+    const spanColumns: readonly DatagridColumn<Person>[] = [
       { key: 'name', header: 'Name', resizable: false, sortable: false, rowSpan: 2 },
       { key: 'age', header: 'Age', resizable: false, sortable: false },
     ];
-    const { container } = renderWithSpruce(<Datagridex<Person> rows={rows} columns={spanColumns} />);
-    const dataRows = container.querySelectorAll('.sp-datagridex__body-row:not(.sp-datagridex__body-row--new)');
+    const { container } = renderWithSpruce(<Datagrid<Person> rows={rows} columns={spanColumns} />);
+    const dataRows = container.querySelectorAll('.sp-datagrid__body-row:not(.sp-datagrid__body-row--new)');
     const nameCells = [...dataRows].flatMap((row) => [...row.querySelectorAll('[role="gridcell"]')]).filter((cell) => cell.textContent?.includes('Ada') || cell.textContent?.includes('Grace'));
 
     expect(dataRows).toHaveLength(2);
@@ -355,14 +355,14 @@ describe('Datagridex', () => {
   });
 
   it('keeps cells after a covered row-span column in their declared grid tracks', () => {
-    const spanColumns: readonly DatagridexColumn<Person>[] = [
+    const spanColumns: readonly DatagridColumn<Person>[] = [
       { key: 'name', header: 'Name', resizable: false, sortable: false },
       { key: 'age', header: 'Age', resizable: false, sortable: false, rowSpan: 2 },
       { key: 'id', header: 'ID', resizable: false, sortable: false },
     ];
-    const { container } = renderWithSpruce(<Datagridex<Person> rows={rows} columns={spanColumns} />);
-    const dataRows = container.querySelectorAll('.sp-datagridex__body-row:not(.sp-datagridex__body-row--new)');
-    const secondRowIdCell = dataRows[1]?.querySelector<HTMLElement>('[data-sp-datagridex-cell="id"]');
+    const { container } = renderWithSpruce(<Datagrid<Person> rows={rows} columns={spanColumns} />);
+    const dataRows = container.querySelectorAll('.sp-datagrid__body-row:not(.sp-datagrid__body-row--new)');
+    const secondRowIdCell = dataRows[1]?.querySelector<HTMLElement>('[data-sp-datagrid-cell="id"]');
 
     expect(secondRowIdCell).toHaveStyle({ gridColumn: '3' });
   });
@@ -371,7 +371,7 @@ describe('Datagridex', () => {
     const onVirtualPageRequest = vi.fn();
     const onPageSizeChange = vi.fn();
     const { getByRole, user } = renderWithSpruce(
-      <Datagridex<Person>
+      <Datagrid<Person>
         rows={rows}
         columns={columns}
         virtualPaging
@@ -392,7 +392,7 @@ describe('Datagridex', () => {
 
   it('disables row reorder controls when the visible order is transformed', () => {
     const { getByRole } = renderWithSpruce(
-      <Datagridex<Person> rows={rows} columns={columns} rowReorder pagination />,
+      <Datagrid<Person> rows={rows} columns={columns} rowReorder pagination />,
     );
 
     expect(getByRole('button', { name: /Drag handle: Row 1/i })).toBeDisabled();
@@ -400,7 +400,7 @@ describe('Datagridex', () => {
 
   it.each(['light', 'dark'] as const)('uses design tokens in the %s theme', async (theme: 'light' | 'dark') => {
     const { getByRole } = renderWithTheme(
-      <Datagridex<Person> rows={rows} columns={columns} ariaLabel={`${theme} people`} />,
+      <Datagrid<Person> rows={rows} columns={columns} ariaLabel={`${theme} people`} />,
       theme,
     );
 

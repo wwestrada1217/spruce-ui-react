@@ -12,7 +12,8 @@ import {
   Button,
   AreaChart,
   Datagrid,
-  type ColumnDef,
+  type DatagridCellTemplateContext,
+  type DatagridColumn,
 } from 'spruce-react';
 
 interface PayrollRecord {
@@ -39,24 +40,29 @@ export default function Payroll() {
     { id: 'PAY-2026-04', month: 'April 2026', grossPay: '$172,000', taxDeduction: '$38,000', netPay: '$134,000', status: 'Completed', payDate: 'Apr 25, 2026' },
   ];
 
-  const columns: ColumnDef<PayrollRecord>[] = [
-    { field: 'month', headerName: 'Pay Period', cellRenderer: (_val, row) => <strong>{row.month}</strong> },
-    { field: 'id', headerName: 'Batch ID', cellRenderer: (_val, row) => <code>{row.id}</code> },
-    { field: 'grossPay', headerName: 'Gross Payroll' },
-    { field: 'taxDeduction', headerName: 'Tax & Deductions' },
-    { field: 'netPay', headerName: 'Net Disbursed' },
+  const columns: DatagridColumn<PayrollRecord>[] = [
+    { key: 'month', header: 'Pay Period' },
+    { key: 'id', header: 'Batch ID' },
+    { key: 'grossPay', header: 'Gross Payroll' },
+    { key: 'taxDeduction', header: 'Tax & Deductions' },
+    { key: 'netPay', header: 'Net Disbursed' },
     {
-      field: 'status',
-      headerName: 'Status',
-      cellRenderer: (_val, row) => <Badge variant={row.status === 'Completed' ? 'success' : 'warning'}>{row.status}</Badge>,
+      key: 'status',
+      header: 'Status',
     },
-    { field: 'payDate', headerName: 'Payment Date' },
+    { key: 'payDate', header: 'Payment Date' },
     {
-      field: 'actions',
-      headerName: 'Statement',
-      cellRenderer: () => <Button size="sm" variant="outline" iconLeft="download">PDF Report</Button>,
+      key: 'actions',
+      header: 'Statement',
     },
   ];
+
+  const cellTemplates = {
+    month: ({ row }: DatagridCellTemplateContext<PayrollRecord>) => <strong>{row.month}</strong>,
+    id: ({ row }: DatagridCellTemplateContext<PayrollRecord>) => <code>{row.id}</code>,
+    status: ({ row }: DatagridCellTemplateContext<PayrollRecord>) => <Badge variant={row.status === 'Completed' ? 'success' : 'warning'}>{row.status}</Badge>,
+    actions: () => <Button size="sm" variant="outline" iconLeft="download">PDF Report</Button>,
+  };
 
   return (
     <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -80,7 +86,7 @@ export default function Payroll() {
       <Card>
         <div style={{ padding: 20 }}>
           <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 600 }}>Historical Payroll Batches</h3>
-          <Datagrid columns={columns} rowData={records} autoHeightRow options={{ pagination: true, pageSize: 5 }} />
+          <Datagrid columns={columns} rows={records} autoHeight pagination pageSize={5} cellTemplates={cellTemplates} />
         </div>
       </Card>
     </div>

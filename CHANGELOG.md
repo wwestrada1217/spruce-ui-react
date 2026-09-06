@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Completed the React design-system foundation: typed color, typography, spacing, density, borders, shadows, z-index, motion, icon, motif, and illustration collections.
 - Added Angular-parity theme infrastructure with light, dark, and system modes, 34 built-in theme presets, accent presets, custom accents, color harmony, persistence, and runtime token updates.
-- Expanded the library with the remaining navigation, action, feedback, data-display, workspace, editor, chart, effect, and utility components, plus core data adapters and Datagridex support.
+- Expanded the library with the remaining navigation, action, feedback, data-display, workspace, editor, chart, effect, and utility components, plus core data adapters and Datagrid support.
 - Added comprehensive documentation coverage with live examples, CodePreview updates, application blocks, foundation pages, and Angular-aligned navigation, sidebar groups, and appearance controls.
 
 ### Changed

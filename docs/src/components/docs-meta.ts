@@ -16,7 +16,7 @@ export interface DocsPageMetadata {
 const SYMBOLS: Record<string, readonly string[]> = {
   '#/components/barcode-qr': ['Barcode', 'QrCode'],
   '#/components/breadcrumbs': ['Breadcrumb'],
-  '#/components/datagridex': ['Datagridex'],
+  '#/components/datagrid': ['Datagrid'],
   '#/components/datetime-picker': ['DatetimePicker'],
   '#/components/daterange-picker': ['DateRangePicker'],
   '#/components/form-builder': ['FormBuilder'],

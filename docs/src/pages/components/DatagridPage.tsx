@@ -1,362 +1,378 @@
-import { useState, useEffect, useRef } from 'react'
-import { Datagrid, type ColumnDef, type GridOptions } from 'spruce-react'
+import { useEffect, useRef, useState } from 'react'
+import {
+  Datagrid,
+  type DatagridColumn,
+  type DatagridHandle,
+} from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
 
-// ── Sample data ──────────────────────────────────────────────────────────────
-
-interface Employee {
+interface Project {
   id: number
   name: string
-  department: string
-  role: string
-  salary: number
-  status: 'active' | 'inactive' | 'pending'
-  performance: number
-  location: string
-  startDate: string
-  email: string
-  reports?: Employee[]
+  owner: string
+  status: 'active' | 'paused' | 'complete'
+  budget: number
+  region: 'Americas' | 'EMEA'
+  description: string
 }
 
-const DEPTS = ['Engineering', 'Product', 'Design', 'Marketing', 'Sales', 'HR', 'Finance', 'DevOps']
-const ROLES = ['Senior Engineer', 'Lead Designer', 'Product Manager', 'Data Analyst', 'DevOps Engineer', 'Marketing Specialist', 'Sales Rep', 'HR Manager', 'Frontend Dev', 'Backend Engineer', 'UX Designer', 'Tech Lead']
-const LOCS = ['San Francisco', 'New York', 'Austin', 'Seattle', 'Chicago', 'Denver', 'Boston', 'Portland']
-const NAMES = ['Alice Chen', 'Bob Martinez', 'Carol Johnson', 'David Kim', 'Emma Wilson', 'Frank Thompson', 'Grace Lee', 'Henry Davis', 'Isabella Brown', 'James Taylor', 'Kate Anderson', 'Liam Jackson', 'Mia White', 'Noah Harris', 'Olivia Martin', 'Paul Garcia', 'Quinn Robinson', 'Rachel Lewis', 'Sam Walker', 'Tina Hall']
+const PROJECTS: readonly Project[] = [
+  { id: 1, name: 'Atlas redesign', owner: 'Mina Patel', status: 'active', budget: 82000, region: 'Americas', description: 'Refresh the core workspace experience.' },
+  { id: 2, name: 'Mobile foundation', owner: 'Jon Bell', status: 'paused', budget: 41000, region: 'EMEA', description: 'Shared responsive primitives for product teams.' },
+  { id: 3, name: 'Billing migration', owner: 'Rae Chen', status: 'complete', budget: 126000, region: 'Americas', description: 'Move legacy invoices onto the new ledger.' },
+  { id: 4, name: 'Support console', owner: 'Mina Patel', status: 'active', budget: 68000, region: 'EMEA', description: 'Give support a faster customer timeline.' },
+  { id: 5, name: 'Analytics refresh', owner: 'Rae Chen', status: 'active', budget: 97000, region: 'Americas', description: 'Make operational metrics easier to explore.' },
+]
 
-function generateEmployees(count: number): Employee[] {
-  return Array.from({ length: count }, (_, i) => ({
-    id: i + 1,
-    name: NAMES[i % NAMES.length],
-    department: DEPTS[i % DEPTS.length],
-    role: ROLES[i % ROLES.length],
-    salary: 55000 + Math.floor(Math.random() * 95000),
-    status: (['active', 'inactive', 'pending'] as const)[i % 3],
-    performance: 60 + Math.floor(Math.random() * 40),
-    location: LOCS[i % LOCS.length],
-    startDate: `202${1 + (i % 4)}-${String((i % 12) + 1).padStart(2, '0')}-15`,
-    email: `${NAMES[i % NAMES.length].toLowerCase().replace(' ', '.')}@company.com`,
-  }))
-}
+const ROW_SPAN_PROJECTS: readonly Project[] = [
+  { ...PROJECTS[0], id: 11 },
+  { ...PROJECTS[3], id: 12, name: 'Support console follow-up' },
+  { ...PROJECTS[1], id: 13 },
+  { ...PROJECTS[2], id: 14 },
+]
 
-const EMPLOYEES = generateEmployees(20)
-const LARGE_DATA = generateEmployees(5000)
-
-const TREE_DATA: Employee[] = [
+const PROJECT_COLUMNS: readonly DatagridColumn<Project>[] = [
+  { key: 'name', header: 'Project', editable: true, filterable: true },
+  { key: 'owner', header: 'Owner', filterable: true, filterVariant: 'dynamic' },
   {
-    id: 100, name: 'Alice Chen', department: 'Engineering', role: 'VP Engineering',
-    salary: 180000, status: 'active', performance: 95, location: 'San Francisco',
-    startDate: '2019-03-01', email: 'alice@company.com',
-    reports: [
-      {
-        id: 101, name: 'Bob Martinez', department: 'Engineering', role: 'Tech Lead',
-        salary: 145000, status: 'active', performance: 90, location: 'Austin',
-        startDate: '2020-06-15', email: 'bob@company.com',
-        reports: [
-          { id: 102, name: 'Carol Johnson', department: 'Engineering', role: 'Senior Engineer', salary: 125000, status: 'active', performance: 88, location: 'Austin', startDate: '2021-01-10', email: 'carol@company.com' },
-          { id: 103, name: 'David Kim', department: 'Engineering', role: 'Senior Engineer', salary: 120000, status: 'active', performance: 85, location: 'Seattle', startDate: '2021-04-20', email: 'david@company.com' },
-        ],
-      },
-      {
-        id: 104, name: 'Emma Wilson', department: 'Engineering', role: 'Lead Designer',
-        salary: 135000, status: 'active', performance: 92, location: 'New York',
-        startDate: '2020-09-01', email: 'emma@company.com',
-      },
-    ],
+    key: 'status',
+    header: 'Status',
+    editable: true,
+    editorType: 'select',
+    editorOptions: {
+      options: [
+        { label: 'Active', value: 'active' },
+        { label: 'Paused', value: 'paused' },
+        { label: 'Complete', value: 'complete' },
+      ],
+    },
   },
+  { key: 'region', header: 'Region', filterable: true },
   {
-    id: 200, name: 'Frank Thompson', department: 'Product', role: 'VP Product',
-    salary: 175000, status: 'active', performance: 91, location: 'New York',
-    startDate: '2019-05-10', email: 'frank@company.com',
-    reports: [
-      { id: 201, name: 'Grace Lee', department: 'Product', role: 'Product Manager', salary: 130000, status: 'active', performance: 87, location: 'Chicago', startDate: '2021-02-15', email: 'grace@company.com' },
-    ],
+    key: 'budget',
+    header: 'Budget',
+    align: 'end',
+    editable: true,
+    editorType: 'number',
+    aggregate: { type: 'sum', label: 'Total' },
+    valueFormatter: ({ value }) => `$${Number(value).toLocaleString()}`,
   },
 ]
 
-// ── Code snippets ────────────────────────────────────────────────────────────
+const GROUPS = [
+  { key: 'identity', header: 'Project identity', columnKeys: ['name', 'owner'] },
+  { key: 'delivery', header: 'Delivery', columnKeys: ['status', 'region', 'budget'] },
+] as const
 
-const BASIC_CODE = `const columns: ColumnDef<Employee>[] = [
-  { field: 'id', headerName: 'ID', width: 60, sortable: true },
-  { field: 'name', headerName: 'Name', width: 180, sortable: true },
-  { field: 'department', headerName: 'Department', width: 140, sortable: true },
-  { field: 'role', headerName: 'Role', width: 180, sortable: true },
-  { field: 'salary', headerName: 'Salary', width: 120, sortable: true,
-    valueFormatter: (v) => \`$\${Number(v).toLocaleString()}\` },
-  { field: 'status', headerName: 'Status', width: 100 },
-];
+const IMPORT_CODE = `import {
+  Datagrid,
+  type DatagridColumn,
+} from 'spruce-react'
+import 'spruce-react/style.css'`
 
-<Datagrid columns={columns} rowData={employees} />`
+const BASIC_CODE = `interface Project {
+  name: string
+  owner: string
+  budget: number
+}
 
-const SORTING_CODE = `// Single-column sort: click a header
-// Multi-column sort: Ctrl+click additional headers
+const columns: DatagridColumn<Project>[] = [
+  { key: 'name', header: 'Project' },
+  { key: 'owner', header: 'Owner' },
+  { key: 'budget', header: 'Budget', align: 'end' },
+]
+
+<Datagrid<Project>
+  rows={projects}
+  columns={columns}
+  ariaLabel="Projects"
+/>`
+
+const SIZING_CODE = `<Datagrid
+  rows={projects}
+  columns={columns}
+  autoHeight
+  autoColumnWidth
+  fitColumnsToWidth
+  showVerticalLines={false}
+/>`
+
+const PINNING_CODE = `const columns = [
+  { key: 'name', header: 'Project', pinned: 'left' },
+  { key: 'owner', header: 'Owner' },
+  { key: 'budget', header: 'Budget', pinned: 'right' },
+]
+
+<Datagrid rows={projects} columns={columns} />`
+
+const MENU_CODE = `const columns = [{
+  key: 'budget',
+  header: 'Budget',
+  menuItems: [
+    { label: 'Open budget report', icon: 'external-link', command: openReport },
+  ],
+}]
+
+<Datagrid rows={projects} columns={columns} columnMenu />`
+
+const SORTING_CODE = `<Datagrid
+  rows={projects}
+  columns={columns}
+  multiSort
+  sortIndicatorVisibility="always"
+  onSortChange={({ key, direction }) => logSort(key, direction)}
+  onSortsChange={(nextSorts) => saveSorts(nextSorts)}
+/>`
+
+const FILTERING_CODE = `const columns = [
+  { key: 'owner', header: 'Owner', filterable: true },
+  {
+    key: 'budget',
+    header: 'Budget',
+    filterable: true,
+    filterVariant: 'dynamic',
+    filterDataType: 'number',
+  },
+]
+
 <Datagrid
+  rows={projects}
   columns={columns}
-  rowData={employees}
+  searchable
+  onFilterChange={(filters) => loadFilteredRows(filters)}
 />`
 
-const FILTERING_INLINE_CODE = `const columns: ColumnDef<Employee>[] = [
-  { field: 'name', headerName: 'Name', width: 180,
-    sortable: true, filterable: true, filterMode: 'inline' },
-  { field: 'department', headerName: 'Department', width: 140,
-    sortable: true, filterable: true, filterMode: 'inline' },
-  // ...
-];
-
-<Datagrid columns={columns} rowData={employees} />`
-
-const FILTERING_POPOVER_CODE = `const columns: ColumnDef<Employee>[] = [
-  { field: 'name', headerName: 'Name', width: 180,
-    sortable: true, filterable: true },
-  { field: 'salary', headerName: 'Salary', width: 120,
-    sortable: true, filterable: true },
-  // ...
-];
-
-<Datagrid columns={columns} rowData={employees}
-  options={{ showToolbar: true }} />`
-
-const PAGINATION_CODE = `<Datagrid
+const TEMPLATE_CODE = `<Datagrid
+  rows={projects}
   columns={columns}
-  rowData={employees}
-  options={{
-    pagination: true,
-    pageSize: 5,
-    pageSizeOptions: [5, 10, 20],
+  cellTemplates={{
+    status: ({ row, formattedValue }) => (
+      <strong data-status={row.status}>{formattedValue}</strong>
+    ),
   }}
+  rowDetail={({ row }) => <p>{row.description}</p>}
+  rowDetails
 />`
 
-const SELECTION_CODE = `<Datagrid
+const TOOLBAR_CODE = `<Datagrid
+  rows={projects}
   columns={columns}
-  rowData={employees}
-  options={{
-    selectionMode: 'multi',
-    rowHover: true,
-    onSelectionChange: (rows) => console.log('Selected:', rows),
-  }}
+  toolbar
+  searchable
+  columnSelector
+  toolbarShowGroupedColumns
+  statusbar
+  footer
 />`
 
-const CELL_EDIT_CODE = `const columns: ColumnDef<Employee>[] = [
-  { field: 'id', headerName: 'ID', width: 60 },
-  { field: 'name', headerName: 'Name', width: 180, editable: true },
-  { field: 'department', headerName: 'Dept', width: 140, editable: true,
-    editor: {
-      type: 'select',
-      options: [
-        { value: 'Engineering', label: 'Engineering' },
-        { value: 'Product', label: 'Product' },
-        { value: 'Design', label: 'Design' },
-      ],
-    } },
-  { field: 'salary', headerName: 'Salary', width: 120, editable: true,
-    editor: { type: 'number', min: 30000, max: 300000, step: 1000 } },
-];
+const GROUPS_CODE = `const columnGroups = [
+  { key: 'identity', header: 'Project identity', columnKeys: ['name', 'owner'] },
+  { key: 'delivery', header: 'Delivery', columnKeys: ['status', 'region', 'budget'] },
+]
 
-<Datagrid columns={columns} rowData={employees}
-  options={{ editMode: 'cell', editTrigger: 'dblclick' }} />`
-
-const ROW_EDIT_CODE = `<Datagrid columns={columns} rowData={employees}
-  options={{ editMode: 'row' }} />`
-
-const PINNED_CODE = `const columns: ColumnDef<Employee>[] = [
-  { field: 'id', headerName: 'ID', width: 60, pinned: 'left' },
-  { field: 'name', headerName: 'Name', width: 180, pinned: 'left' },
-  { field: 'department', headerName: 'Dept', width: 140 },
-  { field: 'role', headerName: 'Role', width: 180 },
-  { field: 'salary', headerName: 'Salary', width: 120 },
-  { field: 'location', headerName: 'Location', width: 140 },
-  { field: 'status', headerName: 'Status', width: 100, pinned: 'right' },
-];
-
-<Datagrid columns={columns} rowData={employees} />`
-
-const VIRTUAL_CODE = `// Renders only visible rows for 5,000+ row datasets
 <Datagrid
+  rows={projects}
   columns={columns}
-  rowData={largeData}
-  options={{ virtualScroll: true }}
-  style={{ height: 400 }}
+  columnGroups={columnGroups}
 />`
+
+const ROW_SPAN_CODE = `const columns = [
+  {
+    key: 'owner',
+    header: 'Owner',
+    rowSpan: ({ row, rows, rowIndex }) =>
+      rows[rowIndex + 1]?.owner === row.owner ? 2 : 1,
+  },
+]
+
+<Datagrid rows={projects} columns={columns} />`
 
 const GROUPING_CODE = `<Datagrid
+  rows={projects}
   columns={columns}
-  rowData={employees}
-  options={{
-    groupByField: 'department',
-    showToolbar: true,
-  }}
+  groupBy={groupBy}
+  onGroupByChange={setGroupBy}
+  groupSorting
+  groupsExpandedByDefault
+  groupSelection
+  selectionMode="multiple"
 />`
 
-const TREE_CODE = `const treeData = [
-  { id: 1, name: 'Alice', role: 'VP', reports: [
-    { id: 2, name: 'Bob', role: 'Lead', reports: [
-      { id: 3, name: 'Carol', role: 'Engineer' },
-    ]},
-  ]},
-];
+const AGGREGATE_CODE = `const columns = [
+  { key: 'name', header: 'Project', aggregate: 'count' },
+  {
+    key: 'budget',
+    header: 'Budget',
+    aggregate: {
+      type: 'avg',
+      label: 'Average',
+      valueFormatter: ({ value }) => '$' + Number(value).toLocaleString(),
+    },
+  },
+]
 
-<Datagrid columns={columns} rowData={treeData}
-  options={{ treeChildrenField: 'reports', showToolbar: true }} />`
+<Datagrid rows={projects} columns={columns} footer footerLabel="Summary" />`
 
-const DETAIL_CODE = `<Datagrid columns={columns} rowData={employees}
-  options={{
-    detailRenderer: ({ row, close }) => (
-      <div style={{ padding: 16 }}>
-        <h4>{row.name}</h4>
-        <p>Email: {row.email}</p>
-        <p>Location: {row.location}</p>
-        <button onClick={close}>Close</button>
-      </div>
+const VIRTUAL_CODE = `<Datagrid
+  rows={largeRows}
+  columns={columns}
+  virtualScroll
+  virtualScrollHeight={400}
+  virtualRowHeight={32}
+  virtualOverscan={6}
+  columnVirtualization
+/>`
+
+const VIRTUAL_PAGING_CODE = `<Datagrid
+  rows={pageRows}
+  columns={columns}
+  virtualPaging
+  virtualPage={page}
+  virtualTotalRows={totalRows}
+  virtualPagingLoading={loading}
+  onVirtualPageRequest={loadPage}
+/>`
+
+const EDITING_CODE = `const columns = [
+  { key: 'name', header: 'Project', editable: true, required: true },
+  { key: 'budget', header: 'Budget', editable: true, editorType: 'number' },
+]
+
+<Datagrid
+  rows={projects}
+  columns={columns}
+  editMode="cell"
+  editOnClick
+  editOnType
+  preventInvalidCommit
+  onCellEditCommit={applyCellEdit}
+  onCellValidationFailed={showValidation}
+/>`
+
+const CUSTOM_EDITOR_CODE = `<Datagrid
+  rows={projects}
+  columns={columns}
+  editMode="cell"
+  cellEditors={{
+    name: ({ value, update, commit, cancel }) => (
+      <input
+        autoFocus
+        value={String(value ?? '')}
+        onChange={(event) => update(event.target.value)}
+        onBlur={commit}
+        onKeyDown={(event) => event.key === 'Escape' && cancel()}
+      />
     ),
   }}
 />`
 
-const DRAG_CODE = `<Datagrid columns={columns} rowData={employees}
-  options={{
-    rowDraggable: true,
-    onRowDrop: (from, to, newOrder) =>
-      console.log('Reordered:', from, to),
-  }}
+const NEW_ROW_CODE = `<Datagrid
+  rows={projects}
+  columns={columns}
+  editMode="cell"
+  enableNewRow
+  newRowFactory={() => ({
+    id: crypto.randomUUID(),
+    name: '',
+    owner: '',
+    status: 'active',
+    budget: 0,
+    region: 'Americas',
+    description: '',
+  })}
+  onNewRowCommit={({ row }) => setProjects((current) => [...current, row])}
 />`
 
-const TOOLBAR_CODE = `<Datagrid columns={columns} rowData={employees}
-  options={{
-    showToolbar: true,
-    toolbarButtons: [
-      { label: 'Export', icon: 'download', action: () => alert('Export') },
-      { label: 'Delete', icon: 'trash', variant: 'danger',
-        action: () => alert('Delete') },
-    ],
-  }}
+const DATA_CONTEXT_CODE = `const dataContextOptions = {
+  synchronizeSelection: true,
+  stateDisplay: 'row-and-cell',
+  validationDisplay: 'row-and-cell',
+  toolbarActions: true,
+  newRowDefaults: { status: 'active', budget: 0 },
+}
+
+<Datagrid
+  dataContext={projectContext}
+  dataContextOptions={dataContextOptions}
+  columns={columns}
+  editMode="cell"
+  toolbar
+  searchable
+  enableNewRow
+  onDataContextSaveComplete={handleSaved}
+  onDataContextSaveError={handleSaveError}
 />`
 
-const DENSITY_CODE = `<Datagrid columns={columns} rowData={employees}
-  options={{ density: 'dense' }} />
-<Datagrid columns={columns} rowData={employees}
-  options={{ density: 'comfortable' }} />`
+const KEYBOARD_CODE = `// Header: Enter/Space sorts
+// Header: Alt + Arrow/Home/End reorders
+// Resize handle: Arrow, Shift + Arrow, Home, End
+// Editable cell: Enter/F2 edits; printable keys edit when editOnType is enabled
+// Editor: Enter commits; Escape cancels
+// Row reorder: Alt + Arrow/Home/End moves the row`
 
-const AGGREGATE_CODE = `const columns: ColumnDef<Employee>[] = [
-  { field: 'name', headerName: 'Name', width: 180,
-    aggregate: { type: 'count', label: 'Total: ' } },
-  { field: 'salary', headerName: 'Salary', width: 120,
-    aggregate: { type: 'avg', label: 'Avg: ',
-      formatter: (v) => \`$\${Number(v).toLocaleString()}\` } },
-];
+const THEME_CODE = `<SpruceProvider defaultTheme="dark">
+  <Datagrid
+    rows={projects}
+    columns={columns}
+    ariaLabel="Projects"
+  />
+</SpruceProvider>`
 
-<Datagrid columns={columns} rowData={employees}
-  options={{ showAggregates: true }} />`
+interface Section {
+  id: string
+  label: string
+}
 
-const STRIPED_CODE = `<Datagrid columns={columns} rowData={employees}
-  options={{ striped: true }} />
-
-<Datagrid columns={columns} rowData={employees}
-  options={{ borderless: true }} />`
-
-// ── Sections ─────────────────────────────────────────────────────────────────
-
-interface Section { id: string; label: string }
-const SECTIONS: Section[] = [
-  { id: 'basic', label: 'Basic Usage' },
+const SECTIONS: readonly Section[] = [
+  { id: 'import', label: 'Import' },
+  { id: 'basic', label: 'Basic usage' },
+  { id: 'sizing', label: 'Sizing' },
+  { id: 'pinning', label: 'Column pinning' },
+  { id: 'menu', label: 'Column menu' },
   { id: 'sorting', label: 'Sorting' },
+  { id: 'templates', label: 'Custom rendering' },
   { id: 'filtering', label: 'Filtering' },
-  { id: 'pagination', label: 'Pagination' },
-  { id: 'selection', label: 'Selection' },
-  { id: 'cell-editing', label: 'Cell Editing' },
-  { id: 'row-editing', label: 'Row Editing' },
-  { id: 'column-pinning', label: 'Column Pinning' },
-  { id: 'virtual-scroll', label: 'Virtual Scroll' },
-  { id: 'grouping', label: 'Row Grouping' },
-  { id: 'tree', label: 'Tree Rows' },
-  { id: 'detail', label: 'Detail Panel' },
-  { id: 'drag', label: 'Row Drag & Drop' },
-  { id: 'toolbar', label: 'Toolbar' },
-  { id: 'density', label: 'Density' },
-  { id: 'aggregates', label: 'Aggregates' },
-  { id: 'striped', label: 'Striped & Borderless' },
-  { id: 'api', label: 'API Reference' },
+  { id: 'toolbar', label: 'Toolbar and selector' },
+  { id: 'groups', label: 'Column groups' },
+  { id: 'spans', label: 'Row spans' },
+  { id: 'details', label: 'Row details and pane' },
+  { id: 'grouping', label: 'Row grouping' },
+  { id: 'aggregates', label: 'Aggregates and footer' },
+  { id: 'status', label: 'Status bar' },
+  { id: 'empty', label: 'Empty states' },
+  { id: 'large-data', label: 'Large data sets' },
+  { id: 'selection', label: 'Selection and stripes' },
+  { id: 'reorder', label: 'Row reordering' },
+  { id: 'editing', label: 'Editing' },
+  { id: 'new-row', label: 'New row' },
+  { id: 'data-context', label: 'DataContext' },
+  { id: 'keyboard', label: 'Keyboard interaction' },
+  { id: 'theming', label: 'Theming' },
+  { id: 'api', label: 'Public API' },
 ]
-
-// ── Reusable column sets ─────────────────────────────────────────────────────
-
-const basicCols: ColumnDef<Employee>[] = [
-  { field: 'id', headerName: 'ID', width: 60, sortable: true },
-  { field: 'name', headerName: 'Name', width: 180, sortable: true },
-  { field: 'department', headerName: 'Department', width: 140, sortable: true },
-  { field: 'role', headerName: 'Role', width: 180, sortable: true },
-  { field: 'salary', headerName: 'Salary', width: 120, sortable: true, valueFormatter: (v) => `$${Number(v).toLocaleString()}` },
-  { field: 'status', headerName: 'Status', width: 100 },
-]
-
-const inlineFilterCols: ColumnDef<Employee>[] = [
-  { field: 'id', headerName: 'ID', width: 60 },
-  { field: 'name', headerName: 'Name', width: 180, sortable: true, filterable: true, filterMode: 'inline' },
-  { field: 'department', headerName: 'Department', width: 140, sortable: true, filterable: true, filterMode: 'inline' },
-  { field: 'role', headerName: 'Role', width: 180, sortable: true, filterable: true, filterMode: 'inline' },
-  { field: 'salary', headerName: 'Salary', width: 120, valueFormatter: (v) => `$${Number(v).toLocaleString()}` },
-]
-
-const popoverFilterCols: ColumnDef<Employee>[] = [
-  { field: 'id', headerName: 'ID', width: 60 },
-  { field: 'name', headerName: 'Name', width: 180, sortable: true, filterable: true },
-  { field: 'department', headerName: 'Department', width: 140, sortable: true, filterable: true },
-  { field: 'salary', headerName: 'Salary', width: 120, sortable: true, filterable: true, valueFormatter: (v) => `$${Number(v).toLocaleString()}` },
-  { field: 'status', headerName: 'Status', width: 100 },
-]
-
-const editableCols: ColumnDef<Employee>[] = [
-  { field: 'id', headerName: 'ID', width: 60 },
-  { field: 'name', headerName: 'Name', width: 180, editable: true },
-  { field: 'department', headerName: 'Dept', width: 140, editable: true, editor: { type: 'select', options: [{ value: 'Engineering', label: 'Engineering' }, { value: 'Product', label: 'Product' }, { value: 'Design', label: 'Design' }, { value: 'Marketing', label: 'Marketing' }] } },
-  { field: 'role', headerName: 'Role', width: 180, editable: true },
-  { field: 'salary', headerName: 'Salary', width: 120, editable: true, editor: { type: 'number', min: 30000, max: 300000, step: 1000 }, valueFormatter: (v) => `$${Number(v).toLocaleString()}` },
-  { field: 'status', headerName: 'Status', width: 100 },
-]
-
-const pinnedCols: ColumnDef<Employee>[] = [
-  { field: 'id', headerName: 'ID', width: 60, pinned: 'left' },
-  { field: 'name', headerName: 'Name', width: 180, pinned: 'left' },
-  { field: 'department', headerName: 'Dept', width: 140 },
-  { field: 'role', headerName: 'Role', width: 180 },
-  { field: 'salary', headerName: 'Salary', width: 120, valueFormatter: (v) => `$${Number(v).toLocaleString()}` },
-  { field: 'location', headerName: 'Location', width: 140 },
-  { field: 'startDate', headerName: 'Start Date', width: 120 },
-  { field: 'email', headerName: 'Email', width: 200 },
-  { field: 'status', headerName: 'Status', width: 100, pinned: 'right' },
-]
-
-const treeCols: ColumnDef<Employee>[] = [
-  { field: 'id', headerName: 'ID', width: 60 },
-  { field: 'name', headerName: 'Name', width: 200 },
-  { field: 'role', headerName: 'Role', width: 180 },
-  { field: 'salary', headerName: 'Salary', width: 120, valueFormatter: (v) => `$${Number(v).toLocaleString()}` },
-  { field: 'location', headerName: 'Location', width: 140 },
-]
-
-const aggCols: ColumnDef<Employee>[] = [
-  { field: 'id', headerName: 'ID', width: 60 },
-  { field: 'name', headerName: 'Name', width: 180, aggregate: { type: 'count', label: 'Total: ' } },
-  { field: 'department', headerName: 'Dept', width: 140 },
-  { field: 'salary', headerName: 'Salary', width: 130, valueFormatter: (v) => `$${Number(v).toLocaleString()}`, aggregate: { type: 'avg', label: 'Avg: ', formatter: (v) => `$${Math.round(Number(v)).toLocaleString()}` } },
-  { field: 'performance', headerName: 'Perf', width: 90, aggregate: { type: 'max', label: 'Max: ' } },
-]
-
-// ── Component ────────────────────────────────────────────────────────────────
 
 export function DatagridPage() {
-  const [activeSection, setActiveSection] = useState('basic')
+  const [projects, setProjects] = useState<readonly Project[]>(PROJECTS)
+  const [selectedRows, setSelectedRows] = useState<readonly Project[]>([])
+  const [expandedRows, setExpandedRows] = useState<readonly Project[]>([])
+  const [groupBy, setGroupBy] = useState<readonly string[]>(['region', 'owner'])
+  const [reorderRows, setReorderRows] = useState<readonly Project[]>(PROJECTS.slice(0, 4))
+  const [lastAction, setLastAction] = useState('Interact with the grid to see emitted state changes.')
+  const [activeSection, setActiveSection] = useState('import')
+  const gridRef = useRef<DatagridHandle<Project>>(null)
   const mainRef = useRef<HTMLDivElement>(null)
-  const [densityVal, setDensityVal] = useState<'dense' | 'default' | 'comfortable'>('default')
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
-        if (visible.length > 0) setActiveSection(visible[0].target.id)
+          .filter((entry) => entry.isIntersecting)
+          .sort((left, right) => left.boundingClientRect.top - right.boundingClientRect.top)
+        if (visible[0]?.target.id) setActiveSection(visible[0].target.id)
       },
-      { rootMargin: '-10% 0px -60% 0px', threshold: 0 },
+      { rootMargin: '-10% 0px -65% 0px', threshold: 0 },
     )
-    mainRef.current?.querySelectorAll('section[id]').forEach((el) => observer.observe(el))
+    mainRef.current?.querySelectorAll('section[id]').forEach((section) => observer.observe(section))
     return () => observer.disconnect()
   }, [])
 
@@ -364,405 +380,327 @@ export function DatagridPage() {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
+  function applyCellEdit(event: { row: Project; key: string; value: unknown }) {
+    setProjects((current) => current.map((project) => (
+      project === event.row ? { ...project, [event.key]: event.value } as Project : project
+    )))
+    setLastAction(`Committed ${event.key}.`)
+  }
+
   return (
     <div className="features-layout">
       <div className="features-main" ref={mainRef}>
         <h1>Datagrid</h1>
         <p className="docs-desc">
-          A high-performance data grid with sorting, filtering, pagination, cell/row editing,
-          column pinning, virtual scrolling, row grouping, tree rows, detail panels,
-          row drag-and-drop, and more.
+          A typed, accessible data grid for sortable, filterable, resizable, reorderable, editable,
+          selectable, grouped, paginated, and virtualized records.
         </p>
 
-        {/* ── Basic ──────────────────────────────────────────────────────── */}
+        <section id="import" className="demo-section">
+          <h2>Import</h2>
+          <p className="section-desc">Import the component and its typed column contract from the single Spruce React package.</p>
+          <CodePreview code={IMPORT_CODE} language="typescript" codeOnly />
+        </section>
+
         <section id="basic" className="demo-section">
-          <h2>Basic Usage</h2>
-          <p className="section-desc">
-            Provide <code>columns</code> and <code>rowData</code> to render a grid.
-            Each column definition specifies a field key, header label, width, and optional features.
-          </p>
-          <CodePreview code={BASIC_CODE}>
-            <Datagrid columns={basicCols} rowData={EMPLOYEES} />
+          <h2>Basic usage</h2>
+          <p className="section-desc">Provide a generic row type, an array of rows, and a typed column definition. Sorting, resizing, and column reordering are enabled by default.</p>
+          <CodePreview code={BASIC_CODE} language="typescript">
+            <Datagrid<Project> ref={gridRef} rows={projects} columns={PROJECT_COLUMNS} ariaLabel="Projects" />
           </CodePreview>
         </section>
 
-        {/* ── Sorting ────────────────────────────────────────────────────── */}
+        <section id="sizing" className="demo-section">
+          <h2>Sizing</h2>
+          <p className="section-desc">Use <code>autoHeight</code> for wrapped content, <code>autoColumnWidth</code> for intrinsic sizing, and <code>fitColumnsToWidth</code> when the grid should fill its viewport. Numeric, percentage, flex, minimum, and maximum column widths are supported.</p>
+          <CodePreview code={SIZING_CODE} language="typescript">
+            <Datagrid<Project> rows={projects.slice(0, 4)} columns={PROJECT_COLUMNS} fitColumnsToWidth ariaLabel="Sized projects" />
+          </CodePreview>
+          <p>Set <code>autoHeight={'{false}'}</code> and give the host a height when the grid belongs in a fixed workspace. Set <code>showVerticalLines</code> to <code>true</code> when column separators are useful.</p>
+        </section>
+
+        <section id="pinning" className="demo-section">
+          <h2>Column pinning</h2>
+          <p className="section-desc">Set <code>pinned</code> to <code>left</code> or <code>right</code> to keep a column visible while the center columns scroll horizontally. Utility columns remain pinned to the logical edge.</p>
+          <CodePreview code={PINNING_CODE} language="typescript">
+            <Datagrid<Project> rows={projects} columns={PROJECT_COLUMNS} columnPins={{ name: 'left', budget: 'right' }} ariaLabel="Pinned projects" />
+          </CodePreview>
+        </section>
+
+        <section id="menu" className="demo-section">
+          <h2>Column menu</h2>
+          <p className="section-desc">Enable <code>columnMenu</code> to expose sorting, width, visibility, grouping, and pinning actions. Add typed <code>menuItems</code> for application commands.</p>
+          <CodePreview code={MENU_CODE} language="typescript">
+            <Datagrid<Project> rows={projects} columns={PROJECT_COLUMNS} columnMenu ariaLabel="Project column menu" />
+          </CodePreview>
+        </section>
+
         <section id="sorting" className="demo-section">
           <h2>Sorting</h2>
-          <p className="section-desc">
-            Set <code>sortable: true</code> on column definitions. Click a header to cycle through
-            ascending, descending, and unsorted. Hold Ctrl/Cmd and click multiple columns for multi-sort.
-          </p>
-          <CodePreview code={SORTING_CODE}>
-            <Datagrid columns={basicCols} rowData={EMPLOYEES} />
+          <p className="section-desc">Client sorting handles strings, numbers, booleans, dates, value getters, and custom comparators. Use <code>sortMode="manual"</code> with <code>onSortChange</code> or <code>onSortsChange</code> for remote sorting.</p>
+          <CodePreview code={SORTING_CODE} language="typescript">
+            <Datagrid<Project> rows={projects} columns={PROJECT_COLUMNS} multiSort sortIndicatorVisibility="always" onSortChange={({ key, direction }) => setLastAction(`Sorted ${key} ${direction ?? 'off'}.`)} ariaLabel="Sortable projects" />
           </CodePreview>
         </section>
 
-        {/* ── Filtering ──────────────────────────────────────────────────── */}
+        <section id="templates" className="demo-section">
+          <h2>Custom cell rendering</h2>
+          <p className="section-desc">Use <code>cellTemplates</code> for read-only presentation while sorting, filtering, and editing continue to use the underlying value. Row details, detail panes, leading actions, and complete row templates use the same render-prop model.</p>
+          <CodePreview code={TEMPLATE_CODE} language="typescript">
+            <Datagrid<Project>
+              rows={projects}
+              columns={PROJECT_COLUMNS}
+              cellTemplates={{
+                status: ({ row, formattedValue }) => <strong data-status={row.status}>{formattedValue}</strong>,
+              }}
+              rowDetails
+              expandedRows={expandedRows}
+              onExpandedRowsChange={setExpandedRows}
+              rowDetail={({ row }) => <p>{row.description}</p>}
+              ariaLabel="Templated projects"
+            />
+          </CodePreview>
+        </section>
+
         <section id="filtering" className="demo-section">
           <h2>Filtering</h2>
-          <p className="section-desc">
-            Set <code>filterable: true</code> on columns. Use <code>filterMode: 'inline'</code> for
-            a filter row below the header, or the default <code>'popover'</code> for a filter icon in the header.
-          </p>
-          <h3>Inline Filters</h3>
-          <CodePreview code={FILTERING_INLINE_CODE}>
-            <Datagrid columns={inlineFilterCols} rowData={EMPLOYEES} />
-          </CodePreview>
-          <h3 style={{ marginTop: 24 }}>Popover Filters</h3>
-          <CodePreview code={FILTERING_POPOVER_CODE}>
-            <Datagrid columns={popoverFilterCols} rowData={EMPLOYEES} options={{ showToolbar: true }} />
+          <p className="section-desc">Set <code>filterable</code> on a column for distinct-value filtering. Use <code>filterVariant="dynamic"</code> and <code>filterDataType</code> for condition builders with text, number, date, and boolean operators. <code>searchable</code> adds a global search field.</p>
+          <CodePreview code={FILTERING_CODE} language="typescript">
+            <Datagrid<Project> rows={projects} columns={PROJECT_COLUMNS} searchable toolbar ariaLabel="Filterable projects" onFilterChange={(filters) => setLastAction(`${filters.length} column filter${filters.length === 1 ? '' : 's'} active.`)} />
           </CodePreview>
         </section>
 
-        {/* ── Pagination ─────────────────────────────────────────────────── */}
-        <section id="pagination" className="demo-section">
-          <h2>Pagination</h2>
-          <p className="section-desc">
-            Enable <code>pagination</code> in options with configurable <code>pageSize</code> and
-            <code> pageSizeOptions</code>.
-          </p>
-          <CodePreview code={PAGINATION_CODE}>
-            <Datagrid columns={basicCols} rowData={EMPLOYEES} options={{ pagination: true, pageSize: 5, pageSizeOptions: [5, 10, 20] }} />
-          </CodePreview>
-        </section>
-
-        {/* ── Selection ──────────────────────────────────────────────────── */}
-        <section id="selection" className="demo-section">
-          <h2>Selection</h2>
-          <p className="section-desc">
-            Set <code>selectionMode</code> to <code>'single'</code> or <code>'multi'</code>.
-            Multi-select supports Shift+click for range selection and Ctrl+click for toggle.
-          </p>
-          <CodePreview code={SELECTION_CODE}>
-            <Datagrid columns={basicCols} rowData={EMPLOYEES} options={{ selectionMode: 'multi', rowHover: true }} />
-          </CodePreview>
-        </section>
-
-        {/* ── Cell Editing ────────────────────────────────────────────────── */}
-        <section id="cell-editing" className="demo-section">
-          <h2>Cell Editing</h2>
-          <p className="section-desc">
-            Set <code>editMode: 'cell'</code> and mark columns as <code>editable: true</code>.
-            Supports text, number, select, date, boolean, and textarea editor types.
-            Double-click a cell to edit (or set <code>editTrigger: 'click'</code>).
-          </p>
-          <CodePreview code={CELL_EDIT_CODE}>
-            <Datagrid columns={editableCols} rowData={EMPLOYEES.slice(0, 8)} options={{ editMode: 'cell', editTrigger: 'dblclick' }} />
-          </CodePreview>
-        </section>
-
-        {/* ── Row Editing ─────────────────────────────────────────────────── */}
-        <section id="row-editing" className="demo-section">
-          <h2>Row Editing</h2>
-          <p className="section-desc">
-            Set <code>editMode: 'row'</code> for full-row editing. An action column appears with
-            edit, save, and cancel buttons. Double-click a row to enter edit mode.
-          </p>
-          <CodePreview code={ROW_EDIT_CODE}>
-            <Datagrid columns={editableCols} rowData={EMPLOYEES.slice(0, 8)} options={{ editMode: 'row' }} />
-          </CodePreview>
-        </section>
-
-        {/* ── Column Pinning ──────────────────────────────────────────────── */}
-        <section id="column-pinning" className="demo-section">
-          <h2>Column Pinning</h2>
-          <p className="section-desc">
-            Set <code>pinned: 'left'</code> or <code>pinned: 'right'</code> on columns to
-            freeze them while scrolling horizontally.
-          </p>
-          <CodePreview code={PINNED_CODE}>
-            <Datagrid columns={pinnedCols} rowData={EMPLOYEES} />
-          </CodePreview>
-        </section>
-
-        {/* ── Virtual Scroll ──────────────────────────────────────────────── */}
-        <section id="virtual-scroll" className="demo-section">
-          <h2>Virtual Scroll</h2>
-          <p className="section-desc">
-            Enable <code>virtualScroll: true</code> for datasets with thousands of rows.
-            Only visible rows are rendered in the DOM, providing smooth 60fps scrolling.
-          </p>
-          <CodePreview code={VIRTUAL_CODE}>
-            <Datagrid
-              columns={basicCols}
-              rowData={LARGE_DATA}
-              options={{ virtualScroll: true }}
-              style={{ height: 400 }}
-            />
-          </CodePreview>
-        </section>
-
-        {/* ── Row Grouping ────────────────────────────────────────────────── */}
-        <section id="grouping" className="demo-section">
-          <h2>Row Grouping</h2>
-          <p className="section-desc">
-            Set <code>groupByField</code> to group rows by a column value.
-            Group headers are collapsible and show the row count.
-          </p>
-          <CodePreview code={GROUPING_CODE}>
-            <Datagrid columns={basicCols} rowData={EMPLOYEES} options={{ groupByField: 'department', showToolbar: true }} />
-          </CodePreview>
-        </section>
-
-        {/* ── Tree Rows ───────────────────────────────────────────────────── */}
-        <section id="tree" className="demo-section">
-          <h2>Tree Rows</h2>
-          <p className="section-desc">
-            Set <code>treeChildrenField</code> to the property containing child rows.
-            Tree nodes are expandable/collapsible with indented display.
-          </p>
-          <CodePreview code={TREE_CODE}>
-            <Datagrid columns={treeCols} rowData={TREE_DATA} options={{ treeChildrenField: 'reports', showToolbar: true }} />
-          </CodePreview>
-        </section>
-
-        {/* ── Detail Panel ────────────────────────────────────────────────── */}
-        <section id="detail" className="demo-section">
-          <h2>Detail Panel</h2>
-          <p className="section-desc">
-            Provide a <code>detailRenderer</code> function to display expandable detail content below each row.
-            Click the expand button to toggle.
-          </p>
-          <CodePreview code={DETAIL_CODE}>
-            <Datagrid
-              columns={basicCols}
-              rowData={EMPLOYEES.slice(0, 8)}
-              options={{
-                detailRenderer: ({ row, close }) => (
-                  <div style={{ padding: 16, fontSize: 13 }}>
-                    <strong>{(row as Employee).name}</strong> &mdash; {(row as Employee).email}
-                    <span style={{ marginLeft: 12, color: 'var(--sp-text-subtle)' }}>
-                      {(row as Employee).location} | Started {(row as Employee).startDate}
-                    </span>
-                    <button onClick={close} style={{ marginLeft: 12, cursor: 'pointer', fontSize: 11, border: '1px solid var(--sp-border)', borderRadius: 4, padding: '2px 8px', background: 'transparent' }}>
-                      Close
-                    </button>
-                  </div>
-                ),
-              }}
-            />
-          </CodePreview>
-        </section>
-
-        {/* ── Row Drag & Drop ─────────────────────────────────────────────── */}
-        <section id="drag" className="demo-section">
-          <h2>Row Drag & Drop</h2>
-          <p className="section-desc">
-            Set <code>rowDraggable: true</code> to allow reordering rows via drag handle.
-          </p>
-          <CodePreview code={DRAG_CODE}>
-            <Datagrid columns={basicCols} rowData={EMPLOYEES.slice(0, 8)} options={{ rowDraggable: true }} />
-          </CodePreview>
-        </section>
-
-        {/* ── Toolbar ─────────────────────────────────────────────────────── */}
         <section id="toolbar" className="demo-section">
-          <h2>Toolbar</h2>
-          <p className="section-desc">
-            Enable <code>showToolbar: true</code> to display the toolbar with column panel, filter badges,
-            and custom action buttons.
-          </p>
-          <CodePreview code={TOOLBAR_CODE}>
-            <Datagrid
-              columns={popoverFilterCols}
-              rowData={EMPLOYEES}
-              options={{
-                showToolbar: true,
-                toolbarButtons: [
-                  { label: 'Export', icon: 'download', action: () => alert('Export clicked') },
-                  { label: 'Delete', icon: 'trash', variant: 'danger', action: () => alert('Delete clicked') },
-                ],
-              }}
+          <h2>Built-in toolbar and column selector</h2>
+          <p className="section-desc">The toolbar can contain search, DataContext actions, custom content, the column selector, and grouped-column controls. The selector preserves the full column order while hiding columns.</p>
+          <CodePreview code={TOOLBAR_CODE} language="typescript">
+            <Datagrid<Project> rows={projects} columns={PROJECT_COLUMNS} toolbar searchable columnSelector statusbar footer ariaLabel="Project tools" />
+          </CodePreview>
+        </section>
+
+        <section id="groups" className="demo-section">
+          <h2>Column groups</h2>
+          <p className="section-desc">Use <code>columnGroups</code> to add a grouped header row. Groups can be reordered and resized when the corresponding grid-level and group-level capabilities are enabled.</p>
+          <CodePreview code={GROUPS_CODE} language="typescript">
+            <Datagrid<Project> rows={projects} columns={PROJECT_COLUMNS} columnGroups={GROUPS} ariaLabel="Grouped project columns" />
+          </CodePreview>
+        </section>
+
+        <section id="spans" className="demo-section">
+          <h2>Row spans</h2>
+          <p className="section-desc">A numeric <code>rowSpan</code> or row-span callback merges adjacent records in a column. Row spans are disabled while grouping, virtualization, or expanded row details are active.</p>
+          <CodePreview code={ROW_SPAN_CODE} language="typescript">
+            <Datagrid<Project>
+              rows={ROW_SPAN_PROJECTS}
+              columns={PROJECT_COLUMNS.map((column) => column.key === 'owner' ? { ...column, rowSpan: ({ rows, rowIndex }) => rows[rowIndex + 1]?.owner === rows[rowIndex]?.owner ? 2 : 1 } : column)}
+              ariaLabel="Projects with row spans"
             />
           </CodePreview>
         </section>
 
-        {/* ── Density ─────────────────────────────────────────────────────── */}
-        <section id="density" className="demo-section">
-          <h2>Density</h2>
-          <p className="section-desc">
-            Control row height with <code>density</code>: <code>'dense'</code> (26px),
-            <code>'default'</code> (32px), or <code>'comfortable'</code> (38px).
-          </p>
-          <CodePreview code={DENSITY_CODE}>
-            <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-              {(['dense', 'default', 'comfortable'] as const).map((d) => (
-                <button
-                  key={d}
-                  onClick={() => setDensityVal(d)}
-                  style={{
-                    padding: '4px 12px',
-                    borderRadius: 6,
-                    border: '1px solid var(--sp-border-strong)',
-                    background: densityVal === d ? 'var(--sp-primary)' : 'transparent',
-                    color: densityVal === d ? '#fff' : 'var(--sp-text-color)',
-                    cursor: 'pointer',
-                    fontSize: 12,
-                  }}
-                >
-                  {d}
-                </button>
-              ))}
-            </div>
-            <Datagrid columns={basicCols} rowData={EMPLOYEES.slice(0, 6)} options={{ density: densityVal }} />
+        <section id="details" className="demo-section">
+          <h2>Row details and detail pane</h2>
+          <p className="section-desc">Use <code>rowDetails</code> with <code>rowDetail</code> for an expandable detail row. Use <code>detailPane</code>, <code>detailPaneRow</code>, and <code>detailPaneRenderer</code> for a side panel.</p>
+          <CodePreview code={`<Datagrid
+  rows={projects}
+  columns={columns}
+  rowDetails
+  rowDetail={({ row }) => <p>{row.description}</p>}
+  detailPane
+  detailPaneRow={detailPaneRow}
+  onDetailPaneRowChange={setDetailPaneRow}
+  detailPaneRenderer={({ row, close }) => (
+    <><h3>{row.name}</h3><p>{row.description}</p><button onClick={close}>Close</button></>
+  )}
+/>`} language="typescript">
+            <Datagrid<Project>
+              rows={projects}
+              columns={PROJECT_COLUMNS}
+              rowDetails
+              expandedRows={expandedRows}
+              onExpandedRowsChange={setExpandedRows}
+              rowDetail={({ row }) => <p>{row.description}</p>}
+              detailPane
+              detailPaneRow={selectedRows[0] ?? null}
+              detailPaneTitle={({ name }) => name}
+              detailPaneRenderer={({ row, close }) => <div><strong>{row.name}</strong><p>{row.description}</p><button type="button" onClick={close}>Close</button></div>}
+              selectionMode="single"
+              selectedRows={selectedRows}
+              onSelectedRowsChange={setSelectedRows}
+              onDetailPaneRowChange={(row) => setSelectedRows(row ? [row] : [])}
+              ariaLabel="Projects with details"
+            />
           </CodePreview>
         </section>
 
-        {/* ── Aggregates ──────────────────────────────────────────────────── */}
+        <section id="grouping" className="demo-section">
+          <h2>Multi-column row grouping</h2>
+          <p className="section-desc">Pass ordered keys to <code>groupBy</code> for nested groups. Keep controlled grouping state in sync with <code>onGroupByChange</code> so the toolbar remove and drag/drop actions update the view. <code>groupSorts</code>, <code>groupsExpandedByDefault</code>, <code>stickyGroupHeaders</code>, <code>indentGroupedRows</code>, and <code>groupSelection</code> control the grouped view.</p>
+          <CodePreview code={GROUPING_CODE} language="typescript">
+            <Datagrid<Project> rows={projects} columns={PROJECT_COLUMNS} groupBy={groupBy} onGroupByChange={setGroupBy} groupSorting groupsExpandedByDefault groupSelection selectionMode="multiple" ariaLabel="Grouped projects" />
+          </CodePreview>
+        </section>
+
         <section id="aggregates" className="demo-section">
-          <h2>Aggregates</h2>
-          <p className="section-desc">
-            Set <code>showAggregates: true</code> and define <code>aggregate</code> on columns.
-            Supports sum, avg, min, max, count, and custom aggregation functions.
-          </p>
-          <CodePreview code={AGGREGATE_CODE}>
-            <Datagrid columns={aggCols} rowData={EMPLOYEES} options={{ showAggregates: true }} />
+          <h2>Aggregates and footer</h2>
+          <p className="section-desc">Set <code>aggregate</code> to <code>sum</code>, <code>count</code>, <code>avg</code>, <code>min</code>, or <code>max</code>, or provide a custom aggregate. Enable <code>footer</code> and customize its accessible label with <code>footerLabel</code>.</p>
+          <CodePreview code={AGGREGATE_CODE} language="typescript">
+            <Datagrid<Project> rows={projects} columns={PROJECT_COLUMNS} footer footerLabel="Project summary" ariaLabel="Projects with aggregates" />
           </CodePreview>
         </section>
 
-        {/* ── Striped & Borderless ────────────────────────────────────────── */}
-        <section id="striped" className="demo-section">
-          <h2>Striped & Borderless</h2>
-          <p className="section-desc">
-            Use <code>striped: true</code> for alternating row backgrounds, or <code>borderless: true</code> for
-            a clean flat look without internal borders.
-          </p>
-          <CodePreview code={STRIPED_CODE}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-              <div>
-                <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--sp-text-muted)', marginBottom: 8 }}>Striped</p>
-                <Datagrid columns={basicCols} rowData={EMPLOYEES.slice(0, 6)} options={{ striped: true }} />
-              </div>
-              <div>
-                <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--sp-text-muted)', marginBottom: 8 }}>Borderless</p>
-                <Datagrid columns={basicCols} rowData={EMPLOYEES.slice(0, 6)} options={{ borderless: true }} />
-              </div>
-            </div>
+        <section id="status" className="demo-section">
+          <h2>Status bar</h2>
+          <p className="section-desc">The status bar can show total rows, selected rows, custom start/end content, the column selector, and merged pagination controls. Set <code>statusbarMergePagination</code> when pagination should live inside it.</p>
+          <CodePreview code={`<Datagrid
+  rows={projects}
+  columns={columns}
+  statusbar
+  statusbarShowRowCount
+  statusbarShowSelectedRowCount
+  statusbarMergePagination
+  pagination
+  statusbarStart={<span>Last sync: just now</span>}
+/>`} language="typescript">
+            <Datagrid<Project> rows={projects} columns={PROJECT_COLUMNS} statusbar statusbarShowRowCount statusbarShowSelectedRowCount statusbarMergePagination pagination pageSize={3} selectedRows={selectedRows} selectionMode="multiple" onSelectedRowsChange={setSelectedRows} statusbarStart={<span>Last sync: just now</span>} ariaLabel="Project status" />
           </CodePreview>
         </section>
 
-        {/* ── API Reference ───────────────────────────────────────────────── */}
+        <section id="empty" className="demo-section">
+          <h2>Empty states</h2>
+          <p className="section-desc">Customize the empty and filtered-empty messages independently. <code>emptyState</code> can replace the built-in presentation with application content.</p>
+          <CodePreview code={`<Datagrid
+  rows={[]}
+  columns={columns}
+  emptyMessage="No projects yet"
+  emptyStateDescription="Create a project to start tracking delivery."
+  emptyState={<CreateProjectPrompt />}
+/>`} language="typescript">
+            <Datagrid<Project> rows={[]} columns={PROJECT_COLUMNS} emptyMessage="No projects yet" emptyStateDescription="Create a project to start tracking delivery." ariaLabel="Empty projects" />
+          </CodePreview>
+        </section>
+
+        <section id="large-data" className="demo-section">
+          <h2>Large data sets</h2>
+          <p className="section-desc">Use row virtualization for large local collections. Column virtualization keeps only horizontally visible center columns mounted while pinned columns remain visible.</p>
+          <CodePreview code={VIRTUAL_CODE} language="typescript">
+            <Datagrid<Project> rows={Array.from({ length: 100 }, (_, index) => ({ ...PROJECTS[index % PROJECTS.length], id: 1000 + index }))} columns={PROJECT_COLUMNS} virtualScroll virtualScrollHeight={280} virtualRowHeight={32} virtualOverscan={6} columnVirtualization ariaLabel="Virtualized projects" />
+          </CodePreview>
+          <CodePreview code={VIRTUAL_PAGING_CODE} language="typescript" codeOnly />
+          <p>For remote pages, set <code>virtualPaging</code>, provide <code>virtualTotalRows</code> when known, and replace <code>rows</code> in response to <code>onVirtualPageRequest</code>. Use <code>virtualPagingLoading</code> to prevent duplicate requests.</p>
+        </section>
+
+        <section id="selection" className="demo-section">
+          <h2>Row selection and stripes</h2>
+          <p className="section-desc">Single selection uses radios; multiple selection uses checkboxes and an indeterminate header control. Selection is controlled through <code>selectedRows</code> and <code>onSelectedRowsChange</code>.</p>
+          <CodePreview code={`<Datagrid
+  rows={projects}
+  columns={columns}
+  selectionMode="multiple"
+  selectedRows={selectedRows}
+  onSelectedRowsChange={setSelectedRows}
+  stripedRows
+/>`} language="typescript">
+            <Datagrid<Project> rows={projects} columns={PROJECT_COLUMNS} selectionMode="multiple" selectedRows={selectedRows} onSelectedRowsChange={setSelectedRows} stripedRows ariaLabel="Selectable projects" />
+          </CodePreview>
+          <p role="status">{selectedRows.length} project{selectedRows.length === 1 ? '' : 's'} selected.</p>
+        </section>
+
+        <section id="reorder" className="demo-section">
+          <h2>Row reordering</h2>
+          <p className="section-desc">Set <code>rowReorder</code> to enable drag handles. Reordering pauses while sorting, filtering, grouping, pagination, virtual paging, or virtual scrolling transforms the visible order.</p>
+          <CodePreview code={`<Datagrid
+  rows={projects}
+  columns={columns}
+  rowReorder
+  onRowOrderChange={({ rows }) => setProjects(rows)}
+/>`} language="typescript">
+            <Datagrid<Project> rows={reorderRows} columns={PROJECT_COLUMNS} rowReorder onRowOrderChange={({ rows: nextRows }) => { setReorderRows(nextRows); setLastAction('Rows reordered.') }} ariaLabel="Reorderable projects" />
+          </CodePreview>
+        </section>
+
+        <section id="editing" className="demo-section">
+          <h2>Editing and validation</h2>
+          <p className="section-desc">Set <code>editable</code> on columns and choose <code>editMode="cell"</code> or <code>editMode="row"</code>. Built-in text, number, date, checkbox, select, combobox, and grid-combobox editors are typed through the column definition.</p>
+          <CodePreview code={EDITING_CODE} language="typescript">
+            <Datagrid<Project> rows={projects} columns={PROJECT_COLUMNS} editMode="cell" editOnClick editOnType preventInvalidCommit onCellEditCommit={applyCellEdit} onCellValidationFailed={() => setLastAction('Invalid value kept in the editor.')} ariaLabel="Editable projects" />
+          </CodePreview>
+          <p role="status">{lastAction}</p>
+          <h3>Custom cell editors</h3>
+          <p>Use <code>cellEditors</code> when an application-specific control owns the draft. The render context provides <code>value</code>, <code>update</code>, <code>commit</code>, <code>cancel</code>, and validation state.</p>
+          <CodePreview code={CUSTOM_EDITOR_CODE} language="typescript" codeOnly />
+        </section>
+
+        <section id="new-row" className="demo-section">
+          <h2>New row</h2>
+          <p className="section-desc">Set <code>enableNewRow</code> to keep a draft row below the records. <code>newRowFactory</code> supplies identifiers and defaults; each valid cell commit emits <code>onNewRowCommit</code>.</p>
+          <CodePreview code={NEW_ROW_CODE} language="typescript" codeOnly />
+        </section>
+
+        <section id="data-context" className="demo-section">
+          <h2>DataContext integration</h2>
+          <p className="section-desc">Bind a compatible <code>dataContext</code> to make it the grid&apos;s row and change manager. The adapter can synchronize selection, show row/cell state, block invalid saves, and provide Add/Delete/Save/Discard toolbar commands.</p>
+          <CodePreview code={DATA_CONTEXT_CODE} language="typescript" codeOnly />
+          <p>Valid edits write through <code>patch</code>, new rows use <code>add</code>, and toolbar save/discard operations call the context. Use <code>onDataContextSaveComplete</code> and <code>onDataContextSaveError</code> for application-level feedback.</p>
+        </section>
+
+        <section id="keyboard" className="demo-section">
+          <h2>Keyboard interaction</h2>
+          <p className="section-desc">Datagrid keeps grid navigation and utility controls keyboard accessible. Focus the grid, header, resize handle, cell, or editor and use the following shortcuts.</p>
+          <CodePreview code={KEYBOARD_CODE} language="typescript" codeOnly />
+          <div className="api-table-wrap">
+            <table className="api-table">
+              <thead><tr><th>Control</th><th>Keys</th><th>Result</th></tr></thead>
+              <tbody>
+                <tr><td>Sort button</td><td>Enter, Space</td><td>Cycle ascending, descending, and unsorted.</td></tr>
+                <tr><td>Column header</td><td>Alt + Arrow/Home/End</td><td>Reorder the column.</td></tr>
+                <tr><td>Resize handle</td><td>Arrow, Shift + Arrow, Home, End</td><td>Resize by a step, large step, minimum, or maximum.</td></tr>
+                <tr><td>Editable cell</td><td>Enter, F2, printable key</td><td>Start editing; printable keys replace the value when <code>editOnType</code> is enabled.</td></tr>
+                <tr><td>Editor</td><td>Enter, Escape</td><td>Commit or cancel the draft.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="theming" className="demo-section">
+          <h2>Theming</h2>
+          <p className="section-desc">Datagrid consumes Spruce surface, text, border, typography, spacing, density, motion, scrollbar, and focus tokens. It follows the active <code>SpruceProvider</code> theme and document direction.</p>
+          <CodePreview code={THEME_CODE} language="typescript" codeOnly />
+          <p>Use the <code>locale</code> prop for display and comparison overrides. Use provider locale and direction for localized chrome and RTL layouts. Customize local presentation with <code>--sp-datagrid-*</code> tokens rather than hard-coded colors.</p>
+        </section>
+
         <section id="api" className="demo-section">
-          <h2>API Reference</h2>
-
-          <h3>DatagridProps</h3>
+          <h2>Public API</h2>
+          <p className="section-desc">Datagrid exposes typed props and callbacks for the Angular feature surface, plus an imperative ref for common commands.</p>
           <div className="api-table-wrap">
             <table className="api-table">
-              <thead>
-                <tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr>
-              </thead>
+              <thead><tr><th>Surface</th><th>React API</th><th>Purpose</th></tr></thead>
               <tbody>
-                <tr><td><code>columns</code></td><td><code>ColumnDef&lt;T&gt;[]</code></td><td>Required</td><td>Column definitions array</td></tr>
-                <tr><td><code>rowData</code></td><td><code>T[]</code></td><td><code>[]</code></td><td>Data rows</td></tr>
-                <tr><td><code>options</code></td><td><code>GridOptions&lt;T&gt;</code></td><td><code>{'{}'}</code></td><td>Grid configuration options</td></tr>
+                <tr><td>Data</td><td><code>rows</code>, <code>data</code>, <code>dataContext</code></td><td>Local rows or tracked DataContext records.</td></tr>
+                <tr><td>Columns</td><td><code>columns</code>, <code>columnGroups</code>, <code>columnPins</code></td><td>Typed columns, grouped headers, and pinned columns.</td></tr>
+                <tr><td>Sorting/filtering</td><td><code>sortMode</code>, <code>sorts</code>, <code>filterMode</code>, <code>columnFilters</code>, <code>searchTerm</code></td><td>Client or manual state.</td></tr>
+                <tr><td>Grouping</td><td><code>groupBy</code>, <code>groupSorts</code>, <code>onGroupByChange</code>, <code>onGroupSortsChange</code></td><td>Controlled nested grouping and group sorting.</td></tr>
+                <tr><td>Selection</td><td><code>selectionMode</code>, <code>selectedRows</code>, <code>onSelectedRowsChange</code>, <code>onSelectionChange</code></td><td>Single or multiple controlled selection.</td></tr>
+                <tr><td>Pagination</td><td><code>pagination</code>, <code>pageSize</code>, <code>paginationType</code>, <code>onPageChange</code></td><td>Compact or full client pagination.</td></tr>
+                <tr><td>Virtual data</td><td><code>virtualScroll</code>, <code>columnVirtualization</code>, <code>virtualPaging</code></td><td>Large local and remote datasets.</td></tr>
+                <tr><td>Editing</td><td><code>editMode</code>, <code>editOnClick</code>, <code>editOnType</code>, <code>cellEditors</code></td><td>Cell/row editors and custom controls.</td></tr>
+                <tr><td>Details</td><td><code>rowDetails</code>, <code>rowDetail</code>, <code>detailPaneRenderer</code>, <code>onDetailPaneRowChange</code></td><td>Expandable rows and controlled side panels.</td></tr>
+                <tr><td>Callbacks</td><td><code>onSortChange</code>, <code>onFilterChange</code>, <code>onCellEditCommit</code>, <code>onRowOrderChange</code>, <code>onDataContextSaveComplete</code></td><td>Immutable state and lifecycle events.</td></tr>
+                <tr><td>Ref methods</td><td><code>DatagridHandle&lt;T&gt;</code></td><td>Sorting, filtering, paging, selection, grouping, sizing, and editing commands.</td></tr>
               </tbody>
             </table>
           </div>
-
-          <h3 style={{ marginTop: 24 }}>ColumnDef&lt;T&gt;</h3>
-          <div className="api-table-wrap">
-            <table className="api-table">
-              <thead>
-                <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
-              </thead>
-              <tbody>
-                <tr><td><code>field</code></td><td><code>string</code></td><td>Required</td><td>Row data property key</td></tr>
-                <tr><td><code>headerName</code></td><td><code>string</code></td><td>field</td><td>Column header label</td></tr>
-                <tr><td><code>width</code></td><td><code>number</code></td><td>150</td><td>Column width in px</td></tr>
-                <tr><td><code>minWidth</code></td><td><code>number</code></td><td>60</td><td>Minimum column width</td></tr>
-                <tr><td><code>maxWidth</code></td><td><code>number</code></td><td>2000</td><td>Maximum column width</td></tr>
-                <tr><td><code>visible</code></td><td><code>boolean</code></td><td>true</td><td>Column visibility</td></tr>
-                <tr><td><code>sortable</code></td><td><code>boolean</code></td><td>false</td><td>Enable sorting</td></tr>
-                <tr><td><code>resizable</code></td><td><code>boolean</code></td><td>true</td><td>Enable column resize</td></tr>
-                <tr><td><code>editable</code></td><td><code>boolean</code></td><td>false</td><td>Enable cell editing</td></tr>
-                <tr><td><code>filterable</code></td><td><code>boolean</code></td><td>false</td><td>Enable column filtering</td></tr>
-                <tr><td><code>filterMode</code></td><td><code>'inline' | 'popover'</code></td><td>'popover'</td><td>Filter UI style</td></tr>
-                <tr><td><code>pinned</code></td><td><code>'left' | 'right' | null</code></td><td>null</td><td>Pin column position</td></tr>
-                <tr><td><code>valueFormatter</code></td><td><code>(value, row) =&gt; string</code></td><td>&mdash;</td><td>Format display value</td></tr>
-                <tr><td><code>cellRenderer</code></td><td><code>(value, row) =&gt; ReactNode</code></td><td>&mdash;</td><td>Custom cell render function</td></tr>
-                <tr><td><code>editor</code></td><td><code>CellEditorConfig</code></td><td>&mdash;</td><td>Editor configuration</td></tr>
-                <tr><td><code>aggregate</code></td><td><code>AggregateConfig</code></td><td>&mdash;</td><td>Aggregate function</td></tr>
-                <tr><td><code>wrapText</code></td><td><code>boolean</code></td><td>false</td><td>Allow text wrapping</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <h3 style={{ marginTop: 24 }}>GridOptions&lt;T&gt;</h3>
-          <div className="api-table-wrap">
-            <table className="api-table">
-              <thead>
-                <tr><th>Property</th><th>Type</th><th>Default</th><th>Description</th></tr>
-              </thead>
-              <tbody>
-                <tr><td><code>density</code></td><td><code>'dense' | 'default' | 'comfortable'</code></td><td>'default'</td><td>Row density</td></tr>
-                <tr><td><code>striped</code></td><td><code>boolean</code></td><td>false</td><td>Alternating row backgrounds</td></tr>
-                <tr><td><code>borderless</code></td><td><code>boolean</code></td><td>false</td><td>Remove internal borders</td></tr>
-                <tr><td><code>autoFit</code></td><td><code>boolean</code></td><td>false</td><td>Columns fill available width</td></tr>
-                <tr><td><code>virtualScroll</code></td><td><code>boolean</code></td><td>false</td><td>Enable virtual scrolling</td></tr>
-                <tr><td><code>selectionMode</code></td><td><code>'none' | 'single' | 'multi'</code></td><td>'none'</td><td>Row selection mode</td></tr>
-                <tr><td><code>rowHover</code></td><td><code>boolean</code></td><td>false</td><td>Highlight row on hover</td></tr>
-                <tr><td><code>editMode</code></td><td><code>'cell' | 'row'</code></td><td>&mdash;</td><td>Editing mode</td></tr>
-                <tr><td><code>editTrigger</code></td><td><code>'click' | 'dblclick'</code></td><td>'dblclick'</td><td>How to open cell editor</td></tr>
-                <tr><td><code>editOnType</code></td><td><code>boolean</code></td><td>false</td><td>Open editor on keypress</td></tr>
-                <tr><td><code>keyboardNav</code></td><td><code>boolean</code></td><td>false</td><td>Arrow key cell navigation</td></tr>
-                <tr><td><code>pagination</code></td><td><code>boolean</code></td><td>false</td><td>Enable pagination</td></tr>
-                <tr><td><code>pageSize</code></td><td><code>number</code></td><td>50</td><td>Rows per page</td></tr>
-                <tr><td><code>pageSizeOptions</code></td><td><code>number[]</code></td><td>[10,25,50,100]</td><td>Page size options</td></tr>
-                <tr><td><code>showToolbar</code></td><td><code>boolean</code></td><td>false</td><td>Show toolbar</td></tr>
-                <tr><td><code>toolbarButtons</code></td><td><code>GridToolbarButton[]</code></td><td>&mdash;</td><td>Custom toolbar buttons</td></tr>
-                <tr><td><code>colReorder</code></td><td><code>boolean</code></td><td>false</td><td>Enable column reorder</td></tr>
-                <tr><td><code>rowDraggable</code></td><td><code>boolean</code></td><td>false</td><td>Enable row drag</td></tr>
-                <tr><td><code>groupByField</code></td><td><code>string</code></td><td>&mdash;</td><td>Group rows by field</td></tr>
-                <tr><td><code>treeChildrenField</code></td><td><code>string</code></td><td>&mdash;</td><td>Tree children property</td></tr>
-                <tr><td><code>detailRenderer</code></td><td><code>(ctx) =&gt; ReactNode</code></td><td>&mdash;</td><td>Row detail panel renderer</td></tr>
-                <tr><td><code>showAggregates</code></td><td><code>boolean</code></td><td>false</td><td>Show aggregate row</td></tr>
-                <tr><td><code>loading</code></td><td><code>boolean</code></td><td>false</td><td>Show loading state</td></tr>
-                <tr><td><code>emptyMessage</code></td><td><code>string</code></td><td>'No data to display'</td><td>Empty state message</td></tr>
-                <tr><td><code>infiniteScroll</code></td><td><code>boolean</code></td><td>false</td><td>Enable infinite scroll</td></tr>
-                <tr><td><code>serverSide</code></td><td><code>boolean</code></td><td>false</td><td>Server-side mode</td></tr>
-                <tr><td><code>fetchRows</code></td><td><code>(params) =&gt; Promise</code></td><td>&mdash;</td><td>Server fetch function</td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          <h3 style={{ marginTop: 24 }}>Callback Options</h3>
-          <div className="api-table-wrap">
-            <table className="api-table">
-              <thead>
-                <tr><th>Property</th><th>Type</th><th>Description</th></tr>
-              </thead>
-              <tbody>
-                <tr><td><code>onRowClick</code></td><td><code>(row, index) =&gt; void</code></td><td>Row click handler</td></tr>
-                <tr><td><code>onRowDblClick</code></td><td><code>(row, index) =&gt; void</code></td><td>Row double-click handler</td></tr>
-                <tr><td><code>onCellClick</code></td><td><code>(value, field, row) =&gt; void</code></td><td>Cell click handler</td></tr>
-                <tr><td><code>onSelectionChange</code></td><td><code>(rows) =&gt; void</code></td><td>Selection change handler</td></tr>
-                <tr><td><code>onCellEdit</code></td><td><code>(event) =&gt; void</code></td><td>Cell edit commit handler</td></tr>
-                <tr><td><code>onRowEdit</code></td><td><code>(event) =&gt; void</code></td><td>Row edit commit handler</td></tr>
-                <tr><td><code>onFilterChange</code></td><td><code>(filters) =&gt; void</code></td><td>Filter change handler</td></tr>
-                <tr><td><code>onSortChange</code></td><td><code>(sort) =&gt; void</code></td><td>Sort change handler</td></tr>
-                <tr><td><code>onPageChange</code></td><td><code>(state) =&gt; void</code></td><td>Page change handler</td></tr>
-                <tr><td><code>onRowDrop</code></td><td><code>(from, to, newOrder) =&gt; void</code></td><td>Row drop handler</td></tr>
-                <tr><td><code>onColumnStateChange</code></td><td><code>(states) =&gt; void</code></td><td>Column state change handler</td></tr>
-                <tr><td><code>onColReorder</code></td><td><code>(fields) =&gt; void</code></td><td>Column reorder handler</td></tr>
-                <tr><td><code>onNewRow</code></td><td><code>(draft) =&gt; void</code></td><td>New row commit handler</td></tr>
-              </tbody>
-            </table>
-          </div>
+          <button type="button" onClick={() => gridRef.current?.clearSelection()}>Clear the selection in the basic grid</button>
         </section>
       </div>
 
-      {/* ── Table of Contents ─────────────────────────────────────────── */}
       <nav className="features-toc" aria-label="Table of contents">
         <p className="features-toc__title">On this page</p>
         <ul className="toc-list">
-          {SECTIONS.map((s) => (
-            <li key={s.id}>
-              <a
-                className={`toc-link${activeSection === s.id ? ' active' : ''}`}
-                onClick={() => scrollTo(s.id)}
-              >
-                {s.label}
+          {SECTIONS.map((section) => (
+            <li key={section.id}>
+              <a className={`toc-link${activeSection === section.id ? ' active' : ''}`} href={`#${section.id}`} onClick={(event) => { event.preventDefault(); scrollTo(section.id) }}>
+                {section.label}
               </a>
             </li>
           ))}

@@ -87,7 +87,7 @@ import { ColorPickerPage } from './pages/components/ColorPickerPage'
 import { EmojiPickerPage } from './pages/components/EmojiPickerPage'
 import { FormBuilderPage } from './pages/components/FormBuilderPage'
 import { LookupsPage } from './pages/components/LookupsPage'
-import { DatagridexPage } from './pages/components/DatagridexPage'
+import { DatagridPage } from './pages/components/DatagridPage'
 import { GanttPage } from './pages/components/GanttPage'
 import { SchedulerPage } from './pages/components/SchedulerPage'
 import { KanbanPage } from './pages/components/KanbanPage'
@@ -327,7 +327,7 @@ function renderPage(hash: string): React.ReactElement {
     case '#/components/emoji-picker':         return <EmojiPickerPage />
     case '#/components/form-builder':         return <FormBuilderPage />
     case '#/components/lookups':              return <LookupsPage />
-    case '#/components/datagridex':          return <DatagridexPage />
+    case '#/components/datagrid':          return <DatagridPage />
     case '#/components/gantt':               return <GanttPage />
     case '#/components/scheduler':           return <SchedulerPage />
     case '#/components/kanban':              return <KanbanPage />

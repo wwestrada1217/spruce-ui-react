@@ -14,7 +14,8 @@ import {
   Input,
   Select,
   Datagrid,
-  type ColumnDef,
+  type DatagridCellTemplateContext,
+  type DatagridColumn,
 } from 'spruce-react';
 
 interface EmployeeRecord {
@@ -51,60 +52,63 @@ export default function Employees() {
     return matchesSearch && matchesDept;
   });
 
-  const columns: ColumnDef<EmployeeRecord>[] = [
+  const columns: DatagridColumn<EmployeeRecord>[] = [
     {
-      field: 'name',
-      headerName: 'Employee',
-      cellRenderer: (_val, row) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <Avatar name={row.name} size="sm" />
-          <div>
-            <span style={{ fontWeight: 600, fontSize: 13, display: 'block' }}>{row.name}</span>
-            <span style={{ fontSize: 11, color: 'var(--sp-text-muted, #64748b)' }}>{row.email}</span>
-          </div>
-        </div>
-      ),
+      key: 'name',
+      header: 'Employee',
     },
     {
-      field: 'id',
-      headerName: 'Employee ID',
-      cellRenderer: (_val, row) => <code style={{ fontSize: 12 }}>{row.id}</code>,
+      key: 'id',
+      header: 'Employee ID',
     },
     {
-      field: 'department',
-      headerName: 'Department',
+      key: 'department',
+      header: 'Department',
     },
     {
-      field: 'role',
-      headerName: 'Job Title',
+      key: 'role',
+      header: 'Job Title',
     },
     {
-      field: 'status',
-      headerName: 'Status',
-      cellRenderer: (_val, row) => {
-        const variantMap = {
-          Active: 'success',
-          'On Leave': 'warning',
-          Terminated: 'danger',
-        } as const;
-        return <Badge variant={variantMap[row.status]}>{row.status}</Badge>;
-      },
+      key: 'status',
+      header: 'Status',
     },
     {
-      field: 'joinDate',
-      headerName: 'Join Date',
+      key: 'joinDate',
+      header: 'Join Date',
     },
     {
-      field: 'actions',
-      headerName: 'Actions',
-      cellRenderer: () => (
-        <div style={{ display: 'flex', gap: 6 }}>
-          <Button size="sm" variant="ghost" iconLeft="eye" aria-label="View Profile" />
-          <Button size="sm" variant="ghost" iconLeft="edit" aria-label="Edit Record" />
-        </div>
-      ),
+      key: 'actions',
+      header: 'Actions',
     },
   ];
+
+  const cellTemplates = {
+    name: ({ row }: DatagridCellTemplateContext<EmployeeRecord>) => (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <Avatar name={row.name} size="sm" />
+        <div>
+          <span style={{ fontWeight: 600, fontSize: 13, display: 'block' }}>{row.name}</span>
+          <span style={{ fontSize: 11, color: 'var(--sp-text-muted, #64748b)' }}>{row.email}</span>
+        </div>
+      </div>
+    ),
+    id: ({ row }: DatagridCellTemplateContext<EmployeeRecord>) => <code style={{ fontSize: 12 }}>{row.id}</code>,
+    status: ({ row }: DatagridCellTemplateContext<EmployeeRecord>) => {
+      const variantMap = {
+        Active: 'success',
+        'On Leave': 'warning',
+        Terminated: 'danger',
+      } as const;
+      return <Badge variant={variantMap[row.status]}>{row.status}</Badge>;
+    },
+    actions: () => (
+      <div style={{ display: 'flex', gap: 6 }}>
+        <Button size="sm" variant="ghost" iconLeft="eye" aria-label="View Profile" />
+        <Button size="sm" variant="ghost" iconLeft="edit" aria-label="Edit Record" />
+      </div>
+    ),
+  };
 
   return (
     <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -147,9 +151,11 @@ export default function Employees() {
         <div style={{ padding: 8 }}>
           <Datagrid
             columns={columns}
-            rowData={filteredEmployees}
-            autoHeightRow
-            options={{ pagination: true, pageSize: 10 }}
+            rows={filteredEmployees}
+            autoHeight
+            pagination
+            pageSize={10}
+            cellTemplates={cellTemplates}
           />
         </div>
       </Card>

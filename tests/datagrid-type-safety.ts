@@ -1,10 +1,10 @@
 import type {
-  DatagridexCellEditorContext,
-  DatagridexCellTemplateContext,
-  DatagridexColumn,
-  DatagridexHandle,
-  DatagridexProps,
-  DatagridexValidationRules,
+  DatagridCellEditorContext,
+  DatagridCellTemplateContext,
+  DatagridColumn,
+  DatagridHandle,
+  DatagridProps,
+  DatagridValidationRules,
 } from '../src/index.js'
 import { createDataContext } from '../src/index.js'
 
@@ -14,27 +14,27 @@ interface Project extends Record<string, unknown> {
   budget: number
 }
 
-const columns: readonly DatagridexColumn<Project>[] = [
+const columns: readonly DatagridColumn<Project>[] = [
   { key: 'id', header: 'ID', readonly: true },
   { key: 'name', header: 'Name', editable: true, required: true },
   { key: 'budget', header: 'Budget', editable: true, editorType: 'number' },
 ]
 
-const rules: DatagridexValidationRules<Project> = {
+const rules: DatagridValidationRules<Project> = {
   min: 0,
   custom: (value) => Number(value) >= 0 || 'Budget cannot be negative',
 }
 
-const props: DatagridexProps<Project> = {
+const props: DatagridProps<Project> = {
   rows: [{ id: 1, name: 'Atlas', budget: 100 }],
   columns,
   editMode: 'cell',
   rowDetails: true,
   cellTemplates: {
-    name: ({ row, formattedValue }: DatagridexCellTemplateContext<Project>) => `${row.id}: ${formattedValue}`,
+    name: ({ row, formattedValue }: DatagridCellTemplateContext<Project>) => `${row.id}: ${formattedValue}`,
   },
   cellEditors: {
-    name: ({ value, update, commit, cancel }: DatagridexCellEditorContext<Project>) => {
+    name: ({ value, update, commit, cancel }: DatagridCellEditorContext<Project>) => {
       update(value)
       commit()
       cancel()
@@ -47,7 +47,7 @@ const props: DatagridexProps<Project> = {
   },
 }
 
-const handle: DatagridexHandle<Project> = {
+const handle: DatagridHandle<Project> = {
   sortBy: () => undefined,
   filterBy: () => undefined,
   filterByCondition: () => undefined,
@@ -76,7 +76,7 @@ const handle: DatagridexHandle<Project> = {
 }
 
 const dataContext = createDataContext<Project>({ idField: 'id' })
-const contextProps: DatagridexProps<Project> = {
+const contextProps: DatagridProps<Project> = {
   rows: [],
   columns,
   dataContext,
