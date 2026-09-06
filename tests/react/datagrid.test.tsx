@@ -77,6 +77,17 @@ function ControlledGroupingGrid({ initialGroupBy = ['age'] }: { initialGroupBy?:
 }
 
 describe('Datagrid', () => {
+  it('uses the Spruce Input for global search', () => {
+    const { container, getByRole } = renderWithSpruce(
+      <Datagrid<Person> ariaLabel="People" rows={rows} columns={columns} searchable />,
+    );
+
+    const search = getByRole('searchbox', { name: 'Search' });
+    expect(search).toHaveClass('sp-input-wrap__field');
+    expect(search.closest('.sp-input-wrap')).toHaveClass('sp-datagrid__search');
+    expect(container.querySelector('.sp-datagrid__search-group')).not.toBeInTheDocument();
+  });
+
   it('uses Spruce controls for the dynamic filter popover', async () => {
     const { container, getByRole, getByLabelText, queryByRole, user } = renderWithSpruce(
       <Datagrid<Person> ariaLabel="People" rows={rows} columns={filterColumns} />,

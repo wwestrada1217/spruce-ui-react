@@ -2471,19 +2471,18 @@ function DatagridInner<T extends object = Record<string, unknown>>(
           <div className="sp-datagrid__toolbar-start">
             {toolbarStart}
             {searchable && (
-              <div className="sp-input-group sp-datagrid__search-group" style={{ maxWidth: '240px' }}>
-                <input
-                  type="search"
-                  className="sp-input sp-input--sm"
-                  aria-label={t('search')}
-                  placeholder={t('search')}
-                  value={activeSearchQuery}
-                  onChange={(e) => {
-                    setInternalSearchQuery(e.target.value);
-                    onSearchQueryChange?.(e.target.value);
-                  }}
-                />
-              </div>
+              <Input
+                className="sp-datagrid__search"
+                type="search"
+                size="sm"
+                ariaLabel={t('search')}
+                placeholder={t('search')}
+                value={activeSearchQuery}
+                onChange={(value) => {
+                  setInternalSearchQuery(value);
+                  onSearchQueryChange?.(value);
+                }}
+              />
             )}
             {dataContextAdapter?.toolbarActions && (
               <div className="sp-datagrid__toolbar-actions" style={{ display: 'flex', gap: '4px' }}>
