@@ -4,46 +4,49 @@ import { CodePreview } from '../../components/CodePreview';
 import { DocsPackageBadge } from '../../components/DocsPackageBadge';
 
 const BASIC_CODE = `<Accordion>
-  <AccordionItem header="What is Spruce?">
-    Spruce is a design system for enterprise web applications, built with
-    Angular and React. It provides a comprehensive set of components,
-    design tokens, and utilities.
+  <AccordionItem label="Shipping and delivery">
+    Orders leave the warehouse within one business day.
   </AccordionItem>
-  <AccordionItem header="How do I install it?">
-    Run <code>npm install spruce-react</code> and wrap your app with
-    <code>&lt;SpruceProvider&gt;</code>.
+  <AccordionItem label="Returns">
+    Unopened items can be returned for 30 days.
   </AccordionItem>
-  <AccordionItem header="Is it accessible?">
-    Yes. Every component passes WCAG AA checks and ships with proper
-    ARIA attributes, focus management, and keyboard navigation.
+  <AccordionItem label="Warranty">
+    Hardware carries a two year limited warranty.
   </AccordionItem>
 </Accordion>`;
 
-const MULTIPLE_CODE = `<Accordion multiple>
-  <AccordionItem header="Section A" defaultOpen>
-    Content for section A.
+const MULTIPLE_CODE = `<Accordion multiple allToggle variant="separated">
+  <AccordionItem label="Identity" icon="users" description="Sign-in and directory">
+    Configure the identity provider, session lifetime, and directory sync.
   </AccordionItem>
-  <AccordionItem header="Section B" defaultOpen>
-    Content for section B.
-  </AccordionItem>
-  <AccordionItem header="Section C">
-    Content for section C.
+  <AccordionItem label="Security" icon="shield" description="Policies and keys">
+    Rotate API keys and require multi-factor sign-in.
   </AccordionItem>
 </Accordion>`;
 
 const VARIANTS_CODE = `<Accordion variant="contained">...</Accordion>
-<Accordion variant="separated" size="lg">...</Accordion>
-<Accordion variant="flush" indicator="plus">...</Accordion>`;
+<Accordion variant="separated">...</Accordion>
+<Accordion variant="flush">...</Accordion>`;
+
+const SIZES_CODE = `<Accordion size="sm">...</Accordion>
+<Accordion size="lg">...</Accordion>`;
+
+const INDICATORS_CODE = `<Accordion indicator="plus">...</Accordion>
+<Accordion indicatorPosition="start">...</Accordion>`;
 
 const RICH_HEADERS_CODE = `<Accordion multiple>
   <AccordionItem
     header={<><span>Pending invitations</span> <Badge size="sm" variant="warning">3</Badge></>}
-    actions={<Button size="sm" variant="ghost">Resend</Button>}
+    actions={<Button size="sm" variant="ghost" iconLeft="refresh-cw">Resend</Button>}
   >Invitations expire after seven days.</AccordionItem>
+  <AccordionItem trigger="indicator" header="Deployment keys">
+    Read-only keys can be scoped to a single repository.
+  </AccordionItem>
 </Accordion>`;
 
 const CONTROLLED_CODE = `const [open, setOpen] = useState(['a'])
-<Accordion multiple value={open} onValueChange={setOpen}>...</Accordion>`;
+const accordionRef = useRef<AccordionHandle>(null)
+<Accordion ref={accordionRef} multiple value={open} onValueChange={setOpen}>...</Accordion>`;
 
 const LAZY_CODE = `<Accordion multiple lazy>
   <AccordionItem header="Usage report">Built after first open.</AccordionItem>
@@ -55,22 +58,19 @@ const DISABLED_CODE = `<Accordion>
   <AccordionItem header="Also available">Another active panel.</AccordionItem>
 </Accordion>`;
 
-const STANDALONE_CODE = `<AccordionItem header="Standalone item">
-  Works without a parent Accordion wrapper.
-</AccordionItem>`;
-
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
-  { id: 'basic',      label: 'Basic usage' },
-  { id: 'variants',   label: 'Variants & sizes' },
+  { id: 'basic', label: 'Basic' },
+  { id: 'variants', label: 'Variants' },
+  { id: 'sizes', label: 'Sizes' },
   { id: 'indicators', label: 'Indicators' },
-  { id: 'multiple',   label: 'Multiple open' },
+  { id: 'multiple', label: 'Multiple' },
   { id: 'rich-headers', label: 'Rich headers' },
-  { id: 'controlled', label: 'Controlled state' },
-  { id: 'lazy',       label: 'Deferred panels' },
-  { id: 'disabled',   label: 'Disabled item' },
-  { id: 'standalone', label: 'Standalone' },
-  { id: 'api',        label: 'API' },
+  { id: 'controlled', label: 'Controlled' },
+  { id: 'lazy', label: 'Deferred panels' },
+  { id: 'disabled', label: 'Disabled' },
+  { id: 'accessibility', label: 'Accessibility' },
+  { id: 'api', label: 'API' },
 ];
 
 export function AccordionPage() {
@@ -100,9 +100,9 @@ export function AccordionPage() {
       <div className="features-main" ref={mainRef}>
         <h1>Accordion</h1>
         <p className="docs-desc">
-          Collapsible content panels with accessible keyboard navigation and ARIA attributes.
-          Supports variants, configurable indicators, single-open (default) and multi-open modes,
-          controlled state, and deferred panels.
+          Stacked disclosure panels for long-form content. Each header is a heading with a real
+          toggle button, so the group reads correctly in a screen reader and responds to the
+          keyboard.
         </p>
         <DocsPackageBadge packageName="spruce-react" symbols={['Accordion', 'AccordionItem']} />
 
@@ -115,17 +115,14 @@ export function AccordionPage() {
           <CodePreview code={BASIC_CODE}>
             <div style={{ maxWidth: 560, width: '100%' }}>
               <Accordion>
-                <AccordionItem header="What is Spruce?">
-                  Spruce is a design system for enterprise web applications, built with Angular and React.
-                  It provides a comprehensive set of components, design tokens, and utilities.
+                <AccordionItem label="Shipping and delivery">
+                  Orders leave the warehouse within one business day.
                 </AccordionItem>
-                <AccordionItem header="How do I install it?">
-                  Run <code>npm install spruce-react</code> and wrap your app with{' '}
-                  <code>{'<SpruceProvider>'}</code>.
+                <AccordionItem label="Returns">
+                  Unopened items can be returned for 30 days.
                 </AccordionItem>
-                <AccordionItem header="Is it accessible?">
-                  Yes. Every component passes WCAG AA checks and ships with proper ARIA attributes,
-                  focus management, and keyboard navigation.
+                <AccordionItem label="Warranty">
+                  Hardware carries a two year limited warranty.
                 </AccordionItem>
               </Accordion>
             </div>
@@ -133,16 +130,30 @@ export function AccordionPage() {
         </section>
 
         <section id="variants" className="demo-section" aria-labelledby="variants-heading">
-          <h2 id="variants-heading">Variants &amp; Sizes</h2>
+          <h2 id="variants-heading">Variants</h2>
           <p className="section-desc">
             <code>contained</code> frames the group, <code>separated</code> gives each item its own
-            surface, and <code>flush</code> removes outer chrome. <code>size</code> adjusts density.
+            surface, and <code>flush</code> removes outer chrome.
           </p>
           <CodePreview code={VARIANTS_CODE} language="typescript">
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <Accordion variant="contained"><AccordionItem header="Contained" defaultOpen>One framed surface.</AccordionItem><AccordionItem header="Second item">Hairline dividers.</AccordionItem></Accordion>
-              <Accordion variant="separated" size="lg"><AccordionItem header="Separated" defaultOpen>Each item is its own card.</AccordionItem><AccordionItem header="Second item">Cards are spaced apart.</AccordionItem></Accordion>
-              <Accordion variant="flush" size="sm"><AccordionItem header="Flush" defaultOpen>No outer border or background.</AccordionItem><AccordionItem header="Second item">Only a hairline rule remains.</AccordionItem></Accordion>
+              <Accordion variant="contained"><AccordionItem label="Contained" defaultOpen>One framed surface.</AccordionItem><AccordionItem label="Second item">Hairline dividers.</AccordionItem></Accordion>
+              <Accordion variant="separated"><AccordionItem label="Separated" defaultOpen>Each item is its own card.</AccordionItem><AccordionItem label="Second item">Cards are spaced apart.</AccordionItem></Accordion>
+              <Accordion variant="flush"><AccordionItem label="Flush" defaultOpen>No outer border or background.</AccordionItem><AccordionItem label="Second item">Only a hairline rule remains.</AccordionItem></Accordion>
+            </div>
+          </CodePreview>
+        </section>
+
+        <section id="sizes" className="demo-section" aria-labelledby="sizes-heading">
+          <h2 id="sizes-heading">Sizes</h2>
+          <p className="section-desc">
+            Use <code>sm</code> for dense layouts, <code>md</code> for the default density, or{' '}
+            <code>lg</code> when the headers need more breathing room.
+          </p>
+          <CodePreview code={SIZES_CODE} language="typescript">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <Accordion size="sm"><AccordionItem label="Small" defaultOpen>Compact row padding for dense interfaces.</AccordionItem></Accordion>
+              <Accordion size="lg"><AccordionItem label="Large" defaultOpen>More generous row padding for prominent content.</AccordionItem></Accordion>
             </div>
           </CodePreview>
         </section>
@@ -153,26 +164,38 @@ export function AccordionPage() {
             Choose <code>chevron</code>, <code>plus</code>, or <code>none</code>, and place the
             indicator at the start or end of the row.
           </p>
-          <CodePreview code={`<Accordion indicator="plus" indicatorPosition="start">...</Accordion>`} language="typescript">
-            <Accordion indicator="plus" indicatorPosition="start">
-              <AccordionItem header="Leading plus" defaultOpen>The indicator leads the title.</AccordionItem>
-              <AccordionItem header="Second item">Closed items show a plus.</AccordionItem>
-            </Accordion>
+          <CodePreview code={INDICATORS_CODE} language="typescript">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <Accordion indicator="plus">
+                <AccordionItem label="Plus indicator" defaultOpen>The plus changes to a minus when open.</AccordionItem>
+                <AccordionItem label="Second item">Closed items show a plus.</AccordionItem>
+              </Accordion>
+              <Accordion indicatorPosition="start">
+                <AccordionItem label="Leading chevron" defaultOpen>The indicator can lead the title.</AccordionItem>
+              </Accordion>
+            </div>
           </CodePreview>
         </section>
 
         <section id="multiple" className="demo-section" aria-labelledby="multiple-heading">
-          <h2 id="multiple-heading">Multiple open</h2>
+          <h2 id="multiple-heading">Multiple open panels</h2>
           <p className="section-desc">
             Add the <code>multiple</code> prop to allow more than one panel to be open simultaneously.
-            Use <code>defaultOpen</code> on <code>AccordionItem</code> to pre-expand a panel.
+            Use <code>allToggle</code> to provide expand-all and collapse-all controls, and{' '}
+            <code>defaultOpen</code> to pre-expand a panel.
           </p>
           <CodePreview code={MULTIPLE_CODE}>
             <div style={{ maxWidth: 560, width: '100%' }}>
-              <Accordion multiple>
-                <AccordionItem header="Section A" defaultOpen>Content for section A.</AccordionItem>
-                <AccordionItem header="Section B" defaultOpen>Content for section B.</AccordionItem>
-                <AccordionItem header="Section C">Content for section C.</AccordionItem>
+              <Accordion multiple allToggle variant="separated">
+                <AccordionItem label="Identity" icon="users" description="Sign-in and directory" defaultOpen>
+                  Configure the identity provider, session lifetime, and directory sync.
+                </AccordionItem>
+                <AccordionItem label="Security" icon="shield" description="Policies and keys" defaultOpen>
+                  Rotate API keys and require multi-factor sign-in.
+                </AccordionItem>
+                <AccordionItem label="Billing" description="Plans and invoices">
+                  Review plans, payment methods, and invoices.
+                </AccordionItem>
               </Accordion>
             </div>
           </CodePreview>
@@ -243,19 +266,20 @@ export function AccordionPage() {
           </CodePreview>
         </section>
 
-        <section id="standalone" className="demo-section" aria-labelledby="standalone-heading">
-          <h2 id="standalone-heading">Standalone</h2>
+        <section id="accessibility" className="demo-section" aria-labelledby="accessibility-heading">
+          <h2 id="accessibility-heading">Accessibility</h2>
           <p className="section-desc">
-            <code>AccordionItem</code> manages its own open state when used outside an{' '}
-            <code>{'<Accordion>'}</code> container.
+            Accordion headers use heading semantics and real buttons with <code>aria-expanded</code>{' '}
+            and <code>aria-controls</code>. Closed panels are inert so their content is not reachable
+            by keyboard or assistive technology.
           </p>
-          <CodePreview code={STANDALONE_CODE}>
-            <div style={{ maxWidth: 560, width: '100%' }}>
-              <AccordionItem header="Standalone item">
-                Works without a parent Accordion wrapper.
-              </AccordionItem>
-            </div>
-          </CodePreview>
+          <ul>
+            <li>Use <code>headingLevel</code> to match the surrounding page hierarchy.</li>
+            <li>Use <code>trigger="indicator"</code> when row actions or non-interactive header space should not toggle the panel.</li>
+            <li>Arrow keys move between triggers; Home and End jump to the first and last trigger.</li>
+            <li>Find-in-page can reveal a closed panel when <code>findable</code> is enabled.</li>
+            <li>Expand and collapse transitions respect the user&apos;s reduced-motion preference.</li>
+          </ul>
         </section>
 
         <section id="api" className="demo-section">
@@ -269,12 +293,17 @@ export function AccordionPage() {
               <tbody>
                 <tr><td><code>multiple</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Allow multiple panels open simultaneously.</td></tr>
                 <tr><td><code>value</code> / <code>defaultValue</code></td><td><code>string[]</code></td><td><code>[]</code></td><td>Controlled or initial open item values.</td></tr>
-                <tr><td><code>onValueChange</code></td><td><code>(value: string[]) =&gt; void</code></td><td>—</td><td>Controlled open-value callback.</td></tr>
+                <tr><td><code>onValueChange</code> / <code>onChange</code></td><td><code>(value: string[]) =&gt; void</code></td><td>—</td><td>Controlled open-value callbacks.</td></tr>
+                <tr><td><code>onItemToggle</code></td><td><code>(event: AccordionToggleEvent) =&gt; void</code></td><td>—</td><td>Called when an item changes its open state.</td></tr>
                 <tr><td><code>collapsible</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Whether the active item can be closed in single mode.</td></tr>
                 <tr><td><code>variant</code> / <code>size</code></td><td><code>AccordionVariant</code> / <code>AccordionSize</code></td><td><code>'contained'</code> / <code>'md'</code></td><td>Surface treatment and density.</td></tr>
                 <tr><td><code>indicator</code> / <code>indicatorPosition</code></td><td><code>'chevron' | 'plus' | 'none'</code> / <code>'start' | 'end'</code></td><td><code>'chevron'</code> / <code>'end'</code></td><td>Disclosure affordance and placement.</td></tr>
+                <tr><td><code>disabled</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Disable every item and the all-toggle control.</td></tr>
+                <tr><td><code>headingLevel</code></td><td><code>number</code></td><td><code>3</code></td><td>ARIA heading level applied to each item header, clamped from 1 to 6.</td></tr>
                 <tr><td><code>lazy</code> / <code>findable</code></td><td><code>boolean</code></td><td><code>false</code> / <code>true</code></td><td>Lazy body mounting and find-in-page support.</td></tr>
-                <tr><td><code>allToggle</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Show localized expand-all/collapse-all control.</td></tr>
+                <tr><td><code>allToggle</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Show localized expand-all/collapse-all control in multiple mode.</td></tr>
+                <tr><td><code>ariaLabel</code> / <code>className</code></td><td><code>string</code> / <code>string</code></td><td>—</td><td>Accessible group label and custom root class.</td></tr>
+                <tr><td><code>ref</code></td><td><code>AccordionHandle</code></td><td>—</td><td>Imperative <code>isOpen</code>, <code>setOpen</code>, <code>toggle</code>, <code>expandAll</code>, and <code>collapseAll</code> methods.</td></tr>
                 <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>—</td><td><code>AccordionItem</code> elements.</td></tr>
               </tbody>
             </table>
@@ -286,13 +315,16 @@ export function AccordionPage() {
                 <tr><th>Name</th><th>Type</th><th>Default</th><th>Description</th></tr>
               </thead>
               <tbody>
-                <tr><td><code>header</code></td><td><code>ReactNode</code></td><td>—</td><td>Content of the clickable header row.</td></tr>
+                <tr><td><code>header</code> / <code>label</code></td><td><code>ReactNode</code></td><td>—</td><td>Content of the header; <code>label</code> is an Angular-compatible alias.</td></tr>
                 <tr><td><code>value</code></td><td><code>string</code></td><td>generated</td><td>Stable controlled item identifier.</td></tr>
                 <tr><td><code>open</code> / <code>onOpenChange</code></td><td><code>boolean</code> / callback</td><td>—</td><td>Optional controlled standalone item state.</td></tr>
                 <tr><td><code>description</code> / <code>icon</code></td><td><code>ReactNode</code> / <code>string</code></td><td>—</td><td>Optional header metadata.</td></tr>
                 <tr><td><code>trigger</code></td><td><code>'row' | 'indicator'</code></td><td><code>'row'</code></td><td>Choose whether the whole row or only the indicator toggles.</td></tr>
                 <tr><td><code>defaultOpen</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Open on first render.</td></tr>
                 <tr><td><code>disabled</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Prevent toggling.</td></tr>
+                <tr><td><code>lazy</code> / <code>actions</code></td><td><code>boolean</code> / <code>ReactNode</code></td><td>—</td><td>Defer body mounting and render controls outside the disclosure trigger.</td></tr>
+                <tr><td><code>indicator</code> / <code>indicatorPosition</code></td><td><code>AccordionIndicator</code> / <code>AccordionIndicatorPosition</code></td><td>group</td><td>Override the group disclosure affordance for one item.</td></tr>
+                <tr><td><code>className</code> / <code>onOpenChange</code></td><td><code>string</code> / callback</td><td>—</td><td>Custom item class and open-state callback.</td></tr>
                 <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>—</td><td>Collapsible body content.</td></tr>
               </tbody>
             </table>

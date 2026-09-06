@@ -137,7 +137,7 @@ export type { BreadcrumbsProps, BreadcrumbItemProps, BreadcrumbItemDef } from '.
 
 // ─── Accordion ────────────────────────────────────────────────────────────────
 export { Accordion, AccordionItem } from './components/accordion/Accordion.js';
-export type { AccordionProps, AccordionItemProps, AccordionVariant, AccordionSize, AccordionIndicator, AccordionIndicatorPosition, AccordionTriggerMode, AccordionToggleEvent } from './components/accordion/Accordion.js';
+export type { AccordionProps, AccordionItemProps, AccordionVariant, AccordionSize, AccordionIndicator, AccordionIndicatorPosition, AccordionTriggerMode, AccordionToggleEvent, AccordionHandle } from './components/accordion/Accordion.js';
 
 // ─── Code Editor ──────────────────────────────────────────────────────────────
 export { CodeEditor } from './components/code-editor/CodeEditor.js';

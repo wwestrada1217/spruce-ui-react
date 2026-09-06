@@ -1,14 +1,18 @@
 import './Accordion.css';
 import {
   createContext,
+  forwardRef,
   useCallback,
   useContext,
   useEffect,
   useId,
+  useImperativeHandle,
   useMemo,
   useRef,
   useState,
+  type ForwardedRef,
   type KeyboardEvent,
+  type MouseEvent,
   type ReactNode,
 } from 'react';
 import { Icon } from '../../icons/Icon.js';
@@ -23,6 +27,14 @@ export type AccordionTriggerMode = 'row' | 'indicator';
 export interface AccordionToggleEvent {
   value: string;
   open: boolean;
+}
+
+export interface AccordionHandle {
+  isOpen: (value: string) => boolean;
+  setOpen: (value: string, open: boolean) => void;
+  toggle: (value: string) => void;
+  expandAll: () => void;
+  collapseAll: () => void;
 }
 
 interface AccordionContextValue {
@@ -68,7 +80,7 @@ export interface AccordionProps {
   className?: string;
 }
 
-export function Accordion({
+export const Accordion = forwardRef(function Accordion({
   multiple = false,
   collapsible = true,
   variant = 'contained',
@@ -88,7 +100,7 @@ export function Accordion({
   ariaLabel,
   children,
   className = '',
-}: AccordionProps) {
+}: AccordionProps, ref: ForwardedRef<AccordionHandle>) {
   const { t } = useI18n();
   const [internalValue, setInternalValue] = useState<string[]>(defaultValue);
   const [registeredItems, setRegisteredItems] = useState<string[]>([]);
@@ -153,10 +165,23 @@ export function Accordion({
   }), [clampedHeadingLevel, collapsible, disabled, findable, indicator, indicatorPosition, lazy, multiple, openItems, register, registeredItems, setOpen, size, toggle, unregister, variant]);
 
   const allOpen = registeredItems.length > 0 && registeredItems.every((id) => openItems.has(id));
+  const expandAll = useCallback(() => {
+    if (!multiple) return;
+    publish([...registeredItems]);
+  }, [multiple, publish, registeredItems]);
+  const collapseAll = useCallback(() => publish([]), [publish]);
   const toggleAll = () => {
-    if (allOpen) registeredItems.forEach((id) => setOpen(id, false));
-    else registeredItems.forEach((id) => setOpen(id, true));
+    if (allOpen) collapseAll();
+    else expandAll();
   };
+
+  useImperativeHandle(ref, () => ({
+    isOpen: (id) => openItems.has(id),
+    setOpen,
+    toggle,
+    expandAll,
+    collapseAll,
+  }), [collapseAll, expandAll, openItems, setOpen, toggle]);
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     const target = event.target;
@@ -180,16 +205,18 @@ export function Accordion({
         aria-label={ariaLabel}
         onKeyDown={onKeyDown}
       >
-        {allToggle && registeredItems.length > 0 && (
-          <button className="sp-accordion__all-toggle" type="button" onClick={toggleAll} disabled={disabled}>
-            {allOpen ? t('collapseAll') : t('expandAll')}
-          </button>
+        {allToggle && multiple && registeredItems.length > 0 && (
+          <div className="sp-accordion__bar">
+            <button className="sp-accordion__all" type="button" onClick={toggleAll} disabled={disabled}>
+              {allOpen ? t('collapseAll') : t('expandAll')}
+            </button>
+          </div>
         )}
-        {children}
+        <div className="sp-accordion__items">{children}</div>
       </div>
     </AccordionContext.Provider>
   );
-}
+});
 
 export interface AccordionItemProps {
   value?: string;
@@ -286,6 +313,17 @@ export function AccordionItem({
     return () => body.removeEventListener('beforematch', beforeMatch);
   }, [findable, isOpen, setItemOpen]);
 
+  function handleRowClick(event: MouseEvent<HTMLDivElement>) {
+    if (isDisabled) return;
+    const target = event.target as HTMLElement;
+    if (target.closest('.sp-accordion-item__actions')) return;
+    const interactive = target.closest(
+      'button, a, input, select, textarea, label, summary, [role="button"], [role="menuitem"], [contenteditable="true"]',
+    );
+    if (interactive && !interactive.hasAttribute('data-sp-accordion-trigger')) return;
+    setItemOpen(!isOpen);
+  }
+
   const displayHeader = header ?? label;
   const bodyShouldRender = !lazy || hasBeenOpen || isOpen;
   const indicatorVisual = indicator !== 'none' && (
@@ -300,9 +338,9 @@ export function AccordionItem({
       aria-label={isOpen ? t('collapse') : t('expand')}
       aria-expanded={isOpen}
       aria-controls={panelId}
+      data-sp-accordion-trigger="true"
       disabled={isDisabled}
       tabIndex={triggerModeValue === 'row' ? -1 : undefined}
-      onClick={() => setItemOpen(!isOpen)}
     >
       <Icon name={indicator === 'plus' ? (isOpen ? 'minus' : 'plus') : 'chevron-down'} size={16} aria-hidden="true" />
     </button>
@@ -310,17 +348,24 @@ export function AccordionItem({
 
   const title = (
     <span className="sp-accordion-item__title-wrap">
-      {icon && <Icon name={icon} size={16} aria-hidden="true" />}
-      <span className="sp-accordion-item__title">{displayHeader}</span>
+      <span className="sp-accordion-item__title-line">
+        {icon && <Icon className="sp-accordion-item__icon" name={icon} size={16} aria-hidden="true" />}
+        <span id={triggerModeValue === 'indicator' ? headingId : undefined} className="sp-accordion-item__title">{displayHeader}</span>
+      </span>
       {description && <span className="sp-accordion-item__description">{description}</span>}
     </span>
   );
 
   return (
     <div className={['sp-accordion-item', isOpen && 'sp-accordion-item--open', isDisabled && 'sp-accordion-item--disabled', className].filter(Boolean).join(' ')}>
-      <div role="heading" aria-level={headingLevel} className="sp-accordion-item__heading">
-        <div className={['sp-accordion-item__header', `sp-accordion-item__header--${indicatorPosition}`].join(' ')}>
-          {indicatorPosition === 'start' && triggerModeValue === 'indicator' && indicatorButton}
+      <div
+        role="heading"
+        aria-level={headingLevel}
+        className={['sp-accordion-item__header', `sp-accordion-item__header--${indicatorPosition}`, triggerModeValue === 'indicator' && 'sp-accordion-item__header--free'].filter(Boolean).join(' ')}
+        onClick={handleRowClick}
+      >
+        {indicatorPosition === 'start' && (triggerModeValue === 'indicator' ? indicatorButton : indicatorVisual)}
+        {triggerModeValue === 'row' ? (
           <button
             id={headingId}
             className="sp-accordion-item__trigger"
@@ -329,28 +374,26 @@ export function AccordionItem({
             aria-expanded={isOpen}
             aria-controls={panelId}
             data-sp-accordion-trigger="true"
-            onClick={() => triggerModeValue === 'row' && setItemOpen(!isOpen)}
           >
-            {indicatorPosition === 'start' && triggerModeValue === 'row' && indicatorVisual}
             {title}
-            {indicatorPosition === 'end' && triggerModeValue === 'row' && indicatorVisual}
           </button>
-          {indicatorPosition === 'end' && triggerModeValue === 'indicator' && indicatorButton}
-          {actions && <div className="sp-accordion-item__actions" onClick={(event) => event.stopPropagation()}>{actions}</div>}
-        </div>
+        ) : title}
+        {actions && <div className="sp-accordion-item__actions" onClick={(event) => event.stopPropagation()}>{actions}</div>}
+        {indicatorPosition === 'end' && (triggerModeValue === 'indicator' ? indicatorButton : indicatorVisual)}
       </div>
       {bodyShouldRender && (
-          <div
+        <div
           ref={bodyRef}
           id={panelId}
           className="sp-accordion-item__body"
           role="region"
           aria-labelledby={headingId}
           aria-hidden={!isOpen}
+          inert={!isOpen ? true : undefined}
           hidden={!isOpen && !findable}
           data-findable={findable ? 'true' : undefined}
         >
-          {children}
+          <div className="sp-accordion-item__body-inner">{children}</div>
         </div>
       )}
     </div>

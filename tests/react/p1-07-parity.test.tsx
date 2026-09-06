@@ -24,6 +24,43 @@ describe('P1.0-07 navigation and action parity', () => {
     expect(document.activeElement).toHaveTextContent('First');
   });
 
+  it('supports expand-all and collapse-all for multiple accordions', async () => {
+    const view = renderWithSpruce(
+      <Accordion multiple allToggle ariaLabel="Settings">
+        <AccordionItem value="one" header="One">Panel one</AccordionItem>
+        <AccordionItem value="two" header="Two">Panel two</AccordionItem>
+      </Accordion>,
+    );
+
+    await waitFor(() => expect(view.getByRole('button', { name: 'Expand all' })).toBeInTheDocument());
+    await view.user.click(view.getByRole('button', { name: 'Expand all' }));
+    expect(view.getByRole('button', { name: /One/ })).toHaveAttribute('aria-expanded', 'true');
+    expect(view.getByRole('button', { name: /Two/ })).toHaveAttribute('aria-expanded', 'true');
+
+    await view.user.click(view.getByRole('button', { name: 'Collapse all' }));
+    expect(view.getByRole('button', { name: /One/ })).toHaveAttribute('aria-expanded', 'false');
+    expect(view.getByRole('button', { name: /Two/ })).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('toggles an indicator-triggered item from inert row space', async () => {
+    const view = renderWithSpruce(
+      <Accordion ariaLabel="Actions">
+        <AccordionItem value="one" header="One" trigger="indicator" actions={<button type="button">Action</button>}>
+          Panel one
+        </AccordionItem>
+      </Accordion>,
+    );
+
+    await view.user.click(view.getByText('One'));
+    expect(view.getByRole('button', { name: 'Collapse' })).toHaveAttribute('aria-expanded', 'true');
+
+    await view.user.click(view.getByRole('button', { name: 'Collapse' }));
+    expect(view.getByRole('button', { name: 'Expand' })).toHaveAttribute('aria-expanded', 'false');
+
+    await view.user.click(view.getByRole('button', { name: 'Action' }));
+    expect(view.getByRole('button', { name: 'Expand' })).toHaveAttribute('aria-expanded', 'false');
+  });
+
   it('controls button-group selection and preserves RTL connected layout', async () => {
     const changed = vi.fn();
     const view = renderWithRtl(<ButtonGroup items={[{ label: 'One', value: 'one' }, { label: 'Two', value: 'two' }]} toggleMode="single" defaultValue={['one']} ariaLabel="Modes" onValueChange={changed} />);
