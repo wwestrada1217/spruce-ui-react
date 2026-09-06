@@ -13,6 +13,8 @@ import {
   useEffect,
   Children,
   isValidElement,
+  type HTMLAttributes,
+  type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from 'react';
 import { useI18n } from '../../i18n/i18n-context.js';
@@ -37,8 +39,14 @@ export interface SplitterProps {
   keyIncrement?: number;
   /** Render a 1px visual hairline while preserving the configured hit area. */
   thin?: boolean;
+  /** Additional attributes for each gutter, useful for integrating with layout metadata. */
+  gutterProps?: (index: number) => HTMLAttributes<HTMLDivElement>;
   onSizeChange?: (sizes: number[]) => void;
+  /** Fired after a pointer, touch, or keyboard size change completes. */
+  onSizeChangeEnd?: () => void;
+  /** Fired when pointer, mouse, or touch dragging starts. */
   onDragStart?: () => void;
+  /** Fired when pointer, mouse, or touch dragging ends. */
   onDragEnd?: () => void;
   className?: string;
   children: ReactNode;
@@ -94,7 +102,9 @@ export function Splitter({
   ariaLabel,
   keyIncrement = 2,
   thin = false,
+  gutterProps,
   onSizeChange,
+  onSizeChangeEnd,
   onDragStart,
   onDragEnd,
   className = '',
@@ -125,6 +135,7 @@ export function Splitter({
     startPos: number;
     startSizes: number[];
     containerSize: number;
+    input: 'pointer' | 'mouse' | 'touch';
   } | null>(null);
 
   // Keep sizes in sync if initialSizes prop changes while not dragging
@@ -179,7 +190,8 @@ export function Splitter({
   );
 
   const handleDragStart = useCallback(
-    (gutterIndex: number, clientPos: number) => {
+    (gutterIndex: number, clientPos: number, input: 'pointer' | 'mouse' | 'touch') => {
+      if (dragState.current) return;
       const containerSize = getContainerSize();
       if (containerSize <= 0) return;
 
@@ -188,6 +200,7 @@ export function Splitter({
         startPos: clientPos,
         startSizes: [...sizes],
         containerSize,
+        input,
       };
       setDragging(true);
       onDragStart?.();
@@ -220,14 +233,63 @@ export function Splitter({
   );
 
   const handleDragEnd = useCallback(() => {
+    if (!dragState.current) return;
     dragState.current = null;
     setDragging(false);
     onDragEnd?.();
-  }, [onDragEnd]);
+    onSizeChangeEnd?.();
+  }, [onDragEnd, onSizeChangeEnd]);
 
-  // Mouse events
+  // Pointer, mouse, and touch events. Pointer events are primary, while the
+  // mouse/touch paths keep the component usable in older event environments.
   useEffect(() => {
     if (!dragging) return;
+    const input = dragState.current?.input;
+    if (!input) return;
+
+    if (input === 'pointer') {
+      const onPointerMove = (e: PointerEvent) => {
+        e.preventDefault();
+        handleDragMove(isHorizontal ? e.clientX : e.clientY);
+      };
+
+      const onPointerUp = () => {
+        handleDragEnd();
+      };
+
+      window.addEventListener('pointermove', onPointerMove);
+      window.addEventListener('pointerup', onPointerUp);
+      window.addEventListener('pointercancel', onPointerUp);
+
+      return () => {
+        window.removeEventListener('pointermove', onPointerMove);
+        window.removeEventListener('pointerup', onPointerUp);
+        window.removeEventListener('pointercancel', onPointerUp);
+      };
+    }
+
+    if (input === 'touch') {
+      const onTouchMove = (e: TouchEvent) => {
+        if (e.touches.length === 0) return;
+        e.preventDefault();
+        const touch = e.touches[0];
+        handleDragMove(isHorizontal ? touch.clientX : touch.clientY);
+      };
+
+      const onTouchEnd = () => {
+        handleDragEnd();
+      };
+
+      window.addEventListener('touchmove', onTouchMove, { passive: false });
+      window.addEventListener('touchend', onTouchEnd);
+      window.addEventListener('touchcancel', onTouchEnd);
+
+      return () => {
+        window.removeEventListener('touchmove', onTouchMove);
+        window.removeEventListener('touchend', onTouchEnd);
+        window.removeEventListener('touchcancel', onTouchEnd);
+      };
+    }
 
     const onMouseMove = (e: MouseEvent) => {
       e.preventDefault();
@@ -247,46 +309,30 @@ export function Splitter({
     };
   }, [dragging, isHorizontal, handleDragMove, handleDragEnd]);
 
-  // Touch events
-  useEffect(() => {
-    if (!dragging) return;
-
-    const onTouchMove = (e: TouchEvent) => {
-      if (e.touches.length === 0) return;
+  const handleGutterPointerDown = useCallback(
+    (gutterIndex: number, e: ReactPointerEvent<HTMLDivElement>) => {
       e.preventDefault();
-      const touch = e.touches[0];
-      handleDragMove(isHorizontal ? touch.clientX : touch.clientY);
-    };
-
-    const onTouchEnd = () => {
-      handleDragEnd();
-    };
-
-    window.addEventListener('touchmove', onTouchMove, { passive: false });
-    window.addEventListener('touchend', onTouchEnd);
-    window.addEventListener('touchcancel', onTouchEnd);
-
-    return () => {
-      window.removeEventListener('touchmove', onTouchMove);
-      window.removeEventListener('touchend', onTouchEnd);
-      window.removeEventListener('touchcancel', onTouchEnd);
-    };
-  }, [dragging, isHorizontal, handleDragMove, handleDragEnd]);
+      handleDragStart(gutterIndex, isHorizontal ? e.clientX : e.clientY, 'pointer');
+    },
+    [handleDragStart, isHorizontal],
+  );
 
   const handleGutterMouseDown = useCallback(
     (gutterIndex: number, e: React.MouseEvent) => {
+      if (dragState.current) return;
       e.preventDefault();
-      handleDragStart(gutterIndex, isHorizontal ? e.clientX : e.clientY);
+      handleDragStart(gutterIndex, isHorizontal ? e.clientX : e.clientY, 'mouse');
     },
     [handleDragStart, isHorizontal],
   );
 
   const handleGutterTouchStart = useCallback(
     (gutterIndex: number, e: React.TouchEvent) => {
+      if (dragState.current) return;
       if (e.touches.length === 0) return;
       e.preventDefault();
       const touch = e.touches[0];
-      handleDragStart(gutterIndex, isHorizontal ? touch.clientX : touch.clientY);
+      handleDragStart(gutterIndex, isHorizontal ? touch.clientX : touch.clientY, 'touch');
     },
     [handleDragStart, isHorizontal],
   );
@@ -298,8 +344,9 @@ export function Splitter({
           ? [...initialSizes]
           : Array.from({ length: paneCount }, () => 100 / paneCount);
       updateSizes(resetSizes);
+      onSizeChangeEnd?.();
     },
-    [initialSizes, paneCount, updateSizes],
+    [initialSizes, paneCount, updateSizes, onSizeChangeEnd],
   );
 
   const handleGutterKeyDown = useCallback(
@@ -341,9 +388,10 @@ export function Splitter({
       if (newSizes) {
         const constrained = applyConstraints(newSizes, gutterIndex);
         updateSizes(constrained);
+        onSizeChangeEnd?.();
       }
     },
-    [sizes, isHorizontal, isRtl, paneMeta, applyConstraints, keyIncrement, updateSizes],
+    [sizes, isHorizontal, isRtl, paneMeta, applyConstraints, keyIncrement, updateSizes, onSizeChangeEnd],
   );
 
   const rootClasses = [
@@ -373,23 +421,54 @@ export function Splitter({
       const gutterStyle: React.CSSProperties = isHorizontal
         ? { width: gutterSize }
         : { height: gutterSize };
+      const customGutterProps = gutterProps?.(i);
+      const {
+        className: customClassName,
+        style: customStyle,
+        onPointerDown: customOnPointerDown,
+        onMouseDown: customOnMouseDown,
+        onTouchStart: customOnTouchStart,
+        onDoubleClick: customOnDoubleClick,
+        onKeyDown: customOnKeyDown,
+        role: customRole,
+        tabIndex: customTabIndex,
+        'aria-label': customAriaLabel,
+        ...customAttributes
+      } = customGutterProps ?? {};
 
       elements.push(
         <div
           key={`gutter-${i}`}
-          className="sp-splitter__gutter"
-          role="separator"
+          {...customAttributes}
+          className={['sp-splitter__gutter', customClassName].filter(Boolean).join(' ')}
+          role={customRole ?? 'separator'}
           aria-orientation={isHorizontal ? 'vertical' : 'horizontal'}
           aria-valuenow={Math.round(sizes[i])}
           aria-valuemin={paneMeta[i]?.minSize ?? 0}
           aria-valuemax={paneMeta[i]?.maxSize ?? 100}
-          aria-label={`${t('split')} ${i + 1}`}
-          tabIndex={0}
-          style={gutterStyle}
-          onMouseDown={(e) => handleGutterMouseDown(i, e)}
-          onTouchStart={(e) => handleGutterTouchStart(i, e)}
-          onDoubleClick={handleGutterDoubleClick}
-          onKeyDown={(e) => handleGutterKeyDown(i, e)}
+          aria-label={customAriaLabel ?? `${t('split')} ${i + 1}`}
+          tabIndex={customTabIndex ?? 0}
+          style={{ ...customStyle, ...gutterStyle }}
+          onPointerDown={(e) => {
+            customOnPointerDown?.(e);
+            if (!e.defaultPrevented) handleGutterPointerDown(i, e);
+          }}
+          onMouseDown={(e) => {
+            customOnMouseDown?.(e);
+            if (!e.defaultPrevented) handleGutterMouseDown(i, e);
+          }}
+          onTouchStart={(e) => {
+            customOnTouchStart?.(e);
+            if (!e.defaultPrevented) handleGutterTouchStart(i, e);
+          }}
+          onDoubleClick={(e) => {
+            customOnDoubleClick?.(e);
+            if (!e.defaultPrevented) handleGutterDoubleClick();
+          }}
+          onKeyDown={(e) => {
+            customOnKeyDown?.(e);
+            if (!e.defaultPrevented) handleGutterKeyDown(i, e);
+          }}
         >
           <div className="sp-splitter__gutter-handle" />
         </div>,

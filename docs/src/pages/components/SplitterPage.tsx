@@ -200,9 +200,11 @@ export function SplitterPage() {
                 <tr><td><code>keyIncrement</code></td><td><code>number</code></td><td><code>2</code></td><td>Percentage moved per arrow-key press</td></tr>
                 <tr><td><code>thin</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Render a 1px visual divider while preserving the gutter hit area</td></tr>
                 <tr><td><code>ariaLabel</code></td><td><code>string</code></td><td>localized</td><td>Accessible name for the split view</td></tr>
+                <tr><td><code>gutterProps</code></td><td><code>(index) =&gt; HTMLAttributes&lt;HTMLDivElement&gt;</code></td><td>—</td><td>Additional attributes for each gutter</td></tr>
                 <tr><td><code>onSizeChange</code></td><td><code>(sizes: number[]) =&gt; void</code></td><td>—</td><td>Fired during drag and keyboard changes</td></tr>
-                <tr><td><code>onDragStart</code></td><td><code>() =&gt; void</code></td><td>—</td><td>Fired when pointer or touch dragging starts</td></tr>
-                <tr><td><code>onDragEnd</code></td><td><code>() =&gt; void</code></td><td>—</td><td>Fired when pointer or touch dragging ends</td></tr>
+                <tr><td><code>onSizeChangeEnd</code></td><td><code>() =&gt; void</code></td><td>—</td><td>Fired after a pointer, touch, or keyboard size change completes</td></tr>
+                <tr><td><code>onDragStart</code></td><td><code>() =&gt; void</code></td><td>—</td><td>Fired when pointer, mouse, or touch dragging starts</td></tr>
+                <tr><td><code>onDragEnd</code></td><td><code>() =&gt; void</code></td><td>—</td><td>Fired when pointer, mouse, or touch dragging ends</td></tr>
               </tbody>
             </table>
           </div>

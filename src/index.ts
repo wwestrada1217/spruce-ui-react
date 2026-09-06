@@ -464,8 +464,8 @@ export { LayoutManager, LayoutDragHandle } from './components/layout-manager/Lay
 export type { LayoutManagerProps, LayoutManagerHandle, LayoutDragHandleProps, LayoutItem, LayoutBreakpoint, LayoutChangeEvent, LayoutDragEvent, LayoutResizeEvent, LayoutCompactType, LayoutResizeHandle } from './components/layout-manager/LayoutManager.js';
 export { Masonry, MasonryItem } from './components/masonry/Masonry.js';
 export type { MasonryProps, MasonryItemProps, MasonryItemLayout } from './components/masonry/Masonry.js';
-export { DockManager, DockPanel, DockPanelTools, AutoHideStrip } from './components/dock-manager/DockManager.js';
-export type { DockManagerProps, DockManagerHandle, DockPanelProps, DockPanelToolsProps, AutoHideStripProps, AutoHideStripTab, DockLayout, DockNode, DockLeafNode, DockTabNode, DockDocumentNode, DockSplitNode, DockFloat, DockAutoHide, DockSplitDirection, DropZone, AutoHideStripPosition } from './components/dock-manager/DockManager.js';
+export { DockManager, DockPanel, DockPanelTools, AutoHideStrip, calculateSplitResize, findSplitIntersections } from './components/dock-manager/DockManager.js';
+export type { DockManagerProps, DockManagerHandle, DockPanelProps, DockPanelToolsProps, AutoHideStripProps, AutoHideStripTab, DockLayout, DockNode, DockLeafNode, DockTabNode, DockDocumentNode, DockSplitNode, DockFloat, DockAutoHide, DockSplitDirection, DropZone, AutoHideStripPosition, DockCornerSplitRef, DockCornerJunction } from './components/dock-manager/DockManager.js';
 export { DragDrop } from './components/drag-drop/DragDrop.js';
 export type { DragDropProps, DragDropEvent, DragDropEffect, DragDropEffectAllowed, DragDropPosition, DragDropAxis } from './components/drag-drop/DragDrop.js';
 export { Fullscreen } from './components/fullscreen/Fullscreen.js';

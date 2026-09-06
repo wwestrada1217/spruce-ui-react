@@ -58,6 +58,7 @@
   transition: background var(--sp-duration-fast, 150ms);
   position: relative;
   z-index: 1;
+  touch-action: none;
 }
 
 .sp-splitter--horizontal .sp-splitter__gutter {

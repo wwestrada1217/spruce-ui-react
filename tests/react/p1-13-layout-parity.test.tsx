@@ -51,6 +51,41 @@ describe('P1-13 layout and behavior parity', () => {
     expect(ref.current?.importLayout(ref.current.exportLayout())).toBe(true)
   })
 
+  it('keeps pointer splitter movement aligned across multiple drag frames', () => {
+    const frames: Array<FrameRequestCallback> = []
+    const requestAnimationFrame = vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
+      frames.push(callback)
+      return frames.length
+    })
+    const layout = {
+      root: {
+        type: 'split' as const,
+        id: 'split',
+        direction: 'h' as const,
+        children: [
+          { type: 'leaf' as const, id: 'left', panelId: 'a' },
+          { type: 'leaf' as const, id: 'right', panelId: 'b' },
+        ],
+        sizes: [50, 50],
+      },
+      floats: [],
+    }
+    render(<DockManager layout={layout}><DockPanel panelId="a" title="Alpha">Alpha</DockPanel><DockPanel panelId="b" title="Beta">Beta</DockPanel></DockManager>)
+    const split = document.querySelector('.sp-dock-split') as HTMLElement
+    expect(split).toHaveClass('sp-splitter')
+    Object.defineProperty(split, 'offsetWidth', { configurable: true, value: 1000 })
+    const splitter = screen.getByRole('separator', { name: 'Resize split' })
+    expect(splitter).toHaveClass('sp-splitter__gutter')
+    fireEvent.pointerDown(splitter, { button: 0, clientX: 500, clientY: 10 })
+    fireEvent.pointerMove(window, { clientX: 550, clientY: 10 })
+    act(() => { frames.shift()?.(0) })
+    fireEvent.pointerMove(window, { clientX: 600, clientY: 10 })
+    act(() => { frames.shift()?.(0) })
+    fireEvent.pointerUp(window, { clientX: 600, clientY: 10 })
+    requestAnimationFrame.mockRestore()
+    expect(splitter).toHaveAttribute('aria-valuenow', '60')
+  })
+
   it('fires pointer drop callbacks and exposes drag state semantics', () => {
     const onDropped = vi.fn()
     render(<><DragDrop data="source" group="source" data-testid="source">Source</DragDrop><DragDrop group="target" accepts={['source']} data-testid="target" onDropped={onDropped}>Target</DragDrop></>)
