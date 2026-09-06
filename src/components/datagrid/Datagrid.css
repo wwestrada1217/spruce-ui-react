@@ -2475,6 +2475,11 @@
   font-size: var(--sp-text-sm, 13px);
 }
 
+/* Spruce Select renders its option list into body. Keep it above the filter surface. */
+body:has(.sp-datagrid__filter-popover) .sp-select__dropdown {
+  z-index: 10001 !important;
+}
+
 .sp-datagrid__filter-header {
   display: flex;
   align-items: flex-start;
