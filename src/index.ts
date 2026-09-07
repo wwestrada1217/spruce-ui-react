@@ -239,8 +239,8 @@ export type {
 } from './components/circular-progress/CircularProgress.js';
 
 // ─── StatCard ─────────────────────────────────────────────────────────────────
-export { StatCard } from './components/stat-card/StatCard.js';
-export type { StatCardProps, StatCardVariant, StatCardTrend, StatCardIconColor, StatCardChartFit } from './components/stat-card/StatCard.js';
+export { StatCard, StatGroup, StatDivider } from './components/stat-card/StatCard.js';
+export type { StatCardProps, StatCardVariant, StatCardTrend, StatCardIconColor, StatCardChartFit, StatGroupProps, StatGroupVariant, StatDividerProps } from './components/stat-card/StatCard.js';
 
 // ─── Empty ────────────────────────────────────────────────────────────────────
 export { Empty } from './components/empty/Empty.js';
@@ -349,6 +349,7 @@ export type { MaskedInputProps, MaskedInputSize } from './components/masked-inpu
 // ─── Calendar ─────────────────────────────────────────────────────────────────
 export { Calendar } from './components/calendar/Calendar.js';
 export type { CalendarProps, DateFilter } from './components/calendar/Calendar.js';
+export type { DateControlContractProps, DateControlVariant } from './components/date-control/date-control-contract.js';
 
 // ─── DatePicker ───────────────────────────────────────────────────────────────
 export { DatePicker } from './components/date-picker/DatePicker.js';
@@ -405,7 +406,7 @@ export type { DrawerProps, DrawerPosition, DrawerSize } from './components/drawe
 
 // ─── Modal ───────────────────────────────────────────────────────────────────
 export { Modal } from './components/modal/Modal.js';
-export type { ModalProps, ModalSize } from './components/modal/Modal.js';
+export type { ModalProps, ModalSize, ModalRegionBackground } from './components/modal/Modal.js';
 
 // ─── Window ──────────────────────────────────────────────────────────────────
 export { Window } from './components/window/Window.js';
@@ -477,7 +478,7 @@ export type { ComboboxProps, ComboboxOption, ComboboxSource } from './components
 
 // ─── GridCombobox ────────────────────────────────────────────────────────────
 export { GridCombobox } from './components/grid-combobox/GridCombobox.js';
-export type { GridComboboxProps, GridComboboxColumn, GridComboboxOption, GridComboboxSource } from './components/grid-combobox/GridCombobox.js';
+export type { GridComboboxProps, GridComboboxColumn, GridComboboxOption, GridComboboxSource, GridComboboxVariant } from './components/grid-combobox/GridCombobox.js';
 
 // ─── Lookup contracts ───────────────────────────────────────────────────────
 export type { LookupOption, LookupColumn, LookupRenderContext, LookupSource, LookupRenderer } from './components/lookup/lookup-types.js';

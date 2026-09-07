@@ -6,10 +6,10 @@
  */
 
 import './StatCard.css'
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { Icon } from '../../icons/Icon.js'
 
-export type StatCardVariant = 'flat' | 'icon' | 'trend'
+export type StatCardVariant = 'flat' | 'icon' | 'trend' | 'inline'
 export type StatCardTrend = 'up' | 'down' | 'neutral'
 export type StatCardIconColor = 'blue' | 'green' | 'amber' | 'red' | 'purple'
 export type StatCardChartFit = 'bleed' | 'inset'
@@ -71,12 +71,12 @@ export function StatCard({
 
   return (
     <div className={cardClass}>
-      {variant === 'icon' && (
+      {(variant === 'icon' || (variant === 'inline' && icon)) && (
         <div
           className="sp-stat-card__icon"
           style={{ background: iconBg, color: iconFg }}
         >
-          <Icon name={icon ?? 'bar-chart-2'} size={20} />
+          <Icon name={icon ?? 'bar-chart-2'} size={variant === 'inline' ? 14 : 20} />
         </div>
       )}
 
@@ -94,6 +94,17 @@ export function StatCard({
             </div>
             <span className="sp-stat-card__value">{value}</span>
           </>
+        ) : variant === 'inline' ? (
+          <div className="sp-stat-card__inline-content">
+            <span className="sp-stat-card__value">{value}</span>
+            <span className="sp-stat-card__label">{label}</span>
+            {change && (
+              <span className={changeClass}>
+                <Icon name={trendIcon(trend)} size={11} />
+                {change}
+              </span>
+            )}
+          </div>
         ) : (
           <>
             <span className="sp-stat-card__label">{label}</span>
@@ -113,4 +124,43 @@ export function StatCard({
       )}
     </div>
   )
+}
+
+export type StatGroupVariant = 'strip' | 'grid' | 'stack'
+
+export interface StatGroupProps {
+  variant?: StatGroupVariant
+  bordered?: boolean
+  children?: ReactNode
+  className?: string
+  style?: CSSProperties
+  ariaLabel?: string
+}
+
+/** Groups related metrics into a responsive strip, grid, or vertical stack. */
+export function StatGroup({
+  variant = 'strip',
+  bordered = true,
+  children,
+  className = '',
+  style,
+  ariaLabel,
+}: StatGroupProps) {
+  const classes = [
+    'sp-stat-group',
+    `sp-stat-group--${variant}`,
+    bordered && 'sp-stat-group--bordered',
+    className,
+  ].filter(Boolean).join(' ')
+
+  return <div className={classes} style={style} role="group" aria-label={ariaLabel}>{children}</div>
+}
+
+export interface StatDividerProps {
+  className?: string
+}
+
+/** Decorative hairline divider for explicit stat-group layouts. */
+export function StatDivider({ className = '' }: StatDividerProps) {
+  return <span className={['sp-stat-divider', className].filter(Boolean).join(' ')} aria-hidden="true" />
 }

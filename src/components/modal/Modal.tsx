@@ -13,6 +13,7 @@ import { useI18n } from '../../i18n/i18n-context.js';
 import { useFocusTrap } from '../../utils/FocusUtils.js';
 
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
+export type ModalRegionBackground = `var(--${string})` | 'transparent' | 'inherit';
 
 export interface ModalProps {
   open: boolean;
@@ -24,6 +25,10 @@ export interface ModalProps {
   closeOnBackdrop?: boolean;
   closeOnEscape?: boolean;
   focusTrap?: boolean;
+  /** Token-backed background applied only to the header region. */
+  headerBackground?: ModalRegionBackground;
+  /** Token-backed background applied only to the footer region. */
+  footerBackground?: ModalRegionBackground;
   children?: ReactNode;
   footer?: ReactNode;
   className?: string;
@@ -40,6 +45,8 @@ export function Modal({
   closeOnBackdrop = true,
   closeOnEscape = true,
   focusTrap = true,
+  headerBackground,
+  footerBackground,
   children,
   footer,
   className = '',
@@ -93,7 +100,7 @@ export function Modal({
         tabIndex={-1}
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="sp-modal__header">
+        <div className="sp-modal__header" style={headerBackground ? { background: headerBackground } : undefined}>
           <div className="sp-modal__heading">
             {title && <span id={titleId} className="sp-modal__title">{title}</span>}
             {description && <p id={descriptionId} className="sp-modal__description">{description}</p>}
@@ -103,7 +110,7 @@ export function Modal({
           </button>
         </div>
         <div className="sp-modal__body">{children}</div>
-        {footer && <div className="sp-modal__footer">{footer}</div>}
+        {footer && <div className="sp-modal__footer" style={footerBackground ? { background: footerBackground } : undefined}>{footer}</div>}
       </div>
     </div>,
     document.body,

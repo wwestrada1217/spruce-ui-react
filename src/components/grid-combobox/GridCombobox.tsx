@@ -11,19 +11,22 @@ import { normalizeLookupOption, readLookupPage, type LookupRenderContext, type L
 export interface GridComboboxColumn { key: string; label: string; width?: string; minWidth?: number; }
 export type GridComboboxSource = LookupSource<unknown>;
 export interface GridComboboxOption { value: string; label: string; disabled?: boolean; icon?: string; [key: string]: unknown; }
+export type GridComboboxVariant = 'default' | 'outline' | 'outlined' | 'filled';
 
 export interface GridComboboxProps {
   columns: GridComboboxColumn[];
   options?: GridComboboxSource | null;
   source?: GridComboboxSource | null;
-  value?: string;
+  value?: string | readonly string[];
+  multiple?: boolean;
   selectedItem?: unknown;
-  onChange?: (value: string) => void;
+  onChange?: (value: string | string[]) => void;
   onSelect?: (item: GridComboboxOption) => void;
   onSelectedItem?: (item: unknown) => void;
   onOpenChange?: (open: boolean) => void;
   placeholder?: string;
   filterBy?: string | string[];
+  searchFields?: readonly string[] | null;
   displayField?: string;
   valueField?: string;
   pageSize?: number;
@@ -38,6 +41,8 @@ export interface GridComboboxProps {
   required?: boolean;
   label?: string;
   floatingLabel?: boolean;
+  icon?: string | null;
+  variant?: GridComboboxVariant;
   placement?: Placement;
   constrainToModal?: boolean;
   dismissOnClickOutside?: boolean;
@@ -47,6 +52,8 @@ export interface GridComboboxProps {
   virtualPaging?: boolean;
   showPagingFooter?: boolean;
   resizableColumns?: boolean;
+  /** Allow the dropdown panel itself to be resized by the user. */
+  panelResizable?: boolean;
   renderRow?: (context: LookupRenderContext<GridComboboxOption>) => ReactNode;
   renderEmpty?: () => ReactNode;
   ariaLabel?: string;
@@ -57,12 +64,12 @@ export interface GridComboboxProps {
 }
 
 export function GridCombobox({
-  columns, options, source, value, selectedItem, onChange, onSelect, onSelectedItem, onOpenChange,
-  placeholder = 'Search...', filterBy = 'label', displayField = 'label', valueField = 'value', pageSize = 20,
+  columns, options, source, value, multiple = false, selectedItem, onChange, onSelect, onSelectedItem, onOpenChange,
+  placeholder = 'Search...', filterBy = 'label', searchFields = null, displayField = 'label', valueField = 'value', pageSize = 20,
   autoOpen = false, disabled = false, readOnly = false, hidden = false, error, hint, errors, invalid, required = false,
-  label = '', floatingLabel = false, placement = 'bottom-start', constrainToModal = true,
+  label = '', floatingLabel = false, icon = null, variant = 'default', placement = 'bottom-start', constrainToModal = true,
   dismissOnClickOutside = true, dismissOnScroll = true, virtualScroll = false, itemHeight = 32,
-  virtualPaging = false, showPagingFooter = true, resizableColumns = false, renderRow, renderEmpty,
+  virtualPaging = false, showPagingFooter = true, resizableColumns = false, panelResizable = false, renderRow, renderEmpty,
   ariaLabel, ariaLabelledBy, ariaDescribedBy, className = '', id,
 }: GridComboboxProps) {
   const { direction, t } = useI18n();
@@ -72,7 +79,8 @@ export function GridCombobox({
   const inputId = id ?? `sp-grid-combo-${instanceId}`;
   const errorId = `${inputId}-error`;
   const hintId = `${inputId}-hint`;
-  const filterKeys = useMemo(() => Array.isArray(filterBy) ? filterBy : [filterBy], [filterBy]);
+  const filterKeys = useMemo(() => searchFields?.length ? [...searchFields] : Array.isArray(filterBy) ? filterBy : [filterBy], [filterBy, searchFields]);
+  const normalizedVariant = variant === 'outlined' ? 'outline' : variant;
   const effectiveDisabled = disabled || Boolean(field?.disabled);
   const effectiveReadOnly = readOnly || Boolean(field?.readOnly);
   const effectiveHidden = hidden || Boolean(field?.hidden);
@@ -142,13 +150,16 @@ export function GridCombobox({
     return () => document.removeEventListener('mousedown', handler);
   }, [dismissOnClickOutside, open, setOpenState]);
   useEffect(() => {
+    if (multiple) return;
     if (!value) { setQuery(''); return; }
     const selected = items.map((item) => normalizeLookupOption(item, displayField, valueField)).find((item) => item.value === value);
     if (selected) setQuery(selected.label);
     else if (selectedItem) setQuery(normalizeLookupOption(selectedItem, displayField, valueField).label);
-  }, [displayField, items, selectedItem, value, valueField]);
+  }, [displayField, items, multiple, selectedItem, value, valueField]);
 
   const normalized = useMemo(() => items.map((item) => normalizeLookupOption(item, displayField, valueField)), [displayField, items, valueField]);
+  const selectedValues = useMemo(() => new Set(Array.isArray(value) ? value : value ? [value] : []), [value]);
+  const selectedOptions = useMemo(() => normalized.filter((option) => selectedValues.has(option.value)), [normalized, selectedValues]);
   const visibleItems = virtualScroll ? items.slice(virtualStart, virtualStart + Math.ceil(240 / itemHeight) + 8) : items;
   const activeIndex = virtualScroll ? virtualStart + highlightedIndex : highlightedIndex;
   const gridTemplate = columns.map((column) => columnWidths[column.key] ?? column.width ?? '1fr').join(' ');
@@ -161,11 +172,18 @@ export function GridCombobox({
     const item = items[index];
     const option = normalized[index];
     if (!item || !option || option.disabled) return;
-    onChange?.(option.value);
+    if (multiple) {
+      const next = new Set(selectedValues);
+      if (next.has(option.value)) next.delete(option.value);
+      else next.add(option.value);
+      onChange?.([...next]);
+    } else {
+      onChange?.(option.value);
+    }
     onSelect?.(item);
     onSelectedItem?.(item);
-    setQuery(option.label);
-    setOpenState(false);
+    setQuery(multiple ? '' : option.label);
+    if (!multiple) setOpenState(false);
     focusInputAfterSelection();
   }
   function moveHighlight(delta: number) {
@@ -207,21 +225,24 @@ export function GridCombobox({
   }
 
   if (effectiveHidden) return null;
-  const rootClasses = ['sp-gc', floatingLabel && 'sp-gc--floating', open && 'sp-gc--open', effectiveDisabled && 'sp-gc--disabled', effectiveReadOnly && 'sp-gc--readonly', hasError && 'sp-gc--error', className].filter(Boolean).join(' ');
+  const rootClasses = ['sp-gc', `sp-gc--${normalizedVariant}`, floatingLabel && 'sp-gc--floating', open && 'sp-gc--open', effectiveDisabled && 'sp-gc--disabled', effectiveReadOnly && 'sp-gc--readonly', hasError && 'sp-gc--error', className].filter(Boolean).join(' ');
   const activeDescendant = activeIndex >= 0 ? `sp-gc-opt-${instanceId}-${activeIndex}` : undefined;
   return <>
     <div ref={anchorRef} className={rootClasses} dir={direction} data-constrain-to-modal={constrainToModal}>
       {floatingLabel && <label className="sp-gc__floating-label" htmlFor={inputId}>{label}{effectiveRequired && <span aria-hidden="true">*</span>}</label>}
       <div className="sp-gc__input-wrap">
-        <Icon name="search" size={14} className="sp-gc__search-icon" />
+        <Icon name={icon ?? 'search'} size={14} className="sp-gc__search-icon" />
+        {multiple && selectedOptions.length > 0 && <div className="sp-gc__chips" aria-label={`${selectedOptions.length} selected`}>
+          {selectedOptions.map((option) => <span key={option.value} className="sp-gc__chip">{option.label}<button type="button" aria-label={`Remove ${option.label}`} disabled={effectiveDisabled || effectiveReadOnly} onMouseDown={(event) => event.preventDefault()} onClick={() => onChange?.([...selectedValues].filter((item) => item !== option.value))}><Icon name="x" size={10} /></button></span>)}
+        </div>}
         <input ref={inputRef} id={inputId} className="sp-gc__input" placeholder={placeholder === 'Search...' ? t('search') : placeholder} disabled={effectiveDisabled} readOnly={effectiveReadOnly} value={query} onChange={(event: ChangeEvent<HTMLInputElement>) => { setQuery(event.target.value); if (!open) setOpenState(true); else void load(1, event.target.value); }} onFocus={() => { if (suppressOpenOnFocusRef.current) { suppressOpenOnFocusRef.current = false; return; } setOpenState(true); }} onKeyDown={handleKeyDown} role="combobox" aria-expanded={open} aria-haspopup="listbox" aria-autocomplete="list" aria-activedescendant={activeDescendant} aria-label={ariaLabel || (!label ? undefined : label)} aria-labelledby={ariaLabelledBy || undefined} aria-describedby={describedBy} aria-invalid={hasError || undefined} aria-required={effectiveRequired || undefined} aria-readonly={effectiveReadOnly || undefined} />
-        {query && !effectiveDisabled && <button type="button" className="sp-gc__clear" tabIndex={-1} aria-label={t('clear')} onMouseDown={(event) => { event.preventDefault(); setQuery(''); onChange?.(''); inputRef.current?.focus(); }}><Icon name="x" size={12} /></button>}
+        {(query || selectedValues.size > 0) && !effectiveDisabled && !effectiveReadOnly && <button type="button" className="sp-gc__clear" tabIndex={-1} aria-label={t('clear')} onMouseDown={(event) => { event.preventDefault(); setQuery(''); onChange?.(multiple ? [] : ''); inputRef.current?.focus(); }}><Icon name="x" size={12} /></button>}
       </div>
     </div>
-    {open && createPortal(<div ref={panelRef} className="sp-gc__dropdown" role="listbox" style={{ position: 'fixed', top: position.top, left: position.left, width: position.width, zIndex: 999, opacity: ready ? 1 : 0 }} onScroll={handlePanelScroll}>
+    {open && createPortal(<div ref={panelRef} className={`sp-gc__dropdown${panelResizable ? ' sp-gc__dropdown--resizable' : ''}`} role="listbox" aria-multiselectable={multiple || undefined} style={{ position: 'fixed', top: position.top, left: position.left, width: position.width, zIndex: 999, opacity: ready ? 1 : 0 }} onScroll={handlePanelScroll}>
       <div className="sp-gc__header" style={{ gridTemplateColumns: gridTemplate }}>{columns.map((column) => <div key={column.key} className="sp-gc__header-cell">{column.label}{resizableColumns && <button type="button" className="sp-gc__resizer" aria-label={t('resizeColumn', { column: column.label })} onPointerDown={(event) => beginResize(column.key, event)} />}</div>)}</div>
       {loading && <div className="sp-gc__loading" role="status">{t('loading')}</div>}
-      {!loading && visibleItems.length > 0 && <div style={virtualScroll ? { paddingTop: `${virtualStart * itemHeight}px`, paddingBottom: `${Math.max(0, items.length - virtualStart - visibleItems.length) * itemHeight}px` } : undefined}>{visibleItems.map((item, offset) => { const index = virtualScroll ? virtualStart + offset : offset; const option = normalized[index]; const selected = option?.value === value; const highlighted = index === activeIndex; const context = { item, option, selected, highlighted }; return <button key={`${option?.value ?? index}-${index}`} id={`sp-gc-opt-${instanceId}-${index}`} type="button" role="option" aria-selected={selected} disabled={option?.disabled} className={['sp-gc__row', selected && 'sp-gc__row--selected', highlighted && 'sp-gc__row--highlighted'].filter(Boolean).join(' ')} style={{ gridTemplateColumns: gridTemplate }} onMouseEnter={() => setHighlightedIndex(virtualScroll ? offset : index)} onClick={() => selectOption(index)}>{renderRow ? renderRow(context) : columns.map((column) => <span key={column.key} className="sp-gc__cell">{column.key === valueField && option?.icon && <Icon name={option.icon} size={14} />}{String(item[column.key] ?? '')}</span>)}{selected && <Icon name="check" size={14} className="sp-gc__check" />}</button>; })}</div>}
+      {!loading && visibleItems.length > 0 && <div style={virtualScroll ? { paddingTop: `${virtualStart * itemHeight}px`, paddingBottom: `${Math.max(0, items.length - virtualStart - visibleItems.length) * itemHeight}px` } : undefined}>{visibleItems.map((item, offset) => { const index = virtualScroll ? virtualStart + offset : offset; const option = normalized[index]; const selected = Boolean(option && selectedValues.has(option.value)); const highlighted = index === activeIndex; const context = { item, option, selected, highlighted }; return <button key={`${option?.value ?? index}-${index}`} id={`sp-gc-opt-${instanceId}-${index}`} type="button" role="option" aria-selected={selected} disabled={option?.disabled} className={['sp-gc__row', selected && 'sp-gc__row--selected', highlighted && 'sp-gc__row--highlighted'].filter(Boolean).join(' ')} style={{ gridTemplateColumns: gridTemplate }} onMouseEnter={() => setHighlightedIndex(virtualScroll ? offset : index)} onClick={() => selectOption(index)}>{renderRow ? renderRow(context) : columns.map((column) => <span key={column.key} className="sp-gc__cell">{column.key === valueField && option?.icon && <Icon name={option.icon} size={14} />}{String(item[column.key] ?? '')}</span>)}{selected && <Icon name="check" size={14} className="sp-gc__check" />}</button>; })}</div>}
       {!loading && !visibleItems.length && <div className="sp-gc__empty">{renderEmpty ? renderEmpty() : t('noResults')}</div>}
       {virtualPaging && showPagingFooter && <div className="sp-gc__paging"><button type="button" disabled={page <= 1 || loading} onClick={() => void load(page - 1, query)}>{t('previous')}</button><span>{t('page')} {page} {t('of')} {totalPages}</span><button type="button" disabled={page >= totalPages || loading} onClick={() => void load(page + 1, query)}>{t('next')}</button></div>}
     </div>, document.body)}

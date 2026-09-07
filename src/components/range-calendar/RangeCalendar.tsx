@@ -9,6 +9,7 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { Icon } from '../../icons/Icon.js';
 import { useI18n } from '../../i18n/i18n-context.js';
 import './RangeCalendar.css';
+import { DateControlMessages, useDateControlContract, type DateControlContractProps } from '../date-control/date-control-contract.js';
 
 /* ── Types ── */
 
@@ -22,7 +23,7 @@ export interface DateRangePreset {
   range: DateRange;
 }
 
-export interface RangeCalendarProps {
+export interface RangeCalendarProps extends DateControlContractProps {
   value?: DateRange;
   onChange?: (range: DateRange) => void;
   months?: number;
@@ -106,10 +107,26 @@ export function RangeCalendar({
   months: monthCount = 2,
   presets,
   showFooter = true,
-  disabled = false,
+  disabled: disabledProp = false,
+  readOnly = false,
+  hidden = false,
+  invalid,
+  error,
+  errors,
+  required = false,
+  touched = false,
+  onTouchedChange,
+  onBlur,
+  hint,
+  ariaLabel,
+  ariaLabelledBy,
+  ariaDescribedBy,
+  id,
   className = '',
 }: RangeCalendarProps) {
   const { monthNames, monthLabels, dayLabels, t, formatDayLabel, leadingBlankDays } = useI18n();
+  const contract = useDateControlContract({ disabled: disabledProp, readOnly, hidden, invalid, error, errors, required, touched, onTouchedChange, onBlur, hint, ariaLabel, ariaLabelledBy, ariaDescribedBy, id, valuePresent: Boolean(value?.start || value?.end) });
+  const disabled = contract.disabled || contract.readOnly;
   const today = useMemo(() => todayISO(), []);
   const todayParsed = useMemo(() => parseISO(today), [today]);
 
@@ -366,6 +383,9 @@ export function RangeCalendar({
   // Root classes
   const rootClasses = [
     'sp-rcal',
+    contract.invalid && 'sp-date-control--invalid',
+    contract.readOnly && 'sp-date-control--readonly',
+    contract.hidden && 'sp-date-control--hidden',
     disabled && 'sp-rcal--disabled',
     className,
   ]
@@ -380,12 +400,18 @@ export function RangeCalendar({
 
     return (
       <div
+        id={contract.id}
         className={rootClasses}
         ref={containerRef}
         tabIndex={0}
         role="application"
           aria-label={`${t('dateRangeCalendar')} ${t('month')}`}
-        aria-disabled={disabled || undefined}
+        aria-disabled={contract.disabled || undefined}
+        aria-readonly={contract.readOnly || undefined}
+        aria-invalid={contract.invalid || undefined}
+        aria-required={contract.required || undefined}
+        aria-describedby={contract.aria['aria-describedby']}
+        onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) contract.markTouched(); }}
       >
         <div className="sp-rcal__body">
           {presets && presets.length > 0 && (
@@ -480,6 +506,7 @@ export function RangeCalendar({
             </button>
           </div>
         )}
+        <DateControlMessages errorMessage={contract.errorMessage} hint={contract.hint} errorId={contract.errorId} hintId={contract.hintId} />
       </div>
     );
   }
@@ -490,12 +517,18 @@ export function RangeCalendar({
 
     return (
       <div
+        id={contract.id}
         className={rootClasses}
         ref={containerRef}
         tabIndex={0}
         role="application"
           aria-label={`${t('dateRangeCalendar')} ${t('year')}`}
-        aria-disabled={disabled || undefined}
+        aria-disabled={contract.disabled || undefined}
+        aria-readonly={contract.readOnly || undefined}
+        aria-invalid={contract.invalid || undefined}
+        aria-required={contract.required || undefined}
+        aria-describedby={contract.aria['aria-describedby']}
+        onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) contract.markTouched(); }}
       >
         <div className="sp-rcal__body">
           {presets && presets.length > 0 && (
@@ -581,6 +614,7 @@ export function RangeCalendar({
             </button>
           </div>
         )}
+        <DateControlMessages errorMessage={contract.errorMessage} hint={contract.hint} errorId={contract.errorId} hintId={contract.hintId} />
       </div>
     );
   }
@@ -589,12 +623,18 @@ export function RangeCalendar({
 
   return (
     <div
+      id={contract.id}
       className={rootClasses}
       ref={containerRef}
       tabIndex={0}
       role="application"
         aria-label={t('dateRangeCalendar')}
-      aria-disabled={disabled || undefined}
+      aria-disabled={contract.disabled || undefined}
+      aria-readonly={contract.readOnly || undefined}
+      aria-invalid={contract.invalid || undefined}
+      aria-required={contract.required || undefined}
+      aria-describedby={contract.aria['aria-describedby']}
+      onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) contract.markTouched(); }}
       onKeyDown={handleKeyDown}
     >
       <div className="sp-rcal__body">
@@ -731,6 +771,7 @@ export function RangeCalendar({
           </button>
         </div>
       )}
+      <DateControlMessages errorMessage={contract.errorMessage} hint={contract.hint} errorId={contract.errorId} hintId={contract.hintId} />
     </div>
   );
 }

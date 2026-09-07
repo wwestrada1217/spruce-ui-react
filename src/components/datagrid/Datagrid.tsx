@@ -14,6 +14,7 @@ import {
   type CSSProperties,
   type ForwardedRef,
   type KeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
   type ReactElement,
   type ReactNode,
 } from 'react';
@@ -22,11 +23,14 @@ import { Button } from '../button/Button.js';
 import { Checkbox } from '../checkbox/Checkbox.js';
 import { Dropdown, type DropdownItem } from '../dropdown/Dropdown.js';
 import { Field } from '../field/Field.js';
+import { FilterExpression, type FilterGroup } from '../filter-expression/FilterExpression.js';
 import { Icon } from '../../icons/Icon.js';
 import { Input } from '../input/Input.js';
 import { Popover } from '../popover/Popover.js';
 import { Select, type SelectOption } from '../select/Select.js';
 import { useI18n } from '../../i18n/i18n-context.js';
+import { surfaceChromeClasses, type Border, type Chrome, type Radius } from '../../chrome/chrome.js';
+import type { IReadableDataSource } from '../../data/types.js';
 import {
   createDatagridDataContextAdapter,
   type DatagridDataContextAdapter,
@@ -35,6 +39,9 @@ import type {
   DatagridAggregate,
   DatagridAggregateScope,
   DatagridCellEditor as DatagridCellEditorRenderer,
+  DatagridCellClassName,
+  DatagridCellEvent,
+  DatagridCellStyle,
   DatagridCellEditCommit,
   DatagridCellTemplate as DatagridCellTemplateRenderer,
   DatagridColumn,
@@ -58,16 +65,21 @@ import type {
   DatagridFilterChange,
   DatagridFilterIndicatorVisibility,
   DatagridFilterMode,
+  DatagridFilterPanelConfig,
   DatagridGroupBy,
   DatagridGroupSort,
   DatagridGroupSortDirection,
   DatagridHandle,
   DatagridLeadingRowActions as DatagridLeadingRowActionsRenderer,
   DatagridNewRowCommit,
+  DatagridNewRowCommitMode,
   DatagridNewRowFactory,
+  DatagridNewRowPosition,
+  DatagridNestedGridConfig,
   DatagridPageChange,
   DatagridPaginationType,
   DatagridRowClassName,
+  DatagridRowEvent,
   DatagridRowDetail as DatagridRowDetailRenderer,
   DatagridRowDetailExpandable,
   DatagridRowEditCommit,
@@ -76,6 +88,7 @@ import type {
   DatagridRowStyle,
   DatagridRowTemplate as DatagridRowTemplateRenderer,
   DatagridSelectionChange,
+  DatagridSelectionControl,
   DatagridSelectionMode,
   DatagridSort,
   DatagridSortChange,
@@ -149,6 +162,9 @@ export interface DatagridProps<T extends object = Record<string, unknown>> {
   readonly children?: ReactNode;
   readonly data?: readonly T[];
   readonly rows?: readonly T[];
+  /** Angular-compatible alias for rows. */
+  readonly rowData?: readonly T[];
+  readonly dataSource?: IReadableDataSource<T> | null;
   readonly columns?: readonly DatagridColumn<T>[];
   readonly columnGroups?: readonly DatagridColumnGroup[];
   readonly trackBy?: DatagridTrackBy<T> | keyof T;
@@ -159,6 +175,20 @@ export interface DatagridProps<T extends object = Record<string, unknown>> {
   readonly emptyStateDescription?: string | null;
   readonly filterEmptyStateDescription?: string | null;
   readonly autoColumnWidth?: boolean;
+  readonly autoFit?: boolean;
+  readonly chrome?: Chrome;
+  readonly radius?: Radius;
+  readonly border?: Border;
+  readonly density?: 'dense' | 'default' | 'comfortable';
+  readonly autoRowHeight?: boolean;
+  readonly headerTextCase?: 'uppercase' | 'default';
+  readonly nullText?: string;
+  readonly borderless?: boolean;
+  readonly showColumnLines?: boolean;
+  readonly hideColumnLines?: boolean;
+  readonly columnLines?: boolean;
+  readonly showColumnBorders?: boolean;
+  readonly rowHover?: boolean;
   readonly reorderable?: boolean;
   readonly defaultColumnWidth?: number;
   readonly sortMode?: DatagridSortMode;
@@ -181,6 +211,12 @@ export interface DatagridProps<T extends object = Record<string, unknown>> {
   readonly stickyGroupHeaders?: boolean;
   readonly indentGroupedRows?: boolean;
   readonly selectionMode?: DatagridSelectionMode;
+  readonly selectionControl?: DatagridSelectionControl;
+  readonly appendSelection?: boolean;
+  readonly rowSelection?: boolean;
+  readonly hideSelectionColumn?: boolean;
+  readonly selectOnNavigate?: boolean;
+  readonly hideFocusRing?: boolean;
   readonly selection?: readonly T[];
   readonly fitColumnsToWidth?: boolean;
   readonly stripedRows?: boolean;
@@ -209,12 +245,19 @@ export interface DatagridProps<T extends object = Record<string, unknown>> {
   readonly virtualHasPreviousPage?: boolean;
   readonly virtualHasNextPage?: boolean;
   readonly virtualPagingLoading?: boolean;
+  readonly virtualDataSourceWindow?: boolean;
   readonly virtualPageThreshold?: number;
   readonly virtualPageRequest?: (request: DatagridVirtualPageRequest) => void;
   readonly onVirtualPageRequest?: (request: DatagridVirtualPageRequest) => void;
   readonly onPageSizeChange?: (pageSize: number) => void;
   readonly editMode?: DatagridEditMode;
   readonly editOnType?: boolean;
+  readonly autoEditOnNavigate?: boolean;
+  readonly manualCommit?: boolean;
+  readonly showDirtyIndicator?: boolean;
+  readonly undoStackSize?: number;
+  readonly enableUndoShortcuts?: boolean;
+  readonly enableFillDown?: boolean;
   readonly editLabels?: Partial<DatagridEditLabels>;
   readonly isRowEditable?: (row: T) => boolean;
   readonly isCellEditable?: (row: T, column: DatagridColumn<T>) => boolean;
@@ -224,6 +267,8 @@ export interface DatagridProps<T extends object = Record<string, unknown>> {
   readonly newRowPrompt?: string;
   readonly newRowLabel?: string;
   readonly newRowFactory?: DatagridNewRowFactory<T>;
+  readonly newRowPosition?: DatagridNewRowPosition;
+  readonly newRowCommit?: DatagridNewRowCommitMode;
   readonly preventInvalidCommit?: boolean;
   readonly onCellValidationFailed?: (event: DatagridValidationEvent<T>) => void;
   readonly onRowValidationFailed?: (events: readonly DatagridValidationEvent<T>[]) => void;
@@ -233,6 +278,8 @@ export interface DatagridProps<T extends object = Record<string, unknown>> {
   readonly rowDetailExpandable?: DatagridRowDetailExpandable<T>;
   readonly rowClassName?: DatagridRowClassName<T>;
   readonly rowStyle?: DatagridRowStyle<T>;
+  readonly cellClassName?: DatagridCellClassName<T>;
+  readonly cellStyle?: DatagridCellStyle<T>;
   readonly showGroupToolbar?: boolean;
   readonly groupSorting?: boolean;
   readonly groupsExpandedByDefault?: boolean;
@@ -277,6 +324,8 @@ export interface DatagridProps<T extends object = Record<string, unknown>> {
   readonly emptyIcon?: string;
   readonly emptyState?: ReactNode;
   readonly loading?: boolean;
+  readonly loadingMode?: 'spinner' | 'skeleton';
+  readonly skeletonRowCount?: number;
   readonly loadingMessage?: string;
   readonly detailPaneTitle?: string | ((row: T) => string);
   readonly cellTemplates?: Partial<Record<string, DatagridCellTemplateRenderer<T>>>;
@@ -288,6 +337,15 @@ export interface DatagridProps<T extends object = Record<string, unknown>> {
   readonly detailPaneRow?: T | null;
   readonly leadingRowActions?: DatagridLeadingRowActionsRenderer<T>;
   readonly rowTemplate?: DatagridRowTemplateRenderer<T>;
+  readonly treeChildrenField?: keyof T | string;
+  readonly treeExpandedByDefault?: boolean;
+  readonly nestedGrid?: DatagridNestedGridConfig<T, object>;
+  readonly infiniteScroll?: boolean;
+  readonly infiniteScrollThreshold?: number;
+  readonly onLoadMore?: (currentCount: number) => Promise<readonly T[] | void>;
+  readonly pinControlColumns?: boolean;
+  readonly pinSelectionColumns?: boolean;
+  readonly filterPanel?: DatagridFilterPanelConfig;
   readonly dataContext?: DatagridDataContext<T>;
   readonly dataContextOptions?: DatagridDataContextOptions<T>;
 
@@ -305,13 +363,25 @@ export interface DatagridProps<T extends object = Record<string, unknown>> {
   readonly onSelectionChange?: (event: DatagridSelectionChange<T>) => void;
   readonly onPageChange?: (event: DatagridPageChange) => void;
   readonly onRowOrderChange?: (event: DatagridRowOrderChange<T>) => void;
-  readonly onCellEditCommit?: (event: DatagridCellEditCommit<T>) => void;
-  readonly onRowEditCommit?: (event: DatagridRowEditCommit<T>) => void;
+  readonly onCellEditCommit?: (event: DatagridCellEditCommit<T>) => void | boolean | Promise<void | boolean>;
+  readonly onRowEditCommit?: (event: DatagridRowEditCommit<T>) => void | boolean | Promise<void | boolean>;
   readonly onNewRowCommit?: (event: DatagridNewRowCommit<T>) => void;
   readonly onEditCancel?: (event: DatagridEditCancel<T>) => void;
   readonly onValidationError?: (event: DatagridValidationEvent<T>) => void;
   readonly onDataContextSaveComplete?: () => void;
   readonly onDataContextSaveError?: (error: unknown) => void;
+  readonly onRowClick?: (event: DatagridRowEvent<T>) => void;
+  readonly onRowDoubleClick?: (event: DatagridRowEvent<T>) => void;
+  readonly onCellClick?: (event: DatagridCellEvent<T>) => void;
+  readonly onDetailOpen?: (row: T) => void;
+  readonly onDetailClose?: (row: T) => void;
+  readonly onFilterExpressionChange?: (expression: FilterGroup) => void;
+
+  readonly columnResizeMode?: 'live' | 'deferred';
+  readonly columnReorderMode?: 'live' | 'deferred';
+  readonly colResizeMode?: 'live' | 'deferred';
+  readonly colReorderMode?: 'live' | 'deferred';
+  readonly showColumnMenu?: boolean;
 
   readonly className?: string;
   readonly style?: CSSProperties;
@@ -353,12 +423,13 @@ function formatCellValue<T extends object>(
   rowIndex: number,
   column: DatagridColumn<T>,
   locale = 'en-US',
+  nullText = '',
 ): string {
   const value = getCellValue(row, column);
   if (column.valueFormatter) {
     return column.valueFormatter({ value, row, rowIndex, column });
   }
-  if (value === null || value === undefined) return '';
+  if (value === null || value === undefined) return nullText;
   if (typeof value === 'object' && value instanceof Date) {
     return new Intl.DateTimeFormat(locale).format(value);
   }
@@ -857,6 +928,8 @@ function DatagridInner<T extends object = Record<string, unknown>>(
   const {
     data: dataProp,
     rows: rowsProp,
+    rowData,
+    dataSource,
     columns: columnsProp = [],
     columnGroups: columnGroupsProp = [],
     trackBy,
@@ -867,6 +940,20 @@ function DatagridInner<T extends object = Record<string, unknown>>(
     emptyStateDescription,
     filterEmptyStateDescription = 'Try changing or clearing the active filters.',
     autoColumnWidth = true,
+    autoFit,
+    chrome = 'default',
+    radius,
+    border = 'default',
+    density = 'default',
+    autoRowHeight = false,
+    headerTextCase = 'uppercase',
+    nullText,
+    borderless = false,
+    showColumnLines,
+    hideColumnLines = false,
+    columnLines,
+    showColumnBorders,
+    rowHover = true,
     reorderable = true,
     defaultColumnWidth = DEFAULT_COLUMN_WIDTH,
     sortMode = 'client',
@@ -889,6 +976,12 @@ function DatagridInner<T extends object = Record<string, unknown>>(
     stickyGroupHeaders = false,
     indentGroupedRows = true,
     selectionMode = 'none',
+    selectionControl = 'checkbox',
+    appendSelection = false,
+    rowSelection = false,
+    hideSelectionColumn = false,
+    selectOnNavigate = false,
+    hideFocusRing = false,
     selection: selectionProp,
     fitColumnsToWidth = false,
     stripedRows = false,
@@ -918,11 +1011,18 @@ function DatagridInner<T extends object = Record<string, unknown>>(
     virtualHasPreviousPage,
     virtualHasNextPage,
     virtualPagingLoading = false,
+    virtualDataSourceWindow = false,
     virtualPageRequest,
     onVirtualPageRequest,
     onPageSizeChange,
     editMode = 'none',
     editOnType = false,
+    autoEditOnNavigate = false,
+    manualCommit = false,
+    showDirtyIndicator = true,
+    undoStackSize = 100,
+    enableUndoShortcuts = true,
+    enableFillDown = true,
     editLabels: customEditLabels,
     isRowEditable,
     isCellEditable,
@@ -932,6 +1032,8 @@ function DatagridInner<T extends object = Record<string, unknown>>(
     newRowPrompt,
     newRowLabel,
     newRowFactory,
+    newRowPosition = 'bottom',
+    newRowCommit = 'immediate',
     preventInvalidCommit = true,
     onCellValidationFailed,
     onRowValidationFailed,
@@ -941,6 +1043,8 @@ function DatagridInner<T extends object = Record<string, unknown>>(
     rowDetailExpandable,
     rowClassName,
     rowStyle,
+    cellClassName,
+    cellStyle,
     showGroupToolbar = false,
     showColumnSelector = false,
     showStatusbar = false,
@@ -953,6 +1057,8 @@ function DatagridInner<T extends object = Record<string, unknown>>(
     emptyIcon = 'search',
     emptyState,
     loading = false,
+    loadingMode = 'spinner',
+    skeletonRowCount = 5,
     loadingMessage: loadingMessageProp,
     toolbar = false,
     searchable = false,
@@ -996,6 +1102,15 @@ function DatagridInner<T extends object = Record<string, unknown>>(
     detailPaneRow,
     leadingRowActions,
     rowTemplate,
+    treeChildrenField,
+    treeExpandedByDefault = false,
+    nestedGrid,
+    infiniteScroll = false,
+    infiniteScrollThreshold = 120,
+    onLoadMore,
+    pinControlColumns = false,
+    pinSelectionColumns = true,
+    filterPanel,
     dataContext,
     dataContextOptions,
     onSortChange,
@@ -1019,6 +1134,17 @@ function DatagridInner<T extends object = Record<string, unknown>>(
     onValidationError,
     onDataContextSaveComplete,
     onDataContextSaveError,
+    onRowClick,
+    onRowDoubleClick,
+    onCellClick,
+    onDetailOpen,
+    onDetailClose,
+    onFilterExpressionChange,
+    columnResizeMode,
+    columnReorderMode,
+    colResizeMode,
+    colReorderMode,
+    showColumnMenu,
     className = '',
     style,
     ariaLabel: ariaLabelProp,
@@ -1026,6 +1152,13 @@ function DatagridInner<T extends object = Record<string, unknown>>(
   } = props;
 
   const { t, locale: i18nLocale } = useI18n();
+  const effectiveFitColumnsToWidth = autoFit ?? fitColumnsToWidth;
+  const effectiveShowColumnLines = hideColumnLines
+    ? false
+    : showColumnLines ?? columnLines ?? showColumnBorders ?? showVerticalLines;
+  const effectiveColumnMenu = showColumnMenu ?? columnMenu;
+  const effectiveResizeMode = columnResizeMode ?? colResizeMode ?? 'live';
+  const effectiveReorderMode = columnReorderMode ?? colReorderMode ?? 'deferred';
   const isPaginated = virtualPaging || (paginateProp ?? paginationProp ?? false);
   const isRowReorder = reorderableRowsProp ?? rowReorderProp ?? false;
   const allowNewRow = enableNewRow ?? allowNewRowProp;
@@ -1034,7 +1167,36 @@ function DatagridInner<T extends object = Record<string, unknown>>(
   const defaultGroupsExpanded = groupsExpandedByDefault ?? expandAllGroups;
   const effectiveLocale = localeProp ?? i18nLocale;
   const effectivePageSizeOptions = pageSizeOptions ?? paginationRowsOptions;
-  const rowDetail = rowDetailProp ?? (typeof rowDetailsProp === 'function' ? rowDetailsProp : undefined);
+  const rowDetail = rowDetailProp ?? (typeof rowDetailsProp === 'function' ? rowDetailsProp : undefined) ??
+    (nestedGrid
+      ? ({ row }: { row: T }) => (
+          <div style={{ height: nestedGrid.height ?? 300 }}>
+            <Datagrid
+              data={nestedGrid.getRows(row)}
+              columns={nestedGrid.columns}
+              {...nestedGrid.props}
+              autoHeight={false}
+              fixedHeight="100%"
+            />
+          </div>
+        )
+      : treeChildrenField
+        ? ({ row }: { row: T }) => {
+            const children = (row as Record<string, unknown>)[String(treeChildrenField)];
+            return Array.isArray(children) && children.length > 0 ? (
+              <Datagrid
+                rows={children.filter((child): child is object => Boolean(child) && typeof child === 'object')}
+                columns={columnsProp as readonly DatagridColumn<object>[]}
+                treeChildrenField={treeChildrenField as string}
+                treeExpandedByDefault={treeExpandedByDefault}
+                autoHeight
+                chrome="flush"
+                border="none"
+                ariaLabel={`${ariaLabelProp ?? 'Data Grid'} child rows`}
+              />
+            ) : null;
+          }
+        : undefined);
   const effectiveDetailPaneRenderer =
     typeof detailPane === 'function'
       ? detailPane
@@ -1046,6 +1208,12 @@ function DatagridInner<T extends object = Record<string, unknown>>(
 
   const ariaLabel = ariaLabelProp ?? t('dataGrid') ?? 'Data Grid';
   const gridId = useId();
+  const [dataSourceRows, setDataSourceRows] = useState<readonly T[]>([]);
+  const [dataSourceTotal, setDataSourceTotal] = useState(0);
+  const [dataSourceLoading, setDataSourceLoading] = useState(false);
+  const [appendedRows, setAppendedRows] = useState<readonly T[]>([]);
+  const [loadMorePending, setLoadMorePending] = useState(false);
+  const effectiveLoading = loading || dataSourceLoading;
 
   // Data Context Adapter
   const dataContextAdapter = useMemo<DatagridDataContextAdapter<T> | null>(() => {
@@ -1058,8 +1226,9 @@ function DatagridInner<T extends object = Record<string, unknown>>(
     if (dataContextAdapter) {
       return dataContextAdapter.rows;
     }
-    return dataProp ?? rowsProp ?? [];
-  }, [dataContextAdapter, dataProp, rowsProp]);
+    const base = dataSource ? dataSourceRows : dataProp ?? rowsProp ?? rowData ?? [];
+    return appendedRows.length > 0 ? [...base, ...appendedRows] : base;
+  }, [appendedRows, dataContextAdapter, dataProp, dataSource, dataSourceRows, rowData, rowsProp]);
 
   // Local controllable states
   const [internalSearchQuery, setInternalSearchQuery] = useState('');
@@ -1120,6 +1289,7 @@ function DatagridInner<T extends object = Record<string, unknown>>(
 
   const [internalSelection, setInternalSelection] = useState<readonly T[]>([]);
   const activeSelection = selectionProp !== undefined ? selectionProp : (selectedRows !== undefined ? selectedRows : internalSelection);
+  const lastSelectedIndexRef = useRef<number | null>(null);
 
   const [internalPage, setInternalPage] = useState(pageProp ?? 1);
   const activePage = virtualPaging ? Math.max(1, virtualPage) : pageProp !== undefined ? pageProp : internalPage;
@@ -1140,14 +1310,23 @@ function DatagridInner<T extends object = Record<string, unknown>>(
     });
     return expandedIds;
   }, [expandedRows, internalExpandedRowDetails, rawRows, trackBy]);
+  useEffect(() => {
+    if (!treeChildrenField || !treeExpandedByDefault || expandedRows !== undefined) return;
+    setInternalExpandedRowDetails(new Set(rawRows.flatMap((row, index) => {
+      const children = (row as Record<string, unknown>)[String(treeChildrenField)];
+      return Array.isArray(children) && children.length > 0 ? [resolveTrackBy(trackBy, row, index)] : [];
+    })));
+  }, [expandedRows, rawRows, trackBy, treeChildrenField, treeExpandedByDefault]);
   const [internalDetailPaneRow, setInternalDetailPaneRow] = useState<T | null>(null);
   const activeDetailPaneRow = detailPaneRow !== undefined ? detailPaneRow : internalDetailPaneRow;
   const setActiveDetailPaneRow = useCallback(
     (next: T | null) => {
+      if (activeDetailPaneRow && activeDetailPaneRow !== next) onDetailClose?.(activeDetailPaneRow);
+      if (next && activeDetailPaneRow !== next) onDetailOpen?.(next);
       setInternalDetailPaneRow(next);
       onDetailPaneRowChange?.(next);
     },
-    [onDetailPaneRowChange],
+    [activeDetailPaneRow, onDetailClose, onDetailOpen, onDetailPaneRowChange],
   );
 
   const updateExpandedRowDetails = useCallback(
@@ -1167,6 +1346,10 @@ function DatagridInner<T extends object = Record<string, unknown>>(
   const [newRowEditing, setNewRowEditing] = useState(false);
   const [cellDraftValue, setCellDraftValue] = useState<unknown>(undefined);
   const [cellValidationErrors, setCellValidationErrors] = useState<readonly DatagridValidationError[]>([]);
+  const [dirtyCells, setDirtyCells] = useState<ReadonlySet<string>>(new Set());
+  const [editHistory, setEditHistory] = useState<readonly DatagridCellEditCommit<T>[]>([]);
+  const [editHistoryIndex, setEditHistoryIndex] = useState(0);
+  const lastEditedCellRef = useRef<{ row: T; rowIndex: number; column: DatagridColumn<T> } | null>(null);
 
   // Drag states
   const [draggedColumnKey, setDraggedColumnKey] = useState<string | null>(null);
@@ -1210,16 +1393,50 @@ function DatagridInner<T extends object = Record<string, unknown>>(
 
   const gridContainerRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
+  const dataSourceRequestRef = useRef(0);
   const [pinnedColumnOffsets, setPinnedColumnOffsets] = useState<ReadonlyMap<string, DatagridPinnedColumnOffset>>(new Map());
 
   const effectiveSelectionMode: DatagridSelectionMode =
     selectionMode === 'none' && dataContextAdapter?.synchronizeSelection ? 'single' : selectionMode;
+  const showSelectionColumn = effectiveSelectionMode !== 'none' && !hideSelectionColumn;
   const effectiveVirtualRowHeight = Math.max(1, rowHeight ?? virtualRowHeight);
-  const virtualizationEnabled = virtualScroll && activeGroupBy.length === 0 && !isPaginated;
+  const virtualizationEnabled = virtualScroll && !autoRowHeight && activeGroupBy.length === 0 && !isPaginated;
+
+  useEffect(() => {
+    if (!dataSource) return;
+    const requestId = ++dataSourceRequestRef.current;
+    const windowStart = virtualDataSourceWindow
+      ? Math.max(0, Math.floor(virtualScrollTop / effectiveVirtualRowHeight) - virtualOverscan)
+      : 0;
+    setDataSourceLoading(true);
+    void dataSource.read({
+      pageNumber: activePage,
+      pageSize: virtualDataSourceWindow
+        ? Math.max(activePageSize, Math.ceil(virtualViewportHeight / effectiveVirtualRowHeight) + virtualOverscan * 2)
+        : activePageSize,
+      searchTerm: activeSearchQuery || undefined,
+      sortBy: activeSorts.length > 0
+        ? activeSorts.map((sort) => `${sort.key}:${sort.direction}`).join(',')
+        : undefined,
+      custom: virtualDataSourceWindow ? { start: windowStart, count: activePageSize } : undefined,
+    }).then((response) => {
+      if (requestId !== dataSourceRequestRef.current) return;
+      setDataSourceRows(response.data);
+      setDataSourceTotal(response.totalRecords);
+      setAppendedRows([]);
+    }).catch(() => {
+      if (requestId === dataSourceRequestRef.current) {
+        setDataSourceRows([]);
+        setDataSourceTotal(0);
+      }
+    }).finally(() => {
+      if (requestId === dataSourceRequestRef.current) setDataSourceLoading(false);
+    });
+  }, [activePage, activePageSize, activeSearchQuery, activeSorts, dataSource, effectiveVirtualRowHeight, virtualDataSourceWindow, virtualOverscan, virtualScrollTop, virtualViewportHeight]);
 
   useEffect(() => {
     const viewport = viewportRef.current;
-    if (!viewport || (!virtualScroll && !columnVirtualization)) {
+    if (!viewport || (!virtualScroll && !columnVirtualization && !infiniteScroll)) {
       return;
     }
 
@@ -1230,6 +1447,17 @@ function DatagridInner<T extends object = Record<string, unknown>>(
     const handleScroll = () => {
       setVirtualScrollTop(viewport.scrollTop);
       setHorizontalScrollLeft(viewport.scrollLeft);
+      if (
+        infiniteScroll &&
+        onLoadMore &&
+        !loadMorePending &&
+        viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight <= infiniteScrollThreshold
+      ) {
+        setLoadMorePending(true);
+        void onLoadMore(rawRows.length).then((more) => {
+          if (more?.length) setAppendedRows((current) => [...current, ...more]);
+        }).finally(() => setLoadMorePending(false));
+      }
     };
     updateViewportHeight();
     viewport.addEventListener('scroll', handleScroll, { passive: true });
@@ -1241,7 +1469,7 @@ function DatagridInner<T extends object = Record<string, unknown>>(
       viewport.removeEventListener('scroll', handleScroll);
       observer?.disconnect();
     };
-  }, [columnVirtualization, virtualScroll, virtualScrollHeight]);
+  }, [columnVirtualization, infiniteScroll, infiniteScrollThreshold, loadMorePending, onLoadMore, rawRows.length, virtualScroll, virtualScrollHeight]);
 
   // Column order & pinned setup
   const orderedColumns = useMemo(() => {
@@ -1453,7 +1681,9 @@ function DatagridInner<T extends object = Record<string, unknown>>(
   }, [activeGroupBy, sortedRows, groupedHierarchy]);
 
   // Paged rows
-  const totalRowsCount = virtualPaging
+  const totalRowsCount = dataSource && dataSourceTotal > 0
+    ? dataSourceTotal
+    : virtualPaging
     ? virtualTotalRows ?? (Math.max(0, activePage - 1) * activePageSize + sortedRows.length)
     : sortedRows.length;
   const totalPages = virtualPaging
@@ -1516,7 +1746,7 @@ function DatagridInner<T extends object = Record<string, unknown>>(
     if (rowDetail) parts.push('40px');
     if (hasLeadingRowActions) parts.push(`${Math.max(32, leadingRowActionsWidth)}px`);
     if (isRowReorder) parts.push('32px');
-    if (effectiveSelectionMode !== 'none') parts.push('40px');
+    if (showSelectionColumn) parts.push('40px');
     if (showRowNumbers) parts.push(`${DEFAULT_ROW_NUMBER_WIDTH}px`);
 
     if (columnVirtualization && columnVirtualLayout.beforeWidth > 0) {
@@ -1570,7 +1800,7 @@ function DatagridInner<T extends object = Record<string, unknown>>(
     hasLeadingRowActions,
     leadingRowActionsWidth,
     isRowReorder,
-    effectiveSelectionMode,
+    showSelectionColumn,
     autoColumnWidth,
     defaultColumnWidth,
     showRowNumbers,
@@ -1616,7 +1846,7 @@ function DatagridInner<T extends object = Record<string, unknown>>(
         (rowDetail ? 40 : 0) +
         (hasLeadingRowActions ? Math.max(32, leadingRowActionsWidth) : 0) +
         (isRowReorder ? 32 : 0) +
-        (effectiveSelectionMode !== 'none' ? 40 : 0) +
+        (showSelectionColumn ? 40 : 0) +
         (showRowNumbers ? DEFAULT_ROW_NUMBER_WIDTH : 0);
 
       for (const column of visibleColumns) {
@@ -1665,7 +1895,7 @@ function DatagridInner<T extends object = Record<string, unknown>>(
     columnPinsProp,
     columnWidths,
     defaultColumnWidth,
-    effectiveSelectionMode,
+    showSelectionColumn,
     hasLeadingRowActions,
     hasPinnedColumns,
     isRowReorder,
@@ -1687,7 +1917,7 @@ function DatagridInner<T extends object = Record<string, unknown>>(
     (rowDetail ? 1 : 0) +
     (hasLeadingRowActions ? 1 : 0) +
     (isRowReorder ? 1 : 0) +
-    (effectiveSelectionMode !== 'none' ? 1 : 0) +
+    (showSelectionColumn ? 1 : 0) +
     (showRowNumbers ? 1 : 0);
   const ariaColumnCount = ariaColumnOffset + visibleColumns.length + (showRowEditActions ? 1 : 0);
 
@@ -1758,6 +1988,33 @@ function DatagridInner<T extends object = Record<string, unknown>>(
     },
     [effectiveSelectionMode, activeSelection, onSelectionChange, onSelectedRowsChange, dataContextAdapter],
   );
+
+  const handleRowSelection = useCallback((row: T, rowIndex: number, event: ReactMouseEvent<HTMLDivElement>) => {
+    if (!rowSelection || effectiveSelectionMode === 'none') return;
+    let next: readonly T[];
+    if (effectiveSelectionMode === 'single') {
+      next = [row];
+    } else if (event.shiftKey && lastSelectedIndexRef.current !== null) {
+      const start = Math.min(lastSelectedIndexRef.current, rowIndex);
+      const end = Math.max(lastSelectedIndexRef.current, rowIndex);
+      const range = sortedRows.slice(start, end + 1);
+      next = appendSelection || event.ctrlKey || event.metaKey
+        ? [...activeSelection, ...range.filter((candidate) => !activeSelection.includes(candidate))]
+        : range;
+    } else if (event.ctrlKey || event.metaKey) {
+      next = activeSelection.includes(row)
+        ? activeSelection.filter((candidate) => candidate !== row)
+        : [...activeSelection, row];
+    } else if (appendSelection) {
+      next = activeSelection.includes(row) ? activeSelection : [...activeSelection, row];
+    } else {
+      next = [row];
+    }
+    lastSelectedIndexRef.current = rowIndex;
+    setInternalSelection(next);
+    onSelectionChange?.({ selectedRows: next, changedRow: row, selected: next.includes(row) });
+    onSelectedRowsChange?.(next);
+  }, [activeSelection, appendSelection, effectiveSelectionMode, onSelectedRowsChange, onSelectionChange, rowSelection, sortedRows]);
 
   const handleToggleGroupSelection = useCallback(
     (rows: readonly T[]) => {
@@ -1846,21 +2103,39 @@ function DatagridInner<T extends object = Record<string, unknown>>(
         if (preventInvalidCommit) return false;
       }
 
-      onCellEditCommit?.({
+      const commitEvent: DatagridCellEditCommit<T> = {
         row,
         rowIndex,
         column,
         key: column.key,
         previousValue: getCellValue(row, column),
         value,
-      });
-      dataContextAdapter?.patch(row, { [column.key]: value });
-      setEditingCell(null);
-      setCellDraftValue(undefined);
-      setCellValidationErrors([]);
+      };
+      const applyCommit = () => {
+        dataContextAdapter?.patch(row, { [column.key]: value });
+        lastEditedCellRef.current = { row, rowIndex, column };
+        setDirtyCells((current) => new Set(current).add(`${String(resolveTrackBy(trackBy, row, rowIndex))}:${column.key}`));
+        if (undoStackSize > 0) {
+          setEditHistory((current) => {
+            const next = [...current.slice(0, editHistoryIndex), commitEvent].slice(-undoStackSize);
+            setEditHistoryIndex(next.length);
+            return next;
+          });
+        }
+        setEditingCell(null);
+        setCellDraftValue(undefined);
+        setCellValidationErrors([]);
+      };
+      const decision = onCellEditCommit?.(commitEvent);
+      if (manualCommit && decision instanceof Promise) {
+        void decision.then((accepted) => { if (accepted === true) applyCommit(); });
+        return true;
+      }
+      if (manualCommit && decision !== true) return false;
+      applyCommit();
       return true;
     },
-    [dataContextAdapter, onCellEditCommit, onCellValidationFailed, onValidationError, preventInvalidCommit],
+    [dataContextAdapter, editHistoryIndex, manualCommit, onCellEditCommit, onCellValidationFailed, onValidationError, preventInvalidCommit, trackBy, undoStackSize],
   );
 
   const startRowEdit = useCallback(
@@ -2178,6 +2453,26 @@ function DatagridInner<T extends object = Record<string, unknown>>(
           setRowDrafts(new Map());
         }
       },
+      undo() {
+        const event = editHistory[editHistoryIndex - 1];
+        if (!event) return;
+        dataContextAdapter?.patch(event.row, { [event.key]: event.previousValue });
+        setEditHistoryIndex((index) => Math.max(0, index - 1));
+      },
+      redo() {
+        const event = editHistory[editHistoryIndex];
+        if (!event) return;
+        dataContextAdapter?.patch(event.row, { [event.key]: event.value });
+        setEditHistoryIndex((index) => Math.min(editHistory.length, index + 1));
+      },
+      fillDown() {
+        const source = lastEditedCellRef.current;
+        if (!source) return;
+        const value = getCellValue(source.row, source.column);
+        activeSelection.forEach((row) => {
+          if (row !== source.row) dataContextAdapter?.patch(row, { [source.column.key]: value });
+        });
+      },
     }),
     [
       visibleColumns,
@@ -2215,6 +2510,9 @@ function DatagridInner<T extends object = Record<string, unknown>>(
       commitCellDraft,
       commitRowDraft,
       saveDataContextChanges,
+      editHistory,
+      editHistoryIndex,
+      activeSelection,
       activeSelection,
       expandedRowDetails,
       updateExpandedRowDetails,
@@ -2237,8 +2535,51 @@ function DatagridInner<T extends object = Record<string, unknown>>(
     return () => document.removeEventListener('pointerdown', handleClickOutside);
   }, []);
 
+  const undoEdit = useCallback(() => {
+    if (editHistoryIndex <= 0) return;
+    const event = editHistory[editHistoryIndex - 1];
+    if (!event) return;
+    dataContextAdapter?.patch(event.row, { [event.key]: event.previousValue });
+    setEditHistoryIndex((index) => Math.max(0, index - 1));
+  }, [dataContextAdapter, editHistory, editHistoryIndex]);
+
+  const redoEdit = useCallback(() => {
+    const event = editHistory[editHistoryIndex];
+    if (!event) return;
+    dataContextAdapter?.patch(event.row, { [event.key]: event.value });
+    setEditHistoryIndex((index) => Math.min(editHistory.length, index + 1));
+  }, [dataContextAdapter, editHistory, editHistoryIndex]);
+
+  const fillDown = useCallback(() => {
+    const source = lastEditedCellRef.current;
+    if (!source || activeSelection.length < 2) return;
+    const value = getCellValue(source.row, source.column);
+    for (const row of activeSelection) {
+      if (row === source.row) continue;
+      dataContextAdapter?.patch(row, { [source.column.key]: value });
+      onCellEditCommit?.({ row, rowIndex: sortedRows.indexOf(row), column: source.column, key: source.column.key, previousValue: getCellValue(row, source.column), value });
+    }
+  }, [activeSelection, dataContextAdapter, onCellEditCommit, sortedRows]);
+
   // Keyboard navigation on grid
   const handleGridKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if ((e.ctrlKey || e.metaKey) && !editingCell && editingRowIndex === null) {
+      if (enableUndoShortcuts && e.key.toLowerCase() === 'z') {
+        e.preventDefault();
+        if (e.shiftKey) redoEdit(); else undoEdit();
+        return;
+      }
+      if (enableUndoShortcuts && e.key.toLowerCase() === 'y') {
+        e.preventDefault();
+        redoEdit();
+        return;
+      }
+      if (enableFillDown && e.key.toLowerCase() === 'd') {
+        e.preventDefault();
+        fillDown();
+        return;
+      }
+    }
     if (e.key === 'ArrowRight' || e.key === 'ArrowLeft' || e.key === 'ArrowDown' || e.key === 'ArrowUp') {
       const focusedCell = document.activeElement?.closest('[role="gridcell"], [role="columnheader"]');
       if (!focusedCell) return;
@@ -2257,6 +2598,19 @@ function DatagridInner<T extends object = Record<string, unknown>>(
       if (currIdx === -1) return;
 
       let nextIdx = currIdx;
+      const focusTarget = (target: HTMLElement) => {
+        target.focus();
+        const rowElement = target.closest<HTMLElement>('[data-row-index]');
+        const rowIndex = Number(rowElement?.dataset.rowIndex);
+        const row = Number.isInteger(rowIndex) ? sortedRows[rowIndex] : undefined;
+        if (row && selectOnNavigate && effectiveSelectionMode === 'single') {
+          setInternalSelection([row]);
+          onSelectionChange?.({ selectedRows: [row], changedRow: row, selected: true });
+          onSelectedRowsChange?.([row]);
+        }
+        const key = target.dataset.spDatagridCell;
+        if (row && key && autoEditOnNavigate && editMode === 'cell') startCellEdit(rowIndex, key, undefined, row);
+      };
       if (e.key === 'ArrowRight') nextIdx = currIdx + 1;
       if (e.key === 'ArrowLeft') nextIdx = currIdx - 1;
       if (e.key === 'ArrowDown') {
@@ -2265,7 +2619,7 @@ function DatagridInner<T extends object = Record<string, unknown>>(
           const rowCells = Array.from(nextRow.querySelectorAll<HTMLElement>('[role="gridcell"]'));
           const colIdx = Array.from(focusedCell.parentElement?.children ?? []).indexOf(focusedCell);
           if (rowCells[colIdx]) {
-            rowCells[colIdx].focus();
+            focusTarget(rowCells[colIdx]);
             e.preventDefault();
             return;
           }
@@ -2279,7 +2633,7 @@ function DatagridInner<T extends object = Record<string, unknown>>(
           );
           const colIdx = Array.from(focusedCell.parentElement?.children ?? []).indexOf(focusedCell);
           if (rowCells[colIdx]) {
-            rowCells[colIdx].focus();
+            focusTarget(rowCells[colIdx]);
             e.preventDefault();
             return;
           }
@@ -2287,7 +2641,7 @@ function DatagridInner<T extends object = Record<string, unknown>>(
       }
 
       if (nextIdx >= 0 && nextIdx < cells.length) {
-        cells[nextIdx].focus();
+        focusTarget(cells[nextIdx]);
         e.preventDefault();
       }
     }
@@ -2296,12 +2650,24 @@ function DatagridInner<T extends object = Record<string, unknown>>(
   // Host CSS classes
   const hostClasses = [
     'sp-datagrid',
+    ...surfaceChromeClasses({ chrome, radius, border }),
+    `sp-datagrid--density-${density}`,
+    `sp-datagrid--header-${headerTextCase}`,
+    autoRowHeight ? 'sp-datagrid--auto-row-height' : '',
+    borderless ? 'sp-datagrid--borderless' : '',
+    rowHover ? '' : 'sp-datagrid--no-row-hover',
+    hideFocusRing ? 'sp-datagrid--hide-focus-ring' : '',
+    pinControlColumns ? 'sp-datagrid--pin-control-columns' : '',
+    pinSelectionColumns ? 'sp-datagrid--pin-selection-columns' : '',
+    effectiveResizeMode === 'deferred' ? 'sp-datagrid--resize-deferred' : '',
+    effectiveReorderMode === 'live' ? 'sp-datagrid--reorder-live' : '',
+    allowNewRow && newRowPosition === 'top' ? 'sp-datagrid--new-row-top' : '',
     autoHeight
       ? 'sp-datagrid-host--auto-height sp-datagrid--auto-height'
       : 'sp-datagrid-host--fixed-height sp-datagrid--fixed-height',
-    loading ? 'sp-datagrid-host--loading' : '',
-    fitColumnsToWidth ? 'sp-datagrid--fit-columns-to-width' : '',
-    !showVerticalLines ? 'sp-datagrid--without-vertical-lines' : '',
+    effectiveLoading ? 'sp-datagrid-host--loading' : '',
+    effectiveFitColumnsToWidth ? 'sp-datagrid--fit-columns-to-width' : '',
+    !effectiveShowColumnLines ? 'sp-datagrid--without-vertical-lines' : '',
     hasPinnedColumns ? 'sp-datagrid--has-pinned-columns' : '',
     sortIndicatorVisibility === 'always' ? 'sp-datagrid--sort-indicators-always' : '',
     filterIndicatorVisibility === 'always' ? 'sp-datagrid--filter-indicators-always' : '',
@@ -2323,6 +2689,10 @@ function DatagridInner<T extends object = Record<string, unknown>>(
       '--sp-datagrid-detail-pane-width': `${Math.max(240, detailPaneWidth)}px`,
       '--sp-datagrid-row-detail-height': `${Math.max(rowDetailHeight, effectiveVirtualRowHeight)}px`,
       '--sp-datagrid-column-virtualization-overscan': `${Math.max(0, columnVirtualizationOverscan)}px`,
+      '--sp-datagrid-detail-control-width': rowDetail ? '40px' : '0px',
+      '--sp-datagrid-leading-control-width': hasLeadingRowActions ? `${leadingRowActionsWidth}px` : '0px',
+      '--sp-datagrid-drag-control-width': isRowReorder ? '36px' : '0px',
+      '--sp-datagrid-selection-control-width': showSelectionColumn ? '40px' : '0px',
     } as CSSProperties),
     ...(headerHeight ? ({ '--sp-datagrid-header-height': `${headerHeight}px` } as CSSProperties) : {}),
     ...style,
@@ -2689,6 +3059,11 @@ function DatagridInner<T extends object = Record<string, unknown>>(
 
       {/* Grid Viewport */}
       <div className="sp-datagrid__body">
+        {filterPanel?.position === 'left' && (
+          <aside className={`sp-datagrid__filter-expression-panel${filterPanel.pinned === false ? ' sp-datagrid__filter-expression-panel--floating' : ''}`} style={{ width: filterPanel.width ?? 320, minWidth: filterPanel.minWidth ?? 240, maxWidth: filterPanel.maxWidth ?? 600 }} aria-label={t('filter')}>
+            <FilterExpression fields={[...filterPanel.fields]} expression={filterPanel.expression} chrome="flush" border="none" onChange={onFilterExpressionChange ?? (() => undefined)} />
+          </aside>
+        )}
         <div ref={viewportRef} className="sp-datagrid__viewport">
           <div
             className="sp-datagrid__grid sp-datagrid-matrix"
@@ -2696,7 +3071,7 @@ function DatagridInner<T extends object = Record<string, unknown>>(
             role="grid"
             aria-label={ariaLabel}
             aria-labelledby={ariaLabelledBy}
-            aria-busy={loading || virtualPagingLoading ? true : undefined}
+            aria-busy={effectiveLoading || virtualPagingLoading ? true : undefined}
             aria-rowcount={totalRowsCount}
             aria-colcount={ariaColumnCount}
             aria-multiselectable={effectiveSelectionMode === 'multiple' ? true : undefined}
@@ -2709,7 +3084,7 @@ function DatagridInner<T extends object = Record<string, unknown>>(
                 {rowDetail && <div className="sp-datagrid__column-group-cell sp-datagrid__column-group-cell--empty" />}
                 {hasLeadingRowActions && <div className="sp-datagrid__column-group-cell sp-datagrid__column-group-cell--empty" />}
                 {isRowReorder && <div className="sp-datagrid__column-group-cell sp-datagrid__column-group-cell--empty" />}
-                {effectiveSelectionMode !== 'none' && <div className="sp-datagrid__column-group-cell sp-datagrid__column-group-cell--empty" />}
+                {showSelectionColumn && <div className="sp-datagrid__column-group-cell sp-datagrid__column-group-cell--empty" />}
                 {showRowNumbers && <div className="sp-datagrid__column-group-cell sp-datagrid__column-group-cell--empty" />}
 
                 {orderedColumnGroups.map((cg) => {
@@ -2815,7 +3190,7 @@ function DatagridInner<T extends object = Record<string, unknown>>(
                   <span className="sp-datagrid__visually-hidden">Row Reorder</span>
                 </div>
               )}
-              {effectiveSelectionMode !== 'none' && (
+              {showSelectionColumn && (
                 <div className="sp-datagrid__header-cell sp-datagrid__selection-cell" role="columnheader" aria-label={`${t('selectAllRowsOnPage')}`}>
                   {effectiveSelectionMode === 'multiple' && (
                     <Checkbox
@@ -2902,6 +3277,14 @@ function DatagridInner<T extends object = Record<string, unknown>>(
                           key: col.key,
                           position: e.clientX < midX ? 'before' : 'after',
                         });
+                        if (effectiveReorderMode === 'live') {
+                          const nextOrder = activeColumnOrder.filter((key) => key !== draggedColumnKey);
+                          let targetIndex = nextOrder.indexOf(col.key);
+                          if (e.clientX >= midX) targetIndex += 1;
+                          nextOrder.splice(Math.max(0, targetIndex), 0, draggedColumnKey);
+                          setInternalColumnOrder(nextOrder);
+                          onColumnOrderChange?.(nextOrder);
+                        }
                       }
                     }}
                     onDrop={(e) => {
@@ -2973,7 +3356,7 @@ function DatagridInner<T extends object = Record<string, unknown>>(
                     )}
 
                     {/* Column Menu */}
-                    {(columnMenu || col.menuItems) && (
+                    {(effectiveColumnMenu || col.menuItems) && (
                       <div className="sp-datagrid__column-menu">
                         <Dropdown
                           trigger={(
@@ -3007,6 +3390,7 @@ function DatagridInner<T extends object = Record<string, unknown>>(
                             typeof columnWidths.get(col.key) === 'number'
                               ? (columnWidths.get(col.key) as number)
                               : e.currentTarget.parentElement?.getBoundingClientRect().width ?? 120;
+                          let deferredWidth = initialWidth;
 
                           const handleMouseMove = (moveEvent: MouseEvent) => {
                             const diff = moveEvent.clientX - startX;
@@ -3014,11 +3398,18 @@ function DatagridInner<T extends object = Record<string, unknown>>(
                               col.maxWidth ?? Number.POSITIVE_INFINITY,
                               Math.max(col.minWidth ?? DEFAULT_MIN_COLUMN_WIDTH, initialWidth + diff),
                             );
-                            setColumnWidths((prev) => new Map(prev).set(col.key, newW));
-                            onColumnResize?.({ key: col.key, width: newW });
+                            deferredWidth = newW;
+                            if (effectiveResizeMode === 'live') {
+                              setColumnWidths((prev) => new Map(prev).set(col.key, newW));
+                              onColumnResize?.({ key: col.key, width: newW });
+                            }
                           };
 
                           const handleMouseUp = () => {
+                            if (effectiveResizeMode === 'deferred') {
+                              setColumnWidths((prev) => new Map(prev).set(col.key, deferredWidth));
+                              onColumnResize?.({ key: col.key, width: deferredWidth });
+                            }
                             window.removeEventListener('mousemove', handleMouseMove);
                             window.removeEventListener('mouseup', handleMouseUp);
                           };
@@ -3073,7 +3464,7 @@ function DatagridInner<T extends object = Record<string, unknown>>(
             </div>
 
             {/* Body Rows */}
-            {displayRows.length === 0 && !loading && (
+            {displayRows.length === 0 && !effectiveLoading && (
               <div className="sp-datagrid__empty-row" role="row">
                 <div className="sp-datagrid__empty-cell" role="gridcell" style={{ gridColumn: '1 / -1' }}>
                   {emptyState ?? (
@@ -3082,8 +3473,13 @@ function DatagridInner<T extends object = Record<string, unknown>>(
                       <div className="sp-datagrid__empty-state-copy">
                         <strong>{resolvedEmptyTitle}</strong>
                         {resolvedEmptyDescription && <p>{resolvedEmptyDescription}</p>}
-                      </div>
-                    </div>
+        </div>
+        {filterPanel && filterPanel.position !== 'left' && (
+          <aside className={`sp-datagrid__filter-expression-panel${filterPanel.pinned === false ? ' sp-datagrid__filter-expression-panel--floating' : ''}`} style={{ width: filterPanel.width ?? 320, minWidth: filterPanel.minWidth ?? 240, maxWidth: filterPanel.maxWidth ?? 600 }} aria-label={t('filter')}>
+            <FilterExpression fields={[...filterPanel.fields]} expression={filterPanel.expression} chrome="flush" border="none" onChange={onFilterExpressionChange ?? (() => undefined)} />
+          </aside>
+        )}
+      </div>
                   )}
                 </div>
               </div>
@@ -3169,6 +3565,13 @@ function DatagridInner<T extends object = Record<string, unknown>>(
               const isRowDetailOpen = expandedRowDetails.has(rowId);
               const isEditingThisRow = editingRowIndex === rowIndex;
               const canEditRow = isRowEditable ? isRowEditable(row) : true;
+              const isDirtyRow = visibleColumns.some((column) => dirtyCells.has(`${String(rowId)}:${column.key}`));
+              const treeChildren = treeChildrenField ? (row as Record<string, unknown>)[String(treeChildrenField)] : undefined;
+              const canExpandRow = rowDetailExpandable
+                ? rowDetailExpandable(row, rowIndex)
+                : treeChildrenField
+                  ? Array.isArray(treeChildren) && treeChildren.length > 0
+                  : true;
 
               // DataContext row markers
               const rowState = dataContextAdapter?.recordState(row);
@@ -3193,6 +3596,7 @@ function DatagridInner<T extends object = Record<string, unknown>>(
                 stripedRows && rowIndex % 2 === 1 ? 'sp-datagrid__body-row--striped' : '',
                 isSelected ? 'sp-datagrid__body-row--selected' : '',
                 isEditingThisRow ? 'sp-datagrid__body-row--editing' : '',
+                showDirtyIndicator && isDirtyRow ? 'sp-datagrid__body-row--modified' : '',
                 rowReorderingEnabled && (!rowReorderable || rowReorderable(row)) ? 'sp-datagrid__body-row--reorderable' : '',
                 draggedRowIndex === rowIndex ? 'sp-datagrid__body-row--dragging' : '',
                 rowDropTarget?.index === rowIndex && rowDropTarget.position === 'before' ? 'sp-datagrid__body-row--drop-before' : '',
@@ -3235,6 +3639,13 @@ function DatagridInner<T extends object = Record<string, unknown>>(
                         : String((row as Record<string, unknown>)[String(rowLabel)] ?? '')
                       : `Row ${rowIndex + 1}`}
                     style={customRowStyle}
+                    data-row-index={rowIndex}
+                    onClick={(event) => {
+                      onRowClick?.({ row, rowIndex, nativeEvent: event });
+                      const target = event.target as HTMLElement;
+                      if (!target.closest('button, input, select, textarea, a')) handleRowSelection(row, rowIndex, event);
+                    }}
+                    onDoubleClick={(event) => onRowDoubleClick?.({ row, rowIndex, nativeEvent: event })}
                     draggable={rowReorderingEnabled && (!rowReorderable || rowReorderable(row))}
                     onDragStart={() => setDraggedRowIndex(rowIndex)}
                     onDragEnd={() => {
@@ -3274,7 +3685,7 @@ function DatagridInner<T extends object = Record<string, unknown>>(
                     {/* Row Detail Toggle */}
                     {rowDetail && (
                       <div className="sp-datagrid__cell sp-datagrid__row-detail-toggle-cell" role="gridcell">
-                        {(!rowDetailExpandable || rowDetailExpandable(row, rowIndex)) && (
+                        {canExpandRow && (
                           <button
                             type="button"
                             className="sp-datagrid__row-detail-toggle"
@@ -3283,8 +3694,13 @@ function DatagridInner<T extends object = Record<string, unknown>>(
                             onClick={() => {
                               {
                                 const next = new Set(expandedRowDetails);
-                                if (next.has(rowId)) next.delete(rowId);
-                                else next.add(rowId);
+                                if (next.has(rowId)) {
+                                  next.delete(rowId);
+                                  onDetailClose?.(row);
+                                } else {
+                                  next.add(rowId);
+                                  onDetailOpen?.(row);
+                                }
                                 updateExpandedRowDetails(next);
                               }
                             }}
@@ -3336,9 +3752,9 @@ function DatagridInner<T extends object = Record<string, unknown>>(
                     )}
 
                     {/* Row Selection Cell */}
-                    {effectiveSelectionMode !== 'none' && (
+                    {showSelectionColumn && (
                       <div className="sp-datagrid__cell sp-datagrid__selection-cell" role="gridcell">
-                        {effectiveSelectionMode === 'single' ? (
+                        {effectiveSelectionMode === 'single' && selectionControl === 'radio' ? (
                           <label className="sp-datagrid__radio">
                             <input
                               type="radio"
@@ -3389,7 +3805,7 @@ function DatagridInner<T extends object = Record<string, unknown>>(
                       }
 
                       const cellVal = getCellValue(row, col);
-                      const formattedVal = formatCellValue(row, rowIndex, col, effectiveLocale);
+                      const formattedVal = formatCellValue(row, rowIndex, col, effectiveLocale, nullText);
                       const isEditingCell =
                         (editMode === 'cell' && editingCell?.rowIndex === rowIndex && editingCell?.key === col.key) ||
                         (editMode === 'row' && isEditingThisRow && canEditRow);
@@ -3443,6 +3859,10 @@ function DatagridInner<T extends object = Record<string, unknown>>(
                         cellState === 'added' && dataContextAdapter?.showCellState() ? 'sp-datagrid__cell--state-added' : '',
                         cellState === 'modified' && dataContextAdapter?.showCellState() ? 'sp-datagrid__cell--state-modified' : '',
                         isCellInvalid && dataContextAdapter?.showCellValidation() ? 'sp-datagrid__cell--validation-error' : '',
+                        showDirtyIndicator && dirtyCells.has(`${String(rowId)}:${col.key}`) ? 'sp-datagrid__cell--modified' : '',
+                        (cellVal === null || cellVal === undefined) ? 'sp-datagrid__cell--null' : '',
+                        normalizeClassName(typeof col.className === 'function' ? col.className({ value: cellVal, row, rowIndex, column: col }) : col.className),
+                        normalizeClassName(cellClassName?.({ value: cellVal, row, rowIndex, column: col })),
                       ]
                         .filter(Boolean)
                         .join(' ');
@@ -3470,13 +3890,16 @@ function DatagridInner<T extends object = Record<string, unknown>>(
                             ...pinnedColumnStyle(col.key, pin),
                             gridColumn: gridColumnFor(col),
                             ...(span > 1 ? { '--sp-datagrid-row-span': span } : {}),
+                            ...(typeof col.style === 'function' ? col.style({ value: cellVal, row, rowIndex, column: col }) ?? {} : col.style ?? {}),
+                            ...(cellStyle?.({ value: cellVal, row, rowIndex, column: col }) ?? {}),
                           } as CSSProperties}
                           onDoubleClick={() => {
                             if (isEditable && !isReadonly && editMode === 'cell') {
                               startCellEdit(rowIndex, col.key, cellVal, row);
                             }
                           }}
-                          onClick={() => {
+                          onClick={(event) => {
+                            onCellClick?.({ row, rowIndex, column: col, value: cellVal, nativeEvent: event });
                             if (isEditable && !isReadonly && editMode === 'cell' && editOnClick) {
                               startCellEdit(rowIndex, col.key, cellVal, row);
                             }
@@ -3748,7 +4171,7 @@ function DatagridInner<T extends object = Record<string, unknown>>(
                 {rowDetail && <div className="sp-datagrid__cell sp-datagrid__row-detail-toggle-cell" role="gridcell" />}
                 {hasLeadingRowActions && <div className="sp-datagrid__cell sp-datagrid__leading-row-actions-cell" role="gridcell" />}
                 {isRowReorder && <div className="sp-datagrid__cell sp-datagrid__row-drag-cell" role="gridcell" />}
-                {effectiveSelectionMode !== 'none' && <div className="sp-datagrid__cell sp-datagrid__selection-cell" role="gridcell" />}
+                {showSelectionColumn && <div className="sp-datagrid__cell sp-datagrid__selection-cell" role="gridcell" />}
                 {showRowNumbers && <div className="sp-datagrid__cell sp-datagrid__row-number-cell" role="gridcell" />}
                 {!newRowEditing ? (
                   <div
@@ -3782,14 +4205,14 @@ function DatagridInner<T extends object = Record<string, unknown>>(
                           <Checkbox
                             className="sp-datagrid__editor-control--checkbox"
                             checked={Boolean(value)}
-                            onChange={(checked) => commitNewRowCell(column, checked)}
+                            onChange={(checked) => newRowCommit === 'immediate' ? commitNewRowCell(column, checked) : updateDraft(checked)}
                           />
                         ) : editorType === 'select' || editorType === 'combobox' || editorType === 'grid-combobox' ? (
                           <select
                             className="sp-datagrid__editor"
                             value={String(value ?? '')}
                             autoFocus={column.key === visibleColumns.find((candidate) => candidate.editable === true)?.key}
-                            onChange={(event) => commitNewRowCell(column, event.target.value)}
+                            onChange={(event) => newRowCommit === 'immediate' ? commitNewRowCell(column, event.target.value) : updateDraft(event.target.value)}
                           >
                             {column.editorOptions?.placeholder && <option value="">{column.editorOptions.placeholder}</option>}
                             {options.map((option) => <option key={String(option.value)} value={String(option.value)} disabled={option.disabled}>{option.label}</option>)}
@@ -3808,7 +4231,11 @@ function DatagridInner<T extends object = Record<string, unknown>>(
                                 setNewRowEditing(false);
                               }
                             }}
-                            onBlur={(event) => commitNewRowCell(column, event.currentTarget.value)}
+                            onBlur={(event) => {
+                              if (newRowCommit === 'immediate' || !event.currentTarget.closest('.sp-datagrid__body-row--new')?.contains(event.relatedTarget)) {
+                                commitNewRowCell(column, event.currentTarget.value);
+                              }
+                            }}
                           />
                         )}
                       </div>
@@ -3825,7 +4252,7 @@ function DatagridInner<T extends object = Record<string, unknown>>(
                 {rowDetail && <div className="sp-datagrid__footer-cell" />}
                 {hasLeadingRowActions && <div className="sp-datagrid__footer-cell" />}
                 {isRowReorder && <div className="sp-datagrid__footer-cell" />}
-                {effectiveSelectionMode !== 'none' && <div className="sp-datagrid__footer-cell" />}
+                {showSelectionColumn && <div className="sp-datagrid__footer-cell" />}
                 {showRowNumbers && <div className="sp-datagrid__footer-cell" />}
 
                 {columnVirtualization && columnVirtualLayout.beforeWidth > 0 && (
@@ -4159,12 +4586,22 @@ function DatagridInner<T extends object = Record<string, unknown>>(
       )}
 
       {/* Loading Overlay */}
-      {loading && (
+      {effectiveLoading && (
         <div className="sp-datagrid__loading-overlay">
-          <div className="sp-datagrid__loading-spinner-wrap">
-            <Icon name="refresh-cw" size={24} className="sp-datagrid__loading-spinner" />
-            <span className="sp-datagrid__loading-message">{resolvedLoadingMessage}</span>
-          </div>
+          {loadingMode === 'skeleton' ? (
+            <div className="sp-datagrid__skeleton" role="status" aria-label={resolvedLoadingMessage}>
+              {Array.from({ length: Math.max(1, skeletonRowCount) }, (_, index) => (
+                <div key={index} className="sp-datagrid__skeleton-row">
+                  {renderedColumns.map((column) => <span key={column.key} className="sp-datagrid__skeleton-cell" />)}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="sp-datagrid__loading-spinner-wrap">
+              <Icon name="refresh-cw" size={24} className="sp-datagrid__loading-spinner" />
+              <span className="sp-datagrid__loading-message">{resolvedLoadingMessage}</span>
+            </div>
+          )}
         </div>
       )}
 

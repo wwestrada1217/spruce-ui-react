@@ -30,6 +30,142 @@
   overflow: clip;
 }
 
+.sp-datagrid--density-dense {
+  --sp-datagrid-row-height: 28px;
+  --sp-datagrid-header-height: 32px;
+  --sp-datagrid-cell-padding-inline: var(--sp-space-2, 8px);
+}
+
+.sp-datagrid--density-comfortable {
+  --sp-datagrid-row-height: 40px;
+  --sp-datagrid-header-height: 44px;
+  --sp-datagrid-cell-padding-inline: var(--sp-space-4, 16px);
+}
+
+.sp-datagrid--header-default .sp-datagrid__header-cell,
+.sp-datagrid--header-default .sp-datagrid__column-group-cell {
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.sp-datagrid--borderless {
+  border-color: transparent;
+}
+
+.sp-datagrid--borderless :is(.sp-datagrid__row, .sp-datagrid__cell, .sp-datagrid__header-cell, .sp-datagrid__footer-cell) {
+  border-color: transparent;
+}
+
+.sp-datagrid--auto-row-height .sp-datagrid__body-row {
+  min-block-size: var(--sp-datagrid-row-height);
+  block-size: auto;
+}
+
+.sp-datagrid--auto-row-height .sp-datagrid__cell {
+  white-space: normal;
+}
+
+.sp-datagrid--no-row-hover .sp-datagrid__body-row:hover {
+  background: inherit;
+}
+
+.sp-datagrid--hide-focus-ring :is(.sp-datagrid__cell, .sp-datagrid__header-cell):focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.sp-datagrid__cell--null {
+  color: var(--sp-text-subtle);
+  font-style: italic;
+}
+
+.sp-datagrid__body-row--modified,
+.sp-datagrid__cell--modified {
+  background-image: linear-gradient(var(--sp-warning-tint), var(--sp-warning-tint));
+}
+
+.sp-datagrid--new-row-top .sp-datagrid__column-group-row { order: -3; }
+.sp-datagrid--new-row-top .sp-datagrid__header-row { order: -2; }
+.sp-datagrid--new-row-top .sp-datagrid__body-row--new { order: -1; }
+
+.sp-datagrid--pin-selection-columns .sp-datagrid__selection-cell,
+.sp-datagrid--pin-control-columns .sp-datagrid__selection-cell {
+  position: sticky;
+  z-index: 4;
+  inset-inline-start: calc(var(--sp-datagrid-detail-control-width) + var(--sp-datagrid-leading-control-width) + var(--sp-datagrid-drag-control-width));
+  background: inherit;
+}
+
+.sp-datagrid--pin-selection-columns .sp-datagrid__row-number-cell,
+.sp-datagrid--pin-control-columns .sp-datagrid__row-number-cell {
+  position: sticky;
+  z-index: 4;
+  inset-inline-start: calc(var(--sp-datagrid-detail-control-width) + var(--sp-datagrid-leading-control-width) + var(--sp-datagrid-drag-control-width) + var(--sp-datagrid-selection-control-width));
+  background: inherit;
+}
+
+.sp-datagrid--pin-control-columns .sp-datagrid__row-detail-toggle-cell {
+  position: sticky;
+  z-index: 4;
+  inset-inline-start: 0;
+  background: inherit;
+}
+
+.sp-datagrid--pin-control-columns .sp-datagrid__leading-row-actions-cell {
+  position: sticky;
+  z-index: 4;
+  inset-inline-start: var(--sp-datagrid-detail-control-width);
+  background: inherit;
+}
+
+.sp-datagrid--pin-control-columns .sp-datagrid__row-drag-cell {
+  position: sticky;
+  z-index: 4;
+  inset-inline-start: calc(var(--sp-datagrid-detail-control-width) + var(--sp-datagrid-leading-control-width));
+  background: inherit;
+}
+
+.sp-datagrid__filter-expression-panel {
+  flex: 0 0 auto;
+  overflow: auto;
+  border-inline-start: var(--sp-border-width-hairline, 1px) solid var(--sp-datagrid-border-color);
+  background: var(--sp-surface-0);
+  resize: horizontal;
+}
+
+.sp-datagrid__filter-expression-panel--floating {
+  position: absolute;
+  z-index: 8;
+  inset-block: 0;
+  inset-inline-end: 0;
+  box-shadow: var(--sp-shadow-lg);
+}
+
+.sp-datagrid__skeleton {
+  inline-size: 100%;
+  padding: var(--sp-space-3, 12px);
+}
+
+.sp-datagrid__skeleton-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: var(--sp-space-3, 12px);
+  min-block-size: var(--sp-datagrid-row-height);
+  align-items: center;
+}
+
+.sp-datagrid__skeleton-cell {
+  block-size: var(--sp-space-3, 12px);
+  border-radius: var(--sp-radius-sm);
+  background: var(--sp-surface-200);
+  animation: sp-datagrid-skeleton 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes sp-datagrid-skeleton {
+  from { opacity: 0.45; }
+  to { opacity: 0.9; }
+}
+
 .sp-datagrid > :first-child {
   border-start-start-radius: calc(var(--sp-radius-lg, 8px) - var(--sp-border-width-hairline, 1px));
   border-start-end-radius: calc(var(--sp-radius-lg, 8px) - var(--sp-border-width-hairline, 1px));

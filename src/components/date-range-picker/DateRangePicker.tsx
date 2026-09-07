@@ -10,10 +10,13 @@ import { createPortal } from 'react-dom';
 import {
   computePosition,
   getScrollParents,
+  modalBoundary,
   onClickOutside,
+  type Placement,
 } from '../../utils/positioning.js';
 import { Icon } from '../../icons/Icon.js';
 import { useI18n } from '../../i18n/i18n-context.js';
+import { DateControlMessages, useDateControlContract, type DateControlContractProps, type DateControlVariant } from '../date-control/date-control-contract.js';
 import './DateRangePicker.css';
 
 /* ── Types (re-exported from RangeCalendar conventions) ── */
@@ -28,11 +31,12 @@ export interface DateRangePreset {
   range: DateRange;
 }
 
-export interface DateRangePickerProps {
+export interface DateRangePickerProps extends DateControlContractProps {
   value?: DateRange;
   onChange?: (range: DateRange) => void;
   placeholder?: string;
   disabled?: boolean;
+  readOnly?: boolean;
   inputMode?: boolean;
   /** Show dates from the previous and next months in the calendar panels. */
   showOtherMonths?: boolean;
@@ -40,6 +44,11 @@ export interface DateRangePickerProps {
   selectOtherMonths?: boolean;
   months?: number;
   presets?: DateRangePreset[];
+  variant?: DateControlVariant;
+  placement?: Placement;
+  constrainToModal?: boolean;
+  dismissOnClickOutside?: boolean;
+  dismissOnScroll?: boolean;
   className?: string;
 }
 
@@ -158,15 +167,39 @@ export function DateRangePicker({
   value,
   onChange,
   placeholder = 'Select date range',
-  disabled = false,
+  disabled: disabledProp = false,
+  readOnly = false,
+  hidden = false,
+  invalid,
+  error,
+  errors,
+  required = false,
+  touched = false,
+  onTouchedChange,
+  onBlur,
+  label = '',
+  floatingLabel = false,
+  hint,
+  ariaLabel,
+  ariaLabelledBy,
+  ariaDescribedBy,
+  id,
   inputMode = false,
   showOtherMonths = true,
   selectOtherMonths = true,
   months: monthCount = 2,
   presets,
+  variant = 'default',
+  placement = 'bottom-start',
+  constrainToModal = true,
+  dismissOnClickOutside = true,
+  dismissOnScroll = true,
   className = '',
 }: DateRangePickerProps) {
   const { monthNames, monthLabels, dayLabels, t, formatDate, formatDayLabel, leadingBlankDays } = useI18n();
+  const contract = useDateControlContract({ disabled: disabledProp, readOnly, hidden, invalid, error, errors, required, touched, onTouchedChange, onBlur, label, floatingLabel, hint, ariaLabel, ariaLabelledBy, ariaDescribedBy, id, valuePresent: Boolean(value?.start || value?.end) });
+  const disabled = contract.disabled;
+  const normalizedVariant = variant === 'outlined' ? 'outline' : variant;
   const resolvedPlaceholder = placeholder === 'Select date range' ? t('selectRange') : placeholder;
   const today = useMemo(() => todayISO(), []);
   const todayParsed = useMemo(() => parseISO(today), [today]);
@@ -257,10 +290,10 @@ export function DateRangePicker({
     const anchor = anchorRef.current;
     const dropdown = dropdownRef.current;
     if (!anchor || !dropdown) return;
-    const result = computePosition(anchor, dropdown, 'bottom-start', 4);
+    const result = computePosition(anchor, dropdown, placement, 4, constrainToModal ? modalBoundary(anchor) : undefined);
     setPos({ top: result.top, left: result.left });
     setReady(true);
-  }, []);
+  }, [constrainToModal, placement]);
 
   useEffect(() => {
     if (!open) {
@@ -277,27 +310,25 @@ export function DateRangePicker({
     const anchor = anchorRef.current;
     if (!anchor) return;
     const scrollables = getScrollParents(anchor);
-    const onScroll = () => {
-      rafId.current = requestAnimationFrame(reposition);
-    };
+    const onScroll = () => { if (dismissOnScroll) setOpen(false); else rafId.current = requestAnimationFrame(reposition); };
     scrollables.forEach((el) => el.addEventListener('scroll', onScroll, { passive: true }));
     return () => {
       scrollables.forEach((el) => el.removeEventListener('scroll', onScroll));
       cancelAnimationFrame(rafId.current);
     };
-  }, [open, reposition]);
+  }, [dismissOnScroll, open, reposition]);
 
   // Click-outside to close
   useEffect(() => {
-    if (!open) return;
+    if (!open || !dismissOnClickOutside) return;
     const els = [anchorRef.current, dropdownRef.current].filter(Boolean) as HTMLElement[];
     return onClickOutside(els, () => setOpen(false));
-  }, [open]);
+  }, [dismissOnClickOutside, open]);
 
   /* ── Open / Close ── */
 
   const openDropdown = useCallback(() => {
-    if (disabled) return;
+    if (disabled || contract.readOnly) return;
     // Sync local state from controlled value when opening
     setRangeStart(value?.start ?? null);
     setRangeEnd(value?.end ?? null);
@@ -317,7 +348,7 @@ export function DateRangePicker({
     }
 
     setOpen(true);
-  }, [disabled, value, today]);
+  }, [contract.readOnly, disabled, value, today]);
 
   const closeDropdown = useCallback(() => {
     setOpen(false);
@@ -604,11 +635,17 @@ export function DateRangePicker({
 
   const rootClasses = [
     'sp-drp',
+    `sp-date-control--${normalizedVariant}`,
+    contract.floatingLabel && 'sp-date-control--floating',
+    contract.invalid && 'sp-date-control--invalid',
+    contract.readOnly && 'sp-date-control--readonly',
     open && 'sp-drp--open',
     className,
   ]
     .filter(Boolean)
     .join(' ');
+
+  if (contract.hidden) return null;
 
   /* ── Render: Trigger ── */
 
@@ -620,26 +657,39 @@ export function DateRangePicker({
           className={`sp-drp__input-wrap${disabled ? ' sp-drp__input-wrap--disabled' : ''}`}
         >
           <input
+            id={`${contract.id}-start`}
             type="text"
             className="sp-drp__input"
             placeholder={t('dateInput')}
             value={startInputText}
             disabled={disabled}
-            aria-label={t('startDate')}
+            readOnly={contract.readOnly}
+            aria-label={contract.aria['aria-label'] ?? t('startDate')}
+            aria-labelledby={contract.aria['aria-labelledby']}
+            aria-describedby={contract.aria['aria-describedby']}
+            aria-invalid={contract.aria['aria-invalid']}
+            aria-required={contract.aria['aria-required']}
+            aria-readonly={contract.aria['aria-readonly']}
             onChange={(e) => setStartInputText(e.target.value)}
-            onBlur={handleStartInputBlur}
+            onBlur={() => { handleStartInputBlur(); contract.markTouched(); }}
             onFocus={() => { if (!open) openDropdown(); }}
           />
           <span className="sp-drp__input-sep" aria-hidden="true">&ndash;</span>
           <input
+            id={`${contract.id}-end`}
             type="text"
             className="sp-drp__input"
             placeholder={t('dateInput')}
             value={endInputText}
             disabled={disabled}
+            readOnly={contract.readOnly}
             aria-label={t('endDate')}
+            aria-describedby={contract.aria['aria-describedby']}
+            aria-invalid={contract.aria['aria-invalid']}
+            aria-required={contract.aria['aria-required']}
+            aria-readonly={contract.aria['aria-readonly']}
             onChange={(e) => setEndInputText(e.target.value)}
-            onBlur={handleEndInputBlur}
+            onBlur={() => { handleEndInputBlur(); contract.markTouched(); }}
             onFocus={() => { if (!open) openDropdown(); }}
           />
           <button
@@ -657,13 +707,21 @@ export function DateRangePicker({
 
     return (
       <button
+        id={contract.id}
         ref={anchorRef as unknown as React.RefObject<HTMLButtonElement>}
         type="button"
         className="sp-drp__trigger"
         disabled={disabled}
         aria-haspopup="dialog"
         aria-expanded={open}
+        aria-label={contract.aria['aria-label']}
+        aria-labelledby={contract.aria['aria-labelledby'] ?? (contract.label ? `${contract.id}-label` : undefined)}
+        aria-describedby={contract.aria['aria-describedby']}
+        aria-invalid={contract.aria['aria-invalid']}
+        aria-required={contract.aria['aria-required']}
+        aria-readonly={contract.aria['aria-readonly']}
         onClick={toggleDropdown}
+        onBlur={contract.markTouched}
       >
         <Icon name="filter" size={14} />
         <span className={`sp-drp__value${!displayValue ? ' sp-drp__value--placeholder' : ''}`}>
@@ -967,6 +1025,7 @@ export function DateRangePicker({
 
   return (
     <div className={rootClasses}>
+      {contract.label && <label className="sp-date-control__label" id={`${contract.id}-label`} htmlFor={inputMode ? `${contract.id}-start` : contract.id}>{contract.label}{contract.required && <span className="sp-date-control__required" aria-hidden="true">*</span>}</label>}
       {renderTrigger()}
 
       {open &&
@@ -991,6 +1050,7 @@ export function DateRangePicker({
           </div>,
           document.body,
         )}
+      <DateControlMessages errorMessage={contract.errorMessage} hint={contract.hint} errorId={contract.errorId} hintId={contract.hintId} />
     </div>
   );
 }

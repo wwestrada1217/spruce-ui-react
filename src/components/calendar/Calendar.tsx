@@ -9,12 +9,13 @@ import { Fragment, useState, useMemo, useCallback, useRef, useEffect } from 'rea
 import './Calendar.css';
 import { Icon } from '../../icons/Icon.js';
 import { useI18n } from '../../i18n/i18n-context.js';
+import { DateControlMessages, useDateControlContract, type DateControlContractProps } from '../date-control/date-control-contract.js';
 
 /* ── Types ── */
 
 export type DateFilter = (date: string) => boolean;
 
-export interface CalendarProps {
+export interface CalendarProps extends DateControlContractProps {
   value?: string | null;
   onChange?: (date: string | null) => void;
   disabled?: boolean;
@@ -85,7 +86,21 @@ type CalendarCell = CalendarDay | null;
 export function Calendar({
   value,
   onChange,
-  disabled = false,
+  disabled: disabledProp = false,
+  readOnly = false,
+  hidden = false,
+  invalid,
+  error,
+  errors,
+  required = false,
+  touched = false,
+  onTouchedChange,
+  onBlur,
+  hint,
+  ariaLabel,
+  ariaLabelledBy,
+  ariaDescribedBy,
+  id,
   minDate,
   maxDate,
   disabledDates,
@@ -98,6 +113,8 @@ export function Calendar({
   className,
 }: CalendarProps) {
   const { monthNames, monthLabels, dayLabels, t, formatDayLabel, leadingBlankDays } = useI18n();
+  const contract = useDateControlContract({ disabled: disabledProp, readOnly, hidden, invalid, error, errors, required, touched, onTouchedChange, onBlur, hint, ariaLabel, ariaLabelledBy, ariaDescribedBy, id, valuePresent: Boolean(value) });
+  const disabled = contract.disabled || contract.readOnly;
   /* ── State ── */
 
   const today = useMemo(() => todayIso(), []);
@@ -450,6 +467,9 @@ export function Calendar({
 
   const rootClasses = [
     'sp-cal',
+    contract.invalid && 'sp-date-control--invalid',
+    contract.readOnly && 'sp-date-control--readonly',
+    contract.hidden && 'sp-date-control--hidden',
     showWeekNumbers && 'sp-cal--with-weeks',
     disabled && 'sp-cal--disabled',
     className,
@@ -780,12 +800,13 @@ export function Calendar({
   /* ── Main Render ── */
 
   return (
-    <div className={rootClasses} aria-disabled={disabled || undefined}>
+    <div id={contract.id} className={rootClasses} aria-disabled={contract.disabled || undefined} aria-readonly={contract.readOnly || undefined} aria-invalid={contract.invalid || undefined} aria-required={contract.required || undefined} aria-describedby={contract.aria['aria-describedby']} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) contract.markTouched(); }}>
       {renderHeader()}
       {viewMode === 'days' && renderDaysView()}
       {viewMode === 'months' && renderMonthsView()}
       {viewMode === 'years' && renderYearsView()}
       {renderFooter()}
+      <DateControlMessages errorMessage={contract.errorMessage} hint={contract.hint} errorId={contract.errorId} hintId={contract.hintId} />
     </div>
   );
 }

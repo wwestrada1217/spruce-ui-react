@@ -1,4 +1,5 @@
-import type { CSSProperties, ReactNode } from 'react';
+import type { CSSProperties, MouseEvent as ReactMouseEvent, ReactNode } from 'react';
+import type { FilterField, FilterGroup } from '../filter-expression/FilterExpression.js';
 
 export type DatagridSortDirection = 'asc' | 'desc' | null;
 export type DatagridSortMode = 'client' | 'manual';
@@ -39,6 +40,14 @@ export type DatagridColumnPin = 'left' | 'right';
 export type DatagridGroupSortDirection = 'asc' | 'desc';
 export type DatagridPaginationType = 'compact' | 'full';
 export type DatagridColumnWidth = number | 'auto' | `${number}%`;
+export type DatagridDensity = 'dense' | 'default' | 'comfortable';
+export type DatagridHeaderTextCase = 'uppercase' | 'default';
+export type DatagridSelectionControl = 'checkbox' | 'radio';
+export type DatagridResizeMode = 'live' | 'deferred';
+export type DatagridReorderMode = 'live' | 'deferred';
+export type DatagridLoadingMode = 'spinner' | 'skeleton';
+export type DatagridNewRowPosition = 'top' | 'bottom';
+export type DatagridNewRowCommitMode = 'immediate' | 'onLeave';
 
 export interface DatagridColumnMenuItem {
   readonly label: string;
@@ -186,6 +195,8 @@ export interface DatagridColumn<T extends object = Record<string, unknown>> {
   readonly maxWidth?: number;
   readonly align?: DatagridCellAlignment;
   readonly wrap?: boolean;
+  readonly className?: string | readonly string[] | ((context: DatagridCellContext<T>) => string | readonly string[] | null | undefined);
+  readonly style?: CSSProperties | ((context: DatagridCellContext<T>) => CSSProperties | null | undefined);
   readonly editable?: boolean | ((row: T) => boolean);
   readonly readonly?: boolean | ((row: T) => boolean);
   readonly editorType?: DatagridEditorType;
@@ -333,6 +344,50 @@ export interface DatagridNewRowCommit<T extends object> {
   readonly column: DatagridColumn<T>;
   readonly key: string;
   readonly value: unknown;
+}
+
+export interface DatagridRowEvent<T extends object> {
+  readonly row: T;
+  readonly rowIndex: number;
+  readonly nativeEvent: ReactMouseEvent<HTMLDivElement>;
+}
+
+export interface DatagridCellEvent<T extends object> extends DatagridRowEvent<T> {
+  readonly column: DatagridColumn<T>;
+  readonly value: unknown;
+}
+
+export interface DatagridNestedGridConfig<T extends object, C extends object = Record<string, unknown>> {
+  readonly getRows: (row: T) => readonly C[];
+  readonly columns: readonly DatagridColumn<C>[];
+  readonly props?: Omit<DatagridNestedGridProps<C>, 'data' | 'rows' | 'columns'>;
+  readonly height?: number;
+}
+
+/** Serializable subset accepted by nested grids without recursively nesting their type. */
+export interface DatagridNestedGridProps<T extends object> {
+  readonly selectionMode?: DatagridSelectionMode;
+  readonly stripedRows?: boolean;
+  readonly showVerticalLines?: boolean;
+  readonly rowHeight?: number;
+  readonly headerHeight?: number;
+  readonly emptyMessage?: string;
+  readonly ariaLabel?: string;
+}
+
+export interface DatagridFilterPanelConfig {
+  readonly position?: 'left' | 'right';
+  readonly width?: number;
+  readonly minWidth?: number;
+  readonly maxWidth?: number;
+  readonly pinned?: boolean;
+  readonly fields: readonly FilterField[];
+  readonly expression: FilterGroup;
+}
+
+export interface DatagridEditDecision {
+  readonly accepted: boolean;
+  readonly message?: string;
 }
 
 export interface DatagridEditCancel<T extends object> {
@@ -492,6 +547,9 @@ export interface DatagridHandle<T extends object> {
   commitCellEdit(restoreFocus?: boolean): void;
   commitRowEdit(): void;
   cancelEditing(): void;
+  undo(): void;
+  redo(): void;
+  fillDown(): void;
 }
 
 export type DatagridRowClassName<T extends object> =
@@ -506,3 +564,11 @@ export type DatagridRowStyle<T extends object> =
   | string
   | ((row: T, rowIndex: number) => CSSProperties | string | null | undefined)
   | null;
+
+export type DatagridCellClassName<T extends object> = (
+  context: DatagridCellContext<T>,
+) => string | readonly string[] | Readonly<Record<string, boolean>> | null | undefined;
+
+export type DatagridCellStyle<T extends object> = (
+  context: DatagridCellContext<T>,
+) => CSSProperties | null | undefined;

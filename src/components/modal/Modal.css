@@ -48,6 +48,7 @@
   padding: var(--sp-space-4, 16px) var(--sp-space-5, 20px);
   flex-shrink: 0;
   border-bottom: 1px solid var(--sp-modal-border, rgba(0, 0, 0, 0.08));
+  background: var(--sp-modal-header-bg, transparent);
 }
 
 .sp-modal__heading {
@@ -129,4 +130,5 @@
   gap: var(--sp-space-2, 8px);
   padding: var(--sp-space-3, 12px) var(--sp-space-5, 20px);
   border-top: 1px solid var(--sp-modal-border, rgba(0, 0, 0, 0.08));
+  background: var(--sp-modal-footer-bg, transparent);
 }

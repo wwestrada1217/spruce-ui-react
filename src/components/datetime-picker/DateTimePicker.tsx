@@ -8,13 +8,14 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
-import { computePosition, getScrollParents, onClickOutside } from '../../utils/positioning.js';
+import { computePosition, getScrollParents, modalBoundary, onClickOutside, type Placement } from '../../utils/positioning.js';
 import { useI18n } from '../../i18n/i18n-context.js';
+import { DateControlMessages, useDateControlContract, type DateControlContractProps, type DateControlVariant } from '../date-control/date-control-contract.js';
 import './DateTimePicker.css';
 
 export type DateTimePickerSize = 'sm' | 'md' | 'lg';
 
-export interface DateTimePickerProps {
+export interface DateTimePickerProps extends DateControlContractProps {
   /** Current value as an ISO datetime string (e.g. "2025-01-15T14:30" or "2025-01-15T14:30:00"). */
   value?: string | null;
   /** Called when the value changes. Receives `null` on clear. */
@@ -35,6 +36,11 @@ export interface DateTimePickerProps {
   selectOtherMonths?: boolean;
   /** Disable all interaction. */
   disabled?: boolean;
+  variant?: DateControlVariant;
+  placement?: Placement;
+  constrainToModal?: boolean;
+  dismissOnClickOutside?: boolean;
+  dismissOnScroll?: boolean;
   /** Additional CSS class applied to the root wrapper. */
   className?: string;
 }
@@ -210,10 +216,34 @@ export function DateTimePicker({
   inputMode = false,
   showOtherMonths = true,
   selectOtherMonths = true,
-  disabled = false,
+  disabled: disabledProp = false,
+  readOnly = false,
+  hidden = false,
+  invalid,
+  error,
+  errors,
+  required = false,
+  touched = false,
+  onTouchedChange,
+  onBlur,
+  label = '',
+  floatingLabel = false,
+  hint,
+  ariaLabel,
+  ariaLabelledBy,
+  ariaDescribedBy,
+  id,
+  variant = 'default',
+  placement = 'bottom-start',
+  constrainToModal = true,
+  dismissOnClickOutside = true,
+  dismissOnScroll = true,
   className,
 }: DateTimePickerProps) {
   const { monthNames, monthLabels, dayLabels, t, formatDayLabel, leadingBlankDays } = useI18n();
+  const contract = useDateControlContract({ disabled: disabledProp, readOnly, hidden, invalid, error, errors, required, touched, onTouchedChange, onBlur, label, floatingLabel, hint, ariaLabel, ariaLabelledBy, ariaDescribedBy, id, valuePresent: Boolean(value) });
+  const disabled = contract.disabled;
+  const normalizedVariant = variant === 'outlined' ? 'outline' : variant;
   const resolvedPlaceholder = placeholder === 'Select date & time' ? t('dateTimeInput') : placeholder;
   /* ── State ─────────────────────────────────────────────────────────────── */
 
@@ -270,10 +300,10 @@ export function DateTimePicker({
     const anchor = wrapRef.current;
     const panel = panelRef.current;
     if (!anchor || !panel) return;
-    const result = computePosition(anchor, panel, 'bottom-start', 4);
+    const result = computePosition(anchor, panel, placement, 4, constrainToModal ? modalBoundary(anchor) : undefined);
     setPos({ top: result.top, left: result.left });
     setPanelReady(true);
-  }, []);
+  }, [constrainToModal, placement]);
 
   // Position after open, and re-measure when the sub-view changes panel height
   useEffect(() => {
@@ -285,9 +315,7 @@ export function DateTimePicker({
   // Reposition on scroll / resize
   useEffect(() => {
     if (!open) return;
-    const onScroll = () => {
-      rafId.current = requestAnimationFrame(reposition);
-    };
+    const onScroll = () => { if (dismissOnScroll) setOpen(false); else rafId.current = requestAnimationFrame(reposition); };
     const scrollables = wrapRef.current ? getScrollParents(wrapRef.current) : [];
     scrollables.forEach((el) => el.addEventListener('scroll', onScroll, { passive: true }));
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -298,7 +326,7 @@ export function DateTimePicker({
       window.removeEventListener('resize', onScroll);
       cancelAnimationFrame(rafId.current);
     };
-  }, [open, reposition]);
+  }, [dismissOnScroll, open, reposition]);
 
   /* ── Apply / Close ─────────────────────────────────────────────────────── */
 
@@ -322,10 +350,10 @@ export function DateTimePicker({
   /* ── Click outside ─────────────────────────────────────────────────────── */
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || !dismissOnClickOutside) return;
     const els = [wrapRef.current, panelRef.current].filter(Boolean) as HTMLElement[];
     return onClickOutside(els, applyAndClose);
-  }, [open, applyAndClose]);
+  }, [dismissOnClickOutside, open, applyAndClose]);
 
   /* ── Keyboard ──────────────────────────────────────────────────────────── */
 
@@ -345,7 +373,7 @@ export function DateTimePicker({
   /* ── Toggle ────────────────────────────────────────────────────────────── */
 
   function toggleOpen() {
-    if (disabled) return;
+    if (disabled || contract.readOnly) return;
     if (!open) {
       const parsed = parseISO(value);
       if (parsed) {
@@ -884,17 +912,24 @@ export function DateTimePicker({
 
   const rootCls = [
     'sp-dtp',
+    `sp-date-control--${normalizedVariant}`,
+    contract.floatingLabel && 'sp-date-control--floating',
+    contract.invalid && 'sp-date-control--invalid',
+    contract.readOnly && 'sp-date-control--readonly',
     open ? 'sp-dtp--open' : '',
     className,
   ]
     .filter(Boolean)
     .join(' ');
 
+  if (contract.hidden) return null;
+
   /* ── Input mode render ─────────────────────────────────────────────────── */
 
   if (inputMode) {
     return (
       <div ref={wrapRef} className={rootCls}>
+        {contract.label && <label className="sp-date-control__label" htmlFor={contract.id}>{contract.label}{contract.required && <span className="sp-date-control__required" aria-hidden="true">*</span>}</label>}
         <div
           className={[
             'sp-dtp__input-wrap',
@@ -910,13 +945,21 @@ export function DateTimePicker({
             className="sp-dtp__input-icon"
           />
           <input
+            id={contract.id}
             className="sp-dtp__input"
             type="text"
             placeholder={inputPlaceholder || resolvedPlaceholder}
             value={displayValue}
             disabled={disabled}
+            readOnly={contract.readOnly}
             onChange={handleInputChange}
-            aria-label={t('dateTimeInput')}
+            aria-label={contract.aria['aria-label'] ?? t('dateTimeInput')}
+            aria-labelledby={contract.aria['aria-labelledby']}
+            aria-describedby={contract.aria['aria-describedby']}
+            aria-invalid={contract.aria['aria-invalid']}
+            aria-required={contract.aria['aria-required']}
+            aria-readonly={contract.aria['aria-readonly']}
+            onBlur={contract.markTouched}
           />
           <button
             type="button"
@@ -930,6 +973,7 @@ export function DateTimePicker({
           </button>
         </div>
         {panel}
+        <DateControlMessages errorMessage={contract.errorMessage} hint={contract.hint} errorId={contract.errorId} hintId={contract.hintId} />
       </div>
     );
   }
@@ -938,7 +982,9 @@ export function DateTimePicker({
 
   return (
     <div ref={wrapRef} className={rootCls}>
+      {contract.label && <span className="sp-date-control__label" id={`${contract.id}-label`}>{contract.label}{contract.required && <span className="sp-date-control__required" aria-hidden="true">*</span>}</span>}
       <button
+        id={contract.id}
         type="button"
         className={[
           'sp-dtp__trigger',
@@ -950,6 +996,13 @@ export function DateTimePicker({
         disabled={disabled}
         aria-haspopup="dialog"
         aria-expanded={open}
+        aria-label={contract.aria['aria-label']}
+        aria-labelledby={contract.aria['aria-labelledby'] ?? (contract.label ? `${contract.id}-label` : undefined)}
+        aria-describedby={contract.aria['aria-describedby']}
+        aria-invalid={contract.aria['aria-invalid']}
+        aria-required={contract.aria['aria-required']}
+        aria-readonly={contract.aria['aria-readonly']}
+        onBlur={contract.markTouched}
       >
         <Icon name="calendar" size={iconSize} />
         <span className="sp-dtp__value">
@@ -958,6 +1011,7 @@ export function DateTimePicker({
         <Icon name="chevron-down" size={12} />
       </button>
       {panel}
+      <DateControlMessages errorMessage={contract.errorMessage} hint={contract.hint} errorId={contract.errorId} hintId={contract.hintId} />
     </div>
   );
 }
