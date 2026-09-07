@@ -138,6 +138,35 @@
   background: var(--sp-surface-300, #cdd3dc);
 }
 
+/* ── Chevron ─────────────────────────────────────────────────────────────── */
+
+.sp-combo__chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  flex-shrink: 0;
+  color: var(--sp-text-muted, #4a5568);
+  cursor: pointer;
+  transition: transform var(--sp-duration-normal, 200ms) var(--sp-ease-default, ease);
+}
+
+.sp-combo__chevron:disabled {
+  cursor: not-allowed;
+}
+
+.sp-combo__chevron:focus-visible {
+  outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color, #2563eb);
+  outline-offset: var(--sp-focus-ring-offset, 2px);
+  border-radius: var(--sp-radius-sm, 4px);
+}
+
+.sp-combo--open .sp-combo__chevron {
+  transform: rotate(180deg);
+}
+
 /* ── Dropdown panel ──────────────────────────────────────────────────────── */
 
 .sp-combo__dropdown {
@@ -145,7 +174,7 @@
   overflow-y: auto;
   padding: var(--sp-space-1, 4px) 0;
   background: var(--sp-surface-0, #fff);
-  border: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08));
+  border: var(--sp-overlay-border-width, var(--sp-border-width-hairline, 1px)) solid var(--sp-overlay-border, var(--sp-border-strong));
   border-radius: var(--sp-radius-md, 6px);
   box-shadow: var(--sp-shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1));
   animation: sp-combo-slide-in var(--sp-duration-fast, 100ms) var(--sp-ease-out, ease-out) both;

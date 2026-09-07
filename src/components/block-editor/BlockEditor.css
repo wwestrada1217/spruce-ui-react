@@ -501,7 +501,7 @@
   max-height: 280px;
   overflow-y: auto;
   background: var(--sp-surface-0, #ffffff);
-  border: 1px solid var(--sp-border-strong, rgba(15, 23, 42, 0.14));
+  border: var(--sp-overlay-border-width, var(--sp-border-width-hairline, 1px)) solid var(--sp-overlay-border, var(--sp-border-strong));
   border-radius: var(--sp-radius-xl, 12px);
   box-shadow: var(--sp-shadow-lg, 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.06));
   padding: var(--sp-space-1_5, 6px);
@@ -572,7 +572,7 @@
   z-index: 9999;
   width: 170px;
   background: var(--sp-surface-0, #ffffff);
-  border: 1px solid var(--sp-border-strong, rgba(15, 23, 42, 0.14));
+  border: var(--sp-overlay-border-width, var(--sp-border-width-hairline, 1px)) solid var(--sp-overlay-border, var(--sp-border-strong));
   border-radius: var(--sp-radius-lg, 8px);
   box-shadow: var(--sp-shadow-md, 0 4px 12px rgba(0, 0, 0, 0.08));
   padding: 4px;

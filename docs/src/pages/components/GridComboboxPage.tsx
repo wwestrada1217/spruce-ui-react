@@ -35,6 +35,24 @@ const BASIC_CODE = `<GridCombobox
   onChange={(v) => console.log(v)}
 />`
 
+const CHEVRON_CODE = `<GridCombobox
+  columns={columns}
+  options={options}
+  showChevron
+  placeholder="Choose a country"
+  filterBy={['name', 'code', 'capital']}
+/>`
+
+const STYLE_CODE = `<GridCombobox
+  columns={columns}
+  options={options}
+  resizableColumns
+  showColumnLines
+  stripedRows
+  placeholder="Grid styling..."
+  filterBy={['name', 'code', 'capital']}
+/>`
+
 const RESIZABLE_CODE = `<GridCombobox
   columns={columns}
   options={options}
@@ -61,6 +79,8 @@ const CUSTOM_ROW_CODE = `<GridCombobox
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
   { id: 'basic', label: 'Basic' },
+  { id: 'chevron', label: 'With Chevron' },
+  { id: 'style', label: 'Header Lines & Stripes' },
   { id: 'resizable', label: 'Resizable Columns' },
   { id: 'virtual', label: 'Virtual Scrolling & Paging' },
   { id: 'custom-row', label: 'Custom Rows' },
@@ -93,7 +113,7 @@ export function GridComboboxPage() {
         <p className="docs-desc">
           Searchable combobox that displays options in a multi-column grid with sticky headers.
           Ideal for selecting from structured data like database records. Supports resizable
-          columns, custom rows, and virtual scrolling for larger sources.
+          columns, custom rows, virtual scrolling for larger sources, and an optional chevron indicator.
         </p>
         <DocsPackageBadge packageName="spruce-react" symbols={['GridCombobox', 'GridComboboxColumn', 'GridComboboxOption']} />
 
@@ -115,6 +135,26 @@ export function GridComboboxPage() {
             </div>
           </CodePreview>
           {val && <p style={{ fontSize: 13, color: 'var(--sp-text-subtle)', marginTop: 8 }}>Selected: <code>{val}</code></p>}
+        </section>
+
+        <section id="chevron" className="demo-section" aria-labelledby="chevron-heading">
+          <h2 id="chevron-heading">With Chevron</h2>
+          <p className="section-desc">Set <code>showChevron</code> to add a clickable right-side chevron that toggles the dropdown and rotates when open.</p>
+          <CodePreview code={CHEVRON_CODE} language="typescript">
+            <div style={{ maxWidth: 480 }}>
+              <GridCombobox columns={columns} options={options} showChevron placeholder="Choose a country" filterBy={['name', 'code', 'capital']} />
+            </div>
+          </CodePreview>
+        </section>
+
+        <section id="style" className="demo-section" aria-labelledby="style-heading">
+          <h2 id="style-heading">Header Lines &amp; Stripes</h2>
+          <p className="section-desc">Resizable columns enable vertical header lines by default. Use <code>showColumnLines</code> to control them explicitly, and <code>stripedRows</code> to add alternating row backgrounds.</p>
+          <CodePreview code={STYLE_CODE} language="typescript">
+            <div style={{ maxWidth: 520 }}>
+              <GridCombobox columns={columns} options={options} resizableColumns showColumnLines stripedRows placeholder="Grid styling..." filterBy={['name', 'code', 'capital']} />
+            </div>
+          </CodePreview>
         </section>
 
         <section id="resizable" className="demo-section" aria-labelledby="resizable-heading">
@@ -165,7 +205,10 @@ export function GridComboboxPage() {
                 <tr><td><code>placeholder</code></td><td><code>string</code></td><td><code>'Search...'</code></td><td>Input placeholder</td></tr>
                 <tr><td><code>filterBy</code></td><td><code>string | string[]</code></td><td><code>'label'</code></td><td>Keys to filter on</td></tr>
                 <tr><td><code>disabled</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Disable the combobox</td></tr>
+                <tr><td><code>showChevron</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Show a clickable right-side chevron that rotates when open</td></tr>
                 <tr><td><code>resizableColumns</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Enable accessible column resize handles</td></tr>
+                <tr><td><code>showColumnLines</code></td><td><code>boolean</code></td><td><code>resizableColumns</code></td><td>Show vertical lines between header columns; enabled by default when columns are resizable</td></tr>
+                <tr><td><code>stripedRows</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Show alternating row backgrounds</td></tr>
                 <tr><td><code>renderRow</code></td><td><code>(context) =&gt; ReactNode</code></td><td>—</td><td>Custom row renderer</td></tr>
               </tbody>
             </table>

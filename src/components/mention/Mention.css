@@ -20,7 +20,8 @@
   --sp-mention-text: var(--sp-text-color, #1a202c);
   --sp-mention-placeholder: var(--sp-text-disabled, #a0aec0);
   --sp-mention-panel-bg: var(--sp-surface-0, #fff);
-  --sp-mention-panel-border: var(--sp-border, rgba(0, 0, 0, 0.08));
+  --sp-mention-panel-border: var(--sp-overlay-border, var(--sp-border-strong));
+  --sp-mention-panel-border-width: var(--sp-overlay-border-width, var(--sp-border-width-hairline, 1px));
   --sp-mention-panel-shadow: var(--sp-shadow-lg, 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1));
   --sp-mention-option-hover: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04));
   --sp-mention-tag-bg: var(--sp-primary-subtle, rgba(37, 99, 235, 0.1));
@@ -78,7 +79,7 @@
   overflow-y: auto;
   padding: var(--sp-space-1, 4px) 0;
   background: var(--sp-mention-panel-bg);
-  border: 1px solid var(--sp-mention-panel-border);
+  border: var(--sp-mention-panel-border-width) solid var(--sp-mention-panel-border);
   border-radius: var(--sp-mention-radius);
   box-shadow: var(--sp-mention-panel-shadow);
 }

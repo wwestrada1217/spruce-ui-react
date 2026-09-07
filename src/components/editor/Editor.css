@@ -272,7 +272,7 @@
   min-width: 14rem;
   max-width: 22rem;
   padding: var(--sp-space-1);
-  border: 1px solid var(--sp-border-strong);
+  border: var(--sp-overlay-border-width, var(--sp-border-width-hairline, 1px)) solid var(--sp-overlay-border, var(--sp-border-strong));
   border-radius: var(--sp-radius-md);
   background: var(--sp-surface-raised);
   box-shadow: var(--sp-shadow-md);

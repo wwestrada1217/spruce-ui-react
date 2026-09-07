@@ -42,6 +42,7 @@ export interface GridComboboxProps {
   label?: string;
   floatingLabel?: boolean;
   icon?: string | null;
+  showChevron?: boolean;
   variant?: GridComboboxVariant;
   placement?: Placement;
   constrainToModal?: boolean;
@@ -52,6 +53,10 @@ export interface GridComboboxProps {
   virtualPaging?: boolean;
   showPagingFooter?: boolean;
   resizableColumns?: boolean;
+  /** Show vertical separators between the column headers. Defaults to enabled with resizable columns. */
+  showColumnLines?: boolean;
+  /** Show alternating backgrounds on the option rows. */
+  stripedRows?: boolean;
   /** Allow the dropdown panel itself to be resized by the user. */
   panelResizable?: boolean;
   renderRow?: (context: LookupRenderContext<GridComboboxOption>) => ReactNode;
@@ -68,8 +73,10 @@ export function GridCombobox({
   placeholder = 'Search...', filterBy = 'label', searchFields = null, displayField = 'label', valueField = 'value', pageSize = 20,
   autoOpen = false, disabled = false, readOnly = false, hidden = false, error, hint, errors, invalid, required = false,
   label = '', floatingLabel = false, icon = null, variant = 'default', placement = 'bottom-start', constrainToModal = true,
+  showChevron = false,
   dismissOnClickOutside = true, dismissOnScroll = true, virtualScroll = false, itemHeight = 32,
-  virtualPaging = false, showPagingFooter = true, resizableColumns = false, panelResizable = false, renderRow, renderEmpty,
+  virtualPaging = false, showPagingFooter = true, resizableColumns = false, showColumnLines, stripedRows = false,
+  panelResizable = false, renderRow, renderEmpty,
   ariaLabel, ariaLabelledBy, ariaDescribedBy, className = '', id,
 }: GridComboboxProps) {
   const { direction, t } = useI18n();
@@ -163,6 +170,7 @@ export function GridCombobox({
   const visibleItems = virtualScroll ? items.slice(virtualStart, virtualStart + Math.ceil(240 / itemHeight) + 8) : items;
   const activeIndex = virtualScroll ? virtualStart + highlightedIndex : highlightedIndex;
   const gridTemplate = columns.map((column) => columnWidths[column.key] ?? column.width ?? '1fr').join(' ');
+  const effectiveShowColumnLines = showColumnLines ?? resizableColumns;
 
   function focusInputAfterSelection() {
     if (document.activeElement !== inputRef.current) suppressOpenOnFocusRef.current = true;
@@ -226,6 +234,7 @@ export function GridCombobox({
 
   if (effectiveHidden) return null;
   const rootClasses = ['sp-gc', `sp-gc--${normalizedVariant}`, floatingLabel && 'sp-gc--floating', open && 'sp-gc--open', effectiveDisabled && 'sp-gc--disabled', effectiveReadOnly && 'sp-gc--readonly', hasError && 'sp-gc--error', className].filter(Boolean).join(' ');
+  const dropdownClasses = ['sp-gc__dropdown', panelResizable && 'sp-gc__dropdown--resizable', effectiveShowColumnLines && 'sp-gc__dropdown--column-lines', stripedRows && 'sp-gc__dropdown--striped'].filter(Boolean).join(' ');
   const activeDescendant = activeIndex >= 0 ? `sp-gc-opt-${instanceId}-${activeIndex}` : undefined;
   return <>
     <div ref={anchorRef} className={rootClasses} dir={direction} data-constrain-to-modal={constrainToModal}>
@@ -237,10 +246,14 @@ export function GridCombobox({
         </div>}
         <input ref={inputRef} id={inputId} className="sp-gc__input" placeholder={placeholder === 'Search...' ? t('search') : placeholder} disabled={effectiveDisabled} readOnly={effectiveReadOnly} value={query} onChange={(event: ChangeEvent<HTMLInputElement>) => { setQuery(event.target.value); if (!open) setOpenState(true); else void load(1, event.target.value); }} onFocus={() => { if (suppressOpenOnFocusRef.current) { suppressOpenOnFocusRef.current = false; return; } setOpenState(true); }} onKeyDown={handleKeyDown} role="combobox" aria-expanded={open} aria-haspopup="listbox" aria-autocomplete="list" aria-activedescendant={activeDescendant} aria-label={ariaLabel || (!label ? undefined : label)} aria-labelledby={ariaLabelledBy || undefined} aria-describedby={describedBy} aria-invalid={hasError || undefined} aria-required={effectiveRequired || undefined} aria-readonly={effectiveReadOnly || undefined} />
         {(query || selectedValues.size > 0) && !effectiveDisabled && !effectiveReadOnly && <button type="button" className="sp-gc__clear" tabIndex={-1} aria-label={t('clear')} onMouseDown={(event) => { event.preventDefault(); setQuery(''); onChange?.(multiple ? [] : ''); inputRef.current?.focus(); }}><Icon name="x" size={12} /></button>}
+        {showChevron && <button type="button" className="sp-gc__chevron" aria-label={open ? t('close') : t('open')} aria-expanded={open} disabled={effectiveDisabled || effectiveReadOnly}
+          onMouseDown={(event) => event.preventDefault()} onClick={(event) => { event.stopPropagation(); setOpenState(!open); inputRef.current?.focus(); }}>
+          <Icon name="chevron-down" size={12} />
+        </button>}
       </div>
     </div>
-    {open && createPortal(<div ref={panelRef} className={`sp-gc__dropdown${panelResizable ? ' sp-gc__dropdown--resizable' : ''}`} role="listbox" aria-multiselectable={multiple || undefined} style={{ position: 'fixed', top: position.top, left: position.left, width: position.width, zIndex: 999, opacity: ready ? 1 : 0 }} onScroll={handlePanelScroll}>
-      <div className="sp-gc__header" style={{ gridTemplateColumns: gridTemplate }}>{columns.map((column) => <div key={column.key} className="sp-gc__header-cell">{column.label}{resizableColumns && <button type="button" className="sp-gc__resizer" aria-label={t('resizeColumn', { column: column.label })} onPointerDown={(event) => beginResize(column.key, event)} />}</div>)}</div>
+    {open && createPortal(<div ref={panelRef} className={dropdownClasses} role="listbox" aria-multiselectable={multiple || undefined} style={{ position: 'fixed', top: position.top, left: position.left, width: position.width, zIndex: 999, opacity: ready ? 1 : 0 }} onScroll={handlePanelScroll}>
+      <div className="sp-gc__header" style={{ gridTemplateColumns: gridTemplate }}>{columns.map((column) => <div key={column.key} className="sp-gc__header-cell"><span className="sp-gc__header-label">{column.label}</span>{resizableColumns && <button type="button" className="sp-gc__resizer" aria-label={t('resizeColumn', { column: column.label })} onPointerDown={(event) => beginResize(column.key, event)} />}</div>)}</div>
       {loading && <div className="sp-gc__loading" role="status">{t('loading')}</div>}
       {!loading && visibleItems.length > 0 && <div style={virtualScroll ? { paddingTop: `${virtualStart * itemHeight}px`, paddingBottom: `${Math.max(0, items.length - virtualStart - visibleItems.length) * itemHeight}px` } : undefined}>{visibleItems.map((item, offset) => { const index = virtualScroll ? virtualStart + offset : offset; const option = normalized[index]; const selected = Boolean(option && selectedValues.has(option.value)); const highlighted = index === activeIndex; const context = { item, option, selected, highlighted }; return <button key={`${option?.value ?? index}-${index}`} id={`sp-gc-opt-${instanceId}-${index}`} type="button" role="option" aria-selected={selected} disabled={option?.disabled} className={['sp-gc__row', selected && 'sp-gc__row--selected', highlighted && 'sp-gc__row--highlighted'].filter(Boolean).join(' ')} style={{ gridTemplateColumns: gridTemplate }} onMouseEnter={() => setHighlightedIndex(virtualScroll ? offset : index)} onClick={() => selectOption(index)}>{renderRow ? renderRow(context) : columns.map((column) => <span key={column.key} className="sp-gc__cell">{column.key === valueField && option?.icon && <Icon name={option.icon} size={14} />}{String(item[column.key] ?? '')}</span>)}{selected && <Icon name="check" size={14} className="sp-gc__check" />}</button>; })}</div>}
       {!loading && !visibleItems.length && <div className="sp-gc__empty">{renderEmpty ? renderEmpty() : t('noResults')}</div>}

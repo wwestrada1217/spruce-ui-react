@@ -148,7 +148,7 @@
   overflow-y: auto;
   padding: var(--sp-space-1, 4px) 0;
   background: var(--sp-surface-0, #fff);
-  border: 1px solid var(--sp-border, rgba(0, 0, 0, 0.08));
+  border: var(--sp-overlay-border-width, var(--sp-border-width-hairline, 1px)) solid var(--sp-overlay-border, var(--sp-border-strong));
   border-radius: var(--sp-radius-md, 6px);
   box-shadow: var(--sp-shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1));
   animation: sp-select-slide-down var(--sp-duration-fast, 100ms) var(--sp-ease-out, ease-out) both;

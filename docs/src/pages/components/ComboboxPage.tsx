@@ -19,6 +19,12 @@ const BASIC_CODE = `<Combobox
   onChange={(v) => console.log(v)}
 />`
 
+const CHEVRON_CODE = `<Combobox
+  options={countries}
+  showChevron
+  placeholder="Choose a country"
+/>`
+
 const MULTIPLE_CODE = `<Combobox
   options={countries}
   multiple
@@ -47,6 +53,7 @@ const iconCountries: ComboboxOption[] = [
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
   { id: 'basic',    label: 'Basic' },
+  { id: 'chevron',  label: 'With Chevron' },
   { id: 'variants', label: 'Floating Labels & Variants' },
   { id: 'with-icons', label: 'With Icons' },
   { id: 'custom-item-rendering', label: 'Custom Item Rendering' },
@@ -80,7 +87,7 @@ export function ComboboxPage() {
         <p className="docs-desc">
           Searchable dropdown with text input for filtering. Supports single and multiple selection,
           floating-label variants, icons, custom option rendering, chips, keyboard navigation, and
-          clear button.
+          clear button, and an optional chevron indicator.
         </p>
         <DocsPackageBadge packageName="spruce-react" symbols={['Combobox', 'ComboboxOption']} />
 
@@ -93,6 +100,16 @@ export function ComboboxPage() {
             </div>
           </CodePreview>
           {val && <p style={{ fontSize: 13, color: 'var(--sp-text-subtle)', marginTop: 8 }}>Selected: <code>{String(val)}</code></p>}
+        </section>
+
+        <section id="chevron" className="demo-section" aria-labelledby="chevron-heading">
+          <h2 id="chevron-heading">With Chevron</h2>
+          <p className="section-desc">Set <code>showChevron</code> to add a clickable right-side chevron that toggles the dropdown and rotates when open.</p>
+          <CodePreview code={CHEVRON_CODE} language="typescript">
+            <div style={{ maxWidth: 320 }}>
+              <Combobox options={countries} showChevron placeholder="Choose a country" />
+            </div>
+          </CodePreview>
         </section>
 
         <section id="variants" className="demo-section" aria-labelledby="variants-heading">
@@ -154,6 +171,7 @@ export function ComboboxPage() {
                 <tr><td><code>onChange</code></td><td><code>(value) =&gt; void</code></td><td>—</td><td>Selection callback</td></tr>
                 <tr><td><code>placeholder</code></td><td><code>string</code></td><td><code>'Search...'</code></td><td>Input placeholder</td></tr>
                 <tr><td><code>multiple</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Multi-select mode</td></tr>
+                <tr><td><code>showChevron</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Show a clickable right-side chevron that rotates when open</td></tr>
                 <tr><td><code>disabled</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Disable the combobox</td></tr>
                 <tr><td><code>renderOption</code></td><td><code>(context) =&gt; ReactNode</code></td><td>—</td><td>Custom option renderer</td></tr>
                 <tr><td><code>virtualPaging</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Enable remote/page navigation</td></tr>

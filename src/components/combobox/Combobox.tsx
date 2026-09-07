@@ -46,6 +46,7 @@ export interface ComboboxProps {
   floatingLabel?: boolean;
   variant?: 'default' | 'outline' | 'outlined' | 'filled';
   icon?: string | null;
+  showChevron?: boolean;
   placement?: Placement;
   constrainToModal?: boolean;
   dismissOnClickOutside?: boolean;
@@ -69,6 +70,7 @@ export function Combobox({
   autoOpen = false, placeholder = 'Search…', multiple = false, disabled = false,
   readOnly = false, hidden = false, error, hint, errors, invalid, required = false, label = '',
   floatingLabel = false, variant = 'default', icon = null, placement = 'bottom-start',
+  showChevron = false,
   constrainToModal = true, dismissOnClickOutside = true, dismissOnScroll = true,
   virtualScroll = false, itemHeight = 32, virtualPaging = false, showPagingFooter = true,
   renderOption, renderEmpty, ariaLabel, ariaLabelledBy, ariaDescribedBy, className = '', id,
@@ -229,6 +231,10 @@ export function Combobox({
         {multiple && selectedOptions.map((option) => <span key={option.value} className="sp-combo__chip">{option.label}<button type="button" className="sp-combo__chip-remove" tabIndex={-1} aria-label={`${t('remove')} ${option.label}`} onClick={(event) => removeChip(option.value, event)}><Icon name="x" size={10} /></button></span>)}
         <input ref={inputRef} id={inputId} className="sp-combo__input" value={query} type="text" placeholder={selectedValues.length && multiple ? '' : placeholder === 'Search…' ? t('search') : placeholder} disabled={effectiveDisabled} readOnly={effectiveReadOnly} role="combobox" aria-expanded={open} aria-haspopup="listbox" aria-autocomplete="list" aria-activedescendant={activeDescendant} aria-label={ariaLabel || (!label ? undefined : label)} aria-labelledby={ariaLabelledBy || undefined} aria-describedby={describedBy} aria-invalid={hasError || undefined} aria-required={effectiveRequired || undefined} aria-readonly={effectiveReadOnly || undefined} onChange={(event: ChangeEvent<HTMLInputElement>) => { setQuery(event.target.value); if (!open) openPanel(); else void load(1, event.target.value); }} onFocus={() => { if (suppressOpenOnFocusRef.current) { suppressOpenOnFocusRef.current = false; return; } openPanel(); }} onKeyDown={handleKeyDown} />
         {(query || selectedValues.length > 0) && !effectiveDisabled && <button type="button" className="sp-combo__clear" tabIndex={-1} aria-label={t('clear')} onClick={(event) => { event.stopPropagation(); setQuery(''); updateSelection(multiple ? [] : ''); inputRef.current?.focus(); }}><Icon name="x" size={10} /></button>}
+        {showChevron && <button type="button" className="sp-combo__chevron" aria-label={open ? t('close') : t('open')} aria-expanded={open} disabled={effectiveDisabled || effectiveReadOnly}
+          onMouseDown={(event) => event.preventDefault()} onClick={(event) => { event.stopPropagation(); setOpenState(!open); inputRef.current?.focus(); }}>
+          <Icon name="chevron-down" size={12} />
+        </button>}
       </div>
     </div>
     {open && createPortal(<div ref={panelRef} className="sp-combo__dropdown" role="listbox" aria-multiselectable={multiple || undefined} style={{ position: 'fixed', top: position.top, left: position.left, width: position.width, zIndex: 999, opacity: ready ? 1 : 0 }} onScroll={handlePanelScroll}>
