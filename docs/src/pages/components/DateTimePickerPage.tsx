@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { DateTimePicker } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
 import { DocsPackageBadge } from '../../components/DocsPackageBadge'
+import { DateControlContractRows } from '../../components/DateControlContractRows'
 
 const BASIC_CODE = `<DateTimePicker placeholder="Select date & time" onChange={(v) => console.log(v)} />`
 const FORMAT_CODE = `<DateTimePicker use24Hour placeholder="24-hour format" />`
@@ -13,6 +14,15 @@ const SIZES_CODE = `<DateTimePicker size="sm" placeholder="Small" />
 const OTHER_MONTHS_CODE = `<DateTimePicker showOtherMonths selectOtherMonths placeholder="Adjacent dates selectable" />
 <DateTimePicker showOtherMonths selectOtherMonths={false} placeholder="Adjacent dates disabled" />`
 const DISABLED_CODE = `<DateTimePicker disabled placeholder="Disabled" />`
+const FIELD_STATE_CODE = `<DateTimePicker
+  inputMode
+  label="Publish at"
+  floatingLabel
+  variant="outline"
+  required
+  error="Choose a publication date and time."
+  placement="top-end"
+/>`
 
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
@@ -23,6 +33,7 @@ const SECTIONS: Section[] = [
   { id: 'sizes',      label: 'Sizes' },
   { id: 'other-months', label: 'Other Months' },
   { id: 'disabled',   label: 'Disabled' },
+  { id: 'field-state', label: 'Field & Overlay API' },
   { id: 'api',        label: 'API' },
 ]
 
@@ -124,6 +135,14 @@ export function DateTimePickerPage() {
           </CodePreview>
         </section>
 
+        <section id="field-state" className="demo-section" aria-labelledby="field-state-heading">
+          <h2 id="field-state-heading">Field and overlay contract</h2>
+          <p className="section-desc">DateTimePicker combines visible labels and field variants with shared validation, placement, modal constraints, and dismissal controls.</p>
+          <CodePreview code={FIELD_STATE_CODE} language="typescript">
+            <DateTimePicker inputMode label="Publish at" floatingLabel variant="outline" required error="Choose a publication date and time." placement="top-end" />
+          </CodePreview>
+        </section>
+
         <section id="api" className="demo-section">
           <h2>API</h2>
           <h3>Props</h3>
@@ -143,6 +162,7 @@ export function DateTimePickerPage() {
                 <tr><td><code>disabled</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Disable the picker</td></tr>
                 <tr><td><code>showOtherMonths</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show dates from adjacent months</td></tr>
                 <tr><td><code>selectOtherMonths</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Allow selecting visible adjacent-month dates</td></tr>
+                <DateControlContractRows overlays variants />
               </tbody>
             </table>
           </div>

@@ -318,6 +318,30 @@ const THEME_CODE = `<SpruceProvider defaultTheme="dark">
   />
 </SpruceProvider>`
 
+const CURRENT_OPTIONS_CODE = `<Datagrid
+  rows={projects}
+  columns={columns}
+  chrome="elevated"
+  radius="lg"
+  border="strong"
+  density="dense"
+  autoRowHeight
+  headerTextCase="uppercase"
+  nullText="Not provided"
+  showColumnLines
+  rowHover
+  selectionMode="multiple"
+  selectionControl="checkbox"
+  appendSelection
+  pinSelectionColumns
+  columnResizeMode="deferred"
+  columnReorderMode="live"
+/>
+
+// Advanced workloads can additionally combine dataSource/windowed loading,
+// infiniteScroll, treeChildrenField or nestedGrid, filterPanel, manualCommit,
+// undo/redo/fill-down, newRowPosition/newRowCommit, and row/cell callbacks.`
+
 interface Section {
   id: string
   label: string
@@ -346,6 +370,7 @@ const SECTIONS: readonly Section[] = [
   { id: 'editing', label: 'Editing' },
   { id: 'new-row', label: 'New row' },
   { id: 'data-context', label: 'DataContext' },
+  { id: 'current-options', label: 'Current option set' },
   { id: 'keyboard', label: 'Keyboard interaction' },
   { id: 'theming', label: 'Theming' },
   { id: 'api', label: 'Public API' },
@@ -669,6 +694,32 @@ export function DatagridPage() {
           <p>Use the <code>locale</code> prop for display and comparison overrides. Use provider locale and direction for localized chrome and RTL layouts. Customize local presentation with <code>--sp-datagrid-*</code> tokens rather than hard-coded colors.</p>
         </section>
 
+        <section id="current-options" className="demo-section">
+          <h2>Current option set</h2>
+          <p className="section-desc">The canonical React grid follows the dense, structured DataGridEx presentation while exposing the current Angular Datagrid behavior through idiomatic React props. Feature aliases remain supported so existing grids can migrate incrementally.</p>
+          <CodePreview code={CURRENT_OPTIONS_CODE} language="typescript">
+            <Datagrid<Project>
+              rows={PROJECTS.slice(0, 4)}
+              columns={PROJECT_COLUMNS}
+              chrome="elevated"
+              radius="lg"
+              border="strong"
+              density="dense"
+              autoRowHeight
+              headerTextCase="uppercase"
+              nullText="Not provided"
+              showColumnLines
+              rowHover
+              selectionMode="multiple"
+              selectionControl="checkbox"
+              appendSelection
+              pinSelectionColumns
+              columnResizeMode="deferred"
+              columnReorderMode="live"
+            />
+          </CodePreview>
+        </section>
+
         <section id="api" className="demo-section">
           <h2>Public API</h2>
           <p className="section-desc">Datagrid exposes typed props and callbacks for the Angular feature surface, plus an imperative ref for common commands.</p>
@@ -676,17 +727,23 @@ export function DatagridPage() {
             <table className="api-table">
               <thead><tr><th>Surface</th><th>React API</th><th>Purpose</th></tr></thead>
               <tbody>
-                <tr><td>Data</td><td><code>rows</code>, <code>data</code>, <code>dataContext</code></td><td>Local rows or tracked DataContext records.</td></tr>
+                <tr><td>Data</td><td><code>rows</code>, <code>rowData</code>, <code>data</code>, <code>dataContext</code>, <code>dataSource</code></td><td>Local, tracked, or server-windowed rows.</td></tr>
+                <tr><td>Surface</td><td><code>chrome</code>, <code>radius</code>, <code>border</code>, <code>density</code>, <code>borderless</code>, <code>rowHover</code></td><td>Token-based shell, spacing, lines, and hover behavior.</td></tr>
+                <tr><td>Cell display</td><td><code>autoRowHeight</code>, <code>headerTextCase</code>, <code>nullText</code>, <code>loadingMode</code></td><td>Automatic height, casing, null fallback, and skeleton/spinner loading.</td></tr>
                 <tr><td>Columns</td><td><code>columns</code>, <code>columnGroups</code>, <code>columnPins</code></td><td>Typed columns, grouped headers, and pinned columns.</td></tr>
                 <tr><td>Sorting/filtering</td><td><code>sortMode</code>, <code>sorts</code>, <code>filterMode</code>, <code>columnFilters</code>, <code>searchTerm</code></td><td>Client or manual state.</td></tr>
                 <tr><td>Grouping</td><td><code>groupBy</code>, <code>groupSorts</code>, <code>onGroupByChange</code>, <code>onGroupSortsChange</code></td><td>Controlled nested grouping and group sorting.</td></tr>
-                <tr><td>Selection</td><td><code>selectionMode</code>, <code>selectedRows</code>, <code>onSelectedRowsChange</code>, <code>onSelectionChange</code></td><td>Single or multiple controlled selection.</td></tr>
+                <tr><td>Selection</td><td><code>selectionMode</code>, <code>selectionControl</code>, <code>appendSelection</code>, <code>hideSelectionColumn</code>, <code>selectOnNavigate</code></td><td>Controlled single, append, and range selection with optional navigation selection.</td></tr>
                 <tr><td>Pagination</td><td><code>pagination</code>, <code>pageSize</code>, <code>paginationType</code>, <code>onPageChange</code></td><td>Compact or full client pagination.</td></tr>
-                <tr><td>Virtual data</td><td><code>virtualScroll</code>, <code>columnVirtualization</code>, <code>virtualPaging</code></td><td>Large local and remote datasets.</td></tr>
-                <tr><td>Editing</td><td><code>editMode</code>, <code>editOnClick</code>, <code>editOnType</code>, <code>cellEditors</code></td><td>Cell/row editors and custom controls.</td></tr>
-                <tr><td>Details</td><td><code>rowDetails</code>, <code>rowDetail</code>, <code>detailPaneRenderer</code>, <code>onDetailPaneRowChange</code></td><td>Expandable rows and controlled side panels.</td></tr>
-                <tr><td>Callbacks</td><td><code>onSortChange</code>, <code>onFilterChange</code>, <code>onCellEditCommit</code>, <code>onRowOrderChange</code>, <code>onDataContextSaveComplete</code></td><td>Immutable state and lifecycle events.</td></tr>
-                <tr><td>Ref methods</td><td><code>DatagridHandle&lt;T&gt;</code></td><td>Sorting, filtering, paging, selection, grouping, sizing, and editing commands.</td></tr>
+                <tr><td>Virtual data</td><td><code>virtualScroll</code>, <code>columnVirtualization</code>, <code>virtualPaging</code>, <code>infiniteScroll</code>, <code>virtualDataSourceWindow</code></td><td>Large local, infinite, and server-windowed datasets.</td></tr>
+                <tr><td>Editing</td><td><code>autoEditOnNavigate</code>, <code>manualCommit</code>, <code>showDirtyIndicator</code>, <code>undoStackSize</code>, <code>enableUndoShortcuts</code>, <code>enableFillDown</code></td><td>Manual async decisions, navigation editing, dirty state, undo/redo, and fill-down.</td></tr>
+                <tr><td>Resize/reorder</td><td><code>columnResizeMode</code>, <code>columnReorderMode</code></td><td>Choose live or deferred column updates.</td></tr>
+                <tr><td>Hierarchy</td><td><code>treeChildrenField</code>, <code>nestedGrid</code>, <code>rowDetail</code>, <code>detailPaneRenderer</code></td><td>Tree children, nested grids, expandable details, and side panes.</td></tr>
+                <tr><td>New rows</td><td><code>newRowPosition</code>, <code>newRowCommit</code>, <code>newRowFactory</code></td><td>Top/bottom insertion and explicit or leave-based commit timing.</td></tr>
+                <tr><td>Controls/filtering</td><td><code>pinControlColumns</code>, <code>pinSelectionColumns</code>, <code>filterPanel</code></td><td>Sticky control columns and integrated filter expressions.</td></tr>
+                <tr><td>Callbacks/hooks</td><td><code>rowClassName</code>, <code>cellClassName</code>, <code>onRowClick</code>, <code>onRowDoubleClick</code>, <code>onCellClick</code>, detail lifecycle</td><td>Per-row/cell presentation and interaction lifecycle.</td></tr>
+                <tr><td>Aliases</td><td><code>autoFit</code>, <code>showColumnMenu</code>, <code>rowDetail</code>, <code>rowData</code></td><td>Current names reconcile with established React APIs.</td></tr>
+                <tr><td>Ref methods</td><td><code>DatagridHandle&lt;T&gt;</code></td><td>Includes <code>undo</code>, <code>redo</code>, and <code>fillDown</code> alongside existing commands.</td></tr>
               </tbody>
             </table>
           </div>

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { DatePicker } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
 import { DocsPackageBadge } from '../../components/DocsPackageBadge'
+import { DateControlContractRows } from '../../components/DateControlContractRows'
 
 const BASIC_CODE = `<DatePicker placeholder="Pick a date" onChange={(d) => console.log(d)} />`
 const INPUT_CODE = `<DatePicker inputMode placeholder="MM/DD/YYYY" />`
@@ -20,6 +21,16 @@ const WEEK_NUMBERS_BACKGROUND_CODE = `<DatePicker
 const OTHER_MONTHS_CODE = `<DatePicker showOtherMonths selectOtherMonths placeholder="Adjacent dates selectable" />
 <DatePicker showOtherMonths selectOtherMonths={false} placeholder="Adjacent dates disabled" />`
 const DISABLED_CODE = `<DatePicker disabled placeholder="Disabled" />`
+const FIELD_STATE_CODE = `<DatePicker
+  label="Start date"
+  floatingLabel
+  variant="filled"
+  placement="top-start"
+  required
+  touched
+  error="Choose a start date."
+  dismissOnScroll={false}
+/>`
 
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
@@ -29,6 +40,7 @@ const SECTIONS: Section[] = [
   { id: 'week-numbers', label: 'Week Numbers' },
   { id: 'other-months', label: 'Other Months' },
   { id: 'disabled',     label: 'Disabled' },
+  { id: 'field-state',  label: 'Field & Overlay API' },
   { id: 'api',          label: 'API' },
 ]
 
@@ -138,6 +150,14 @@ export function DatePickerPage() {
           </CodePreview>
         </section>
 
+        <section id="field-state" className="demo-section" aria-labelledby="field-state-heading">
+          <h2 id="field-state-heading">Field and overlay contract</h2>
+          <p className="section-desc">Labels, variants, validation, readonly/touched state, placement, modal constraints, and dismissal behavior remain independently configurable.</p>
+          <CodePreview code={FIELD_STATE_CODE} language="typescript">
+            <DatePicker label="Start date" floatingLabel variant="filled" placement="top-start" required touched error="Choose a start date." dismissOnScroll={false} />
+          </CodePreview>
+        </section>
+
         <section id="api" className="demo-section">
           <h2>API</h2>
           <h3>Props</h3>
@@ -160,6 +180,7 @@ export function DatePickerPage() {
                 <tr><td><code>maxDate</code></td><td><code>string | null</code></td><td><code>null</code></td><td>Max selectable date (ISO)</td></tr>
                 <tr><td><code>disabledDates</code></td><td><code>string[]</code></td><td><code>[]</code></td><td>Specific disabled dates</td></tr>
                 <tr><td><code>dateFilter</code></td><td><code>(date: string) =&gt; boolean</code></td><td><code>null</code></td><td>Custom filter function</td></tr>
+                <DateControlContractRows overlays variants />
               </tbody>
             </table>
           </div>

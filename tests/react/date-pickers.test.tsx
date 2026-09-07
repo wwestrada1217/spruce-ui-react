@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { Calendar, DatePicker, DateRangePicker, DateTimePicker } from '../../src/index.js';
+import { fireEvent } from '@testing-library/react';
+import { Calendar, DatePicker, DateRangePicker, DateTimePicker, RangeCalendar, TimePicker } from '../../src/index.js';
 import { renderWithSpruce } from '../utils/test-utils.js';
 
 function openPicker(container: HTMLElement, selector: string, user: ReturnType<typeof renderWithSpruce>['user']) {
@@ -151,5 +152,51 @@ describe('adjacent-month dates', () => {
     const disabledDay = disabled.container.querySelector<HTMLButtonElement>('.sp-cal__day--other-month');
     expect(disabledDay).not.toBeNull();
     expect(disabledDay).toBeDisabled();
+  });
+});
+
+describe('C-03 shared date-control contract', () => {
+  it('wires readonly, required, invalid, and error state across all six controls', () => {
+    const { container, getAllByRole } = renderWithSpruce(
+      <>
+        <Calendar ariaLabel="Calendar date" readOnly required error="Calendar error" />
+        <RangeCalendar ariaLabel="Calendar range" readOnly required error="Range calendar error" />
+        <DatePicker label="Date" readOnly required error="Date error" />
+        <DateRangePicker label="Date range" readOnly required error="Date range error" />
+        <TimePicker label="Time" readOnly required error="Time error" />
+        <DateTimePicker label="Date and time" readOnly required error="Date time error" />
+      </>,
+    );
+
+    expect(getAllByRole('alert')).toHaveLength(6);
+    expect(container.querySelectorAll('.sp-date-control--invalid')).toHaveLength(6);
+    expect(container.querySelectorAll('.sp-date-control--readonly')).toHaveLength(6);
+    expect(container.querySelectorAll('[aria-required="true"]')).not.toHaveLength(0);
+    expect(container.querySelectorAll('[aria-describedby$="-error"]')).not.toHaveLength(0);
+  });
+
+  it('omits hidden controls and reports blur as touched', () => {
+    const onTouchedChange = vi.fn();
+    const onBlur = vi.fn();
+    const hidden = renderWithSpruce(
+      <>
+        <Calendar hidden />
+        <RangeCalendar hidden />
+        <DatePicker hidden />
+        <DateRangePicker hidden />
+        <TimePicker hidden />
+        <DateTimePicker hidden />
+      </>,
+    );
+    expect(hidden.container.querySelectorAll('.sp-date-control--hidden')).toHaveLength(2);
+    expect(hidden.container.querySelector('.sp-dp, .sp-drp, .sp-tp, .sp-dtp')).not.toBeInTheDocument();
+    hidden.unmount();
+
+    const { getByRole } = renderWithSpruce(
+      <DatePicker inputMode label="Due date" onTouchedChange={onTouchedChange} onBlur={onBlur} />,
+    );
+    fireEvent.blur(getByRole('textbox', { name: 'Due date' }));
+    expect(onTouchedChange).toHaveBeenCalledWith(true);
+    expect(onBlur).toHaveBeenCalledTimes(1);
   });
 });

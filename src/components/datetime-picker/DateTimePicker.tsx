@@ -10,7 +10,8 @@ import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
 import { computePosition, getScrollParents, modalBoundary, onClickOutside, type Placement } from '../../utils/positioning.js';
 import { useI18n } from '../../i18n/i18n-context.js';
-import { DateControlMessages, useDateControlContract, type DateControlContractProps, type DateControlVariant } from '../date-control/date-control-contract.js';
+import { useDateControlContract, type DateControlContractProps, type DateControlVariant } from '../date-control/date-control-contract.js';
+import { DateControlMessages } from '../date-control/DateControlMessages.js';
 import './DateTimePicker.css';
 
 export type DateTimePickerSize = 'sm' | 'md' | 'lg';

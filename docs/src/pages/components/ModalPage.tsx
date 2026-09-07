@@ -23,11 +23,23 @@ const FOOTER_CODE = `<Modal
   <p>Are you sure you want to proceed?</p>
 </Modal>`
 
+const SURFACES_CODE = `<Modal
+  open={open}
+  onClose={() => setOpen(false)}
+  title="Review changes"
+  headerBackground="var(--sp-primary-tint)"
+  footerBackground="var(--sp-surface-100)"
+  footer={<Button onClick={() => setOpen(false)}>Done</Button>}
+>
+  <p>Only the header and footer receive the custom surfaces.</p>
+</Modal>`
+
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
   { id: 'basic',  label: 'Basic' },
   { id: 'sizes',  label: 'Sizes' },
   { id: 'footer', label: 'With Footer' },
+  { id: 'surfaces', label: 'Region Backgrounds' },
   { id: 'api',    label: 'API' },
 ]
 
@@ -36,6 +48,7 @@ export function ModalPage() {
   const [open, setOpen] = useState(false)
   const [sizeModal, setSizeModal] = useState<{ open: boolean; size: 'sm' | 'md' | 'lg' | 'xl' | 'full' }>({ open: false, size: 'md' })
   const [footerOpen, setFooterOpen] = useState(false)
+  const [surfacesOpen, setSurfacesOpen] = useState(false)
   const mainRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -95,6 +108,27 @@ export function ModalPage() {
           </CodePreview>
         </section>
 
+        <section id="surfaces" className="demo-section" aria-labelledby="surfaces-heading">
+          <h2 id="surfaces-heading">Header and footer backgrounds</h2>
+          <p className="section-desc">
+            Apply a Spruce custom-property value to either region without changing the dialog body.
+            The type also accepts <code>transparent</code> and <code>inherit</code>.
+          </p>
+          <CodePreview code={SURFACES_CODE} language="typescript">
+            <Button onClick={() => setSurfacesOpen(true)}>Open surfaced modal</Button>
+            <Modal
+              open={surfacesOpen}
+              onClose={() => setSurfacesOpen(false)}
+              title="Review changes"
+              headerBackground="var(--sp-primary-tint)"
+              footerBackground="var(--sp-surface-100)"
+              footer={<Button onClick={() => setSurfacesOpen(false)}>Done</Button>}
+            >
+              <p style={{ margin: 0 }}>Only the header and footer receive the custom surfaces.</p>
+            </Modal>
+          </CodePreview>
+        </section>
+
         <section id="api" className="demo-section">
           <h2>API</h2>
           <h3>Props</h3>
@@ -108,6 +142,8 @@ export function ModalPage() {
                 <tr><td><code>focusTrap</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Autofocus, trap, and restore focus</td></tr>
                 <tr><td><code>description</code></td><td><code>string</code></td><td>—</td><td>Accessible dialog description</td></tr>
             <tr><td><code>footer</code></td><td><code>ReactNode</code></td><td>—</td><td>Footer content</td></tr>
+            <tr><td><code>headerBackground</code></td><td><code>ModalRegionBackground</code></td><td>—</td><td>Token-safe header-only background</td></tr>
+            <tr><td><code>footerBackground</code></td><td><code>ModalRegionBackground</code></td><td>—</td><td>Token-safe footer-only background</td></tr>
           </tbody></table></div>
         </section>
       </div>

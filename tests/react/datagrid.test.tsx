@@ -432,6 +432,125 @@ describe('Datagrid', () => {
     expect(getByRole('button', { name: /Drag handle: Row 1/i })).toBeDisabled();
   });
 
+  it('applies current shell, density, height, line, resize, reorder, and null-display options', () => {
+    interface NullablePerson { id: number; name: string | null; age: number }
+    const nullableRows: readonly NullablePerson[] = [{ id: 1, name: null, age: 36 }];
+    const nullableColumns: readonly DatagridColumn<NullablePerson>[] = [
+      { key: 'name', header: 'Name', resizable: true },
+      { key: 'age', header: 'Age' },
+    ];
+    const { container, getByText } = renderWithSpruce(
+      <Datagrid<NullablePerson>
+        rows={nullableRows}
+        columns={nullableColumns}
+        chrome="elevated"
+        radius="lg"
+        border="strong"
+        density="comfortable"
+        autoRowHeight
+        headerTextCase="default"
+        nullText="Not provided"
+        borderless
+        showColumnLines={false}
+        rowHover={false}
+        columnResizeMode="deferred"
+        columnReorderMode="live"
+      />,
+    );
+
+    const grid = container.querySelector('.sp-datagrid');
+    expect(grid).toHaveClass(
+      'sp-chrome--elevated',
+      'sp-radius--lg',
+      'sp-border--strong',
+      'sp-datagrid--density-comfortable',
+      'sp-datagrid--auto-row-height',
+      'sp-datagrid--header-default',
+      'sp-datagrid--borderless',
+      'sp-datagrid--no-row-hover',
+      'sp-datagrid--resize-deferred',
+      'sp-datagrid--reorder-live',
+      'sp-datagrid--without-vertical-lines',
+    );
+    expect(getByText('Not provided')).toHaveClass('sp-datagrid__cell--null');
+  });
+
+  it('supports row/cell hooks, callbacks, skeletons, and hidden selection controls', async () => {
+    const onRowClick = vi.fn();
+    const onRowDoubleClick = vi.fn();
+    const onCellClick = vi.fn();
+    const rendered = renderWithSpruce(
+      <Datagrid<Person>
+        rows={rows}
+        columns={columns}
+        selectionMode="multiple"
+        hideSelectionColumn
+        rowClassName={(row) => row.id === 1 ? 'first-row' : ''}
+        cellClassName={({ column }) => column.key === 'name' ? 'name-cell' : ''}
+        onRowClick={onRowClick}
+        onRowDoubleClick={onRowDoubleClick}
+        onCellClick={onCellClick}
+      />,
+    );
+    const adaCell = rendered.getByRole('gridcell', { name: 'Ada' });
+    expect(adaCell).toHaveClass('name-cell');
+    expect(adaCell.closest('[role="row"]')).toHaveClass('first-row');
+    expect(rendered.queryByRole('checkbox')).not.toBeInTheDocument();
+    await rendered.user.click(adaCell);
+    expect(onCellClick).toHaveBeenCalledWith(expect.objectContaining({ row: rows[0], column: columns[0] }));
+    expect(onRowClick).toHaveBeenCalledWith(expect.objectContaining({ row: rows[0] }));
+    await rendered.user.dblClick(adaCell);
+    expect(onRowDoubleClick).toHaveBeenCalledWith(expect.objectContaining({ row: rows[0] }));
+    rendered.unmount();
+
+    const loading = renderWithSpruce(
+      <Datagrid<Person> rows={[]} columns={columns} loading loadingMode="skeleton" skeletonRowCount={3} />,
+    );
+    expect(loading.container.querySelectorAll('.sp-datagrid__skeleton-row')).toHaveLength(3);
+  });
+
+  it('loads server-windowed rows and renders tree children with the canonical grid', async () => {
+    const source = {
+      read: vi.fn(async () => ({
+        pageNumber: 1,
+        pageSize: 25,
+        totalPages: 1,
+        totalRecords: rows.length,
+        data: [...rows],
+        hasPrevious: false,
+        hasNext: false,
+      })),
+      getById: vi.fn(async (id: string) => rows.find((row) => String(row.id) === id) ?? rows[0]!),
+      search: vi.fn(async () => ({
+        pageNumber: 1,
+        pageSize: 25,
+        totalPages: 1,
+        totalRecords: rows.length,
+        data: [...rows],
+        hasPrevious: false,
+        hasNext: false,
+      })),
+    };
+    const remote = renderWithSpruce(
+      <Datagrid<Person> dataSource={source} columns={columns} virtualDataSourceWindow virtualScrollHeight={120} />,
+    );
+    await waitFor(() => expect(remote.getByRole('gridcell', { name: 'Ada' })).toBeInTheDocument());
+    expect(source.read).toHaveBeenCalledWith(expect.objectContaining({ custom: expect.objectContaining({ start: 0 }) }));
+    remote.unmount();
+
+    interface TreePerson extends Person { children?: readonly TreePerson[] }
+    const treeRows: readonly TreePerson[] = [{ id: 1, name: 'Parent', age: 36, children: [{ id: 2, name: 'Child', age: 10 }] }];
+    const treeColumns: readonly DatagridColumn<TreePerson>[] = [
+      { key: 'name', header: 'Name' },
+      { key: 'age', header: 'Age' },
+    ];
+    const tree = renderWithSpruce(
+      <Datagrid<TreePerson> rows={treeRows} columns={treeColumns} treeChildrenField="children" treeExpandedByDefault />,
+    );
+    await waitFor(() => expect(tree.getByText('Child')).toBeInTheDocument());
+    expect(tree.getAllByRole('grid')).toHaveLength(2);
+  });
+
   it.each(['light', 'dark'] as const)('uses design tokens in the %s theme', async (theme: 'light' | 'dark') => {
     const { getByRole } = renderWithTheme(
       <Datagrid<Person> rows={rows} columns={columns} ariaLabel={`${theme} people`} />,

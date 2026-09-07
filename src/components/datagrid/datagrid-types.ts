@@ -360,12 +360,12 @@ export interface DatagridCellEvent<T extends object> extends DatagridRowEvent<T>
 export interface DatagridNestedGridConfig<T extends object, C extends object = Record<string, unknown>> {
   readonly getRows: (row: T) => readonly C[];
   readonly columns: readonly DatagridColumn<C>[];
-  readonly props?: Omit<DatagridNestedGridProps<C>, 'data' | 'rows' | 'columns'>;
+  readonly props?: DatagridNestedGridProps;
   readonly height?: number;
 }
 
 /** Serializable subset accepted by nested grids without recursively nesting their type. */
-export interface DatagridNestedGridProps<T extends object> {
+export interface DatagridNestedGridProps {
   readonly selectionMode?: DatagridSelectionMode;
   readonly stripedRows?: boolean;
   readonly showVerticalLines?: boolean;

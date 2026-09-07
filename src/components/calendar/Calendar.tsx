@@ -9,7 +9,8 @@ import { Fragment, useState, useMemo, useCallback, useRef, useEffect } from 'rea
 import './Calendar.css';
 import { Icon } from '../../icons/Icon.js';
 import { useI18n } from '../../i18n/i18n-context.js';
-import { DateControlMessages, useDateControlContract, type DateControlContractProps } from '../date-control/date-control-contract.js';
+import { useDateControlContract, type DateControlContractProps } from '../date-control/date-control-contract.js';
+import { DateControlMessages } from '../date-control/DateControlMessages.js';
 
 /* ── Types ── */
 

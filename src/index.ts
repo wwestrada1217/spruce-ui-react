@@ -478,7 +478,7 @@ export type { ComboboxProps, ComboboxOption, ComboboxSource } from './components
 
 // ─── GridCombobox ────────────────────────────────────────────────────────────
 export { GridCombobox } from './components/grid-combobox/GridCombobox.js';
-export type { GridComboboxProps, GridComboboxColumn, GridComboboxOption, GridComboboxSource, GridComboboxVariant } from './components/grid-combobox/GridCombobox.js';
+export type { GridComboboxProps, GridComboboxBaseProps, GridComboboxSingleProps, GridComboboxMultipleProps, GridComboboxColumn, GridComboboxOption, GridComboboxSource, GridComboboxVariant } from './components/grid-combobox/GridCombobox.js';
 
 // ─── Lookup contracts ───────────────────────────────────────────────────────
 export type { LookupOption, LookupColumn, LookupRenderContext, LookupSource, LookupRenderer } from './components/lookup/lookup-types.js';
@@ -511,6 +511,9 @@ export type {
   DatagridAggregateValueContext,
   DatagridBuiltInAggregate,
   DatagridCellContext,
+  DatagridCellEvent,
+  DatagridCellClassName,
+  DatagridCellStyle,
   DatagridCellEditorContext,
   DatagridCellTemplateContext,
   DatagridChoiceOption,
@@ -532,6 +535,7 @@ export type {
   DatagridDynamicFilterCondition,
   DatagridDynamicFilterOperator,
   DatagridEditCancel,
+  DatagridEditDecision,
   DatagridEditLabels,
   DatagridEditMode,
   DatagridEditorOptions,
@@ -540,16 +544,23 @@ export type {
   DatagridFilterDataType,
   DatagridFilterIndicatorVisibility,
   DatagridFilterMode,
+  DatagridFilterPanelConfig,
   DatagridFilterVariant,
   DatagridGroupBy,
   DatagridGroupSort,
   DatagridGroupSortDirection,
+  DatagridHeaderTextCase,
   DatagridLeadingRowActionsContext,
   DatagridNewRowCommit,
+  DatagridNewRowCommitMode,
   DatagridNewRowFactory,
+  DatagridNewRowPosition,
   DatagridPageChange,
   DatagridPaginationType,
   DatagridRecordState,
+  DatagridReorderMode,
+  DatagridResizeMode,
+  DatagridRowEvent,
   DatagridRowClassName,
   DatagridRowDetailContext,
   DatagridRowDetailExpandable,
@@ -560,7 +571,12 @@ export type {
   DatagridRowStyle,
   DatagridRowTemplateContext,
   DatagridSelectionChange,
+  DatagridSelectionControl,
   DatagridSelectionMode,
+  DatagridDensity,
+  DatagridLoadingMode,
+  DatagridNestedGridConfig,
+  DatagridNestedGridProps,
   DatagridSort,
   DatagridSortChange,
   DatagridSortDirection,

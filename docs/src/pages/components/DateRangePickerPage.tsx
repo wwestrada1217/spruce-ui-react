@@ -3,6 +3,7 @@ import { DateRangePicker } from 'spruce-react'
 import type { DateRange, DateRangePreset } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
 import { DocsPackageBadge } from '../../components/DocsPackageBadge'
+import { DateControlContractRows } from '../../components/DateControlContractRows'
 
 const BASIC_CODE = `<DateRangePicker placeholder="Select range" onChange={(r) => console.log(r)} />`
 
@@ -22,6 +23,14 @@ const OTHER_MONTHS_CODE = `<DateRangePicker showOtherMonths selectOtherMonths pl
 const MULTI_MONTH_CODE = `<DateRangePicker months={3} placeholder="Three calendar panels" />`
 
 const DISABLED_CODE = `<DateRangePicker disabled placeholder="Disabled" />`
+const FIELD_STATE_CODE = `<DateRangePicker
+  label="Reporting period"
+  floatingLabel
+  variant="outline"
+  placement="top-end"
+  required
+  error="Choose a reporting period."
+/>`
 
 const today = new Date()
 const todayISO = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
@@ -46,6 +55,7 @@ const SECTIONS: Section[] = [
   { id: 'multi-month', label: 'Multiple Months' },
   { id: 'other-months', label: 'Other Months' },
   { id: 'disabled',   label: 'Disabled' },
+  { id: 'field-state', label: 'Field & Overlay API' },
   { id: 'api',        label: 'API' },
 ]
 
@@ -142,6 +152,14 @@ export function DateRangePickerPage() {
           </CodePreview>
         </section>
 
+        <section id="field-state" className="demo-section" aria-labelledby="field-state-heading">
+          <h2 id="field-state-heading">Field and overlay contract</h2>
+          <p className="section-desc">The range picker supports visible/floating labels, field variants, shared validation state, placement, modal constraints, and configurable dismissal.</p>
+          <CodePreview code={FIELD_STATE_CODE} language="typescript">
+            <DateRangePicker label="Reporting period" floatingLabel variant="outline" placement="top-end" required error="Choose a reporting period." />
+          </CodePreview>
+        </section>
+
         <section id="api" className="demo-section">
           <h2>API</h2>
           <h3>Props</h3>
@@ -160,6 +178,7 @@ export function DateRangePickerPage() {
                 <tr><td><code>selectOtherMonths</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Allow selecting visible adjacent-month dates</td></tr>
                 <tr><td><code>months</code></td><td><code>number</code></td><td><code>2</code></td><td>Number of calendar panels</td></tr>
                 <tr><td><code>presets</code></td><td><code>DateRangePreset[]</code></td><td><code>[]</code></td><td>Preset range options</td></tr>
+                <DateControlContractRows overlays variants />
               </tbody>
             </table>
           </div>

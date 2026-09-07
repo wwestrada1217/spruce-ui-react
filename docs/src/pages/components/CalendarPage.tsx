@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Calendar } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
+import { DateControlContractRows } from '../../components/DateControlContractRows'
 
 const BASIC_CODE = `<Calendar onChange={(date) => console.log(date)} />`
 
@@ -21,6 +22,14 @@ const OTHER_MONTHS_CODE = `<Calendar showOtherMonths selectOtherMonths />
 
 const NO_FOOTER_CODE = `<Calendar showFooter={false} />`
 
+const FIELD_STATE_CODE = `<Calendar
+  ariaLabel="Appointment date"
+  required
+  touched
+  errors={[{ message: 'Choose an appointment date.' }]}
+  onTouchedChange={(touched) => console.log(touched)}
+/>`
+
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
   { id: 'basic',          label: 'Basic Usage' },
@@ -29,6 +38,7 @@ const SECTIONS: Section[] = [
   { id: 'week-numbers',   label: 'Week Numbers' },
   { id: 'other-months',   label: 'Other Months' },
   { id: 'no-footer',      label: 'Without Footer' },
+  { id: 'field-state',    label: 'Field State' },
   { id: 'api',            label: 'API' },
 ]
 
@@ -137,6 +147,14 @@ export function CalendarPage() {
           </CodePreview>
         </section>
 
+        <section id="field-state" className="demo-section" aria-labelledby="field-state-heading">
+          <h2 id="field-state-heading">Form state and validation</h2>
+          <p className="section-desc">Calendar shares the date-control readonly, hidden, required, touched, hint, and accessible error contract.</p>
+          <CodePreview code={FIELD_STATE_CODE} language="typescript">
+            <Calendar ariaLabel="Appointment date" required touched errors={[{ message: 'Choose an appointment date.' }]} />
+          </CodePreview>
+        </section>
+
         <section id="api" className="demo-section">
           <h2>API</h2>
           <h3>Props</h3>
@@ -157,6 +175,7 @@ export function CalendarPage() {
                 <tr><td><code>showOtherMonths</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show dates from adjacent months</td></tr>
                 <tr><td><code>selectOtherMonths</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Allow selecting visible adjacent-month dates</td></tr>
                 <tr><td><code>showFooter</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show Today/Clear footer buttons</td></tr>
+                <DateControlContractRows />
               </tbody>
             </table>
           </div>

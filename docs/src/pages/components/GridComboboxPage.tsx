@@ -76,6 +76,21 @@ const CUSTOM_ROW_CODE = `<GridCombobox
   )}
 />`
 
+const CURRENT_API_CODE = `<GridCombobox
+  columns={columns}
+  options={options}
+  multiple
+  value={selected}
+  onChange={(next) => setSelected(Array.isArray(next) ? next : [next])}
+  icon="globe"
+  variant="filled"
+  searchFields={['name', 'capital']}
+  panelResizable
+  label="Markets"
+  required
+  error={selected.length === 0 ? 'Choose at least one market.' : undefined}
+/>`
+
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
   { id: 'basic', label: 'Basic' },
@@ -84,12 +99,14 @@ const SECTIONS: Section[] = [
   { id: 'resizable', label: 'Resizable Columns' },
   { id: 'virtual', label: 'Virtual Scrolling & Paging' },
   { id: 'custom-row', label: 'Custom Rows' },
+  { id: 'current-api', label: 'Multiple & Field API' },
   { id: 'api',   label: 'API' },
 ]
 
 export function GridComboboxPage() {
   const [activeSection, setActiveSection] = useState('basic')
   const [val, setVal] = useState('')
+  const [selected, setSelected] = useState<string[]>([])
   const mainRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -130,7 +147,7 @@ export function GridComboboxPage() {
                 placeholder="Search countries..."
                 filterBy={['name', 'code', 'capital']}
                 value={val}
-                onChange={setVal}
+                onChange={(next) => setVal(Array.isArray(next) ? next[0] ?? '' : next)}
               />
             </div>
           </CodePreview>
@@ -189,6 +206,33 @@ export function GridComboboxPage() {
           </CodePreview>
         </section>
 
+        <section id="current-api" className="demo-section" aria-labelledby="current-api-heading">
+          <h2 id="current-api-heading">Multiple selection and field API</h2>
+          <p className="section-desc">
+            Multiple mode keeps the panel open and reports an array. The leading icon, visual
+            variant, explicit search fields, validation contract, and user-resizable panel can be
+            combined independently of column resizing.
+          </p>
+          <CodePreview code={CURRENT_API_CODE} language="typescript">
+            <div style={{ maxWidth: 520 }}>
+              <GridCombobox
+                columns={columns}
+                options={options}
+                multiple
+                value={selected}
+                onChange={(next) => setSelected(Array.isArray(next) ? next : [next])}
+                icon="globe"
+                variant="filled"
+                searchFields={['name', 'capital']}
+                panelResizable
+                label="Markets"
+                required
+                error={selected.length === 0 ? 'Choose at least one market.' : undefined}
+              />
+            </div>
+          </CodePreview>
+        </section>
+
         <section id="api" className="demo-section">
           <h2>API</h2>
           <h3>Props</h3>
@@ -199,14 +243,21 @@ export function GridComboboxPage() {
                 <tr><td><code>columns</code></td><td><code>GridComboboxColumn[]</code></td><td>—</td><td>Column definitions</td></tr>
                 <tr><td><code>options</code></td><td><code>GridComboboxOption[]</code></td><td>—</td><td>Data rows</td></tr>
                 <tr><td><code>source</code></td><td><code>LookupSource</code></td><td>—</td><td>Array, readable data source, or URL</td></tr>
-                <tr><td><code>value</code></td><td><code>string</code></td><td>—</td><td>Selected value</td></tr>
-                <tr><td><code>onChange</code></td><td><code>(value: string) =&gt; void</code></td><td>—</td><td>Selection callback</td></tr>
+                <tr><td><code>value</code></td><td><code>string | readonly string[]</code></td><td>—</td><td>Controlled selected value or values</td></tr>
+                <tr><td><code>multiple</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Enable array-valued multi-selection</td></tr>
+                <tr><td><code>onChange</code></td><td><code>(value: string | string[]) =&gt; void</code></td><td>—</td><td>Value-based selection callback</td></tr>
                 <tr><td><code>onSelect</code></td><td><code>(item) =&gt; void</code></td><td>—</td><td>Full item callback</td></tr>
                 <tr><td><code>placeholder</code></td><td><code>string</code></td><td><code>'Search...'</code></td><td>Input placeholder</td></tr>
                 <tr><td><code>filterBy</code></td><td><code>string | string[]</code></td><td><code>'label'</code></td><td>Keys to filter on</td></tr>
+                <tr><td><code>searchFields</code></td><td><code>readonly string[] | null</code></td><td><code>null</code></td><td>Explicit local and remote search fields</td></tr>
+                <tr><td><code>icon</code></td><td><code>string | null</code></td><td><code>null</code></td><td>Leading icon name</td></tr>
+                <tr><td><code>variant</code></td><td><code>'default' | 'outline' | 'outlined' | 'filled'</code></td><td><code>'default'</code></td><td>Field surface variant</td></tr>
                 <tr><td><code>disabled</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Disable the combobox</td></tr>
                 <tr><td><code>showChevron</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Show a clickable right-side chevron that rotates when open</td></tr>
                 <tr><td><code>resizableColumns</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Enable accessible column resize handles</td></tr>
+                <tr><td><code>panelResizable</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Allow native resizing of the open panel</td></tr>
+                <tr><td><code>label / floatingLabel</code></td><td><code>string / boolean</code></td><td><code>'' / false</code></td><td>Accessible visible field labelling</td></tr>
+                <tr><td><code>error / errors / invalid / required</code></td><td>field state</td><td>—</td><td>Shared validation and ARIA contract</td></tr>
                 <tr><td><code>showColumnLines</code></td><td><code>boolean</code></td><td><code>resizableColumns</code></td><td>Show vertical lines between header columns; enabled by default when columns are resizable</td></tr>
                 <tr><td><code>stripedRows</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Show alternating row backgrounds</td></tr>
                 <tr><td><code>renderRow</code></td><td><code>(context) =&gt; ReactNode</code></td><td>—</td><td>Custom row renderer</td></tr>

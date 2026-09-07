@@ -5,11 +5,15 @@
  * The full license information can be found in LICENSE in the root directory of this project.
  */
 
+/* The local draft intentionally synchronizes from the controlled range value. */
+/* eslint-disable react-hooks/set-state-in-effect */
+
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { Icon } from '../../icons/Icon.js';
 import { useI18n } from '../../i18n/i18n-context.js';
 import './RangeCalendar.css';
-import { DateControlMessages, useDateControlContract, type DateControlContractProps } from '../date-control/date-control-contract.js';
+import { useDateControlContract, type DateControlContractProps } from '../date-control/date-control-contract.js';
+import { DateControlMessages } from '../date-control/DateControlMessages.js';
 
 /* ── Types ── */
 
@@ -131,13 +135,9 @@ export function RangeCalendar({
   const todayParsed = useMemo(() => parseISO(today), [today]);
 
   // Determine initial base month from value or today
-  const initialBase = useMemo(() => {
-    if (value?.start) {
-      const p = parseISO(value.start);
-      return { month: p.month, year: p.year };
-    }
-    return { month: todayParsed.month, year: todayParsed.year };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const initialBase = value?.start
+    ? parseISO(value.start)
+    : { month: todayParsed.month, year: todayParsed.year };
 
   const [baseMonth, setBaseMonth] = useState(initialBase.month);
   const [baseYear, setBaseYear] = useState(initialBase.year);

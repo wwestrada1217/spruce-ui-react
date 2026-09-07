@@ -5,6 +5,9 @@
  * The full license information can be found in LICENSE in the root directory of this project.
  */
 
+/* Controlled range drafts intentionally synchronize from external values. */
+/* eslint-disable react-hooks/set-state-in-effect */
+
 import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import {
@@ -16,7 +19,8 @@ import {
 } from '../../utils/positioning.js';
 import { Icon } from '../../icons/Icon.js';
 import { useI18n } from '../../i18n/i18n-context.js';
-import { DateControlMessages, useDateControlContract, type DateControlContractProps, type DateControlVariant } from '../date-control/date-control-contract.js';
+import { useDateControlContract, type DateControlContractProps, type DateControlVariant } from '../date-control/date-control-contract.js';
+import { DateControlMessages } from '../date-control/DateControlMessages.js';
 import './DateRangePicker.css';
 
 /* ── Types (re-exported from RangeCalendar conventions) ── */
@@ -216,13 +220,9 @@ export function DateRangePicker({
 
   /* ── Calendar State ── */
 
-  const initialBase = useMemo(() => {
-    if (value?.start) {
-      const p = parseISO(value.start);
-      return { month: p.month, year: p.year };
-    }
-    return { month: todayParsed.month, year: todayParsed.year };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const initialBase = value?.start
+    ? parseISO(value.start)
+    : { month: todayParsed.month, year: todayParsed.year };
 
   const [baseMonth, setBaseMonth] = useState(initialBase.month);
   const [baseYear, setBaseYear] = useState(initialBase.year);

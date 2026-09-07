@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { StatCard } from 'spruce-react'
+import { StatCard, StatDivider, StatGroup } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
 
 // ── Inline sparkline SVG ──────────────────────────────────────────────────────
@@ -78,6 +78,18 @@ const TREND_COLORS_CODE = `<StatCard label="Upward"   value="4,291" change="+8.1
 <StatCard label="Downward" value="1,342" change="−2.4%"  trend="down" />
 <StatCard label="Neutral"  value="3.2%"  change="±0.0%"  trend="neutral" />`
 
+const INLINE_CODE = `<StatGroup variant="strip" bordered ariaLabel="Account metrics">
+  <StatCard variant="inline" icon="users" label="Users" value="4,291" change="+8.1%" trend="up" />
+  <StatDivider />
+  <StatCard variant="inline" icon="shopping-cart" label="Orders" value="1,342" />
+</StatGroup>`
+
+const GROUP_CODE = `<StatGroup variant="grid" bordered>
+  <StatCard label="Revenue" value="$24.5k" />
+  <StatCard label="Users" value="4,291" />
+  <StatCard label="Orders" value="1,342" />
+</StatGroup>`
+
 // ── Sections ──────────────────────────────────────────────────────────────────
 
 interface Section { id: string; label: string }
@@ -88,6 +100,7 @@ const SECTIONS: Section[] = [
   { id: 'icon-colors',    label: 'Icon Colors' },
   { id: 'trend',          label: 'Trend + Sparkline' },
   { id: 'trend-colors',   label: 'Trend Colors' },
+  { id: 'inline',         label: 'Inline & Groups' },
   { id: 'dashboard-grid', label: 'Dashboard Grid' },
   { id: 'api',            label: 'API' },
 ]
@@ -247,6 +260,29 @@ export function StatCardPage() {
           </CodePreview>
         </section>
 
+        <section id="inline" className="demo-section" aria-labelledby="inline-heading">
+          <h2 id="inline-heading">Inline cards and groups</h2>
+          <p className="section-desc">
+            Use the compact inline variant in a labelled strip, or let <code>StatGroup</code>
+            arrange cards as a responsive grid or stack. <code>StatDivider</code> provides an
+            explicit visual separator and is hidden from assistive technology.
+          </p>
+          <CodePreview code={INLINE_CODE} language="typescript">
+            <StatGroup variant="strip" bordered ariaLabel="Account metrics">
+              <StatCard variant="inline" icon="users" label="Users" value="4,291" change="+8.1%" trend="up" />
+              <StatDivider />
+              <StatCard variant="inline" icon="shopping-cart" label="Orders" value="1,342" />
+            </StatGroup>
+          </CodePreview>
+          <CodePreview code={GROUP_CODE} language="typescript">
+            <StatGroup variant="grid" bordered>
+              <StatCard label="Revenue" value="$24.5k" />
+              <StatCard label="Users" value="4,291" />
+              <StatCard label="Orders" value="1,342" />
+            </StatGroup>
+          </CodePreview>
+        </section>
+
         <section id="dashboard-grid" className="demo-section" aria-labelledby="dashboard-grid-heading">
           <h2 id="dashboard-grid-heading">Dashboard Grid</h2>
           <p className="section-desc">
@@ -291,11 +327,23 @@ export function StatCardPage() {
                 <tr><td><code>value</code></td><td><code>string</code></td><td><code>''</code></td><td>Primary metric value (pre-formatted string)</td></tr>
                 <tr><td><code>change</code></td><td><code>string</code></td><td><code>''</code></td><td>Change indicator text — empty hides it</td></tr>
                 <tr><td><code>trend</code></td><td><code>'up' | 'down' | 'neutral'</code></td><td><code>'neutral'</code></td><td>Controls change badge colour</td></tr>
-                <tr><td><code>variant</code></td><td><code>'flat' | 'icon' | 'trend'</code></td><td><code>'flat'</code></td><td>Visual layout variant</td></tr>
+                <tr><td><code>variant</code></td><td><code>'flat' | 'icon' | 'trend' | 'inline'</code></td><td><code>'flat'</code></td><td>Visual layout variant</td></tr>
                 <tr><td><code>icon</code></td><td><code>string | null</code></td><td><code>null</code></td><td>Lucide icon name — used by <code>icon</code> variant</td></tr>
                 <tr><td><code>iconColor</code></td><td><code>'blue' | 'green' | 'amber' | 'red' | 'purple'</code></td><td><code>'blue'</code></td><td>Icon tile colour</td></tr>
                 <tr><td><code>chartFit</code></td><td><code>'bleed' | 'inset'</code></td><td><code>'bleed'</code></td><td>Whether trend charts bleed to the card edges</td></tr>
                 <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>—</td><td>Chart area rendered below the value when <code>variant="trend"</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>StatGroup props</h3>
+          <div className="api-table-wrap">
+            <table className="api-table">
+              <thead><tr><th>Name</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>variant</code></td><td><code>'strip' | 'grid' | 'stack'</code></td><td><code>'strip'</code></td><td>Responsive child layout</td></tr>
+                <tr><td><code>bordered</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Add a token-based group border</td></tr>
+                <tr><td><code>ariaLabel</code></td><td><code>string</code></td><td>—</td><td>Accessible name for the metric group</td></tr>
+                <tr><td><code>children</code></td><td><code>ReactNode</code></td><td>—</td><td>Cards and optional dividers</td></tr>
               </tbody>
             </table>
           </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { TimePicker } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
+import { DateControlContractRows } from '../../components/DateControlContractRows'
 
 const BASIC_CODE = `<TimePicker placeholder="Select time" onChange={(v) => console.log(v)} />`
 const FORMAT_CODE = `<TimePicker use24Hour placeholder="Select time (24h)" />`
@@ -13,6 +14,15 @@ const DISABLED_CODE = `<TimePicker disabled placeholder="Disabled" />`
 const INPUT_MODE_CODE = `<TimePicker inputMode placeholder="hh:MM AM" />
 <TimePicker inputMode use24Hour placeholder="HH:MM" />
 <TimePicker inputMode showSeconds placeholder="hh:MM:SS AM" />`
+const FIELD_STATE_CODE = `<TimePicker
+  inputMode
+  label="Start time"
+  floatingLabel
+  variant="filled"
+  required
+  error="Choose a start time."
+  placement="top-start"
+/>`
 
 interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
@@ -22,6 +32,7 @@ const SECTIONS: Section[] = [
   { id: 'sizes',      label: 'Sizes' },
   { id: 'disabled',   label: 'Disabled' },
   { id: 'input-mode', label: 'Input Mode' },
+  { id: 'field-state', label: 'Field & Overlay API' },
   { id: 'api',        label: 'API' },
 ]
 
@@ -120,6 +131,14 @@ export function TimePickerPage() {
           </CodePreview>
         </section>
 
+        <section id="field-state" className="demo-section" aria-labelledby="field-state-heading">
+          <h2 id="field-state-heading">Field and overlay contract</h2>
+          <p className="section-desc">TimePicker supports labels, visual variants, shared form state, placement, modal constraints, and outside/scroll dismissal controls.</p>
+          <CodePreview code={FIELD_STATE_CODE} language="typescript">
+            <TimePicker inputMode label="Start time" floatingLabel variant="filled" required error="Choose a start time." placement="top-start" />
+          </CodePreview>
+        </section>
+
         <section id="api" className="demo-section">
           <h2>API</h2>
           <h3>Props</h3>
@@ -137,6 +156,7 @@ export function TimePickerPage() {
                 <tr><td><code>showSeconds</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Show seconds spinner</td></tr>
                 <tr><td><code>inputMode</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Text input with toggle button</td></tr>
                 <tr><td><code>disabled</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Disable the picker</td></tr>
+                <DateControlContractRows overlays variants />
               </tbody>
             </table>
           </div>

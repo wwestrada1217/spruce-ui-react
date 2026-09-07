@@ -24,7 +24,7 @@ The comparison covered Angular docs navigation and routes, library barrels, comp
 - All 35 Angular chart pages have React counterparts; React also documents its shared chart kernel.
 - All 12 currently routed Angular/React block examples are present in React.
 - The active Angular docs surfaces that have no React page are three general components, two effects/docs subjects, all 21 Mobile pages, and all 41 AI pages.
-- Several same-name React components exist but trail the current Angular API: `Datagrid`, the six date controls, `GridCombobox`, the `StatCard` family, and `Modal`.
+- The previously recorded current-API deltas for `Datagrid`, the six date controls, `GridCombobox`, the `StatCard` family, and `Modal` are closed in React.
 - The Angular theme package exports two reusable UI surfaces that React does not export: `ThemeSwitcher`/`ThemeSwitcherPanel` and `HarmonyWheel`.
 - Angular includes generated Figma/Tokens Studio/DTCG and Penpot token deliverables; React has no equivalent design-tool export workflow.
 
@@ -48,7 +48,7 @@ The prompts linked from each **TODO** row are copy-paste implementation prompts 
 | **Complete** | Design tokens and typed token API | Current CSS token coverage and typed token access are present. Apparent Angular-only `--sp-control-*`, `--sp-frosted-*`, and `--sp-shadow-*` scan hits are family prefixes rather than missing individual tokens. | No action. |
 | **Complete** | Core data contracts | `DataContext`, local/remote data sources, detail source/manager, form model/bridge, errors, undo, navigation cursor, node store, adapters, and hooks exist in React. | No action. |
 | **Complete** | Positioning, focus, overlays, direction, i18n, chrome, motifs | React has framework-appropriate utilities/providers and the focused parity tests/matrices for these shared contracts. | No action. |
-| **TODO** | Canonical data-grid option set | React `Datagrid` is the correct canonical grid and already covers the core matrix, but it lacks a material set of current Angular grid options and behaviors detailed under Components. | [C-21](#c-21--datagrid-current-option-delta) |
+| **Complete** | Canonical data-grid option set | React `Datagrid` remains canonical and now covers the current Angular option matrix while retaining established React aliases and DataGridEx-style presentation. | No action. |
 | **Not applicable** | Angular signals, dependency injection, services, content projection, template directives, and route guards | React uses controlled props, callbacks, hooks, context/providers, children/render props, and components for the same user-facing behaviors. Angular syntax should not be ported literally. | No action. |
 | **Not applicable** | Angular `signal-forms`, `focus-directives`, `mention-directive`, and template-marker docs | Their behaviors are covered by React's form model/controlled controls, focus utilities, `Mention`/editor APIs, and render props. These are not missing React components. | No action. |
 | **Not applicable** | Legacy `Datagridex` | React intentionally keeps `Datagrid` as the canonical implementation. Reintroducing the legacy grid would create two competing grids. | No action. |
@@ -68,8 +68,8 @@ The prompts linked from each **TODO** row are copy-paste implementation prompts 
 | Flag | Angular surface | React result | Prompt |
 | --- | --- | --- | --- |
 | **Complete** | Badge, Kbd, Progress Bar, Circular Progress, Avatar, Avatar Group, Spinner, Empty, Timeline, Git Graph, Tree, Barcode/QR, Credit Card, Scheduler, Gantt, Kanban, Terminal, PDF Viewer, Rating, Carousel, Lightbox, Image Compare, Image Editor, Aspect Ratio, List, Table, Compose Bar, Comment Thread, Property Panel, Text Diff, entitlement/feature gate | React counterparts and docs exist with the material current behaviors. | No action. |
-| **TODO** | `Datagrid` current option set | React's canonical grid is substantial, but current Angular additionally exposes shell chrome/radius/border/density, automatic row height, header/null/loading variants, selection/navigation variants, deferred resize/reorder, edit undo/fill/manual commit, infinite and server-windowed loading, tree/nested rows, new-row placement/commit modes, pinned control columns, filter-panel integration, and row/cell event hooks. | [C-21](#c-21--datagrid-current-option-delta) |
-| **TODO** | `StatCard`, `StatGroup`, `StatDivider` | React has flat/icon/trend `StatCard`, but Angular now also has the `inline` variant plus exported group (`strip`, `grid`, `stack`, `bordered`) and divider components. | [C-02](#c-02--statcard-family-delta) |
+| **Complete** | `Datagrid` current option set | React's canonical grid now includes current shell, display, selection, resize/reorder, editing, loading, hierarchy, new-row, pinned-control, filter-panel, class-hook, and lifecycle options, with compatibility aliases. | No action. |
+| **Complete** | `StatCard`, `StatGroup`, `StatDivider` | React includes flat/icon/trend/inline cards plus typed strip/grid/stack groups, bordered behavior, and accessible dividers. | No action. |
 | **Not applicable** | `PlanCards` source file | The Angular file is not exported from the current data-display barrel and has no active docs route; React removed its old copy. Restore only after a product/API decision. | No action. |
 
 ### Forms and inputs
@@ -77,8 +77,8 @@ The prompts linked from each **TODO** row are copy-paste implementation prompts 
 | Flag | Angular surface | React result | Prompt |
 | --- | --- | --- | --- |
 | **Complete** | Field, Form Layout, Input Group, Checkbox, Radio, Switch, Input, Property Panel, Select, Combobox, Lookups, Dropdown, Textarea, Mention, Color Picker, Emoji Picker, Password Input/Progress, OTP, Masked Input, Slider/Range, File Upload, Editor, Block Editor, Comment Thread, Markdown Editor, Code Editor, Diff Editor, Text Diff, In-place Editor, Signature Pad, Filter Expression, Form Builder | React counterparts, controlled value callbacks, docs, styling, and the shared form foundation exist. Exceptions are separated below. | No action. |
-| **TODO** | Calendar, Range Calendar, Date Picker, Date Range Picker, Time Picker, Datetime Picker | React has all six controls and adjacent-month behavior, but the current Angular form-state contract and, where applicable, label/floating-label, visual variant, placement, modal constraint, and scroll/outside dismissal controls are incomplete. | [C-03](#c-03--date-control-contract) |
-| **TODO** | `GridCombobox` | React exists, including resizable columns, but lacks current Angular multiple selection, icon, visual variant, search-field configuration, and panel-resize behavior. | [C-04](#c-04--gridcombobox-current-api) |
+| **Complete** | Calendar, Range Calendar, Date Picker, Date Range Picker, Time Picker, Datetime Picker | All six controls share readonly/hidden/invalid/error/required/touched semantics and accessible feedback; picker overlays also expose the applicable label, variant, placement, modal, and dismissal controls. | No action. |
+| **Complete** | `GridCombobox` | React supports controlled single/multiple values, leading icons, variants, search fields, panel and column resizing, shared field validation, and accessible keyboard/ARIA behavior. | No action. |
 | **TODO** | `TreeCombobox` | Entire React component and docs route are absent. | [C-05](#c-05--treecombobox) |
 | **TODO** | `TreeGridCombobox` | Entire React component and docs route are absent. | [C-06](#c-06--treegridcombobox) |
 
@@ -87,7 +87,7 @@ The prompts linked from each **TODO** row are copy-paste implementation prompts 
 | Flag | Angular surface | React result | Prompt |
 | --- | --- | --- | --- |
 | **Complete** | Card, Panel, Grid, Masonry, Splitter, Layout Manager, Dock Manager, Compose Bar, Sidebar, App Header, Drawer, Window, Alert, Message Bar, Popover, Tooltip, Notification Center, Toast, Snackbar, Command Palette, Coachmark, App Shell | React counterparts cover the material public behavior and docs. | No action. |
-| **TODO** | `Modal` | React is implemented, but current Angular exposes `headerBackground` and `footerBackground`; React has no equivalent token-safe header/footer surface controls. | [C-07](#c-07--modal-header-and-footer-backgrounds) |
+| **Complete** | `Modal` | React exposes token-safe `headerBackground` and `footerBackground` values scoped to their respective regions. | No action. |
 | **Not applicable** | `CompanySwitcher` source file | The Angular file is not exported by the current sidebar barrel and has no active nav entry; React intentionally removed its previous copy. Restore only after a product/API decision. | No action. |
 
 ### Charts
@@ -175,17 +175,23 @@ In C:\Users\acasauran\Documents\Spruce\spruce-ui-react, implement React parity f
 
 ### C-02 — StatCard family delta
 
+**Status: Complete (2026-09-07).**
+
 ```text
 Update the React StatCard family in C:\Users\acasauran\Documents\Spruce\spruce-ui-react against the current Angular reference at C:\Users\acasauran\Documents\Spruce\spruce-ng\projects\spruce-ui\data-display\src\lib\stat-card.ts. Add the inline StatCard variant and typed StatGroup/StatDivider exports. Support StatGroup strip/grid/stack variants and bordered behavior while preserving existing flat/icon/trend APIs. Use token-based CSS, responsive layout, accessible semantics, and idiomatic React children. Update src/index.ts and the StatCard docs with live examples/API tables, and add tests for each variant, group layout, divider, and regression behavior. Run npm run build, npm run docs:build, npm run lint, and npm run test:ci.
 ```
 
 ### C-03 — Date control contract
 
+**Status: Complete (2026-09-07).**
+
 ```text
 Bring Calendar, RangeCalendar, DatePicker, DateRangePicker, TimePicker, and DatetimePicker in C:\Users\acasauran\Documents\Spruce\spruce-ui-react up to the current Angular behavior in C:\Users\acasauran\Documents\Spruce\spruce-ng\projects\spruce-ui\dates\src\lib. Preserve controlled React values/onChange and existing showOtherMonths/selectOtherMonths names. Add the shared readonly, hidden, invalid, errors, required, touched/blur semantics and accessible error wiring. Where Angular exposes them, add label, floatingLabel, default/outline/outlined/filled variant, placement, constrainToModal, dismissOnScroll, and dismissOnClickOutside. Keep locale-aware parsing/formatting, RTL, keyboard navigation, focus restoration, portals, adjacent-month selection, and disabled-date rules correct. Factor shared typed helpers rather than duplicating six implementations. Update exports, all six docs pages/API tables/examples, and focused a11y/interaction tests. Run npm run build, npm run docs:build, npm run lint, and npm run test:ci.
 ```
 
 ### C-04 — GridCombobox current API
+
+**Status: Complete (2026-09-07).**
 
 ```text
 Update React GridCombobox in C:\Users\acasauran\Documents\Spruce\spruce-ui-react using C:\Users\acasauran\Documents\Spruce\spruce-ng\projects\spruce-ui\forms\src\lib\grid-combobox.ts and its docs/tests as the behavioral reference. Add controlled single/multiple value support, leading icon, field visual variant, configurable searchFields, and panel resizing while preserving resizableColumns. Reconcile selection, filtering, remote/data-source behavior, placement/dismissal, field validation, keyboard grid/combobox semantics, ARIA relationships, RTL, and render-prop customization. Avoid Angular template/directive APIs. Update public types/exports, docs examples/API tables, and tests for multiple selection, search fields, resizing, keyboard use, and validation. Run npm run build, npm run docs:build, npm run lint, and npm run test:ci.
@@ -204,6 +210,8 @@ Implement a typed React TreeGridCombobox in C:\Users\acasauran\Documents\Spruce\
 ```
 
 ### C-07 — Modal header and footer backgrounds
+
+**Status: Complete (2026-09-07).**
 
 ```text
 Update React Modal in C:\Users\acasauran\Documents\Spruce\spruce-ui-react against C:\Users\acasauran\Documents\Spruce\spruce-ng\projects\spruce-ui\overlays\src\lib\modal.ts. Add typed headerBackground and footerBackground public props with token-safe values consistent with the existing Spruce chrome/background conventions. Apply them only to their regions without breaking padding, sticky layouts, focus trap/restore, portals, themes, or RTL. Document both props with live examples, add regression tests for default/custom backgrounds and absent header/footer regions, and update exports if new public types are introduced. Run npm run build, npm run docs:build, npm run lint, and npm run test:ci.
@@ -289,6 +297,8 @@ Implement AiErrorRecovery, AiVoiceControls, AiHandoff, an idiomatic AiNotificati
 
 ### C-21 — Datagrid current option delta
 
+**Status: Complete (2026-09-07).**
+
 ```text
 Re-audit and close the remaining current Angular Datagrid option gaps in C:\Users\acasauran\Documents\Spruce\spruce-ui-react against C:\Users\acasauran\Documents\Spruce\spruce-ng\projects\spruce-ui\datagrid\src\lib\components\datagrid.ts, models\column-def.model.ts, Datagrid.md, performance notes, and tests. Preserve React's existing canonical Datagrid APIs and map Angular names idiomatically. Implement the material missing behavior: outer chrome/radius/border and density; auto row height; header casing and null text; borderless/line/hover controls; skeleton loading; selection control/append/range/hide-column and select-on-navigation options; deferred/live resize and reorder; auto-edit-on-navigation, manual async commit, dirty indicators, undo/redo and fill-down; infinite scroll and server-windowed data-source loading; tree children and nested grids; new-row position/commit timing; pinned control columns; filter-expression panel integration; cell/row class hooks; and row click/double-click/cell click/detail lifecycle callbacks. Reconcile aliases such as rows/rowData, fitColumnsToWidth/autoFit, rowDetail/detailTemplate, and columnMenu/showColumnMenu without duplicating APIs. Update types, imperative handle, docs/API matrix, virtualization constraints, i18n/RTL/a11y behavior, and focused regression/performance tests. Run npm run build, npm run docs:build, npm run lint, and npm run test:ci.
 ```
@@ -327,7 +337,7 @@ Once the React AI primitives exist, add six composed pattern pages to C:\Users\a
 
 Recommended dependency order:
 
-1. Close current API deltas: C-02, C-03, C-04, C-07, C-21.
+1. Completed current API deltas: C-02, C-03, C-04, C-07, C-21.
 2. Add missing desktop primitives: C-01, C-05, C-06, C-08.
 3. Add the design-tool token workflow: F-01.
 4. Complete reusable theme UI: T-01 and T-02.

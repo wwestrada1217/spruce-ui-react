@@ -1,6 +1,6 @@
 import './GridCombobox.css';
 import { createPortal } from 'react-dom';
-import { useCallback, useEffect, useId, useMemo, useRef, useState, type ChangeEvent, type KeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode, type UIEvent } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type ChangeEvent, type KeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactElement, type ReactNode, type UIEvent } from 'react';
 import { Icon } from '../../icons/Icon.js';
 import { computePosition, getScrollParents, type Placement } from '../../utils/positioning.js';
 import { useI18n } from '../../i18n/i18n-context.js';
@@ -13,14 +13,11 @@ export type GridComboboxSource = LookupSource<unknown>;
 export interface GridComboboxOption { value: string; label: string; disabled?: boolean; icon?: string; [key: string]: unknown; }
 export type GridComboboxVariant = 'default' | 'outline' | 'outlined' | 'filled';
 
-export interface GridComboboxProps {
+export interface GridComboboxBaseProps {
   columns: GridComboboxColumn[];
   options?: GridComboboxSource | null;
   source?: GridComboboxSource | null;
-  value?: string | readonly string[];
-  multiple?: boolean;
   selectedItem?: unknown;
-  onChange?: (value: string | string[]) => void;
   onSelect?: (item: GridComboboxOption) => void;
   onSelectedItem?: (item: unknown) => void;
   onOpenChange?: (open: boolean) => void;
@@ -68,7 +65,24 @@ export interface GridComboboxProps {
   id?: string;
 }
 
-export function GridCombobox({
+export interface GridComboboxSingleProps extends GridComboboxBaseProps {
+  multiple?: false;
+  value?: string;
+  onChange?: (value: string) => void;
+}
+
+export interface GridComboboxMultipleProps extends GridComboboxBaseProps {
+  multiple: true;
+  value?: readonly string[];
+  onChange?: (value: string[]) => void;
+}
+
+export type GridComboboxProps = GridComboboxSingleProps | GridComboboxMultipleProps;
+
+export function GridCombobox(props: GridComboboxSingleProps): ReactElement | null;
+export function GridCombobox(props: GridComboboxMultipleProps): ReactElement | null;
+export function GridCombobox(props: GridComboboxSingleProps | GridComboboxMultipleProps) {
+  const {
   columns, options, source, value, multiple = false, selectedItem, onChange, onSelect, onSelectedItem, onOpenChange,
   placeholder = 'Search...', filterBy = 'label', searchFields = null, displayField = 'label', valueField = 'value', pageSize = 20,
   autoOpen = false, disabled = false, readOnly = false, hidden = false, error, hint, errors, invalid, required = false,
@@ -78,12 +92,13 @@ export function GridCombobox({
   virtualPaging = false, showPagingFooter = true, resizableColumns = false, showColumnLines, stripedRows = false,
   panelResizable = false, renderRow, renderEmpty,
   ariaLabel, ariaLabelledBy, ariaDescribedBy, className = '', id,
-}: GridComboboxProps) {
+  } = props;
   const { direction, t } = useI18n();
   const field = useFormFieldContext();
   const instanceId = useId().replace(/:/g, '');
   const lookupSource = useMemo(() => source ?? options ?? [], [options, source]);
   const inputId = id ?? `sp-grid-combo-${instanceId}`;
+  const listboxId = `${inputId}-listbox`;
   const errorId = `${inputId}-error`;
   const hintId = `${inputId}-hint`;
   const filterKeys = useMemo(() => searchFields?.length ? [...searchFields] : Array.isArray(filterBy) ? filterBy : [filterBy], [filterBy, searchFields]);
@@ -176,6 +191,13 @@ export function GridCombobox({
     if (document.activeElement !== inputRef.current) suppressOpenOnFocusRef.current = true;
     inputRef.current?.focus();
   }
+  function emitValue(next: string | string[]) {
+    if (multiple) {
+      (onChange as GridComboboxMultipleProps['onChange'])?.(Array.isArray(next) ? next : [next]);
+    } else {
+      (onChange as GridComboboxSingleProps['onChange'])?.(Array.isArray(next) ? next[0] ?? '' : next);
+    }
+  }
   function selectOption(index: number) {
     const item = items[index];
     const option = normalized[index];
@@ -184,9 +206,9 @@ export function GridCombobox({
       const next = new Set(selectedValues);
       if (next.has(option.value)) next.delete(option.value);
       else next.add(option.value);
-      onChange?.([...next]);
+      emitValue([...next]);
     } else {
-      onChange?.(option.value);
+      emitValue(option.value);
     }
     onSelect?.(item);
     onSelectedItem?.(item);
@@ -242,17 +264,17 @@ export function GridCombobox({
       <div className="sp-gc__input-wrap">
         <Icon name={icon ?? 'search'} size={14} className="sp-gc__search-icon" />
         {multiple && selectedOptions.length > 0 && <div className="sp-gc__chips" aria-label={`${selectedOptions.length} selected`}>
-          {selectedOptions.map((option) => <span key={option.value} className="sp-gc__chip">{option.label}<button type="button" aria-label={`Remove ${option.label}`} disabled={effectiveDisabled || effectiveReadOnly} onMouseDown={(event) => event.preventDefault()} onClick={() => onChange?.([...selectedValues].filter((item) => item !== option.value))}><Icon name="x" size={10} /></button></span>)}
+          {selectedOptions.map((option) => <span key={option.value} className="sp-gc__chip">{option.label}<button type="button" aria-label={`Remove ${option.label}`} disabled={effectiveDisabled || effectiveReadOnly} onMouseDown={(event) => event.preventDefault()} onClick={() => emitValue([...selectedValues].filter((item) => item !== option.value))}><Icon name="x" size={10} /></button></span>)}
         </div>}
-        <input ref={inputRef} id={inputId} className="sp-gc__input" placeholder={placeholder === 'Search...' ? t('search') : placeholder} disabled={effectiveDisabled} readOnly={effectiveReadOnly} value={query} onChange={(event: ChangeEvent<HTMLInputElement>) => { setQuery(event.target.value); if (!open) setOpenState(true); else void load(1, event.target.value); }} onFocus={() => { if (suppressOpenOnFocusRef.current) { suppressOpenOnFocusRef.current = false; return; } setOpenState(true); }} onKeyDown={handleKeyDown} role="combobox" aria-expanded={open} aria-haspopup="listbox" aria-autocomplete="list" aria-activedescendant={activeDescendant} aria-label={ariaLabel || (!label ? undefined : label)} aria-labelledby={ariaLabelledBy || undefined} aria-describedby={describedBy} aria-invalid={hasError || undefined} aria-required={effectiveRequired || undefined} aria-readonly={effectiveReadOnly || undefined} />
-        {(query || selectedValues.size > 0) && !effectiveDisabled && !effectiveReadOnly && <button type="button" className="sp-gc__clear" tabIndex={-1} aria-label={t('clear')} onMouseDown={(event) => { event.preventDefault(); setQuery(''); onChange?.(multiple ? [] : ''); inputRef.current?.focus(); }}><Icon name="x" size={12} /></button>}
+        <input ref={inputRef} id={inputId} className="sp-gc__input" placeholder={placeholder === 'Search...' ? t('search') : placeholder} disabled={effectiveDisabled} readOnly={effectiveReadOnly} value={query} onChange={(event: ChangeEvent<HTMLInputElement>) => { setQuery(event.target.value); if (!open) setOpenState(true); else void load(1, event.target.value); }} onFocus={() => { if (suppressOpenOnFocusRef.current) { suppressOpenOnFocusRef.current = false; return; } setOpenState(true); }} onKeyDown={handleKeyDown} role="combobox" aria-expanded={open} aria-haspopup="listbox" aria-autocomplete="list" aria-controls={open ? listboxId : undefined} aria-activedescendant={activeDescendant} aria-label={ariaLabel || (!label ? undefined : label)} aria-labelledby={ariaLabelledBy || undefined} aria-describedby={describedBy} aria-invalid={hasError || undefined} aria-required={effectiveRequired || undefined} aria-readonly={effectiveReadOnly || undefined} />
+        {(query || selectedValues.size > 0) && !effectiveDisabled && !effectiveReadOnly && <button type="button" className="sp-gc__clear" tabIndex={-1} aria-label={t('clear')} onMouseDown={(event) => { event.preventDefault(); setQuery(''); emitValue(multiple ? [] : ''); inputRef.current?.focus(); }}><Icon name="x" size={12} /></button>}
         {showChevron && <button type="button" className="sp-gc__chevron" aria-label={open ? t('close') : t('open')} aria-expanded={open} disabled={effectiveDisabled || effectiveReadOnly}
           onMouseDown={(event) => event.preventDefault()} onClick={(event) => { event.stopPropagation(); setOpenState(!open); inputRef.current?.focus(); }}>
           <Icon name="chevron-down" size={12} />
         </button>}
       </div>
     </div>
-    {open && createPortal(<div ref={panelRef} className={dropdownClasses} role="listbox" aria-multiselectable={multiple || undefined} style={{ position: 'fixed', top: position.top, left: position.left, width: position.width, zIndex: 999, opacity: ready ? 1 : 0 }} onScroll={handlePanelScroll}>
+    {open && createPortal(<div ref={panelRef} id={listboxId} className={dropdownClasses} role="listbox" aria-multiselectable={multiple || undefined} style={{ position: 'fixed', top: position.top, left: position.left, width: position.width, zIndex: 999, opacity: ready ? 1 : 0 }} onScroll={handlePanelScroll}>
       <div className="sp-gc__header" style={{ gridTemplateColumns: gridTemplate }}>{columns.map((column) => <div key={column.key} className="sp-gc__header-cell"><span className="sp-gc__header-label">{column.label}</span>{resizableColumns && <button type="button" className="sp-gc__resizer" aria-label={t('resizeColumn', { column: column.label })} onPointerDown={(event) => beginResize(column.key, event)} />}</div>)}</div>
       {loading && <div className="sp-gc__loading" role="status">{t('loading')}</div>}
       {!loading && visibleItems.length > 0 && <div style={virtualScroll ? { paddingTop: `${virtualStart * itemHeight}px`, paddingBottom: `${Math.max(0, items.length - virtualStart - visibleItems.length) * itemHeight}px` } : undefined}>{visibleItems.map((item, offset) => { const index = virtualScroll ? virtualStart + offset : offset; const option = normalized[index]; const selected = Boolean(option && selectedValues.has(option.value)); const highlighted = index === activeIndex; const context = { item, option, selected, highlighted }; return <button key={`${option?.value ?? index}-${index}`} id={`sp-gc-opt-${instanceId}-${index}`} type="button" role="option" aria-selected={selected} disabled={option?.disabled} className={['sp-gc__row', selected && 'sp-gc__row--selected', highlighted && 'sp-gc__row--highlighted'].filter(Boolean).join(' ')} style={{ gridTemplateColumns: gridTemplate }} onMouseEnter={() => setHighlightedIndex(virtualScroll ? offset : index)} onClick={() => selectOption(index)}>{renderRow ? renderRow(context) : columns.map((column) => <span key={column.key} className="sp-gc__cell">{column.key === valueField && option?.icon && <Icon name={option.icon} size={14} />}{String(item[column.key] ?? '')}</span>)}{selected && <Icon name="check" size={14} className="sp-gc__check" />}</button>; })}</div>}

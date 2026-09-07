@@ -1167,36 +1167,37 @@ function DatagridInner<T extends object = Record<string, unknown>>(
   const defaultGroupsExpanded = groupsExpandedByDefault ?? expandAllGroups;
   const effectiveLocale = localeProp ?? i18nLocale;
   const effectivePageSizeOptions = pageSizeOptions ?? paginationRowsOptions;
-  const rowDetail = rowDetailProp ?? (typeof rowDetailsProp === 'function' ? rowDetailsProp : undefined) ??
-    (nestedGrid
-      ? ({ row }: { row: T }) => (
-          <div style={{ height: nestedGrid.height ?? 300 }}>
-            <Datagrid
-              data={nestedGrid.getRows(row)}
-              columns={nestedGrid.columns}
-              {...nestedGrid.props}
-              autoHeight={false}
-              fixedHeight="100%"
-            />
-          </div>
-        )
-      : treeChildrenField
-        ? ({ row }: { row: T }) => {
-            const children = (row as Record<string, unknown>)[String(treeChildrenField)];
-            return Array.isArray(children) && children.length > 0 ? (
+  const rowDetail = useMemo(() => rowDetailProp ?? (typeof rowDetailsProp === 'function' ? rowDetailsProp : undefined) ??
+      (nestedGrid
+        ? ({ row }: { row: T }) => (
+            <div style={{ height: nestedGrid.height ?? 300 }}>
               <Datagrid
-                rows={children.filter((child): child is object => Boolean(child) && typeof child === 'object')}
-                columns={columnsProp as readonly DatagridColumn<object>[]}
-                treeChildrenField={treeChildrenField as string}
-                treeExpandedByDefault={treeExpandedByDefault}
-                autoHeight
-                chrome="flush"
-                border="none"
-                ariaLabel={`${ariaLabelProp ?? 'Data Grid'} child rows`}
+                data={nestedGrid.getRows(row)}
+                columns={nestedGrid.columns}
+                {...nestedGrid.props}
+                autoHeight={false}
+                fixedHeight="100%"
               />
-            ) : null;
-          }
-        : undefined);
+            </div>
+          )
+        : treeChildrenField
+          ? ({ row }: { row: T }) => {
+              const children = (row as Record<string, unknown>)[String(treeChildrenField)];
+              return Array.isArray(children) && children.length > 0 ? (
+                <Datagrid
+                  rows={children.filter((child) => Boolean(child) && typeof child === 'object') as readonly T[]}
+                  columns={columnsProp}
+                  treeChildrenField={treeChildrenField as string}
+                  treeExpandedByDefault={treeExpandedByDefault}
+                  autoHeight
+                  chrome="flush"
+                  border="none"
+                  ariaLabel={`${ariaLabelProp ?? 'Data Grid'} child rows`}
+                />
+              ) : null;
+            }
+          : undefined),
+    [ariaLabelProp, columnsProp, nestedGrid, rowDetailProp, rowDetailsProp, treeChildrenField, treeExpandedByDefault]);
   const effectiveDetailPaneRenderer =
     typeof detailPane === 'function'
       ? detailPane
@@ -2513,7 +2514,6 @@ function DatagridInner<T extends object = Record<string, unknown>>(
       editHistory,
       editHistoryIndex,
       activeSelection,
-      activeSelection,
       expandedRowDetails,
       updateExpandedRowDetails,
     ],
@@ -3492,6 +3492,8 @@ function DatagridInner<T extends object = Record<string, unknown>>(
                 style={{ blockSize: `${virtualTopSpacer}px` }}
               />
             )}
+            {/* The callbacks below only read refs from event handlers, never during render. */}
+            {/* eslint-disable-next-line react-hooks/refs */}
             {renderedDisplayRows.map((item, itemIdx) => {
               const absoluteItemIdx = itemIdx + virtualStartIndex;
               if (item.type === 'group') {

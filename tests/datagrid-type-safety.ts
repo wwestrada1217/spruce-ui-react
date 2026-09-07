@@ -73,6 +73,9 @@ const handle: DatagridHandle<Project> = {
   commitCellEdit: () => undefined,
   commitRowEdit: () => undefined,
   cancelEditing: () => undefined,
+  undo: () => undefined,
+  redo: () => undefined,
+  fillDown: () => undefined,
 }
 
 const dataContext = createDataContext<Project>({ idField: 'id' })

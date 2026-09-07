@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { RangeCalendar } from 'spruce-react'
 import type { DateRange, DateRangePreset } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
+import { DateControlContractRows } from '../../components/DateControlContractRows'
 
 const BASIC_CODE = `<RangeCalendar onChange={(range) => console.log(range)} />`
 
@@ -16,6 +17,12 @@ const PRESETS_CODE = `const presets = [
 const THREE_MONTHS_CODE = `<RangeCalendar months={3} />`
 
 const NO_FOOTER_CODE = `<RangeCalendar showFooter={false} />`
+const FIELD_STATE_CODE = `<RangeCalendar
+  ariaLabel="Reporting range"
+  required
+  touched
+  error="Choose a start and end date."
+/>`
 
 const today = new Date()
 const todayISO = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
@@ -38,6 +45,7 @@ const SECTIONS: Section[] = [
   { id: 'presets',      label: 'With Presets' },
   { id: 'three-months', label: 'Three Months' },
   { id: 'no-footer',    label: 'Without Footer' },
+  { id: 'field-state',  label: 'Field State' },
   { id: 'api',          label: 'API' },
 ]
 
@@ -120,6 +128,14 @@ export function RangeCalendarPage() {
           </CodePreview>
         </section>
 
+        <section id="field-state" className="demo-section" aria-labelledby="field-state-heading">
+          <h2 id="field-state-heading">Form state and validation</h2>
+          <p className="section-desc">RangeCalendar shares the readonly, hidden, required, touched, hint, and accessible error contract.</p>
+          <CodePreview code={FIELD_STATE_CODE} language="typescript">
+            <RangeCalendar ariaLabel="Reporting range" required touched error="Choose a start and end date." />
+          </CodePreview>
+        </section>
+
         <section id="api" className="demo-section">
           <h2>API</h2>
           <h3>Props</h3>
@@ -135,6 +151,7 @@ export function RangeCalendarPage() {
                 <tr><td><code>presets</code></td><td><code>DateRangePreset[]</code></td><td><code>[]</code></td><td>Quick-pick preset ranges</td></tr>
                 <tr><td><code>showFooter</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show Apply/Clear footer</td></tr>
                 <tr><td><code>disabled</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Disable the calendar</td></tr>
+                <DateControlContractRows />
               </tbody>
             </table>
           </div>
