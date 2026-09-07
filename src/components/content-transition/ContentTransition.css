@@ -1,0 +1,40 @@
+.sp-content-transition { display: grid; grid-template-areas: 'overlap'; position: relative; perspective: var(--sp-transition-perspective); transform-style: preserve-3d; }
+.sp-content-transition--clipped { overflow: hidden; }
+.sp-content-transition--disabled { cursor: default; }
+.sp-content-transition:focus-visible { outline: var(--sp-focus-ring-width) solid var(--sp-focus-ring-color); outline-offset: var(--sp-focus-ring-offset); }
+.sp-transition-face { grid-area: overlap; width: 100%; height: 100%; box-sizing: border-box; backface-visibility: hidden; transform-style: preserve-3d; }
+.sp-transition--flip-horizontal .sp-transition-face { transition: transform var(--sp-transition-duration) var(--sp-ease-in-out); }
+.sp-transition--flip-horizontal .sp-transition-face--front { z-index: 2; transform: rotateY(0deg); }
+.sp-transition--flip-horizontal .sp-transition-face--back { z-index: 1; transform: rotateY(180deg); }
+.sp-content-transition--active.sp-transition--flip-horizontal .sp-transition-face--front { z-index: 1; transform: rotateY(-180deg); }
+.sp-content-transition--active.sp-transition--flip-horizontal .sp-transition-face--back { z-index: 2; transform: rotateY(0deg); }
+.sp-transition--flip-vertical .sp-transition-face { transition: transform var(--sp-transition-duration) var(--sp-ease-in-out); }
+.sp-transition--flip-vertical .sp-transition-face--front { z-index: 2; transform: rotateX(0deg); }
+.sp-transition--flip-vertical .sp-transition-face--back { z-index: 1; transform: rotateX(180deg); }
+.sp-content-transition--active.sp-transition--flip-vertical .sp-transition-face--front { z-index: 1; transform: rotateX(-180deg); }
+.sp-content-transition--active.sp-transition--flip-vertical .sp-transition-face--back { z-index: 2; transform: rotateX(0deg); }
+.sp-transition--crossfade .sp-transition-face { transition: opacity var(--sp-transition-duration) var(--sp-ease-default); }
+.sp-transition--crossfade .sp-transition-face--front { opacity: 1; }
+.sp-transition--crossfade .sp-transition-face--back { opacity: 0; pointer-events: none; }
+.sp-content-transition--active.sp-transition--crossfade .sp-transition-face--front { opacity: 0; pointer-events: none; }
+.sp-content-transition--active.sp-transition--crossfade .sp-transition-face--back { opacity: 1; pointer-events: auto; }
+.sp-transition--slide-up .sp-transition-face--back, .sp-transition--slide-down .sp-transition-face--back, .sp-transition--slide-left .sp-transition-face--back, .sp-transition--slide-right .sp-transition-face--back { z-index: 2; transition: transform var(--sp-transition-duration) var(--sp-ease-out); }
+.sp-transition--slide-up .sp-transition-face--back { transform: translateY(100%); }
+.sp-transition--slide-down .sp-transition-face--back { transform: translateY(-100%); }
+.sp-transition--slide-left .sp-transition-face--back { transform: translateX(100%); }
+.sp-transition--slide-right .sp-transition-face--back { transform: translateX(-100%); }
+[dir='rtl'] .sp-transition--slide-left .sp-transition-face--back { transform: translateX(-100%); }
+[dir='rtl'] .sp-transition--slide-right .sp-transition-face--back { transform: translateX(100%); }
+.sp-content-transition--active.sp-transition--slide-up .sp-transition-face--back, .sp-content-transition--active.sp-transition--slide-down .sp-transition-face--back, .sp-content-transition--active.sp-transition--slide-left .sp-transition-face--back, .sp-content-transition--active.sp-transition--slide-right .sp-transition-face--back { transform: translate(0); }
+.sp-transition--zoom .sp-transition-face { transition: transform var(--sp-transition-duration) var(--sp-ease-default), opacity var(--sp-transition-duration) var(--sp-ease-default); }
+.sp-transition--zoom .sp-transition-face--front { opacity: 1; transform: scale(1); }
+.sp-transition--zoom .sp-transition-face--back { opacity: 0; transform: scale(1.15); pointer-events: none; }
+.sp-content-transition--active.sp-transition--zoom .sp-transition-face--front { opacity: 0; transform: scale(.85); pointer-events: none; }
+.sp-content-transition--active.sp-transition--zoom .sp-transition-face--back { opacity: 1; transform: scale(1); pointer-events: auto; }
+.sp-flip-card { display: inline-grid; width: 100%; min-height: 160px; }
+@media (prefers-reduced-motion: reduce) {
+  .sp-transition-face { transition: none !important; transform: none !important; }
+  .sp-transition-face--back { display: none; }
+  .sp-content-transition--active .sp-transition-face--front { display: none; }
+  .sp-content-transition--active .sp-transition-face--back { display: block; }
+}

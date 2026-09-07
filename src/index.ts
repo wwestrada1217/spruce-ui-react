@@ -134,6 +134,8 @@ export type { AvatarGroupProps, AvatarGroupItem } from './components/avatar-grou
 // ─── Breadcrumb ───────────────────────────────────────────────────────────────
 export { Breadcrumbs, BreadcrumbItem } from './components/breadcrumb/Breadcrumb.js';
 export type { BreadcrumbsProps, BreadcrumbItemProps, BreadcrumbItemDef } from './components/breadcrumb/Breadcrumb.js';
+export { Anchor, AnchorItem, AnchorTarget, useAnchorTarget } from './components/anchor/Anchor.js';
+export type { AnchorProps, AnchorItemProps, AnchorTargetProps, AnchorTargetBinding, AnchorItemDefinition, AnchorClickEvent, AnchorVariant, AnchorSize, AnchorOrientation } from './components/anchor/Anchor.js';
 
 // ─── Accordion ────────────────────────────────────────────────────────────────
 export { Accordion, AccordionItem } from './components/accordion/Accordion.js';
@@ -479,6 +481,10 @@ export type { ComboboxProps, ComboboxOption, ComboboxSource } from './components
 // ─── GridCombobox ────────────────────────────────────────────────────────────
 export { GridCombobox } from './components/grid-combobox/GridCombobox.js';
 export type { GridComboboxProps, GridComboboxBaseProps, GridComboboxSingleProps, GridComboboxMultipleProps, GridComboboxColumn, GridComboboxOption, GridComboboxSource, GridComboboxVariant } from './components/grid-combobox/GridCombobox.js';
+export { TreeCombobox } from './components/tree-combobox/TreeCombobox.js';
+export type { TreeComboboxProps, TreeComboboxBaseProps, TreeComboboxSingleProps, TreeComboboxMultipleProps, TreeComboboxNode, TreeComboboxFlatNode, TreeComboboxSource, TreeComboboxVariant, TreeComboboxRenderContext } from './components/tree-combobox/TreeCombobox.js';
+export { TreeGridCombobox } from './components/tree-grid-combobox/TreeGridCombobox.js';
+export type { TreeGridComboboxProps, TreeGridComboboxBaseProps, TreeGridComboboxSingleProps, TreeGridComboboxMultipleProps, TreeGridComboboxColumn, TreeGridComboboxOption, TreeGridComboboxFlatOption, TreeGridComboboxSource, TreeGridComboboxVariant, TreeGridComboboxRenderContext } from './components/tree-grid-combobox/TreeGridCombobox.js';
 
 // ─── Lookup contracts ───────────────────────────────────────────────────────
 export type { LookupOption, LookupColumn, LookupRenderContext, LookupSource, LookupRenderer } from './components/lookup/lookup-types.js';
@@ -1096,6 +1102,8 @@ export { formatCompact, formatNumber, generateTicks } from './charts/axis.js';
 export { bandScale, linearScale, niceLinearDomain } from './charts/scales.js';
 
 // ─── Effects & Animations ───────────────────────────────────────────────────
+export { ContentTransition, FlipCard } from './components/content-transition/ContentTransition.js';
+export type { ContentTransitionProps, ContentTransitionHandle, ContentTransitionRenderContext, ContentTransitionType, ContentTransitionTrigger, FlipCardProps } from './components/content-transition/ContentTransition.js';
 export { Sparkles } from './effects/Sparkles.js';
 export type { SparklesProps, SparkleColor, SparkleSize } from './effects/Sparkles.js';
 export { Confetti } from './effects/Confetti.js';
