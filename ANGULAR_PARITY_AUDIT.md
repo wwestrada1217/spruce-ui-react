@@ -1,5 +1,7 @@
 # Angular-to-React feature parity audit
 
+> **Superseded:** This 2026-08-24 snapshot is retained for implementation history. Use [`ANGULAR_REACT_GAP_CATALOG.md`](./ANGULAR_REACT_GAP_CATALOG.md) for the current 2026-09-07 status, grouped catalog, and copy-paste prompts.
+
 Audit date: 2026-08-24
 
 Angular baseline:
