@@ -121,6 +121,7 @@ export function TreeGridCombobox(props: TreeGridComboboxProps) {
   const lookupSource = useMemo(() => source ?? options ?? [], [options, source]);
   const fields = useMemo(() => searchFields?.length ? [...searchFields] : Array.isArray(filterBy) ? [...filterBy] : [filterBy], [filterBy, searchFields]);
   const normalizedVariant = variant === 'outlined' ? 'outline' : variant;
+  const hasFloatingLabel = floatingLabel || Boolean(label && normalizedVariant !== 'default');
   const effectiveDisabled = disabled || Boolean(field?.disabled);
   const effectiveReadOnly = readOnly || Boolean(field?.readOnly);
   const effectiveHidden = hidden || Boolean(field?.hidden);
@@ -146,6 +147,7 @@ export function TreeGridCombobox(props: TreeGridComboboxProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const suppressFocusOpen = useRef(false);
+  const previousValue = useRef<typeof value>(value);
   const columnsResizable = resizableColumns || resizable;
 
   const load = useCallback(async (term: string) => {
@@ -204,7 +206,8 @@ export function TreeGridCombobox(props: TreeGridComboboxProps) {
   useEffect(() => {
     if (multiple) return;
     const node = typeof value === 'string' ? findTreeNode(tree, value) : undefined;
-    if (node) setQuery(node.label); else if (selectedItem) setQuery(normalizeTreeItems([selectedItem], displayField, valueField, childrenField)[0]?.label ?? ''); else if (!value) setQuery('');
+    if (node) setQuery(node.label); else if (selectedItem) setQuery(normalizeTreeItems([selectedItem], displayField, valueField, childrenField)[0]?.label ?? ''); else if (!value && previousValue.current) setQuery('');
+    previousValue.current = value;
   }, [childrenField, displayField, multiple, selectedItem, tree, value, valueField]);
 
   function emitValue(next: string | string[]) {
@@ -250,13 +253,13 @@ export function TreeGridCombobox(props: TreeGridComboboxProps) {
 
   if (effectiveHidden) return null;
   const activeId = flat[highlighted] ? `${popupId}-row-${highlighted}` : undefined;
-  const rootClass = ['sp-tgc', `sp-tgc--${normalizedVariant}`, floatingLabel && 'sp-tgc--floating', open && 'sp-tgc--open', effectiveDisabled && 'sp-tgc--disabled', effectiveReadOnly && 'sp-tgc--readonly', hasError && 'sp-tgc--error', className].filter(Boolean).join(' ');
+  const rootClass = ['sp-tgc', `sp-tgc--${normalizedVariant}`, hasFloatingLabel && 'sp-tgc--floating', hasFloatingLabel && (open || Boolean(query) || selectedValues.size > 0) && 'sp-tgc--floated', open && 'sp-tgc--open', effectiveDisabled && 'sp-tgc--disabled', effectiveReadOnly && 'sp-tgc--readonly', hasError && 'sp-tgc--error', className].filter(Boolean).join(' ');
   return <>
     <div ref={anchorRef} className={rootClass} dir={direction} style={style} data-constrain-to-modal={constrainToModal}>
       {label && <label className="sp-tgc__label" htmlFor={inputId}>{label}{effectiveRequired && <span aria-hidden="true"> *</span>}</label>}
       <div className="sp-tgc__control"><Icon name={icon ?? 'search'} size={14} className="sp-tgc__search-icon" />
         {multiple && selectedNodes.length > 0 && <div className="sp-tgc__chips" aria-label={`${selectedNodes.length} selected`}>{selectedNodes.map((node) => <span className="sp-tgc__chip" key={node.value}>{node.label}<button type="button" aria-label={`${t('clear')} ${node.label}`} onMouseDown={(event) => event.preventDefault()} onClick={() => emitValue([...selectedValues].filter((entry) => entry !== node.value))}><Icon name="x" size={10} /></button></span>)}</div>}
-        <input ref={inputRef} id={inputId} className="sp-tgc__input" role="combobox" aria-haspopup="grid" aria-expanded={open} aria-controls={open ? popupId : undefined} aria-activedescendant={open ? activeId : undefined} aria-autocomplete="list" aria-label={ariaLabel || (!label ? 'Tree grid combobox' : undefined)} aria-labelledby={ariaLabelledBy} aria-describedby={describedBy} aria-invalid={hasError || undefined} aria-required={effectiveRequired || undefined} aria-readonly={effectiveReadOnly || undefined} disabled={effectiveDisabled} readOnly={effectiveReadOnly} placeholder={placeholder ?? t('search')} value={query} onFocus={() => { if (suppressFocusOpen.current) suppressFocusOpen.current = false; else setOpenState(true); }} onBlur={() => onTouchedChange?.(true)} onChange={(event: ChangeEvent<HTMLInputElement>) => { setQuery(event.target.value); if (!open) setOpenState(true); if (!Array.isArray(lookupSource)) void load(event.target.value); }} onKeyDown={onKeyDown} />
+        <input ref={inputRef} id={inputId} className="sp-tgc__input" role="combobox" aria-haspopup="grid" aria-expanded={open} aria-controls={open ? popupId : undefined} aria-activedescendant={open ? activeId : undefined} aria-autocomplete="list" aria-label={ariaLabel || (!label ? t('treeView') : undefined)} aria-labelledby={ariaLabelledBy} aria-describedby={describedBy} aria-invalid={hasError || undefined} aria-required={effectiveRequired || undefined} aria-readonly={effectiveReadOnly || undefined} disabled={effectiveDisabled} readOnly={effectiveReadOnly} placeholder={hasFloatingLabel && !open && !query ? undefined : placeholder ?? t('search')} value={query} onFocus={() => { if (suppressFocusOpen.current) suppressFocusOpen.current = false; else setOpenState(true); }} onBlur={() => onTouchedChange?.(true)} onChange={(event: ChangeEvent<HTMLInputElement>) => { setQuery(event.target.value); setHighlighted(0); if (!open) setOpenState(true); if (!Array.isArray(lookupSource)) void load(event.target.value); }} onKeyDown={onKeyDown} />
         {(query || selectedValues.size) && !effectiveDisabled && !effectiveReadOnly ? <button type="button" tabIndex={-1} className="sp-tgc__clear" aria-label={t('clear')} onMouseDown={(event) => event.preventDefault()} onClick={() => { setQuery(''); emitValue(multiple ? [] : ''); inputRef.current?.focus(); }}><Icon name="x" size={12} /></button> : null}
         <button type="button" className="sp-tgc__chevron" aria-label={open ? t('close') : t('open')} aria-expanded={open} disabled={effectiveDisabled || effectiveReadOnly} onMouseDown={(event) => event.preventDefault()} onClick={() => { setOpenState(!open); inputRef.current?.focus(); }}><Icon name="chevron-down" size={12} /></button>
       </div>

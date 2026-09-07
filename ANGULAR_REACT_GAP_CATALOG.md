@@ -61,7 +61,7 @@ The prompts linked from each **TODO** row are copy-paste implementation prompts 
 | Flag | Angular surface | React result | Prompt |
 | --- | --- | --- | --- |
 | **Complete** | Button, Button Group, Split Button, Tabs, Breadcrumbs, Stepper, Segmented Control, FAB, Navigation Menu, Toolbar, Pager, Accordion, Overflow | Material APIs, accessibility, tokens, docs, and idiomatic React callbacks are present. | No action. |
-| **TODO** | `Anchor`, `AnchorItem`, `AnchorTarget` | No React component or docs route. Angular supplies scrollspy navigation, nested/data-driven items, target registration, smooth scrolling, multiple rail styles, scrubber behavior, orientation, affix modes, and callbacks. | [C-01](#c-01--anchor-navigation) |
+| **Complete** | `Anchor`, `AnchorItem`, `AnchorTarget` | React provides data-driven/declarative nesting, target component/hook registration, scrollspy and smooth scrolling, all rail aliases, scrubber behavior, orientation, affix modes, controlled state, keyboard support, and docs/tests. | [C-01](#c-01--anchor-navigation) |
 
 ### Data display and productivity
 
@@ -79,8 +79,8 @@ The prompts linked from each **TODO** row are copy-paste implementation prompts 
 | **Complete** | Field, Form Layout, Input Group, Checkbox, Radio, Switch, Input, Property Panel, Select, Combobox, Lookups, Dropdown, Textarea, Mention, Color Picker, Emoji Picker, Password Input/Progress, OTP, Masked Input, Slider/Range, File Upload, Editor, Block Editor, Comment Thread, Markdown Editor, Code Editor, Diff Editor, Text Diff, In-place Editor, Signature Pad, Filter Expression, Form Builder | React counterparts, controlled value callbacks, docs, styling, and the shared form foundation exist. Exceptions are separated below. | No action. |
 | **Complete** | Calendar, Range Calendar, Date Picker, Date Range Picker, Time Picker, Datetime Picker | All six controls share readonly/hidden/invalid/error/required/touched semantics and accessible feedback; picker overlays also expose the applicable label, variant, placement, modal, and dismissal controls. | No action. |
 | **Complete** | `GridCombobox` | React supports controlled single/multiple values, leading icons, variants, search fields, panel and column resizing, shared field validation, and accessible keyboard/ARIA behavior. | No action. |
-| **TODO** | `TreeCombobox` | Entire React component and docs route are absent. | [C-05](#c-05--treecombobox) |
-| **TODO** | `TreeGridCombobox` | Entire React component and docs route are absent. | [C-06](#c-06--treegridcombobox) |
+| **Complete** | `TreeCombobox` | React provides typed local/remote hierarchy lookup, single/cascade multiple selection, shared field states, tree interaction, virtualization, render props, docs, and tests. | [C-05](#c-05--treecombobox) |
+| **Complete** | `TreeGridCombobox` | React provides typed hierarchical grid lookup with Datagridex-informed columns/resizing, local/remote sources, cascade selection, field states, treegrid interaction, docs, and tests. | [C-06](#c-06--treegridcombobox) |
 
 ### Layout, overlays, and shell
 
@@ -101,7 +101,7 @@ The prompts linked from each **TODO** row are copy-paste implementation prompts 
 | Flag | Angular surface | React result | Prompt |
 | --- | --- | --- | --- |
 | **Complete** | Sparkles, Confetti, Shimmer, Rainbow, Shine, Glow, Aura, Marquee, Fade, Ripple, Tilt, Shake, Icon Motion, Slide, Number Ticker, Fire, Snowflakes, Fluid Fill, Hourglass, Thermometer, Wheel of Fortune, Fireworks | React components/pages exist with token-aware and reduced-motion behavior. | No action. |
-| **TODO** | `ContentTransition`, front/back faces, `FlipCard` | React lacks the transition primitive and convenience flip-card component documented by Angular. | [C-08](#c-08--contenttransition-and-flipcard) |
+| **Complete** | `ContentTransition`, front/back faces, `FlipCard` | React provides typed front/back nodes and render props, all transitions/triggers, controlled and uncontrolled state, imperative controls, accessible face visibility, reduced motion, RTL, docs, and tests. | [C-08](#c-08--contenttransition-and-flipcard) |
 
 ### Mobile family
 
@@ -169,6 +169,8 @@ Add a reproducible design-tool token export workflow to C:\Users\acasauran\Docum
 
 ### C-01 — Anchor navigation
 
+**Status: Complete (2026-09-08).**
+
 ```text
 In C:\Users\acasauran\Documents\Spruce\spruce-ui-react, implement React parity for Angular's Anchor family using C:\Users\acasauran\Documents\Spruce\spruce-ng\projects\spruce-ui\navigation\src\lib\anchor.ts and its Angular docs/tests as the behavioral reference. Add typed Anchor, AnchorItem, and an idiomatic AnchorTarget component/hook. Cover data-driven and declarative nested items, line/stepped/timeline/scrubber/bracket/curved/magnifier variants, sm/md/lg sizes, vertical/horizontal orientation, affix/affixTop, title/indicator controls, scroll container and offsets, scrollspy, smooth scrolling, active state, scrubber geometry/fisheye behavior, active-change and click callbacks, keyboard support, reduced motion, RTL, and accessible labels. Use Spruce tokens and sp- BEM CSS. Export components/types from src/index.ts, add the docs page/sidebar/route and CodePreview examples, and add focused interaction/accessibility tests. Run npm run build, npm run docs:build, npm run lint, and npm run test:ci.
 ```
@@ -199,11 +201,15 @@ Update React GridCombobox in C:\Users\acasauran\Documents\Spruce\spruce-ui-react
 
 ### C-05 — TreeCombobox
 
+**Status: Complete (2026-09-08).**
+
 ```text
 Implement a typed React TreeCombobox in C:\Users\acasauran\Documents\Spruce\spruce-ui-react using C:\Users\acasauran\Documents\Spruce\spruce-ng\projects\spruce-ui\forms\src\lib\tree-combobox.ts and its docs/tests as the behavioral reference. Support controlled string/string[] values, local arrays, existing React data-source adapters and URL-backed loading where supported, configurable display/value/children/search fields, icon, auto-open, placeholder, label/floating label, validation states, placement/dismissal, single/multiple selection, cascade selection, expand-all/expand-on-click, tree lines, selected item reporting, option/empty render props, paging/virtual behavior where Angular documents it, and loading/error/empty states. Implement WAI-ARIA combobox/tree keyboard behavior, focus restoration, RTL, i18n, token CSS, and no hard-coded colors. Export components/types, register a complete docs page/sidebar/route, and add interaction/accessibility/data-source tests. Run npm run build, npm run docs:build, npm run lint, and npm run test:ci.
 ```
 
 ### C-06 — TreeGridCombobox
+
+**Status: Complete (2026-09-08).**
 
 ```text
 Implement a typed React TreeGridCombobox in C:\Users\acasauran\Documents\Spruce\spruce-ui-react using C:\Users\acasauran\Documents\Spruce\spruce-ng\projects\spruce-ui\forms\src\lib\tree-grid-combobox.ts and its docs/tests as the behavioral reference. Reuse React TreeCombobox, Table/Datagrid, lookup, data-source, positioning, and form-foundation utilities instead of duplicating them. Support typed columns, column and panel resizing, controlled single/multiple selection, cascade and indeterminate states, hierarchy expansion, searchFields, local/remote sources, field states, placement/dismissal, configurable row/empty renderers, and loading/error/empty states. Implement correct combobox/treegrid ARIA and keyboard navigation, focus restoration, RTL, i18n, and token-based CSS. Export all public types/components, add docs navigation/route with comprehensive examples and API tables, and add interaction/accessibility/data tests. Run npm run build, npm run docs:build, npm run lint, and npm run test:ci.
@@ -218,6 +224,8 @@ Update React Modal in C:\Users\acasauran\Documents\Spruce\spruce-ui-react agains
 ```
 
 ### C-08 — ContentTransition and FlipCard
+
+**Status: Complete (2026-09-08).**
 
 ```text
 Implement React ContentTransition and FlipCard in C:\Users\acasauran\Documents\Spruce\spruce-ui-react using C:\Users\acasauran\Documents\Spruce\spruce-ng\projects\spruce-ui\effects\src\lib\content-transition.ts and its Angular tests/docs as the behavioral reference. Model front/back content as typed React children or explicit render props, not directives. Cover all transition types and hover/click/focus/manual triggers, controlled/uncontrolled active state where appropriate, callbacks, perspective and sizing behavior, keyboard/focus activation, pointer coarse-device behavior, reduced-motion fallback, RTL where directional, and accessible front/back visibility. Add token-based sp- BEM CSS, exports, a docs page/sidebar/route with CodePreview examples, and focused tests for triggers, manual control, accessibility, and reduced motion. Run npm run build, npm run docs:build, npm run lint, and npm run test:ci.
@@ -338,7 +346,7 @@ Once the React AI primitives exist, add six composed pattern pages to C:\Users\a
 Recommended dependency order:
 
 1. Completed current API deltas: C-02, C-03, C-04, C-07, C-21.
-2. Add missing desktop primitives: C-01, C-05, C-06, C-08.
+2. **Complete (2026-09-08):** Add missing desktop primitives: C-01, C-05, C-06, C-08.
 3. Add the design-tool token workflow: F-01.
 4. Complete reusable theme UI: T-01 and T-02.
 5. Add the Mobile family: C-09 through C-13.

@@ -1,5 +1,6 @@
+/* eslint-disable react-refresh/only-export-components */
 import './Anchor.css';
-import { Children, createElement, isValidElement, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ElementType, type KeyboardEvent, type PointerEvent, type ReactElement, type ReactNode, type Ref } from 'react';
+import { Children, createElement, isValidElement, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ElementType, type KeyboardEvent, type PointerEvent, type ReactNode, type Ref } from 'react';
 import { Icon } from '../../icons/Icon.js';
 import { useI18n } from '../../i18n/i18n-context.js';
 
@@ -34,7 +35,8 @@ export interface AnchorItemProps extends Omit<AnchorItemDefinition, 'id' | 'chil
 }
 
 /** Declarative item marker consumed by a parent Anchor. */
-export function AnchorItem(_props: AnchorItemProps) {
+export function AnchorItem(props: AnchorItemProps) {
+  void props;
   return null;
 }
 
@@ -230,12 +232,13 @@ export function Anchor({
     ...style,
     '--sp-anchor-affix-top': typeof affixTop === 'number' ? `${affixTop}px` : affixTop,
     '--sp-anchor-row-height': `${scrubberRowHeight}px`,
+    '--sp-anchor-count': flat.length,
   } as CSSProperties;
   return <nav ref={navRef} className={['sp-anchor', `sp-anchor--${normalizedVariant}`, `sp-anchor--${size}`, `sp-anchor--${resolvedOrientation}`, affix && 'sp-anchor--affix', (activeBackground || showActiveBackground) && 'sp-anchor--active-background', className].filter(Boolean).join(' ')} aria-label={ariaLabel ?? title ?? 'On this page'} dir={textDirection} style={rootStyle}>
     {showTitle && <div className="sp-anchor__title">{title ?? 'On this page'}</div>}
     {normalizedVariant === 'scrubber' ? <div className="sp-anchor__scrubber" onPointerMove={(event: PointerEvent<HTMLDivElement>) => { const rect = event.currentTarget.getBoundingClientRect(); setPointerRow((event.clientY - rect.top) / scrubberRowHeight - .5); }} onPointerLeave={() => setPointerRow(null)}>
       <div className="sp-anchor__ticks">{flat.map((item, index) => { const distance = pointerRow === null ? Number.POSITIVE_INFINITY : Math.abs(index - pointerRow); const bump = distance >= scrubberRadius ? 0 : .5 * (1 + Math.cos(Math.PI * distance / scrubberRadius)); const length = scrubberRestLength + bump * (scrubberPeakLength - scrubberRestLength); return <a key={item.id} href={item.href ?? `#${item.id}`} className={['sp-anchor__link', 'sp-anchor__tick', item.id === currentActive && 'sp-anchor__link--active', item.disabled && 'sp-anchor__link--disabled'].filter(Boolean).join(' ')} aria-label={item.label} aria-current={item.id === currentActive ? 'location' : undefined} aria-disabled={item.disabled || undefined} tabIndex={index === focusedIndex ? 0 : -1} style={{ '--sp-anchor-tick-length': `${length}px`, '--sp-anchor-tick-opacity': index === activeIndex ? .65 : .25 + bump * .75 } as CSSProperties} onFocus={() => setFocusedIndex(index)} onKeyDown={(event) => moveFocus(event, index)} onClick={(event) => activate(event, item)}><span className="sp-anchor__tick-line" /></a>; })}</div>
-      {pointerRow !== null && previewItem && <div className="sp-anchor__preview" role="status"><strong>{previewItem.label}</strong>{previewItem.description && <span>{previewItem.description}</span>}</div>}
+      {pointerRow !== null && previewItem && <div className="sp-anchor__preview" role="status" style={{ '--sp-anchor-preview-index': previewIndex } as CSSProperties}><strong>{previewItem.label}</strong>{previewItem.description && <span>{previewItem.description}</span>}</div>}
     </div> : <ol className="sp-anchor__list">{flat.map((item, index) => <li key={item.id} className={['sp-anchor__item', item.isGroup && 'sp-anchor__item--group'].filter(Boolean).join(' ')} style={{ '--sp-anchor-depth': Math.min(2, item.depth) } as CSSProperties}>
       <a href={item.href ?? `#${item.id}`} className={['sp-anchor__link', item.id === currentActive && 'sp-anchor__link--active', item.disabled && 'sp-anchor__link--disabled'].filter(Boolean).join(' ')} aria-current={item.id === currentActive ? 'location' : undefined} aria-disabled={item.disabled || undefined} tabIndex={!item.disabled && !item.isGroup && index === focusedIndex ? 0 : -1} onFocus={() => setFocusedIndex(index)} onKeyDown={(event) => moveFocus(event, index)} onClick={(event) => activate(event, item)}>
         <span className="sp-anchor__rail" aria-hidden="true">{normalizedVariant === 'timeline' && <span className="sp-anchor__dot" />}</span>

@@ -65,7 +65,7 @@ export function ContentTransition({
     showBack: () => setActive(true),
     toggle: () => setActive(!isActive),
   };
-  useImperativeHandle(ref, () => context, [isActive, disabled]);
+  useImperativeHandle(ref, () => context);
   function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if ((resolvedTrigger === 'click' || resolvedTrigger === 'focus') && (event.key === 'Enter' || event.key === ' ')) {
       event.preventDefault(); setActive(!isActive);
@@ -86,5 +86,6 @@ export interface FlipCardProps extends Omit<ContentTransitionProps, 'type'> {
 }
 
 export function FlipCard({ width, height, className = '', style, ...props }: FlipCardProps) {
-  return <ContentTransition {...props} className={['sp-flip-card', className].filter(Boolean).join(' ')} style={{ ...style, width, height }} />;
+  const sizing = { ...(width !== undefined ? { width } : {}), ...(height !== undefined ? { height } : {}) };
+  return <ContentTransition {...props} className={['sp-flip-card', className].filter(Boolean).join(' ')} style={{ ...style, ...sizing }} />;
 }

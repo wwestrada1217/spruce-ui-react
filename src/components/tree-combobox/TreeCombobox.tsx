@@ -135,6 +135,7 @@ export function TreeCombobox(props: TreeComboboxProps) {
   const hintId = `${inputId}-hint`;
   const lookupSource = useMemo(() => source ?? nodes ?? [], [nodes, source]);
   const normalizedVariant = variant === 'outlined' ? 'outline' : variant;
+  const hasFloatingLabel = floatingLabel || Boolean(label && normalizedVariant !== 'default');
   const effectiveDisabled = disabled || Boolean(field?.disabled);
   const effectiveReadOnly = readOnly || Boolean(field?.readOnly);
   const effectiveHidden = hidden || Boolean(field?.hidden);
@@ -158,6 +159,7 @@ export function TreeCombobox(props: TreeComboboxProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const suppressFocusOpen = useRef(false);
+  const previousValue = useRef<typeof value>(value);
 
   const load = useCallback(async (searchTerm: string) => {
     setLoading(true);
@@ -237,7 +239,8 @@ export function TreeCombobox(props: TreeComboboxProps) {
     const node = typeof value === 'string' ? findTreeNode(tree, value) : undefined;
     if (node) setQuery(node.label);
     else if (selectedItem) setQuery(normalizeTreeItems([selectedItem], displayField, valueField, childrenField)[0]?.label ?? '');
-    else if (!value) setQuery('');
+    else if (!value && previousValue.current) setQuery('');
+    previousValue.current = value;
   }, [childrenField, displayField, multiple, selectedItem, tree, value, valueField]);
 
   function emitValue(next: string | string[]) {
@@ -294,7 +297,7 @@ export function TreeCombobox(props: TreeComboboxProps) {
   if (effectiveHidden) return null;
   const active = flat[highlighted];
   const activeId = active ? `${popupId}-item-${highlighted}` : undefined;
-  const rootClass = ['sp-tc', `sp-tc--${normalizedVariant}`, floatingLabel && 'sp-tc--floating', open && 'sp-tc--open', effectiveDisabled && 'sp-tc--disabled', effectiveReadOnly && 'sp-tc--readonly', hasError && 'sp-tc--error', className].filter(Boolean).join(' ');
+  const rootClass = ['sp-tc', `sp-tc--${normalizedVariant}`, hasFloatingLabel && 'sp-tc--floating', hasFloatingLabel && (open || Boolean(query) || selectedValues.size > 0) && 'sp-tc--floated', open && 'sp-tc--open', effectiveDisabled && 'sp-tc--disabled', effectiveReadOnly && 'sp-tc--readonly', hasError && 'sp-tc--error', className].filter(Boolean).join(' ');
   return <>
     <div ref={anchorRef} className={rootClass} dir={direction} style={style} data-constrain-to-modal={constrainToModal}>
       {label && <label className="sp-tc__label" htmlFor={inputId}>{label}{effectiveRequired && <span aria-hidden="true"> *</span>}</label>}
@@ -303,7 +306,7 @@ export function TreeCombobox(props: TreeComboboxProps) {
         {multiple && selectedNodes.length > 0 && <div className="sp-tc__chips" aria-label={`${selectedNodes.length} selected`}>
           {selectedNodes.map((node) => <span className="sp-tc__chip" key={node.value}>{node.label}<button type="button" aria-label={`${t('clear')} ${node.label}`} onMouseDown={(event) => event.preventDefault()} onClick={() => emitValue([...selectedValues].filter((selected) => selected !== node.value))}><Icon name="x" size={10} /></button></span>)}
         </div>}
-        <input ref={inputRef} id={inputId} className="sp-tc__input" role="combobox" aria-haspopup="tree" aria-expanded={open} aria-controls={open ? popupId : undefined} aria-activedescendant={open ? activeId : undefined} aria-autocomplete="list" aria-label={ariaLabel || (!label ? 'Tree combobox' : undefined)} aria-labelledby={ariaLabelledBy} aria-describedby={describedBy} aria-invalid={hasError || undefined} aria-required={effectiveRequired || undefined} aria-readonly={effectiveReadOnly || undefined} disabled={effectiveDisabled} readOnly={effectiveReadOnly} placeholder={placeholder ?? t('search')} value={query} onFocus={() => { if (suppressFocusOpen.current) suppressFocusOpen.current = false; else setOpenState(true); }} onBlur={handleBlur} onChange={(event: ChangeEvent<HTMLInputElement>) => { const next = event.target.value; setQuery(next); if (!open) setOpenState(true); if (!Array.isArray(lookupSource)) void load(next); }} onKeyDown={onInputKeyDown} />
+        <input ref={inputRef} id={inputId} className="sp-tc__input" role="combobox" aria-haspopup="tree" aria-expanded={open} aria-controls={open ? popupId : undefined} aria-activedescendant={open ? activeId : undefined} aria-autocomplete="list" aria-label={ariaLabel || (!label ? t('treeView') : undefined)} aria-labelledby={ariaLabelledBy} aria-describedby={describedBy} aria-invalid={hasError || undefined} aria-required={effectiveRequired || undefined} aria-readonly={effectiveReadOnly || undefined} disabled={effectiveDisabled} readOnly={effectiveReadOnly} placeholder={hasFloatingLabel && !open && !query ? undefined : placeholder ?? t('search')} value={query} onFocus={() => { if (suppressFocusOpen.current) suppressFocusOpen.current = false; else setOpenState(true); }} onBlur={handleBlur} onChange={(event: ChangeEvent<HTMLInputElement>) => { const next = event.target.value; setQuery(next); setHighlighted(0); if (!open) setOpenState(true); if (!Array.isArray(lookupSource)) void load(next); }} onKeyDown={onInputKeyDown} />
         {(query || selectedValues.size) && !effectiveDisabled && !effectiveReadOnly ? <button type="button" className="sp-tc__clear" tabIndex={-1} aria-label={t('clear')} onMouseDown={(event) => event.preventDefault()} onClick={() => { setQuery(''); emitValue(multiple ? [] : ''); inputRef.current?.focus(); }}><Icon name="x" size={12} /></button> : null}
         <button type="button" className="sp-tc__chevron" aria-label={open ? t('close') : t('open')} aria-expanded={open} disabled={effectiveDisabled || effectiveReadOnly} onMouseDown={(event) => event.preventDefault()} onClick={() => { setOpenState(!open); inputRef.current?.focus(); }}><Icon name="chevron-down" size={12} /></button>
       </div>

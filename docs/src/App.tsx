@@ -83,6 +83,8 @@ import { HideOnScrollPage } from './pages/components/HideOnScrollPage'
 import { SelectPage } from './pages/components/SelectPage'
 import { ComboboxPage } from './pages/components/ComboboxPage'
 import { GridComboboxPage } from './pages/components/GridComboboxPage'
+import { TreeComboboxPage } from './pages/components/TreeComboboxPage'
+import { TreeGridComboboxPage } from './pages/components/TreeGridComboboxPage'
 import { ColorPickerPage } from './pages/components/ColorPickerPage'
 import { EmojiPickerPage } from './pages/components/EmojiPickerPage'
 import { FormBuilderPage } from './pages/components/FormBuilderPage'
@@ -92,6 +94,7 @@ import { GanttPage } from './pages/components/GanttPage'
 import { SchedulerPage } from './pages/components/SchedulerPage'
 import { KanbanPage } from './pages/components/KanbanPage'
 import { TreePage } from './pages/components/TreePage'
+import { AnchorPage } from './pages/components/AnchorPage'
 import { InplaceEditorPage } from './pages/components/InplaceEditorPage'
 import { AppHeaderPage } from './pages/components/AppHeaderPage'
 import { NavMenuPage } from './pages/components/NavMenuPage'
@@ -189,6 +192,7 @@ import { ShakePage } from './pages/effects/ShakePage'
 import { IconMotionPage } from './pages/effects/IconMotionPage'
 import { SlidePage } from './pages/effects/SlidePage'
 import { NumberTickerPage } from './pages/effects/NumberTickerPage'
+import { ContentTransitionPage } from './pages/effects/ContentTransitionPage'
 import { FocusUtilitiesPage } from './pages/utils/FocusUtilitiesPage'
 import { HighlightPage } from './pages/utils/HighlightPage'
 import { CodePreviewUtilPage } from './pages/utils/CodePreviewUtilPage'
@@ -323,6 +327,8 @@ function renderPage(hash: string): React.ReactElement {
     case '#/components/select':              return <SelectPage />
     case '#/components/combobox':            return <ComboboxPage />
     case '#/components/grid-combobox':       return <GridComboboxPage />
+    case '#/components/tree-combobox':       return <TreeComboboxPage />
+    case '#/components/tree-grid-combobox':  return <TreeGridComboboxPage />
     case '#/components/color-picker':         return <ColorPickerPage />
     case '#/components/emoji-picker':         return <EmojiPickerPage />
     case '#/components/form-builder':         return <FormBuilderPage />
@@ -332,6 +338,7 @@ function renderPage(hash: string): React.ReactElement {
     case '#/components/scheduler':           return <SchedulerPage />
     case '#/components/kanban':              return <KanbanPage />
     case '#/components/tree':               return <TreePage />
+    case '#/components/anchor':             return <AnchorPage />
     case '#/components/inplace-editor':     return <InplaceEditorPage />
     case '#/components/app-header':         return <AppHeaderPage />
     case '#/components/nav-menu':           return <NavMenuPage />
@@ -439,6 +446,7 @@ function renderPage(hash: string): React.ReactElement {
     case '#/effects/icon-motion':           return <IconMotionPage />
     case '#/effects/slide':                 return <SlidePage />
     case '#/effects/number-ticker':         return <NumberTickerPage />
+    case '#/effects/content-transition':    return <ContentTransitionPage />
     // Utilities
     case '#/utils/focus-utilities':
     case '#/utils/focus-directives':       return <FocusUtilitiesPage />

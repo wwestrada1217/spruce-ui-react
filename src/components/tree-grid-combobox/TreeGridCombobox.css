@@ -1,5 +1,8 @@
 .sp-tgc { position: relative; display: block; color: var(--sp-text-color); }
 .sp-tgc__label { display: block; margin-block-end: var(--sp-space-1); font-size: var(--sp-text-sm); font-weight: var(--sp-font-medium); }
+.sp-tgc--floating .sp-tgc__label { position: absolute; z-index: 1; inset-block-start: 10px; inset-inline-start: var(--sp-space-9); margin: 0; color: var(--sp-text-muted); font-size: var(--sp-text-sm); font-weight: var(--sp-font-normal); pointer-events: none; transition: transform var(--sp-duration-fast) var(--sp-ease-default), color var(--sp-duration-fast) var(--sp-ease-default); transform-origin: top left; }
+.sp-tgc--floating.sp-tgc--floated .sp-tgc__label { color: var(--sp-text-subtle); transform: translateY(-8px) scale(.78); }
+.sp-tgc--floating .sp-tgc__control { padding-block-start: var(--sp-space-2); }
 .sp-tgc__control { display: flex; align-items: center; gap: var(--sp-space-2); min-height: 36px; padding-inline: var(--sp-space-3); border: var(--sp-border-width-hairline) solid var(--sp-input-border, var(--sp-border-strong)); border-radius: var(--sp-input-radius, var(--sp-radius-md)); background: var(--sp-input-bg, var(--sp-surface-0)); transition: border-color var(--sp-duration-normal) var(--sp-ease-default), box-shadow var(--sp-duration-normal) var(--sp-ease-default); }
 .sp-tgc--outline .sp-tgc__control { background: transparent; }
 .sp-tgc--filled .sp-tgc__control { border-color: transparent; background: var(--sp-surface-100); }
