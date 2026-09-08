@@ -124,7 +124,10 @@ export function Window({
         x: Math.round((window.innerWidth - p.width) / 2),
         y: Math.round((window.innerHeight - p.height) / 2),
       });
-      setZIndex(nextZIndex());
+      const newZ = nextZIndex();
+      activeWindowZIndex = newZ;
+      setZIndex(newZ);
+      setActiveZ(newZ);
       setInitialized(true);
     });
     return () => cancelAnimationFrame(frame);
@@ -145,6 +148,7 @@ export function Window({
     setZIndex((prev) => {
       const next = nextZIndex();
       activeWindowZIndex = next;
+      setActiveZ(next);
       windowStackListeners.forEach((listener) => listener());
       return next === prev ? prev : next;
     });
@@ -153,8 +157,7 @@ export function Window({
   // Drag
   function onDragStart(e: React.MouseEvent) {
     if (maximized) return;
-    if ((e.target as HTMLElement).closest('button')) return;
-    e.preventDefault();
+    if ((e.target as Element).closest('button')) return;
     bringToFront();
 
     const startX = e.clientX;
@@ -239,20 +242,25 @@ export function Window({
   // Toggle maximize
   function toggleMaximize() {
     if (!resizable) return;
-    setMaximized((prev) => {
-      if (prev) {
-        const bounds = savedBounds.current;
-        if (bounds) {
-          setPos({ x: bounds.x, y: bounds.y });
-          setDim({ width: bounds.width, height: bounds.height });
-        }
-        onMaximizeChange?.(false);
-        return false;
+    if (maximized) {
+      if (savedBounds.current) {
+        setPos({ x: savedBounds.current.x, y: savedBounds.current.y });
+        setDim({ width: savedBounds.current.width, height: savedBounds.current.height });
+      } else {
+        const p = SIZE_PRESETS[size];
+        setDim({ width: p.width, height: p.height });
+        setPos({
+          x: Math.round((window.innerWidth - p.width) / 2),
+          y: Math.round((window.innerHeight - p.height) / 2),
+        });
       }
+      setMaximized(false);
+      onMaximizeChange?.(false);
+    } else {
       savedBounds.current = { ...pos, ...dim };
+      setMaximized(true);
       onMaximizeChange?.(true);
-      return true;
-    });
+    }
   }
 
   // Backdrop click
@@ -310,12 +318,22 @@ export function Window({
           onDoubleClick={toggleMaximize}
         >
           <span className="sp-window__title">{title}</span>
-          <div className="sp-window__controls">
+          <div
+            className="sp-window__controls"
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              bringToFront();
+            }}
+            onDoubleClick={(e) => e.stopPropagation()}
+          >
             {resizable && (
               <button
                 type="button"
                 className="sp-window__btn"
-                onClick={toggleMaximize}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleMaximize();
+                }}
                 aria-label={maximized ? t('restore') : t('maximize')}
               >
                 <Icon name={maximized ? 'minimize' : 'maximize'} size={14} />
@@ -324,7 +342,10 @@ export function Window({
             <button
               type="button"
               className="sp-window__btn sp-window__btn--close"
-              onClick={onClose}
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+              }}
               aria-label={t('close')}
             >
               <Icon name="x" size={14} />

@@ -300,7 +300,6 @@ const RAW_NAV_SECTIONS: NavSection[] = [
       { icon: 'bar-chart',       label: 'Charts',             route: '#/blocks/charts'             },
       { icon: 'shield',          label: 'Privacy & Cookie Consent', route: '#/blocks/cookie-consent' },
       { icon: 'table',           label: 'Operations Grid',    route: '#/blocks/operations-grid'   },
-      { icon: 'route',           label: 'REST Client Workflow', route: '#/blocks/rest-client-workflow' },
       { icon: 'trending-up',     label: 'Stocks App',         route: '#/blocks/stocks'             },
     ],
   },

@@ -1,3 +1,4 @@
+.sp-sidebar-account-switcher { display: block; width: 100%; }
 .sp-account__btn { display: flex; align-items: center; gap: var(--sp-density-inline-gap, var(--sp-space-2, 8px)); width: 100%; min-height: var(--sp-density-list-item-min-height, 32px); padding: var(--sp-density-control-padding-y, 6px) var(--sp-density-control-padding-x, 8px); border: 0; border-radius: var(--sp-radius-md, 6px); background: transparent; color: inherit; font: inherit; text-align: start; cursor: pointer; }
 .sp-account__btn:hover, .sp-account__menu-item:hover { background: var(--sp-content-hover-bg, rgba(0, 0, 0, 0.04)); }
 .sp-account__btn:focus-visible, .sp-account__menu-item:focus-visible { outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color, var(--sp-primary)); outline-offset: 2px; }

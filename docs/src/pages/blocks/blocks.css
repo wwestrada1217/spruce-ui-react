@@ -404,95 +404,6 @@
   text-align: center;
 }
 
-.sp-block-workflow__diagram {
-  overflow-x: auto;
-  border: 1px solid var(--sp-border);
-  border-radius: var(--sp-radius-lg);
-  background: var(--sp-surface-50);
-  padding: var(--sp-space-3);
-}
-
-.sp-block-workflow__diagram svg {
-  display: block;
-  min-width: 540px;
-  width: 100%;
-}
-
-.sp-block-workflow__grid,
-.sp-block-workflow__callout {
-  display: grid;
-  gap: var(--sp-space-4);
-}
-
-.sp-block-workflow__grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.sp-block-workflow__callout {
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: start;
-  border: 1px solid var(--sp-info);
-  border-radius: var(--sp-radius-md);
-  background: var(--sp-info-subtle);
-  padding: var(--sp-space-3);
-  color: var(--sp-text-muted);
-}
-
-.sp-block-workflow__callout p {
-  margin: 0;
-}
-
-.sp-block-workflow__steps,
-.sp-block-workflow__list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-space-2);
-  color: var(--sp-text-muted);
-  line-height: 1.6;
-}
-
-.sp-block-workflow__table-wrap {
-  overflow-x: auto;
-}
-
-.sp-block-workflow__table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--sp-text-sm);
-}
-
-.sp-block-workflow__table th,
-.sp-block-workflow__table td {
-  border-bottom: 1px solid var(--sp-border);
-  padding: var(--sp-space-2) var(--sp-space-3);
-  text-align: start;
-  vertical-align: top;
-}
-
-.sp-block-workflow__table th {
-  background: var(--sp-surface-50);
-  color: var(--sp-text-subtle);
-  font-size: var(--sp-text-xs);
-  letter-spacing: var(--sp-tracking-wider);
-  text-transform: uppercase;
-}
-
-.sp-block-workflow__run {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-space-3);
-  border: 1px solid var(--sp-border);
-  border-radius: var(--sp-radius-md);
-  background: var(--sp-surface-50);
-  padding: var(--sp-space-3);
-}
-
-.sp-block-workflow__run p {
-  margin: 0;
-  color: var(--sp-text-muted);
-}
-
 .sp-block-stocks {
   overflow: hidden;
 }
@@ -782,7 +693,6 @@
 @media (max-width: 1100px) {
   .sp-block-chart-grid,
   .sp-block-chart-grid--wide,
-  .sp-block-workflow__grid,
   .sp-block-ops__header,
   .sp-block-ops__bulk,
   .sp-block-ops__handoff {
@@ -819,7 +729,6 @@
 
   .sp-block-cookie__status,
   .sp-block-cookie__detail,
-  .sp-block-workflow__run,
   .sp-block-stocks__company {
     align-items: flex-start;
     flex-direction: column;

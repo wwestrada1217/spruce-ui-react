@@ -893,6 +893,15 @@ function parsedEditorValue<T extends object>(value: unknown, row: T, column: Dat
   return value;
 }
 
+function selectAllInputText(input: HTMLInputElement | null) {
+  if (!input) return;
+  try {
+    input.select();
+  } catch {
+    // Non-text input types such as date might not support select()
+  }
+}
+
 function normalizeChoiceOptions(
   options: unknown,
   displayField = 'label',
@@ -3952,129 +3961,153 @@ function DatagridInner<T extends object = Record<string, unknown>>(
 
                           {/* Editing control or Cell Template */}
                           {isEditingCell ? (
-                            customEditor ? (
-                              customEditor({
-                                $implicit: draftValue,
-                                originalValue: cellVal,
-                                value: draftValue,
-                                row,
-                                rowIndex,
-                                column: col,
-                                invalid: isCellInvalid,
-                                errors: cellValidationErrors,
-                                firstError: cellValidationErrors[0]?.message ?? null,
-                                update: (newVal) => {
-                                  if (editMode === 'row') {
-                                    setRowDrafts((prev) => new Map(prev).set(col.key, newVal));
-                                  } else {
-                                    setCellDraftValue(newVal);
-                                  }
-                                },
-                                commit: () => {
-                                  if (editMode === 'row') {
-                                    // Row save handled by row save button
-                                  } else {
-                                    // Cell commit
-                                    commitCellDraft(row, rowIndex, col, draftValue);
-                                  }
-                                },
-                                cancel: () => {
-                                  setEditingCell(null);
-                                },
-                              })
-                            ) : editorType === 'checkbox' ? (
-                              <Checkbox
-                                className="sp-datagrid__editor-control--checkbox"
-                                checked={Boolean(draftValue)}
-                                onChange={(val) => {
-                                  if (editMode === 'row') {
-                                    setRowDrafts((prev) => new Map(prev).set(col.key, val));
-                                  } else {
-                                    setCellDraftValue(val);
-                                    commitCellDraft(row, rowIndex, col, val);
-                                  }
-                                }}
-                              />
-                            ) : editorType === 'select' || editorType === 'combobox' || editorType === 'grid-combobox' ? (
-                              <select
-                                className="sp-datagrid__editor"
-                                value={col.editorOptions?.multiple === true
-                                  ? (Array.isArray(draftValue) ? draftValue.map((value) => String(value)) : [])
-                                  : String(draftValue ?? '')}
-                                autoFocus
-                                multiple={col.editorOptions?.multiple === true}
-                                onChange={(event) => {
-                                  const value = event.currentTarget.multiple
-                                    ? Array.from(event.currentTarget.selectedOptions).map((option) => {
-                                        const match = choiceOptions.find((candidate) => String(candidate.value) === option.value);
-                                        return col.editorOptions?.useDisplayValue || col.editorOptions?.saveDisplayField
-                                          ? match?.label ?? option.value
-                                          : match?.value ?? option.value;
-                                      })
-                                    : (() => {
-                                        const match = choiceOptions.find((candidate) => String(candidate.value) === event.currentTarget.value);
-                                        return col.editorOptions?.useDisplayValue || col.editorOptions?.saveDisplayField
-                                          ? match?.label ?? event.currentTarget.value
-                                          : match?.value ?? event.currentTarget.value;
-                                      })();
-                                  if (editMode === 'row') {
-                                    setRowDrafts((prev) => new Map(prev).set(col.key, value));
-                                  } else {
-                                    setCellDraftValue(value);
-                                    commitCellDraft(row, rowIndex, col, value);
-                                  }
-                                }}
-                                onKeyDown={(event) => {
-                                  if (event.key === 'Escape') {
-                                    setEditingCell(null);
-                                    setCellDraftValue(undefined);
-                                  } else if (event.key === 'Enter' && editMode === 'cell') {
-                                    event.preventDefault();
-                                    commitCellDraft(row, rowIndex, col, event.currentTarget.value);
-                                  }
-                                }}
-                              >
-                                {col.editorOptions?.placeholder && <option value="">{col.editorOptions.placeholder}</option>}
-                                {choiceOptions.map((option) => (
-                                  <option key={String(option.value)} value={String(option.value)} disabled={option.disabled}>
-                                    {option.label}
-                                  </option>
-                                ))}
-                              </select>
-                            ) : (
-                              <input
-                                type={editorType === 'number' ? 'number' : editorType === 'date' ? 'date' : 'text'}
-                                className={`sp-datagrid__editor${isCellInvalid ? ' sp-datagrid__editor--invalid' : ''}`}
-                                aria-invalid={isCellInvalid ? true : undefined}
-                                min={col.editorOptions?.minDate}
-                                max={col.editorOptions?.maxDate}
-                                value={String(draftValue ?? '')}
-                                autoFocus
-                                onChange={(e) => {
-                                  const val = e.target.value;
-                                  if (editMode === 'row') {
-                                    setRowDrafts((prev) => new Map(prev).set(col.key, val));
-                                  } else {
-                                    setCellDraftValue(val);
-                                    if (validateOnInput) setCellValidationErrors(validateValue(val, row, col));
-                                  }
-                                }}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') {
-                                    if (editMode === 'cell') {
-                                      e.preventDefault();
-                                      commitCellDraft(row, rowIndex, col, e.currentTarget.value);
+                            <>
+                              <span className="sp-datagrid__editor-sizer" aria-hidden="true">
+                                {formattedVal || '\u00A0'}
+                              </span>
+                              {customEditor ? (
+                                customEditor({
+                                  $implicit: draftValue,
+                                  originalValue: cellVal,
+                                  value: draftValue,
+                                  row,
+                                  rowIndex,
+                                  column: col,
+                                  invalid: isCellInvalid,
+                                  errors: cellValidationErrors,
+                                  firstError: cellValidationErrors[0]?.message ?? null,
+                                  update: (newVal) => {
+                                    if (editMode === 'row') {
+                                      setRowDrafts((prev) => new Map(prev).set(col.key, newVal));
+                                    } else {
+                                      setCellDraftValue(newVal);
                                     }
-                                  } else if (e.key === 'Escape') {
+                                  },
+                                  commit: () => {
+                                    if (editMode === 'row') {
+                                      // Row save handled by row save button
+                                    } else {
+                                      // Cell commit
+                                      commitCellDraft(row, rowIndex, col, draftValue);
+                                    }
+                                  },
+                                  cancel: () => {
                                     setEditingCell(null);
-                                    setCellDraftValue(undefined);
-                                  }
-                                }}
-                                onBlur={(event) => {
-                                  if (editMode === 'cell') commitCellDraft(row, rowIndex, col, event.currentTarget.value);
-                                }}
-                              />
-                            )
+                                  },
+                                })
+                              ) : editorType === 'checkbox' ? (
+                                <Checkbox
+                                  className="sp-datagrid__editor-control--checkbox"
+                                  checked={Boolean(draftValue)}
+                                  onChange={(val) => {
+                                    if (editMode === 'row') {
+                                      setRowDrafts((prev) => new Map(prev).set(col.key, val));
+                                    } else {
+                                      setCellDraftValue(val);
+                                      commitCellDraft(row, rowIndex, col, val);
+                                    }
+                                  }}
+                                />
+                              ) : editorType === 'select' || editorType === 'combobox' || editorType === 'grid-combobox' ? (
+                                <select
+                                  className="sp-datagrid__editor"
+                                  value={col.editorOptions?.multiple === true
+                                    ? (Array.isArray(draftValue) ? draftValue.map((value) => String(value)) : [])
+                                    : String(draftValue ?? '')}
+                                  autoFocus
+                                  multiple={col.editorOptions?.multiple === true}
+                                  onChange={(event) => {
+                                    const value = event.currentTarget.multiple
+                                      ? Array.from(event.currentTarget.selectedOptions).map((option) => {
+                                          const match = choiceOptions.find((candidate) => String(candidate.value) === option.value);
+                                          return col.editorOptions?.useDisplayValue || col.editorOptions?.saveDisplayField
+                                            ? match?.label ?? option.value
+                                            : match?.value ?? option.value;
+                                        })
+                                      : (() => {
+                                          const match = choiceOptions.find((candidate) => String(candidate.value) === event.currentTarget.value);
+                                          return col.editorOptions?.useDisplayValue || col.editorOptions?.saveDisplayField
+                                            ? match?.label ?? event.currentTarget.value
+                                            : match?.value ?? event.currentTarget.value;
+                                        })();
+                                    if (editMode === 'row') {
+                                      setRowDrafts((prev) => new Map(prev).set(col.key, value));
+                                    } else {
+                                      setCellDraftValue(value);
+                                      commitCellDraft(row, rowIndex, col, value);
+                                    }
+                                  }}
+                                  onKeyDown={(event) => {
+                                    if (event.key === 'Escape') {
+                                      setEditingCell(null);
+                                      setCellDraftValue(undefined);
+                                    } else if (event.key === 'Enter' && editMode === 'cell') {
+                                      event.preventDefault();
+                                      commitCellDraft(row, rowIndex, col, event.currentTarget.value);
+                                    }
+                                  }}
+                                >
+                                  {col.editorOptions?.placeholder && <option value="">{col.editorOptions.placeholder}</option>}
+                                  {choiceOptions.map((option) => (
+                                    <option key={String(option.value)} value={String(option.value)} disabled={option.disabled}>
+                                      {option.label}
+                                    </option>
+                                  ))}
+                                </select>
+                              ) : (
+                                <input
+                                  type={editorType === 'number' ? 'number' : editorType === 'date' ? 'date' : 'text'}
+                                  className={`sp-datagrid__editor${isCellInvalid ? ' sp-datagrid__editor--invalid' : ''}`}
+                                  aria-invalid={isCellInvalid ? true : undefined}
+                                  min={col.editorOptions?.minDate}
+                                  max={col.editorOptions?.maxDate}
+                                  value={String(draftValue ?? '')}
+                                  autoFocus
+                                  ref={(el) => {
+                                    if (el) {
+                                      el.focus();
+                                      selectAllInputText(el);
+                                      const handleMouseUp = () => {
+                                        selectAllInputText(el);
+                                      };
+                                      el.addEventListener('mouseup', handleMouseUp, { once: true });
+                                      requestAnimationFrame(() => {
+                                        selectAllInputText(el);
+                                      });
+                                      setTimeout(() => {
+                                        el.removeEventListener('mouseup', handleMouseUp);
+                                      }, 300);
+                                    }
+                                  }}
+                                  onFocus={(e) => {
+                                    selectAllInputText(e.currentTarget);
+                                  }}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    if (editMode === 'row') {
+                                      setRowDrafts((prev) => new Map(prev).set(col.key, val));
+                                    } else {
+                                      setCellDraftValue(val);
+                                      if (validateOnInput) setCellValidationErrors(validateValue(val, row, col));
+                                    }
+                                  }}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                      if (editMode === 'cell') {
+                                        e.preventDefault();
+                                        commitCellDraft(row, rowIndex, col, e.currentTarget.value);
+                                      }
+                                    } else if (e.key === 'Escape') {
+                                      setEditingCell(null);
+                                      setCellDraftValue(undefined);
+                                    }
+                                  }}
+                                  onBlur={(event) => {
+                                    if (editMode === 'cell') commitCellDraft(row, rowIndex, col, event.currentTarget.value);
+                                  }}
+                                />
+                              )}
+                            </>
                           ) : editorType === 'checkbox' ? (
                             <Checkbox
                               className="sp-datagrid__cell-checkbox"
@@ -4201,8 +4234,13 @@ function DatagridInner<T extends object = Record<string, unknown>>(
                       return <div key={column.key} className="sp-datagrid__cell" role="gridcell">{formatCellValue(draft, sortedRows.length, column, effectiveLocale)}</div>;
                     }
                     const updateDraft = (nextValue: unknown) => setNewRowDraft({ ...draft, [column.key]: nextValue } as T);
+                    const isFocusedNewRowCol = column.key === visibleColumns.find((candidate) => candidate.editable === true)?.key;
+                    const newRowFormattedVal = formatCellValue(draft, sortedRows.length, column, effectiveLocale);
                     return (
                       <div key={column.key} className="sp-datagrid__cell sp-datagrid__cell--editing sp-datagrid__cell--editable" role="gridcell">
+                        <span className="sp-datagrid__editor-sizer" aria-hidden="true">
+                          {newRowFormattedVal || '\u00A0'}
+                        </span>
                         {editorType === 'checkbox' ? (
                           <Checkbox
                             className="sp-datagrid__editor-control--checkbox"
@@ -4213,7 +4251,7 @@ function DatagridInner<T extends object = Record<string, unknown>>(
                           <select
                             className="sp-datagrid__editor"
                             value={String(value ?? '')}
-                            autoFocus={column.key === visibleColumns.find((candidate) => candidate.editable === true)?.key}
+                            autoFocus={isFocusedNewRowCol}
                             onChange={(event) => newRowCommit === 'immediate' ? commitNewRowCell(column, event.target.value) : updateDraft(event.target.value)}
                           >
                             {column.editorOptions?.placeholder && <option value="">{column.editorOptions.placeholder}</option>}
@@ -4224,7 +4262,26 @@ function DatagridInner<T extends object = Record<string, unknown>>(
                             className="sp-datagrid__editor"
                             type={editorType === 'number' ? 'number' : editorType === 'date' ? 'date' : 'text'}
                             value={String(value ?? '')}
-                            autoFocus={column.key === visibleColumns.find((candidate) => candidate.editable === true)?.key}
+                            autoFocus={isFocusedNewRowCol}
+                            ref={(el) => {
+                              if (el && isFocusedNewRowCol) {
+                                el.focus();
+                                selectAllInputText(el);
+                                const handleMouseUp = () => {
+                                  selectAllInputText(el);
+                                };
+                                el.addEventListener('mouseup', handleMouseUp, { once: true });
+                                requestAnimationFrame(() => {
+                                  selectAllInputText(el);
+                                });
+                                setTimeout(() => {
+                                  el.removeEventListener('mouseup', handleMouseUp);
+                                }, 300);
+                              }
+                            }}
+                            onFocus={(e) => {
+                              selectAllInputText(e.currentTarget);
+                            }}
                             onChange={(event) => updateDraft(event.target.value)}
                             onKeyDown={(event) => {
                               if (event.key === 'Enter') commitNewRowCell(column, event.currentTarget.value);

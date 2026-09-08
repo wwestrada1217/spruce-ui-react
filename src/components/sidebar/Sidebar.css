@@ -189,12 +189,19 @@
 /* ─── Header ─── */
 .sp-sidebar-header {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   flex-direction: column;
   min-height: var(--sp-shell-bar-height, 52px);
   padding: var(--sp-space-1, 4px);
   overflow: hidden;
   transition: padding var(--sp-duration-slow, 300ms) var(--sp-ease-in-out, ease-in-out);
+}
+
+.sp-sidebar-header > *,
+.sp-sidebar-footer > *,
+.sp-sidebar-header > .sp-popover-anchor,
+.sp-sidebar-footer > .sp-popover-anchor {
+  width: 100%;
 }
 
 .sp-sidebar-header--bordered {

@@ -185,6 +185,8 @@ export { SidebarWorkspaceSwitcher } from './components/sidebar/SidebarWorkspaceS
 export type { SidebarWorkspaceSwitcherProps, WorkspaceOption } from './components/sidebar/SidebarWorkspaceSwitcher.js';
 export { SidebarNewsletterSubscribeForm } from './components/sidebar/SidebarNewsletterSubscribeForm.js';
 export type { SidebarNewsletterSubscribeFormProps } from './components/sidebar/SidebarNewsletterSubscribeForm.js';
+export { CompanySwitcher } from './components/sidebar/CompanySwitcher.js';
+export type { CompanyOption, CompanySwitcherProps } from './components/sidebar/CompanySwitcher.js';
 
 // ─── AppShell ─────────────────────────────────────────────────────────────────
 export { AppShell, AppShellHamburger } from './components/app-shell/AppShell.js';

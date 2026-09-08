@@ -134,7 +134,6 @@ import { SupportDeskBlockPage } from './pages/blocks/SupportDeskBlockPage'
 import { ChartsBlockPage } from './pages/blocks/ChartsBlockPage'
 import { CookieConsentBlockPage } from './pages/blocks/CookieConsentBlockPage'
 import { OperationsGridBlockPage } from './pages/blocks/OperationsGridBlockPage'
-import { RestClientWorkflowBlockPage } from './pages/blocks/RestClientWorkflowBlockPage'
 import { StocksBlockPage } from './pages/blocks/StocksBlockPage'
 import { BarChartPage } from './pages/charts/BarChartPage'
 import { PieChartPage } from './pages/charts/PieChartPage'
@@ -395,7 +394,6 @@ export function DocsRoute({ hash }: DocsRouteProps): React.ReactElement {
     case '#/blocks/charts':                  return <ChartsBlockPage />
     case '#/blocks/cookie-consent':          return <CookieConsentBlockPage />
     case '#/blocks/operations-grid':         return <OperationsGridBlockPage />
-    case '#/blocks/rest-client-workflow':    return <RestClientWorkflowBlockPage />
     case '#/blocks/stocks':                  return <StocksBlockPage />
     // Charts
     case '#/charts/chart-kernel':           return <ChartKernelPage />

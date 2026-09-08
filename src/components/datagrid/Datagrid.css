@@ -1151,12 +1151,13 @@
   z-index: 1;
   outline: var(--sp-focus-ring-width, 2px) solid var(--sp-focus-ring-color, var(--sp-focus-ring));
   outline-offset: calc(var(--sp-focus-ring-width, 2px) * -1);
-  animation: sp-focus-glow-inset var(--sp-duration-normal, 200ms) var(--sp-ease-out, ease-out) forwards;
 }
 
 .sp-datagrid__cell--editing {
   overflow: visible;
   background: var(--sp-datagrid-edit-background);
+  min-inline-size: 0;
+  min-width: 0;
 }
 
 .sp-datagrid__cell--editing::after {
@@ -1207,6 +1208,8 @@
 }
 
 .sp-datagrid__editor-sizer {
+  display: inline-block;
+  max-width: 100%;
   visibility: hidden;
   pointer-events: none;
   overflow-wrap: inherit;
@@ -1228,7 +1231,6 @@
   color: var(--sp-text-color);
   font: inherit;
   color-scheme: inherit;
-  transition: background-color var(--sp-duration-normal, 200ms) var(--sp-ease-default, ease);
 }
 
 .sp-datagrid__editor:focus-visible {

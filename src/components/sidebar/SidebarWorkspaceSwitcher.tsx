@@ -63,6 +63,7 @@ export function SidebarWorkspaceSwitcher({
       offset={4}
       open={open ?? internalOpen}
       onOpenChange={setOpen}
+      className={['sp-sidebar-workspace-switcher', className].filter(Boolean).join(' ')}
       trigger={<button type="button" className={['sp-workspace__btn', isCollapsedView && 'sp-workspace__btn--centered', className].filter(Boolean).join(' ')} aria-label={isCollapsedView ? (label ?? t('workspace')) : undefined} aria-haspopup="menu">
         <span className="sp-workspace__icon"><Icon name="menu" size={14} /></span>
         <span className={['sp-workspace__info', isCollapsedView && 'sp-workspace__info--collapsed'].filter(Boolean).join(' ')}>

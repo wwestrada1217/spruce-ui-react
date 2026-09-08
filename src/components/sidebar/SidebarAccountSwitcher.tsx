@@ -54,6 +54,7 @@ export function SidebarAccountSwitcher({
       offset={4}
       open={open ?? internalOpen}
       onOpenChange={setOpen}
+      className={['sp-sidebar-account-switcher', className].filter(Boolean).join(' ')}
       trigger={<button type="button" className={['sp-account__btn', isCollapsedView && 'sp-account__btn--centered', className].filter(Boolean).join(' ')} aria-label={isCollapsedView ? (username || t('accountMenu')) : undefined} aria-haspopup="menu">
         <Avatar size="sm" src={avatar} alt={username} name={username} />
         <span className={['sp-account__info', isCollapsedView && 'sp-account__info--collapsed'].filter(Boolean).join(' ')}>

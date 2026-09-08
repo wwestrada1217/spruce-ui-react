@@ -112,11 +112,14 @@ describe('P1.0-05 overlay parity', () => {
 
   it('supports window maximize state and command palette fuzzy/shortcut/footer behavior', async () => {
     const maximized = vi.fn();
-    const win = renderWithSpruce(<Window open onClose={vi.fn()} title="Editor" onMaximizeChange={maximized}><p>Body</p></Window>);
+    const onClose = vi.fn();
+    const win = renderWithSpruce(<Window open onClose={onClose} title="Editor" onMaximizeChange={maximized}><p>Body</p></Window>);
     await win.user.click(win.getByRole('button', { name: 'Maximize' }));
     expect(maximized).toHaveBeenCalledWith(true);
     await win.user.click(win.getByRole('button', { name: 'Restore' }));
     expect(maximized).toHaveBeenCalledWith(false);
+    await win.user.click(win.getByRole('button', { name: 'Close' }));
+    expect(onClose).toHaveBeenCalledTimes(1);
     win.unmount();
 
     const selected = vi.fn();

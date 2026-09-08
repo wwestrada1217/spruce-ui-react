@@ -284,6 +284,29 @@ describe('Datagrid', () => {
     }));
   });
 
+  it('renders editor sizer and auto-selects cell content when entering cell edit mode', async () => {
+    const { getByRole, container, user } = renderWithSpruce(
+      <Datagrid<Person>
+        ariaLabel="Editable people"
+        rows={rows}
+        columns={columns}
+        editMode="cell"
+      />,
+    );
+    const nameCell = getByRole('gridcell', { name: 'Ada' });
+    await user.dblClick(nameCell);
+
+    const sizer = container.querySelector('.sp-datagrid__editor-sizer');
+    expect(sizer).toBeInTheDocument();
+    expect(sizer).toHaveTextContent('Ada');
+
+    const editor = getByRole('textbox') as HTMLInputElement;
+    expect(editor).toBeInTheDocument();
+    expect(editor.value).toBe('Ada');
+    expect(editor.selectionStart).toBe(0);
+    expect(editor.selectionEnd).toBe(3);
+  });
+
   it('uses provider labels and logical pinned offsets in RTL', () => {
     const { getByRole, container } = renderWithSpruce(
       <Datagrid<Person>

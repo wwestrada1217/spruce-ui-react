@@ -3,7 +3,6 @@ import { within } from '@testing-library/react';
 import { ChartsBlockPage } from '../../docs/src/pages/blocks/ChartsBlockPage';
 import { CookieConsentBlockPage } from '../../docs/src/pages/blocks/CookieConsentBlockPage';
 import { OperationsGridBlockPage } from '../../docs/src/pages/blocks/OperationsGridBlockPage';
-import { RestClientWorkflowBlockPage } from '../../docs/src/pages/blocks/RestClientWorkflowBlockPage';
 import { StocksBlockPage } from '../../docs/src/pages/blocks/StocksBlockPage';
 import { expectNoA11yViolations, renderWithSpruce, waitFor } from '../utils/test-utils.js';
 
@@ -13,7 +12,6 @@ describe('P2-05 application blocks', () => {
       [ChartsBlockPage, 'Charts Blocks'],
       [CookieConsentBlockPage, 'Privacy & Cookie Consent Block'],
       [OperationsGridBlockPage, 'Operations Grid'],
-      [RestClientWorkflowBlockPage, 'REST Client — Workflow Designer'],
       [StocksBlockPage, 'Stocks App'],
     ] as const;
 
@@ -79,15 +77,6 @@ describe('P2-05 application blocks', () => {
     await user.click(week);
     expect(week).toHaveAttribute('aria-pressed', 'true');
     expect(getByRole('button', { name: '1M' })).toHaveAttribute('aria-pressed', 'false');
-  });
-
-  it('reports workflow execution state', async () => {
-    const { getByRole, getByText, user } = renderWithSpruce(<RestClientWorkflowBlockPage />);
-
-    await user.click(getByRole('button', { name: 'Run workflow' }));
-    const output = getByText('Completed: 3 nodes evaluated');
-    expect(output).toBeInTheDocument();
-    expect(output.closest('[role="status"]')).toHaveAttribute('aria-live', 'polite');
   });
 
   it('uses an automatic scroll behavior when reduced motion is requested', async () => {
