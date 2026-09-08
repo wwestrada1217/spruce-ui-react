@@ -95,6 +95,7 @@ import { SchedulerPage } from './pages/components/SchedulerPage'
 import { KanbanPage } from './pages/components/KanbanPage'
 import { TreePage } from './pages/components/TreePage'
 import { AnchorPage } from './pages/components/AnchorPage'
+import { ThemeSwitcherPage } from './pages/components/ThemeSwitcherPage'
 import { InplaceEditorPage } from './pages/components/InplaceEditorPage'
 import { AppHeaderPage } from './pages/components/AppHeaderPage'
 import { NavMenuPage } from './pages/components/NavMenuPage'
@@ -339,6 +340,7 @@ function renderPage(hash: string): React.ReactElement {
     case '#/components/kanban':              return <KanbanPage />
     case '#/components/tree':               return <TreePage />
     case '#/components/anchor':             return <AnchorPage />
+    case '#/components/theme-switcher':     return <ThemeSwitcherPage />
     case '#/components/inplace-editor':     return <InplaceEditorPage />
     case '#/components/app-header':         return <AppHeaderPage />
     case '#/components/nav-menu':           return <NavMenuPage />

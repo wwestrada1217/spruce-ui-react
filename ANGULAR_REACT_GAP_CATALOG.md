@@ -25,8 +25,8 @@ The comparison covered Angular docs navigation and routes, library barrels, comp
 - All 12 currently routed Angular/React block examples are present in React.
 - The active Angular docs surfaces that have no React page are three general components, two effects/docs subjects, all 21 Mobile pages, and all 41 AI pages.
 - The previously recorded current-API deltas for `Datagrid`, the six date controls, `GridCombobox`, the `StatCard` family, and `Modal` are closed in React.
-- The Angular theme package exports two reusable UI surfaces that React does not export: `ThemeSwitcher`/`ThemeSwitcherPanel` and `HarmonyWheel`.
-- Angular includes generated Figma/Tokens Studio/DTCG and Penpot token deliverables; React has no equivalent design-tool export workflow.
+- React now exports the reusable `ThemeSwitcher`/`ThemeSwitcherPanel` and `HarmonyWheel` surfaces alongside the shared theme runtime.
+- React now generates Figma/Tokens Studio/DTCG and Penpot token deliverables from its canonical CSS tokens and theme preset sources, with deterministic check/generate scripts and CI validation.
 
 The prompts linked from each **TODO** row are copy-paste implementation prompts in [Implementation prompts](#implementation-prompts).
 
@@ -38,7 +38,7 @@ The prompts linked from each **TODO** row are copy-paste implementation prompts 
 | **Complete** | Iconography, Background motifs, Illustrations | React contains the icon, flag, motif, and illustration collections plus the corresponding docs. | No action. |
 | **Complete** | Theming, Color harmony | Theme runtime, accents, harmony calculations, preset metadata, persistence, and docs exist. Reusable theme UI gaps are tracked under Themes. | No action. |
 | **Complete** | Motion, Voice & Tone, Internationalization, Accessibility | React has the foundation docs, reduced-motion support, i18n provider/hooks and locale packs, RTL direction, formatting, and accessibility guidance. | No action. |
-| **TODO** | Design-tool token delivery | Angular ships Figma plugin/assets, DTCG and Tokens Studio JSON, a Penpot plugin/foundations board, and generators. React contains none of these repository artifacts or generation scripts. | [F-01](#f-01--design-tool-token-exports) |
+| **Complete** | Design-tool token delivery | React generates DTCG and Tokens Studio JSON, Figma plugin assets, Penpot plugin/token files, and a foundations board from the canonical React tokens and all 34 presets. `tokens:check` enforces reproducibility in CI. | No action. |
 | **Not applicable** | Angular routes use `/foundations/*` | React deliberately uses `/foundation/*`; this is a routing convention, not a missing feature. | No action. |
 
 ## Design systems and core contracts
@@ -142,8 +142,8 @@ React has no AI component package or `/ai/*` docs. Every Angular AI component ro
 | --- | --- | --- | --- |
 | **Complete** | Theme provider/runtime, persistence, light/dark/system modes, density, reduced motion, accent colors, custom accent, harmony schemes/custom offsets, palette revision | React `ThemeProvider`/`useTheme` and docs cover the current runtime behavior. | No action. |
 | **Complete** | Theme presets | React contains the same 34 preset set as Angular. | No action. |
-| **TODO** | Exported `ThemeSwitcher` and `ThemeSwitcherPanel` | React has a docs-only switcher UI, but the library does not export reusable equivalents of the Angular package components and their trigger/panel APIs. | [T-01](#t-01--library-themeswitcher-and-panel) |
-| **TODO** | Exported `HarmonyWheel` | React has harmony calculations and docs, but no reusable library wheel supporting base/selection editing, disabled state, readout, and snap tolerance. | [T-02](#t-02--library-harmonywheel) |
+| **Complete** | Exported `ThemeSwitcher` and `ThemeSwitcherPanel` | Reusable library surfaces now provide icon/button/menu/custom triggers, controlled panel state, theme/accent/harmony choices, density, reduced motion, callbacks, and responsive accessible styling. | No action. |
+| **Complete** | Exported `HarmonyWheel` | The library wheel supports controlled base/selection editing, pointer/touch/keyboard input, disabled state, readout, scheme snapping, high contrast, and reduced motion. | No action. |
 
 ## Docs
 
@@ -162,6 +162,8 @@ React has no AI component package or `/ai/*` docs. Every Angular AI component ro
 Each prompt targets the React repository and treats Angular as behavioral reference, not code to copy literally.
 
 ### F-01 — Design-tool token exports
+
+**Status: Complete (2026-09-08).**
 
 ```text
 Add a reproducible design-tool token export workflow to C:\Users\acasauran\Documents\Spruce\spruce-ui-react using the framework-neutral artifacts under C:\Users\acasauran\Documents\Spruce\spruce-ng\projects\spruce-ui\tokens as the reference: Figma plugin files, DTCG JSON, Tokens Studio JSON, Penpot plugin files/foundations board, and their generation scripts/READMEs. Generate from React's canonical token and preset sources rather than maintaining a second hand-edited token set. Preserve semantic token names, modes/presets, aliases, descriptions, deterministic ordering, and validation. Add package scripts for check/generate, ensure generated artifacts are reproducible with no diff, document the workflow and ownership, and add a CI-safe validation test. Do not introduce Angular or SCSS runtime dependencies into the React library. Run the token checks plus npm run build, npm run docs:build, npm run lint, and npm run test:ci.
@@ -305,7 +307,7 @@ Implement AiErrorRecovery, AiVoiceControls, AiHandoff, an idiomatic AiNotificati
 
 ### C-21 — Datagrid current option delta
 
-**Status: Complete (2026-09-07).**
+**Status: Complete (2026-09-07); Angular Datagridex visual baseline synchronized with React Datagrid (2026-09-08).**
 
 ```text
 Re-audit and close the remaining current Angular Datagrid option gaps in C:\Users\acasauran\Documents\Spruce\spruce-ui-react against C:\Users\acasauran\Documents\Spruce\spruce-ng\projects\spruce-ui\datagrid\src\lib\components\datagrid.ts, models\column-def.model.ts, Datagrid.md, performance notes, and tests. Preserve React's existing canonical Datagrid APIs and map Angular names idiomatically. Implement the material missing behavior: outer chrome/radius/border and density; auto row height; header casing and null text; borderless/line/hover controls; skeleton loading; selection control/append/range/hide-column and select-on-navigation options; deferred/live resize and reorder; auto-edit-on-navigation, manual async commit, dirty indicators, undo/redo and fill-down; infinite scroll and server-windowed data-source loading; tree children and nested grids; new-row position/commit timing; pinned control columns; filter-expression panel integration; cell/row class hooks; and row click/double-click/cell click/detail lifecycle callbacks. Reconcile aliases such as rows/rowData, fitColumnsToWidth/autoFit, rowDetail/detailTemplate, and columnMenu/showColumnMenu without duplicating APIs. Update types, imperative handle, docs/API matrix, virtualization constraints, i18n/RTL/a11y behavior, and focused regression/performance tests. Run npm run build, npm run docs:build, npm run lint, and npm run test:ci.
@@ -313,11 +315,15 @@ Re-audit and close the remaining current Angular Datagrid option gaps in C:\User
 
 ### T-01 — Library ThemeSwitcher and panel
 
+**Status: Complete (2026-09-08).**
+
 ```text
 Promote the docs-only theme switcher behavior in C:\Users\acasauran\Documents\Spruce\spruce-ui-react into reusable library components ThemeSwitcher and ThemeSwitcherPanel, using C:\Users\acasauran\Documents\Spruce\spruce-ng\projects\spruce-ui\theme-switcher\src\lib\theme-switcher.ts as behavioral reference. Reuse ThemeProvider/useTheme and existing Popover, Button, Icon, Select, Switch, and harmony utilities. Support icon/button/menu/custom triggers; configurable header/footer, dismissibility, heading/description, initial/default view, reset/apply/close callbacks; theme mode/presets, density, reduced motion, accent/custom accent, harmony schemes/custom offsets, and responsive layout. Preserve controlled/uncontrolled idiomatic React APIs, focus/keyboard behavior, accessible labels, RTL, and token CSS. Export types/components, refactor docs to consume the library version, document both surfaces, and add interaction/provider/a11y tests. Run npm run build, npm run docs:build, npm run lint, and npm run test:ci.
 ```
 
 ### T-02 — Library HarmonyWheel
+
+**Status: Complete (2026-09-08).**
 
 ```text
 Implement an exported React HarmonyWheel in C:\Users\acasauran\Documents\Spruce\spruce-ui-react using C:\Users\acasauran\Documents\Spruce\spruce-ng\projects\spruce-ui\core\src\lib\harmony-wheel.ts and its tests/docs as behavioral reference. Reuse the existing React harmony/color utilities. Support controlled base and selection values with callbacks, disabled state, optional readout, snapTolerance, pointer/touch/keyboard editing, focus visibility, accessible value text/instructions, RTL where meaningful, and high-contrast/reduced-motion behavior. Use token-based sp- BEM CSS and avoid hard-coded theme colors. Export the component/types, integrate it into the library ThemeSwitcherPanel and Color Harmony docs, and add geometry/input/a11y tests. Run npm run build, npm run docs:build, npm run lint, and npm run test:ci.
@@ -347,8 +353,8 @@ Recommended dependency order:
 
 1. Completed current API deltas: C-02, C-03, C-04, C-07, C-21.
 2. **Complete (2026-09-08):** Add missing desktop primitives: C-01, C-05, C-06, C-08.
-3. Add the design-tool token workflow: F-01.
-4. Complete reusable theme UI: T-01 and T-02.
+3. **Complete (2026-09-08):** Add the design-tool token workflow: F-01.
+4. **Complete (2026-09-08):** Complete reusable theme UI: T-01 and T-02.
 5. Add the Mobile family: C-09 through C-13.
 6. Add AI shared types and primitives: C-14 through C-20.
 7. Finish cross-cutting docs: D-01 through D-03.

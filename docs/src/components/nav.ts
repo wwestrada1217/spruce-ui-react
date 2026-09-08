@@ -161,6 +161,7 @@ const RAW_NAV_SECTIONS: NavSection[] = [
       { icon: 'folder-dt',  label: 'Tabs',              route: '#/components/tabs'            },
       { icon: 'chevrons-right',label: 'Breadcrumbs',      route: '#/components/breadcrumbs'     },
       { icon: 'hash',          label: 'Anchor',            route: '#/components/anchor'          },
+      { icon: 'palette',       label: 'Theme Switcher',    route: '#/components/theme-switcher', description: 'Reusable theme, accent, harmony, density, and motion controls.', keywords: ['appearance', 'HarmonyWheel'] },
       { icon: 'list',         label: 'Stepper',           route: '#/components/stepper'         },
       { icon: 'toggle-left',  label: 'Segmented Control', route: '#/components/segmented'       },
       { icon: 'plus',    label: 'FAB',               route: '#/components/fab'             },

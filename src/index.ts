@@ -194,6 +194,17 @@ export type { AppShellProps, AppShellHamburgerProps } from './components/app-she
 export { ThemeProvider, useTheme } from './theme/theme-context.js';
 export type { AccentHarmony, ThemeContextValue, ThemeProviderProps } from './theme/theme-context.js';
 export { applyThemeToDocument } from './theme/theme-dom.js';
+export { HarmonyWheel } from './components/harmony-wheel/HarmonyWheel.js';
+export type { HarmonyWheelProps } from './components/harmony-wheel/HarmonyWheel.js';
+export { ThemeSwitcher, ThemeSwitcherPanel } from './components/theme-switcher/ThemeSwitcher.js';
+export type {
+  ThemeDensity,
+  ThemeSwitcherModeFilter,
+  ThemeSwitcherPanelProps,
+  ThemeSwitcherProps,
+  ThemeSwitcherTrigger,
+  ThemeSwitcherView,
+} from './components/theme-switcher/ThemeSwitcher.js';
 // Re-export theme types and presets from existing theme module
 export type { SpruceTheme, ThemePreference } from './theme/types.js';
 export * from './theme/index.js';

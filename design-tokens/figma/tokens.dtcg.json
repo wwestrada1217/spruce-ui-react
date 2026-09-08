@@ -1,0 +1,4209 @@
+{
+  "$schema": "https://www.designtokens.org/tr/drafts/format/",
+  "$description": "Generated from src/tokens/tokens.css and src/theme/presets. Do not edit.",
+  "alert": {
+    "radius": {
+      "$type": "dimension",
+      "$value": "4px",
+      "$description": "Spruce semantic token --sp-alert-radius.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-alert-radius",
+        "org.sprucestack.modes": {
+          "light": "4px",
+          "dark": "4px"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "8px",
+          "agents": "8px",
+          "liquid-glass-dark": "20px",
+          "liquid-glass": "20px",
+          "material-dark": "12px",
+          "material": "12px",
+          "modern-dark": "8px",
+          "modern": "8px",
+          "spruce-charcoal-dark": "4px",
+          "spruce-charcoal": "4px",
+          "spruce-dark": "4px",
+          "spruce-slate-dark": "4px",
+          "spruce-slate": "4px",
+          "spruce": "4px"
+        }
+      }
+    }
+  },
+  "backdrop": {
+    "filter": {
+      "$type": "string",
+      "$value": "none",
+      "$description": "Spruce semantic token --sp-backdrop-filter.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-backdrop-filter",
+        "org.sprucestack.modes": {
+          "light": "none",
+          "dark": "none"
+        },
+        "org.sprucestack.presets": {
+          "liquid-glass-dark": "blur(26px) saturate(190%) brightness(1.12)",
+          "liquid-glass": "blur(24px) saturate(180%) brightness(1.06)"
+        }
+      },
+      "strong": {
+        "$type": "string",
+        "$value": "none",
+        "$description": "Spruce semantic token --sp-backdrop-filter-strong.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-backdrop-filter-strong",
+          "org.sprucestack.modes": {
+            "light": "none",
+            "dark": "none"
+          },
+          "org.sprucestack.presets": {
+            "liquid-glass-dark": "blur(40px) saturate(200%) brightness(1.16)",
+            "liquid-glass": "blur(36px) saturate(190%) brightness(1.08)"
+          }
+        }
+      }
+    }
+  },
+  "background": {
+    "$type": "color",
+    "$value": "{surface.0}",
+    "$description": "Spruce semantic token --sp-background.",
+    "$extensions": {
+      "org.sprucestack.css-name": "--sp-background",
+      "org.sprucestack.modes": {
+        "light": "{surface.0}",
+        "dark": "{surface.0}"
+      }
+    }
+  },
+  "bg": {
+    "$type": "color",
+    "$value": "{surface.0}",
+    "$description": "Spruce semantic token --sp-bg.",
+    "$extensions": {
+      "org.sprucestack.css-name": "--sp-bg",
+      "org.sprucestack.modes": {
+        "light": "{surface.0}",
+        "dark": "{surface.0}"
+      }
+    }
+  },
+  "border": {
+    "$type": "color",
+    "$value": "rgba(24, 24, 27, 0.055)",
+    "$description": "Spruce semantic token --sp-border.",
+    "$extensions": {
+      "org.sprucestack.css-name": "--sp-border",
+      "org.sprucestack.modes": {
+        "light": "rgba(24, 24, 27, 0.055)",
+        "dark": "rgba(255, 255, 255, 0.08)"
+      },
+      "org.sprucestack.presets": {
+        "agents-dark": "rgba(244, 244, 245, 0.07)",
+        "agents": "rgba(24, 24, 27, 0.055)",
+        "bumblebee-dark": "rgba(232, 225, 207, 0.10)",
+        "bumblebee": "rgba(31, 26, 18, 0.12)",
+        "comic-dark": "rgba(244, 236, 216, 0.32)",
+        "comic": "rgba(18, 19, 23, 0.35)",
+        "dim": "rgba(205, 214, 244, 0.08)",
+        "dracula": "rgba(189, 147, 249, 0.10)",
+        "liquid-glass-dark": "rgba(255, 255, 255, 0.12)",
+        "liquid-glass": "rgba(255, 255, 255, 0.55)",
+        "material-dark": "rgba(147, 143, 153, 0.22)",
+        "material": "rgba(121, 116, 126, 0.20)",
+        "modern-dark": "rgba(226, 232, 240, 0.08)",
+        "modern": "rgba(15, 23, 42, 0.10)",
+        "monokai-light": "rgba(39, 40, 34, 0.12)",
+        "monokai": "rgba(248, 248, 242, 0.09)",
+        "nord": "rgba(216, 222, 233, 0.08)",
+        "retro": "rgba(180, 130, 30, 0.18)",
+        "shadcn-dark": "rgba(255, 255, 255, 0.08)",
+        "shadcn": "rgba(0, 0, 0, 0.09)",
+        "spruce-charcoal-dark": "rgba(226, 232, 240, 0.08)",
+        "spruce-charcoal": "rgba(15, 23, 42, 0.08)",
+        "spruce-dark": "rgba(255, 255, 255, 0.08)",
+        "spruce-slate-dark": "rgba(226, 232, 240, 0.08)",
+        "spruce-slate": "rgba(15, 23, 42, 0.08)",
+        "spruce": "rgba(24, 24, 27, 0.055)",
+        "visual-studio-dark": "rgba(255, 255, 255, 0.068)",
+        "visual-studio": "rgba(30, 30, 30, 0.075)"
+      }
+    },
+    "focus": {
+      "$type": "color",
+      "$value": "#166534",
+      "$description": "Spruce semantic token --sp-border-focus.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-border-focus",
+        "org.sprucestack.modes": {
+          "light": "#166534",
+          "dark": "#22c55e"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#818cf8",
+          "agents": "#6366f1",
+          "bumblebee-dark": "#f5c542",
+          "bumblebee": "#d99a00",
+          "comic-dark": "#c8f31d",
+          "comic": "#121317",
+          "corporate-dark": "#4a8cc4",
+          "corporate": "#1d3557",
+          "dim": "#818cf8",
+          "dracula": "#bd93f9",
+          "forest": "#166534",
+          "liquid-glass-dark": "#0a84ff",
+          "liquid-glass": "#007aff",
+          "material-dark": "#d0bcff",
+          "material": "#6750a4",
+          "modern-dark": "#60a5fa",
+          "modern": "#2563eb",
+          "monokai-light": "#c2185b",
+          "monokai": "#f92672",
+          "night": "#38bdf8",
+          "nord": "#88C0D0",
+          "ocean": "#0e7490",
+          "retro": "#d97706",
+          "rose": "#be185d",
+          "shadcn-dark": "#fafafa",
+          "shadcn": "#18181b",
+          "spruce-charcoal-dark": "#94a3b8",
+          "spruce-charcoal": "#334155",
+          "spruce-dark": "#22c55e",
+          "spruce-slate-dark": "#8aa6e6",
+          "spruce-slate": "#3a5ba0",
+          "spruce": "#166534",
+          "visual-studio-dark": "#5cb3f0",
+          "visual-studio": "#3a9bdc"
+        }
+      }
+    },
+    "strong": {
+      "$type": "color",
+      "$value": "rgba(24, 24, 27, 0.1)",
+      "$description": "Spruce semantic token --sp-border-strong.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-border-strong",
+        "org.sprucestack.modes": {
+          "light": "rgba(24, 24, 27, 0.1)",
+          "dark": "rgba(255, 255, 255, 0.14)"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "rgba(244, 244, 245, 0.12)",
+          "agents": "rgba(24, 24, 27, 0.10)",
+          "bumblebee-dark": "rgba(245, 197, 66, 0.22)",
+          "bumblebee": "rgba(31, 26, 18, 0.24)",
+          "comic-dark": "#f4ecd8",
+          "comic": "#121317",
+          "dim": "rgba(205, 214, 244, 0.14)",
+          "dracula": "rgba(189, 147, 249, 0.20)",
+          "liquid-glass-dark": "rgba(255, 255, 255, 0.22)",
+          "liquid-glass": "rgba(148, 163, 184, 0.32)",
+          "material-dark": "rgba(147, 143, 153, 0.38)",
+          "material": "rgba(121, 116, 126, 0.38)",
+          "modern-dark": "rgba(226, 232, 240, 0.14)",
+          "modern": "rgba(15, 23, 42, 0.18)",
+          "monokai-light": "rgba(39, 40, 34, 0.22)",
+          "monokai": "rgba(248, 248, 242, 0.17)",
+          "nord": "rgba(216, 222, 233, 0.15)",
+          "retro": "rgba(180, 130, 30, 0.30)",
+          "shadcn-dark": "rgba(255, 255, 255, 0.14)",
+          "shadcn": "rgba(0, 0, 0, 0.16)",
+          "spruce-charcoal-dark": "rgba(226, 232, 240, 0.14)",
+          "spruce-charcoal": "rgba(15, 23, 42, 0.14)",
+          "spruce-dark": "rgba(255, 255, 255, 0.14)",
+          "spruce-slate-dark": "rgba(226, 232, 240, 0.14)",
+          "spruce-slate": "rgba(15, 23, 42, 0.14)",
+          "spruce": "rgba(24, 24, 27, 0.10)",
+          "visual-studio-dark": "rgba(255, 255, 255, 0.118)",
+          "visual-studio": "rgba(30, 30, 30, 0.13)"
+        }
+      }
+    }
+  },
+  "btn": {
+    "radius": {
+      "$type": "dimension",
+      "$value": "3px",
+      "$description": "Spruce semantic token --sp-btn-radius.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-btn-radius",
+        "org.sprucestack.modes": {
+          "light": "3px",
+          "dark": "3px"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "6px",
+          "agents": "6px",
+          "liquid-glass-dark": "16px",
+          "liquid-glass": "16px",
+          "material-dark": "20px",
+          "material": "20px",
+          "modern-dark": "6px",
+          "modern": "6px",
+          "spruce-charcoal-dark": "3px",
+          "spruce-charcoal": "3px",
+          "spruce-dark": "3px",
+          "spruce-slate-dark": "3px",
+          "spruce-slate": "3px",
+          "spruce": "3px"
+        }
+      }
+    }
+  },
+  "card": {
+    "bg": {
+      "$type": "color",
+      "$value": "#fafafa",
+      "$description": "Spruce semantic token --sp-card-bg.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-card-bg",
+        "org.sprucestack.modes": {
+          "light": "#fafafa",
+          "dark": "#252526"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#121215",
+          "agents": "#fafafa",
+          "bumblebee-dark": "#252526",
+          "bumblebee": "#fffdf7",
+          "liquid-glass-dark": "rgba(24, 29, 39, 0.58)",
+          "liquid-glass": "rgba(255, 255, 255, 0.60)",
+          "material-dark": "#1d1b20",
+          "material": "#ffffff",
+          "modern-dark": "#111827",
+          "modern": "#ffffff",
+          "spruce-charcoal-dark": "#131c30",
+          "spruce-charcoal": "#ffffff",
+          "spruce-dark": "#252526",
+          "spruce-slate-dark": "#131c30",
+          "spruce-slate": "#ffffff",
+          "spruce": "#fafafa"
+        }
+      },
+      "filled": {
+        "$type": "color",
+        "$value": "#f4f4f5",
+        "$description": "Spruce semantic token --sp-card-bg-filled.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-card-bg-filled",
+          "org.sprucestack.modes": {
+            "light": "#f4f4f5",
+            "dark": "#2d2d30"
+          },
+          "org.sprucestack.presets": {
+            "agents-dark": "#18181b",
+            "agents": "#f4f4f5",
+            "bumblebee-dark": "#2d2d30",
+            "bumblebee": "#fff9ea",
+            "liquid-glass-dark": "rgba(36, 43, 58, 0.52)",
+            "liquid-glass": "rgba(255, 255, 255, 0.46)",
+            "material-dark": "#2b2930",
+            "material": "#f3edf7",
+            "modern-dark": "#162033",
+            "modern": "#f8fafc",
+            "spruce-charcoal-dark": "#1e293b",
+            "spruce-charcoal": "#f1f5f9",
+            "spruce-dark": "#2d2d30",
+            "spruce-slate-dark": "#1e293b",
+            "spruce-slate": "#f1f5f9",
+            "spruce": "#f4f4f5"
+          }
+        }
+      }
+    },
+    "border": {
+      "$type": "color",
+      "$value": "rgba(24, 24, 27, 0.06)",
+      "$description": "Spruce semantic token --sp-card-border.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-card-border",
+        "org.sprucestack.modes": {
+          "light": "rgba(24, 24, 27, 0.06)",
+          "dark": "rgba(255, 255, 255, 0.08)"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "rgba(244, 244, 245, 0.08)",
+          "agents": "rgba(24, 24, 27, 0.06)",
+          "bumblebee-dark": "rgba(232, 225, 207, 0.10)",
+          "bumblebee": "rgba(31, 26, 18, 0.12)",
+          "liquid-glass-dark": "rgba(255, 255, 255, 0.16)",
+          "liquid-glass": "rgba(255, 255, 255, 0.64)",
+          "material-dark": "rgba(147, 143, 153, 0.22)",
+          "material": "rgba(121, 116, 126, 0.20)",
+          "modern-dark": "rgba(226, 232, 240, 0.08)",
+          "modern": "rgba(15, 23, 42, 0.08)",
+          "spruce-charcoal-dark": "rgba(226, 232, 240, 0.08)",
+          "spruce-charcoal": "rgba(15, 23, 42, 0.08)",
+          "spruce-dark": "rgba(255, 255, 255, 0.08)",
+          "spruce-slate-dark": "rgba(226, 232, 240, 0.08)",
+          "spruce-slate": "rgba(15, 23, 42, 0.08)",
+          "spruce": "rgba(24, 24, 27, 0.06)"
+        }
+      }
+    },
+    "radius": {
+      "$type": "dimension",
+      "$value": "8px",
+      "$description": "Spruce semantic token --sp-card-radius.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-card-radius",
+        "org.sprucestack.modes": {
+          "light": "8px",
+          "dark": "8px"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "10px",
+          "agents": "10px",
+          "liquid-glass-dark": "24px",
+          "liquid-glass": "24px",
+          "material-dark": "12px",
+          "material": "12px",
+          "modern-dark": "8px",
+          "modern": "8px",
+          "spruce-charcoal-dark": "8px",
+          "spruce-charcoal": "8px",
+          "spruce-dark": "8px",
+          "spruce-slate-dark": "8px",
+          "spruce-slate": "8px",
+          "spruce": "8px"
+        }
+      }
+    }
+  },
+  "chart": {
+    "axis": {
+      "label": {
+        "$type": "string",
+        "$value": "#71717a",
+        "$description": "Spruce semantic token --sp-chart-axis-label.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-chart-axis-label",
+          "org.sprucestack.modes": {
+            "light": "#71717a",
+            "dark": "#6a6a6a"
+          },
+          "org.sprucestack.presets": {
+            "agents-dark": "#71717a",
+            "agents": "#71717a",
+            "bumblebee-dark": "#8f8265",
+            "liquid-glass-dark": "#94a3b8",
+            "liquid-glass": "#94a3b8",
+            "modern-dark": "#64748b",
+            "modern": "#334155",
+            "spruce-charcoal-dark": "#64748b",
+            "spruce-charcoal": "#94a3b8",
+            "spruce-dark": "#6a6a6a",
+            "spruce-slate-dark": "#64748b",
+            "spruce-slate": "#94a3b8",
+            "spruce": "#71717a"
+          }
+        }
+      },
+      "line": {
+        "$type": "string",
+        "$value": "#e4e4e7",
+        "$description": "Spruce semantic token --sp-chart-axis-line.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-chart-axis-line",
+          "org.sprucestack.modes": {
+            "light": "#e4e4e7",
+            "dark": "#383838"
+          },
+          "org.sprucestack.presets": {
+            "agents-dark": "#3f3f46",
+            "agents": "#e4e4e7",
+            "bumblebee-dark": "#4a4a4a",
+            "bumblebee": "#d9b24a",
+            "corporate-dark": "#1c2942",
+            "dim": "#363a4f",
+            "dracula": "#44475a",
+            "liquid-glass-dark": "rgba(148, 163, 184, 0.28)",
+            "liquid-glass": "rgba(148, 163, 184, 0.38)",
+            "material-dark": "#48464c",
+            "material": "#cac4d0",
+            "modern-dark": "#334155",
+            "modern": "#e2e8f0",
+            "monokai-light": "#d6d1bd",
+            "monokai": "#49483e",
+            "night": "#253047",
+            "nord": "#434C5E",
+            "shadcn-dark": "#27272a",
+            "spruce-charcoal-dark": "#334155",
+            "spruce-charcoal": "#e2e8f0",
+            "spruce-dark": "#383838",
+            "spruce-slate-dark": "#334155",
+            "spruce-slate": "#e2e8f0",
+            "spruce": "#e4e4e7",
+            "visual-studio-dark": "#383838",
+            "visual-studio": "#dfdfdf"
+          }
+        }
+      },
+      "text": {
+        "$type": "color",
+        "$value": "#71717a",
+        "$description": "Spruce semantic token --sp-chart-axis-text.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-chart-axis-text",
+          "org.sprucestack.modes": {
+            "light": "#71717a",
+            "dark": "#858585"
+          },
+          "org.sprucestack.presets": {
+            "agents-dark": "#a1a1aa",
+            "agents": "#71717a",
+            "bumblebee-dark": "#9d927b",
+            "bumblebee": "#7a6125",
+            "dim": "#a6adc8",
+            "dracula": "#bdbdcc",
+            "liquid-glass-dark": "#cbd5e1",
+            "liquid-glass": "#64748b",
+            "material-dark": "#938f99",
+            "material": "#79747e",
+            "modern-dark": "#94a3b8",
+            "modern": "#64748b",
+            "monokai-light": "#776f60",
+            "monokai": "#d7d2b8",
+            "nord": "#D8DEE9",
+            "shadcn-dark": "#a1a1aa",
+            "spruce-charcoal-dark": "#94a3b8",
+            "spruce-charcoal": "#64748b",
+            "spruce-dark": "#858585",
+            "spruce-slate-dark": "#94a3b8",
+            "spruce-slate": "#64748b",
+            "spruce": "#71717a",
+            "visual-studio-dark": "#858585",
+            "visual-studio": "#6a6a6a"
+          }
+        }
+      }
+    },
+    "dot": {
+      "stroke": {
+        "$type": "string",
+        "$value": "#fafafa",
+        "$description": "Spruce semantic token --sp-chart-dot-stroke.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-chart-dot-stroke",
+          "org.sprucestack.modes": {
+            "light": "#fafafa",
+            "dark": "#1e1e1e"
+          },
+          "org.sprucestack.presets": {
+            "agents-dark": "#09090b",
+            "agents": "#fafafa",
+            "bumblebee-dark": "#1e1e1e",
+            "bumblebee": "#fffdf7",
+            "corporate-dark": "#0c1220",
+            "liquid-glass-dark": "rgba(20, 24, 33, 0.86)",
+            "liquid-glass": "rgba(255, 255, 255, 0.82)",
+            "material-dark": "#141218",
+            "material": "#ffffff",
+            "modern-dark": "#0f172a",
+            "modern": "#ffffff",
+            "monokai-light": "#f8f8f2",
+            "monokai": "#272822",
+            "night": "#0d1117",
+            "nord": "#2E3440",
+            "shadcn-dark": "#09090b",
+            "spruce-charcoal-dark": "#0f172a",
+            "spruce-charcoal": "#f8fafc",
+            "spruce-dark": "#1e1e1e",
+            "spruce-slate-dark": "#0f172a",
+            "spruce-slate": "#f8fafc",
+            "spruce": "#fafafa",
+            "visual-studio-dark": "#1e1e1e",
+            "visual-studio": "#ffffff"
+          }
+        }
+      }
+    },
+    "grid": {
+      "line": {
+        "$type": "string",
+        "$value": "#ececee",
+        "$description": "Spruce semantic token --sp-chart-grid-line.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-chart-grid-line",
+          "org.sprucestack.modes": {
+            "light": "#ececee",
+            "dark": "#2d2d30"
+          },
+          "org.sprucestack.presets": {
+            "agents-dark": "#27272a",
+            "agents": "#ececee",
+            "bumblebee-dark": "#333333",
+            "bumblebee": "#f4d16a",
+            "corporate-dark": "#1c2942",
+            "dim": "#363a4f",
+            "dracula": "#44475a",
+            "liquid-glass-dark": "rgba(100, 116, 139, 0.28)",
+            "liquid-glass": "rgba(203, 213, 225, 0.48)",
+            "material-dark": "#36343b",
+            "material": "#e6e0e9",
+            "modern-dark": "#273449",
+            "modern": "#eef2f7",
+            "monokai-light": "#d6d1bd",
+            "monokai": "#49483e",
+            "night": "#253047",
+            "nord": "#434C5E",
+            "shadcn-dark": "#27272a",
+            "spruce-charcoal-dark": "#1e293b",
+            "spruce-charcoal": "#eef2f7",
+            "spruce-dark": "#2d2d30",
+            "spruce-slate-dark": "#1e293b",
+            "spruce-slate": "#eef2f7",
+            "spruce": "#ececee",
+            "visual-studio-dark": "#2f2f2f",
+            "visual-studio": "#ececec"
+          }
+        }
+      }
+    },
+    "legend": {
+      "text": {
+        "$type": "color",
+        "$value": "#71717a",
+        "$description": "Spruce semantic token --sp-chart-legend-text.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-chart-legend-text",
+          "org.sprucestack.modes": {
+            "light": "#71717a",
+            "dark": "#858585"
+          },
+          "org.sprucestack.presets": {
+            "agents-dark": "#a1a1aa",
+            "agents": "#71717a",
+            "bumblebee-dark": "#c9c0a9",
+            "bumblebee": "#7a6125",
+            "dim": "#a6adc8",
+            "liquid-glass-dark": "#cbd5e1",
+            "liquid-glass": "#64748b",
+            "material-dark": "#cac4d0",
+            "material": "#49454f",
+            "modern-dark": "#94a3b8",
+            "modern": "#64748b",
+            "monokai-light": "#776f60",
+            "monokai": "#d7d2b8",
+            "nord": "#D8DEE9",
+            "spruce-charcoal-dark": "#94a3b8",
+            "spruce-charcoal": "#64748b",
+            "spruce-dark": "#858585",
+            "spruce-slate-dark": "#94a3b8",
+            "spruce-slate": "#64748b",
+            "spruce": "#71717a",
+            "visual-studio-dark": "#b7b7b7",
+            "visual-studio": "#6a6a6a"
+          }
+        }
+      }
+    },
+    "subtitle": {
+      "color": {
+        "$type": "color",
+        "$value": "#71717a",
+        "$description": "Spruce semantic token --sp-chart-subtitle-color.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-chart-subtitle-color",
+          "org.sprucestack.modes": {
+            "light": "#71717a",
+            "dark": "#858585"
+          },
+          "org.sprucestack.presets": {
+            "agents-dark": "#a1a1aa",
+            "agents": "#71717a",
+            "bumblebee-dark": "#9d927b",
+            "bumblebee": "#7a6125",
+            "dim": "#a6adc8",
+            "dracula": "#bdbdcc",
+            "liquid-glass-dark": "#cbd5e1",
+            "liquid-glass": "#64748b",
+            "material-dark": "#cac4d0",
+            "material": "#49454f",
+            "modern-dark": "#94a3b8",
+            "modern": "#64748b",
+            "monokai-light": "#776f60",
+            "monokai": "#d7d2b8",
+            "nord": "#D8DEE9",
+            "shadcn-dark": "#a1a1aa",
+            "spruce-charcoal-dark": "#94a3b8",
+            "spruce-charcoal": "#64748b",
+            "spruce-dark": "#858585",
+            "spruce-slate-dark": "#94a3b8",
+            "spruce-slate": "#64748b",
+            "spruce": "#71717a",
+            "visual-studio-dark": "#858585",
+            "visual-studio": "#6a6a6a"
+          }
+        }
+      }
+    },
+    "title": {
+      "color": {
+        "$type": "color",
+        "$value": "#18181b",
+        "$description": "Spruce semantic token --sp-chart-title-color.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-chart-title-color",
+          "org.sprucestack.modes": {
+            "light": "#18181b",
+            "dark": "#cccccc"
+          },
+          "org.sprucestack.presets": {
+            "agents-dark": "#e4e4e7",
+            "agents": "#18181b",
+            "bumblebee-dark": "#e8e1cf",
+            "bumblebee": "#1f1a12",
+            "dim": "#cdd6f4",
+            "dracula": "#f8f8f2",
+            "liquid-glass-dark": "#f8fafc",
+            "liquid-glass": "#0f172a",
+            "material-dark": "#e6e0e9",
+            "material": "#1d1b20",
+            "modern-dark": "#e2e8f0",
+            "modern": "#0f172a",
+            "monokai-light": "#272822",
+            "monokai": "#f8f8f2",
+            "nord": "#ECEFF4",
+            "shadcn-dark": "#fafafa",
+            "spruce-charcoal-dark": "#e2e8f0",
+            "spruce-charcoal": "#0f172a",
+            "spruce-dark": "#cccccc",
+            "spruce-slate-dark": "#e2e8f0",
+            "spruce-slate": "#0f172a",
+            "spruce": "#18181b",
+            "visual-studio-dark": "#cccccc",
+            "visual-studio": "#1e1e1e"
+          }
+        }
+      }
+    },
+    "tooltip": {
+      "bg": {
+        "$type": "color",
+        "$value": "#27272a",
+        "$description": "Spruce semantic token --sp-chart-tooltip-bg.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-chart-tooltip-bg",
+          "org.sprucestack.modes": {
+            "light": "#27272a",
+            "dark": "#252526"
+          },
+          "org.sprucestack.presets": {
+            "agents-dark": "#27272a",
+            "agents": "#27272a",
+            "bumblebee-dark": "#252526",
+            "bumblebee": "#1f1a12",
+            "corporate-dark": "#151e30",
+            "liquid-glass-dark": "rgba(2, 6, 23, 0.88)",
+            "liquid-glass": "rgba(15, 23, 42, 0.86)",
+            "material-dark": "#e6e0e9",
+            "material": "#313033",
+            "modern-dark": "#111827",
+            "modern": "#0f172a",
+            "monokai-light": "#272822",
+            "monokai": "#33342c",
+            "night": "#161b27",
+            "shadcn-dark": "#18181b",
+            "spruce-charcoal-dark": "#273449",
+            "spruce-charcoal": "#1e293b",
+            "spruce-dark": "#252526",
+            "spruce-slate-dark": "#273449",
+            "spruce-slate": "#1e293b",
+            "spruce": "#27272a",
+            "visual-studio-dark": "#252526",
+            "visual-studio": "#252526"
+          }
+        }
+      },
+      "text": {
+        "$type": "color",
+        "$value": "#fafafa",
+        "$description": "Spruce semantic token --sp-chart-tooltip-text.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-chart-tooltip-text",
+          "org.sprucestack.modes": {
+            "light": "#fafafa",
+            "dark": "#ffffff"
+          },
+          "org.sprucestack.presets": {
+            "agents-dark": "#fafafa",
+            "agents": "#fafafa",
+            "bumblebee-dark": "#e8e1cf",
+            "bumblebee": "#fffdf7",
+            "liquid-glass-dark": "#f8fafc",
+            "liquid-glass": "#f8fafc",
+            "material-dark": "#1d1b20",
+            "material": "#f4eff4",
+            "modern-dark": "#e2e8f0",
+            "modern": "#f8fafc",
+            "monokai-light": "#f8f8f2",
+            "monokai": "#f8f8f2",
+            "spruce-charcoal-dark": "#f8fafc",
+            "spruce-charcoal": "#f8fafc",
+            "spruce-dark": "#ffffff",
+            "spruce-slate-dark": "#f8fafc",
+            "spruce-slate": "#f8fafc",
+            "spruce": "#fafafa",
+            "visual-studio-dark": "#cccccc",
+            "visual-studio": "#ffffff"
+          }
+        }
+      }
+    },
+    "track": {
+      "bg": {
+        "$type": "color",
+        "$value": "#f4f4f5",
+        "$description": "Spruce semantic token --sp-chart-track-bg.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-chart-track-bg",
+          "org.sprucestack.modes": {
+            "light": "#f4f4f5",
+            "dark": "#2d2d30"
+          },
+          "org.sprucestack.presets": {
+            "agents-dark": "#18181b",
+            "agents": "#f4f4f5",
+            "bumblebee-dark": "#2d2d30",
+            "bumblebee": "#fff3ce",
+            "corporate-dark": "#151e30",
+            "liquid-glass-dark": "rgba(36, 43, 58, 0.58)",
+            "liquid-glass": "rgba(241, 246, 255, 0.58)",
+            "material-dark": "#211f26",
+            "material": "#f7f2fa",
+            "modern-dark": "#162033",
+            "modern": "#f8fafc",
+            "monokai-light": "#eceadf",
+            "monokai": "#33342c",
+            "night": "#161b27",
+            "shadcn-dark": "#18181b",
+            "spruce-charcoal-dark": "#1e293b",
+            "spruce-charcoal": "#f1f5f9",
+            "spruce-dark": "#2d2d30",
+            "spruce-slate-dark": "#1e293b",
+            "spruce-slate": "#f1f5f9",
+            "spruce": "#f4f4f5",
+            "visual-studio-dark": "#252526",
+            "visual-studio": "#f3f3f3"
+          }
+        }
+      }
+    },
+    "value": {
+      "label": {
+        "$type": "string",
+        "$value": "#3f3f46",
+        "$description": "Spruce semantic token --sp-chart-value-label.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-chart-value-label",
+          "org.sprucestack.modes": {
+            "light": "#3f3f46",
+            "dark": "#cccccc"
+          },
+          "org.sprucestack.presets": {
+            "agents-dark": "#d4d4d8",
+            "agents": "#3f3f46",
+            "bumblebee-dark": "#c9c0a9",
+            "bumblebee": "#4a3a18",
+            "dim": "#cdd6f4",
+            "dracula": "#f8f8f2",
+            "liquid-glass-dark": "#e2e8f0",
+            "liquid-glass": "#334155",
+            "material-dark": "#cac4d0",
+            "material": "#49454f",
+            "modern-dark": "#cbd5e1",
+            "modern": "#334155",
+            "monokai-light": "#4f4a41",
+            "monokai": "#f8f8f2",
+            "nord": "#ECEFF4",
+            "spruce-charcoal-dark": "#cbd5e1",
+            "spruce-charcoal": "#334155",
+            "spruce-dark": "#cccccc",
+            "spruce-slate-dark": "#cbd5e1",
+            "spruce-slate": "#334155",
+            "spruce": "#3f3f46",
+            "visual-studio-dark": "#cccccc",
+            "visual-studio": "#3c3c3c"
+          }
+        }
+      }
+    }
+  },
+  "checkbox": {
+    "border": {
+      "$type": "color",
+      "$value": "rgba(24, 24, 27, 0.14)",
+      "$description": "Spruce semantic token --sp-checkbox-border.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-checkbox-border",
+        "org.sprucestack.modes": {
+          "light": "rgba(24, 24, 27, 0.14)",
+          "dark": "rgba(255, 255, 255, 0.18)"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "rgba(244, 244, 245, 0.16)",
+          "agents": "rgba(24, 24, 27, 0.14)",
+          "bumblebee-dark": "rgba(232, 225, 207, 0.18)",
+          "liquid-glass-dark": "rgba(255, 255, 255, 0.22)",
+          "liquid-glass": "rgba(100, 116, 139, 0.34)",
+          "modern-dark": "rgba(226, 232, 240, 0.16)",
+          "modern": "rgba(15, 23, 42, 0.16)",
+          "spruce-charcoal-dark": "rgba(226, 232, 240, 0.18)",
+          "spruce-charcoal": "rgba(15, 23, 42, 0.16)",
+          "spruce-dark": "rgba(255, 255, 255, 0.18)",
+          "spruce-slate-dark": "rgba(226, 232, 240, 0.18)",
+          "spruce-slate": "rgba(15, 23, 42, 0.16)",
+          "spruce": "rgba(24, 24, 27, 0.14)"
+        }
+      }
+    },
+    "radius": {
+      "$type": "dimension",
+      "$value": "2px",
+      "$description": "Spruce semantic token --sp-checkbox-radius.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-checkbox-radius",
+        "org.sprucestack.modes": {
+          "light": "2px",
+          "dark": "2px"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "4px",
+          "agents": "4px",
+          "liquid-glass-dark": "8px",
+          "liquid-glass": "8px",
+          "material-dark": "4px",
+          "material": "4px",
+          "modern-dark": "3px",
+          "modern": "3px",
+          "spruce-charcoal-dark": "2px",
+          "spruce-charcoal": "2px",
+          "spruce-dark": "2px",
+          "spruce-slate-dark": "2px",
+          "spruce-slate": "2px",
+          "spruce": "2px"
+        }
+      }
+    }
+  },
+  "content": {
+    "active": {
+      "bg": {
+        "$type": "color",
+        "$value": "rgba(24, 24, 27, 0.065)",
+        "$description": "Spruce semantic token --sp-content-active-bg.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-content-active-bg",
+          "org.sprucestack.modes": {
+            "light": "rgba(24, 24, 27, 0.065)",
+            "dark": "rgba(255, 255, 255, 0.09)"
+          },
+          "org.sprucestack.presets": {
+            "agents-dark": "rgba(244, 244, 245, 0.09)",
+            "agents": "rgba(24, 24, 27, 0.065)",
+            "bumblebee-dark": "rgba(245, 197, 66, 0.14)",
+            "bumblebee": "rgba(217, 154, 0, 0.14)",
+            "comic-dark": "rgba(200, 243, 29, 0.28)",
+            "comic": "rgba(200, 243, 29, 0.6)",
+            "dim": "rgba(205, 214, 244, 0.08)",
+            "dracula": "rgba(189, 147, 249, 0.10)",
+            "liquid-glass-dark": "rgba(10, 132, 255, 0.18)",
+            "liquid-glass": "rgba(0, 122, 255, 0.10)",
+            "material-dark": "rgba(208, 188, 255, 0.14)",
+            "material": "rgba(103, 80, 164, 0.12)",
+            "modern-dark": "rgba(226, 232, 240, 0.08)",
+            "modern": "rgba(15, 23, 42, 0.08)",
+            "monokai-light": "rgba(194, 24, 91, 0.10)",
+            "monokai": "rgba(249, 38, 114, 0.12)",
+            "nord": "rgba(136, 192, 208, 0.10)",
+            "retro": "rgba(180, 130, 30, 0.12)",
+            "shadcn-dark": "rgba(255, 255, 255, 0.09)",
+            "spruce-charcoal-dark": "rgba(226, 232, 240, 0.09)",
+            "spruce-charcoal": "rgba(15, 23, 42, 0.07)",
+            "spruce-dark": "rgba(255, 255, 255, 0.09)",
+            "spruce-slate-dark": "rgba(226, 232, 240, 0.09)",
+            "spruce-slate": "rgba(15, 23, 42, 0.07)",
+            "spruce": "rgba(24, 24, 27, 0.065)",
+            "visual-studio-dark": "rgba(92, 179, 240, 0.14)",
+            "visual-studio": "rgba(58, 155, 220, 0.10)"
+          }
+        }
+      }
+    },
+    "hover": {
+      "bg": {
+        "$type": "color",
+        "$value": "rgba(24, 24, 27, 0.035)",
+        "$description": "Spruce semantic token --sp-content-hover-bg.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-content-hover-bg",
+          "org.sprucestack.modes": {
+            "light": "rgba(24, 24, 27, 0.035)",
+            "dark": "rgba(255, 255, 255, 0.05)"
+          },
+          "org.sprucestack.presets": {
+            "agents-dark": "rgba(244, 244, 245, 0.05)",
+            "agents": "rgba(24, 24, 27, 0.035)",
+            "bumblebee-dark": "rgba(245, 197, 66, 0.08)",
+            "bumblebee": "rgba(217, 154, 0, 0.08)",
+            "comic-dark": "rgba(200, 243, 29, 0.16)",
+            "comic": "rgba(200, 243, 29, 0.35)",
+            "dim": "rgba(205, 214, 244, 0.05)",
+            "dracula": "rgba(189, 147, 249, 0.06)",
+            "liquid-glass-dark": "rgba(255, 255, 255, 0.08)",
+            "liquid-glass": "rgba(255, 255, 255, 0.36)",
+            "material-dark": "rgba(208, 188, 255, 0.08)",
+            "material": "rgba(103, 80, 164, 0.08)",
+            "modern-dark": "rgba(226, 232, 240, 0.05)",
+            "modern": "rgba(15, 23, 42, 0.04)",
+            "monokai-light": "rgba(194, 24, 91, 0.06)",
+            "monokai": "rgba(249, 38, 114, 0.07)",
+            "nord": "rgba(136, 192, 208, 0.06)",
+            "retro": "rgba(180, 130, 30, 0.07)",
+            "shadcn-dark": "rgba(255, 255, 255, 0.05)",
+            "spruce-charcoal-dark": "rgba(226, 232, 240, 0.05)",
+            "spruce-charcoal": "rgba(15, 23, 42, 0.04)",
+            "spruce-dark": "rgba(255, 255, 255, 0.05)",
+            "spruce-slate-dark": "rgba(226, 232, 240, 0.05)",
+            "spruce-slate": "rgba(15, 23, 42, 0.04)",
+            "spruce": "rgba(24, 24, 27, 0.035)",
+            "visual-studio-dark": "rgba(92, 179, 240, 0.085)",
+            "visual-studio": "rgba(58, 155, 220, 0.055)"
+          }
+        }
+      }
+    }
+  },
+  "danger": {
+    "$type": "color",
+    "$value": "#dc2626",
+    "$description": "Spruce semantic token --sp-danger.",
+    "$extensions": {
+      "org.sprucestack.css-name": "--sp-danger",
+      "org.sprucestack.modes": {
+        "light": "#dc2626",
+        "dark": "#f87171"
+      },
+      "org.sprucestack.presets": {
+        "agents-dark": "#f87171",
+        "agents": "#dc2626",
+        "bumblebee-dark": "#f36c6c",
+        "bumblebee": "#c53030",
+        "comic-dark": "#ff8098",
+        "comic": "#c81340",
+        "corporate-dark": "#f87171",
+        "corporate": "#dc2626",
+        "dim": "#f38ba8",
+        "dracula": "#ff5555",
+        "forest": "#b91c1c",
+        "liquid-glass-dark": "#ff453a",
+        "liquid-glass": "#ff3b30",
+        "material-dark": "#ffb4ab",
+        "material": "#ba1a1a",
+        "modern-dark": "#f87171",
+        "modern": "#dc2626",
+        "monokai-light": "#c75000",
+        "monokai": "#fd971f",
+        "night": "#f87171",
+        "nord": "#BF616A",
+        "ocean": "#e11d48",
+        "retro": "#b91c1c",
+        "rose": "#dc2626",
+        "shadcn-dark": "#f87171",
+        "shadcn": "#ef4444",
+        "spruce-charcoal-dark": "#f87171",
+        "spruce-charcoal": "#dc2626",
+        "spruce-dark": "#f87171",
+        "spruce-slate-dark": "#f87171",
+        "spruce-slate": "#dc2626",
+        "spruce": "#dc2626",
+        "visual-studio-dark": "#f14c4c",
+        "visual-studio": "#c42b1c"
+      }
+    },
+    "active": {
+      "$type": "color",
+      "$value": "#991b1b",
+      "$description": "Spruce semantic token --sp-danger-active.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-danger-active",
+        "org.sprucestack.modes": {
+          "light": "#991b1b",
+          "dark": "#dc2626"
+        }
+      }
+    },
+    "bg": {
+      "$type": "color",
+      "$value": "#fef2f2",
+      "$description": "Spruce semantic token --sp-danger-bg.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-danger-bg",
+        "org.sprucestack.modes": {
+          "light": "#fef2f2",
+          "dark": "rgba(248, 113, 113, 0.12)"
+        }
+      }
+    },
+    "border": {
+      "$type": "color",
+      "$value": "rgba(220, 38, 38, 0.25)",
+      "$description": "Spruce semantic token --sp-danger-border.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-danger-border",
+        "org.sprucestack.modes": {
+          "light": "rgba(220, 38, 38, 0.25)",
+          "dark": "rgba(248, 113, 113, 0.25)"
+        }
+      }
+    },
+    "hover": {
+      "$type": "color",
+      "$value": "#b91c1c",
+      "$description": "Spruce semantic token --sp-danger-hover.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-danger-hover",
+        "org.sprucestack.modes": {
+          "light": "#b91c1c",
+          "dark": "#fca5a5"
+        }
+      }
+    },
+    "on": {
+      "tint": {
+        "$type": "color",
+        "$value": "{danger}",
+        "$description": "Spruce semantic token --sp-danger-on-tint.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-danger-on-tint",
+          "org.sprucestack.modes": {
+            "light": "{danger}",
+            "dark": "{danger}"
+          }
+        }
+      }
+    },
+    "subtle": {
+      "$type": "color",
+      "$value": "rgba(220, 38, 38, 0.09)",
+      "$description": "Spruce semantic token --sp-danger-subtle.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-danger-subtle",
+        "org.sprucestack.modes": {
+          "light": "rgba(220, 38, 38, 0.09)",
+          "dark": "rgba(248, 113, 113, 0.13)"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "rgba(248, 113, 113, 0.12)",
+          "agents": "rgba(220, 38, 38, 0.09)",
+          "bumblebee-dark": "rgba(243, 108, 108, 0.13)",
+          "bumblebee": "rgba(197, 48, 48, 0.10)",
+          "comic-dark": "rgba(255, 128, 152, 0.2)",
+          "comic": "#ffe9ee",
+          "corporate-dark": "rgba(248, 113, 113, 0.12)",
+          "corporate": "rgba(220, 38, 38, 0.1)",
+          "dim": "rgba(243, 139, 168, 0.12)",
+          "dracula": "rgba(255, 85, 85, 0.12)",
+          "forest": "rgba(185, 28, 28, 0.1)",
+          "liquid-glass-dark": "rgba(255, 69, 58, 0.15)",
+          "liquid-glass": "rgba(255, 59, 48, 0.12)",
+          "material-dark": "rgba(255, 180, 171, 0.16)",
+          "material": "rgba(186, 26, 26, 0.12)",
+          "modern-dark": "rgba(248, 113, 113, 0.12)",
+          "modern": "rgba(220, 38, 38, 0.1)",
+          "monokai-light": "rgba(199, 80, 0, 0.11)",
+          "monokai": "rgba(253, 151, 31, 0.14)",
+          "night": "rgba(248, 113, 113, 0.12)",
+          "nord": "rgba(191, 97, 106, 0.12)",
+          "ocean": "rgba(225, 29, 72, 0.1)",
+          "retro": "rgba(185, 28, 28, 0.1)",
+          "rose": "rgba(220, 38, 38, 0.1)",
+          "shadcn-dark": "rgba(248, 113, 113, 0.12)",
+          "shadcn": "rgba(239, 68, 68, 0.1)",
+          "spruce-charcoal-dark": "rgba(248, 113, 113, 0.13)",
+          "spruce-charcoal": "rgba(220, 38, 38, 0.09)",
+          "spruce-dark": "rgba(248, 113, 113, 0.13)",
+          "spruce-slate-dark": "rgba(248, 113, 113, 0.13)",
+          "spruce-slate": "rgba(220, 38, 38, 0.09)",
+          "spruce": "rgba(220, 38, 38, 0.09)",
+          "visual-studio-dark": "rgba(241, 76, 76, 0.13)",
+          "visual-studio": "rgba(196, 43, 28, 0.10)"
+        }
+      }
+    },
+    "text": {
+      "$type": "color",
+      "$value": "#b91c1c",
+      "$description": "Spruce semantic token --sp-danger-text.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-danger-text",
+        "org.sprucestack.modes": {
+          "light": "#b91c1c",
+          "dark": "#fca5a5"
+        }
+      }
+    },
+    "tint": {
+      "$type": "color",
+      "$value": "{danger.subtle}",
+      "$description": "Spruce semantic token --sp-danger-tint.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-danger-tint",
+        "org.sprucestack.modes": {
+          "light": "{danger.subtle}",
+          "dark": "{danger.subtle}"
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": "{danger.border}",
+        "$description": "Spruce semantic token --sp-danger-tint-border.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-danger-tint-border",
+          "org.sprucestack.modes": {
+            "light": "{danger.border}",
+            "dark": "{danger.border}"
+          }
+        }
+      }
+    }
+  },
+  "focus": {
+    "glow": {
+      "color": {
+        "$type": "color",
+        "$value": "rgba(22, 101, 52, 0.12)",
+        "$description": "Spruce semantic token --sp-focus-glow-color.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-focus-glow-color",
+          "org.sprucestack.modes": {
+            "light": "rgba(22, 101, 52, 0.12)",
+            "dark": "{primary.subtle}"
+          },
+          "org.sprucestack.presets": {
+            "agents-dark": "rgba(129, 140, 248, 0.16)",
+            "agents": "rgba(99, 102, 241, 0.12)",
+            "bumblebee-dark": "rgba(245, 197, 66, 0.18)",
+            "bumblebee": "rgba(217, 154, 0, 0.18)",
+            "comic-dark": "rgba(200, 243, 29, 0.35)",
+            "comic": "rgba(200, 243, 29, 0.85)",
+            "liquid-glass-dark": "rgba(10, 132, 255, 0.22)",
+            "liquid-glass": "rgba(0, 122, 255, 0.18)",
+            "modern-dark": "rgba(96, 165, 250, 0.18)",
+            "modern": "rgba(37, 99, 235, 0.18)",
+            "spruce-charcoal-dark": "rgba(148, 163, 184, 0.16)",
+            "spruce-charcoal": "rgba(51, 65, 85, 0.12)",
+            "spruce-dark": "rgba(34, 197, 94, 0.16)",
+            "spruce-slate-dark": "rgba(138, 166, 230, 0.16)",
+            "spruce-slate": "rgba(58, 91, 160, 0.12)",
+            "spruce": "rgba(22, 101, 52, 0.12)"
+          }
+        }
+      },
+      "spread": {
+        "$type": "dimension",
+        "$value": "3px",
+        "$description": "Spruce semantic token --sp-focus-glow-spread.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-focus-glow-spread",
+          "org.sprucestack.modes": {
+            "light": "3px",
+            "dark": "3px"
+          },
+          "org.sprucestack.presets": {
+            "agents-dark": "5px",
+            "agents": "5px",
+            "comic-dark": "4px",
+            "comic": "4px",
+            "liquid-glass-dark": "8px",
+            "liquid-glass": "8px",
+            "modern-dark": "6px",
+            "modern": "6px",
+            "spruce-charcoal-dark": "5px",
+            "spruce-charcoal": "5px",
+            "spruce-dark": "3px",
+            "spruce-slate-dark": "3px",
+            "spruce-slate": "3px",
+            "spruce": "3px"
+          }
+        }
+      }
+    },
+    "ring": {
+      "color": {
+        "$type": "color",
+        "$value": "rgba(22, 101, 52, 0.35)",
+        "$description": "Spruce semantic token --sp-focus-ring-color.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-focus-ring-color",
+          "org.sprucestack.modes": {
+            "light": "rgba(22, 101, 52, 0.35)",
+            "dark": "var(--sp-border-focus, var(--sp-primary))"
+          },
+          "org.sprucestack.presets": {
+            "agents-dark": "rgba(129, 140, 248, 0.32)",
+            "agents": "rgba(99, 102, 241, 0.35)",
+            "bumblebee-dark": "rgba(245, 197, 66, 0.28)",
+            "bumblebee": "rgba(217, 154, 0, 0.28)",
+            "comic-dark": "#c8f31d",
+            "comic": "#121317",
+            "liquid-glass-dark": "rgba(10, 132, 255, 0.36)",
+            "liquid-glass": "rgba(0, 122, 255, 0.32)",
+            "modern-dark": "rgba(96, 165, 250, 0.28)",
+            "modern": "rgba(37, 99, 235, 0.22)",
+            "spruce-charcoal-dark": "rgba(148, 163, 184, 0.34)",
+            "spruce-charcoal": "rgba(51, 65, 85, 0.35)",
+            "spruce-dark": "rgba(34, 197, 94, 0.35)",
+            "spruce-slate-dark": "rgba(138, 166, 230, 0.34)",
+            "spruce-slate": "rgba(58, 91, 160, 0.35)",
+            "spruce": "rgba(22, 101, 52, 0.35)"
+          }
+        }
+      },
+      "offset": {
+        "$type": "dimension",
+        "$value": "2px",
+        "$description": "Spruce semantic token --sp-focus-ring-offset.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-focus-ring-offset",
+          "org.sprucestack.modes": {
+            "light": "2px",
+            "dark": "2px"
+          },
+          "org.sprucestack.presets": {
+            "comic-dark": "2px",
+            "comic": "2px"
+          }
+        }
+      },
+      "width": {
+        "$type": "dimension",
+        "$value": "2px",
+        "$description": "Spruce semantic token --sp-focus-ring-width.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-focus-ring-width",
+          "org.sprucestack.modes": {
+            "light": "2px",
+            "dark": "2px"
+          },
+          "org.sprucestack.presets": {
+            "comic-dark": "3px",
+            "comic": "3px"
+          }
+        }
+      }
+    }
+  },
+  "frosted": {
+    "bg": {
+      "$type": "color",
+      "$value": "rgba(255, 255, 255, 0.55)",
+      "$description": "Spruce semantic token --sp-frosted-bg.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-frosted-bg",
+        "org.sprucestack.modes": {
+          "light": "rgba(255, 255, 255, 0.55)",
+          "dark": "rgba(30, 30, 30, 0.65)"
+        },
+        "org.sprucestack.presets": {
+          "liquid-glass-dark": "rgba(24, 29, 39, 0.50)",
+          "liquid-glass": "rgba(255, 255, 255, 0.46)"
+        }
+      }
+    },
+    "blur": {
+      "$type": "string",
+      "$value": "blur(16px) saturate(160%)",
+      "$description": "Spruce semantic token --sp-frosted-blur.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-frosted-blur",
+        "org.sprucestack.modes": {
+          "light": "blur(16px) saturate(160%)",
+          "dark": "blur(18px) saturate(170%)"
+        },
+        "org.sprucestack.presets": {
+          "liquid-glass-dark": "blur(26px) saturate(190%) brightness(1.12)",
+          "liquid-glass": "blur(24px) saturate(180%) brightness(1.06)"
+        }
+      },
+      "strong": {
+        "$type": "string",
+        "$value": "blur(28px) saturate(180%)",
+        "$description": "Spruce semantic token --sp-frosted-blur-strong.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-frosted-blur-strong",
+          "org.sprucestack.modes": {
+            "light": "blur(28px) saturate(180%)",
+            "dark": "blur(30px) saturate(190%)"
+          },
+          "org.sprucestack.presets": {
+            "liquid-glass-dark": "blur(40px) saturate(200%) brightness(1.16)",
+            "liquid-glass": "blur(36px) saturate(190%) brightness(1.08)"
+          }
+        }
+      }
+    },
+    "border": {
+      "$type": "color",
+      "$value": "rgba(255, 255, 255, 0.6)",
+      "$description": "Spruce semantic token --sp-frosted-border.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-frosted-border",
+        "org.sprucestack.modes": {
+          "light": "rgba(255, 255, 255, 0.6)",
+          "dark": "rgba(255, 255, 255, 0.12)"
+        },
+        "org.sprucestack.presets": {
+          "liquid-glass-dark": "rgba(255, 255, 255, 0.16)",
+          "liquid-glass": "rgba(255, 255, 255, 0.64)"
+        }
+      }
+    },
+    "shadow": {
+      "$type": "shadow",
+      "$value": "0 8px 32px -12px rgba(24, 24, 27, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.75)",
+      "$description": "Spruce semantic token --sp-frosted-shadow.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-frosted-shadow",
+        "org.sprucestack.modes": {
+          "light": "0 8px 32px -12px rgba(24, 24, 27, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.75)",
+          "dark": "0 10px 32px -14px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.14)"
+        },
+        "org.sprucestack.presets": {
+          "liquid-glass-dark": "0 20px 44px -28px rgba(0, 0, 0, 0.66), inset 0 1px 0 rgba(255, 255, 255, 0.24), inset 0 0 0 1px rgba(255, 255, 255, 0.07)",
+          "liquid-glass": "0 18px 38px -26px rgba(15, 23, 42, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.90), inset 0 0 0 1px rgba(255, 255, 255, 0.14)"
+        }
+      }
+    }
+  },
+  "icon": {
+    "secondary": {
+      "color": {
+        "$type": "string",
+        "$value": "currentColor",
+        "$description": "Spruce semantic token --sp-icon-secondary-color.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-icon-secondary-color",
+          "org.sprucestack.modes": {
+            "light": "currentColor",
+            "dark": "currentColor"
+          }
+        }
+      },
+      "opacity": {
+        "$type": "number",
+        "$value": "0.2",
+        "$description": "Spruce semantic token --sp-icon-secondary-opacity.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-icon-secondary-opacity",
+          "org.sprucestack.modes": {
+            "light": "0.2",
+            "dark": "0.25"
+          }
+        }
+      }
+    }
+  },
+  "info": {
+    "$type": "color",
+    "$value": "#0e7490",
+    "$description": "Spruce semantic token --sp-info.",
+    "$extensions": {
+      "org.sprucestack.css-name": "--sp-info",
+      "org.sprucestack.modes": {
+        "light": "#0e7490",
+        "dark": "#38bdf8"
+      },
+      "org.sprucestack.presets": {
+        "agents-dark": "#818cf8",
+        "agents": "#6366f1",
+        "bumblebee-dark": "#75beff",
+        "bumblebee": "#0f6f8f",
+        "comic-dark": "#4ecfe8",
+        "comic": "#0c7695",
+        "corporate-dark": "#60a5fa",
+        "corporate": "#0284c7",
+        "dim": "#89dceb",
+        "dracula": "#8be9fd",
+        "forest": "#0369a1",
+        "liquid-glass-dark": "#64d2ff",
+        "liquid-glass": "#5ac8fa",
+        "material-dark": "#92ccff",
+        "material": "#00639b",
+        "modern-dark": "#38bdf8",
+        "modern": "#0ea5e9",
+        "monokai-light": "#007c9d",
+        "monokai": "#66d9ef",
+        "night": "#818cf8",
+        "nord": "#81A1C1",
+        "ocean": "#0284c7",
+        "retro": "#0369a1",
+        "rose": "#0891b2",
+        "shadcn-dark": "#60a5fa",
+        "shadcn": "#2563eb",
+        "spruce-charcoal-dark": "#94a3b8",
+        "spruce-charcoal": "#475569",
+        "spruce-dark": "#38bdf8",
+        "spruce-slate-dark": "#60a5fa",
+        "spruce-slate": "#2563eb",
+        "spruce": "#0e7490",
+        "visual-studio-dark": "#6eb8f8",
+        "visual-studio": "#3a9bdc"
+      }
+    },
+    "active": {
+      "$type": "color",
+      "$value": "#075985",
+      "$description": "Spruce semantic token --sp-info-active.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-info-active",
+        "org.sprucestack.modes": {
+          "light": "#075985",
+          "dark": "#0284c7"
+        }
+      }
+    },
+    "bg": {
+      "$type": "color",
+      "$value": "#f0f9ff",
+      "$description": "Spruce semantic token --sp-info-bg.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-info-bg",
+        "org.sprucestack.modes": {
+          "light": "#f0f9ff",
+          "dark": "rgba(56, 189, 248, 0.12)"
+        }
+      }
+    },
+    "border": {
+      "$type": "color",
+      "$value": "rgba(14, 116, 144, 0.25)",
+      "$description": "Spruce semantic token --sp-info-border.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-info-border",
+        "org.sprucestack.modes": {
+          "light": "rgba(14, 116, 144, 0.25)",
+          "dark": "rgba(56, 189, 248, 0.25)"
+        }
+      }
+    },
+    "hover": {
+      "$type": "color",
+      "$value": "#0369a1",
+      "$description": "Spruce semantic token --sp-info-hover.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-info-hover",
+        "org.sprucestack.modes": {
+          "light": "#0369a1",
+          "dark": "#7dd3fc"
+        }
+      }
+    },
+    "on": {
+      "tint": {
+        "$type": "color",
+        "$value": "{info}",
+        "$description": "Spruce semantic token --sp-info-on-tint.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-info-on-tint",
+          "org.sprucestack.modes": {
+            "light": "{info}",
+            "dark": "{info}"
+          }
+        }
+      }
+    },
+    "subtle": {
+      "$type": "color",
+      "$value": "rgba(14, 116, 144, 0.09)",
+      "$description": "Spruce semantic token --sp-info-subtle.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-info-subtle",
+        "org.sprucestack.modes": {
+          "light": "rgba(14, 116, 144, 0.09)",
+          "dark": "rgba(56, 189, 248, 0.13)"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "rgba(129, 140, 248, 0.12)",
+          "agents": "rgba(99, 102, 241, 0.09)",
+          "bumblebee-dark": "rgba(117, 190, 255, 0.12)",
+          "bumblebee": "rgba(15, 111, 143, 0.10)",
+          "comic-dark": "rgba(78, 207, 232, 0.2)",
+          "comic": "#e4f7fc",
+          "corporate-dark": "rgba(96, 165, 250, 0.12)",
+          "corporate": "rgba(2, 132, 199, 0.1)",
+          "dim": "rgba(137, 220, 235, 0.12)",
+          "dracula": "rgba(139, 233, 253, 0.12)",
+          "forest": "rgba(3, 105, 161, 0.1)",
+          "liquid-glass-dark": "rgba(100, 210, 255, 0.15)",
+          "liquid-glass": "rgba(90, 200, 250, 0.14)",
+          "material-dark": "rgba(146, 204, 255, 0.16)",
+          "material": "rgba(0, 99, 155, 0.12)",
+          "modern-dark": "rgba(56, 189, 248, 0.12)",
+          "modern": "rgba(14, 165, 233, 0.1)",
+          "monokai-light": "rgba(0, 124, 157, 0.10)",
+          "monokai": "rgba(102, 217, 239, 0.13)",
+          "night": "rgba(129, 140, 248, 0.12)",
+          "nord": "rgba(129, 161, 193, 0.12)",
+          "ocean": "rgba(2, 132, 199, 0.1)",
+          "retro": "rgba(3, 105, 161, 0.1)",
+          "rose": "rgba(8, 145, 178, 0.1)",
+          "shadcn-dark": "rgba(96, 165, 250, 0.12)",
+          "shadcn": "rgba(37, 99, 235, 0.1)",
+          "spruce-charcoal-dark": "rgba(148, 163, 184, 0.14)",
+          "spruce-charcoal": "rgba(71, 85, 105, 0.09)",
+          "spruce-dark": "rgba(56, 189, 248, 0.13)",
+          "spruce-slate-dark": "rgba(96, 165, 250, 0.13)",
+          "spruce-slate": "rgba(37, 99, 235, 0.09)",
+          "spruce": "rgba(14, 116, 144, 0.09)",
+          "visual-studio-dark": "rgba(110, 184, 248, 0.12)",
+          "visual-studio": "rgba(58, 155, 220, 0.10)"
+        }
+      }
+    },
+    "text": {
+      "$type": "color",
+      "$value": "#075985",
+      "$description": "Spruce semantic token --sp-info-text.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-info-text",
+        "org.sprucestack.modes": {
+          "light": "#075985",
+          "dark": "#7dd3fc"
+        }
+      }
+    },
+    "tint": {
+      "$type": "color",
+      "$value": "{info.subtle}",
+      "$description": "Spruce semantic token --sp-info-tint.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-info-tint",
+        "org.sprucestack.modes": {
+          "light": "{info.subtle}",
+          "dark": "{info.subtle}"
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": "{info.border}",
+        "$description": "Spruce semantic token --sp-info-tint-border.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-info-tint-border",
+          "org.sprucestack.modes": {
+            "light": "{info.border}",
+            "dark": "{info.border}"
+          }
+        }
+      }
+    }
+  },
+  "input": {
+    "bg": {
+      "$type": "color",
+      "$value": "#ffffff",
+      "$description": "Spruce semantic token --sp-input-bg.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-input-bg",
+        "org.sprucestack.modes": {
+          "light": "#ffffff",
+          "dark": "#252526"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#121215",
+          "agents": "#ffffff",
+          "bumblebee-dark": "#252526",
+          "bumblebee": "#fffdf7",
+          "liquid-glass-dark": "rgba(24, 29, 39, 0.50)",
+          "liquid-glass": "rgba(255, 255, 255, 0.52)",
+          "modern-dark": "#111827",
+          "modern": "#ffffff",
+          "spruce-charcoal-dark": "#131c30",
+          "spruce-charcoal": "#ffffff",
+          "spruce-dark": "#252526",
+          "spruce-slate-dark": "#131c30",
+          "spruce-slate": "#ffffff",
+          "spruce": "#ffffff"
+        }
+      }
+    },
+    "border": {
+      "$type": "color",
+      "$value": "rgba(24, 24, 27, 0.09)",
+      "$description": "Spruce semantic token --sp-input-border.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-input-border",
+        "org.sprucestack.modes": {
+          "light": "rgba(24, 24, 27, 0.09)",
+          "dark": "rgba(255, 255, 255, 0.12)"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "rgba(244, 244, 245, 0.11)",
+          "agents": "rgba(24, 24, 27, 0.09)",
+          "bumblebee-dark": "rgba(232, 225, 207, 0.14)",
+          "bumblebee": "rgba(31, 26, 18, 0.16)",
+          "liquid-glass-dark": "rgba(255, 255, 255, 0.16)",
+          "liquid-glass": "rgba(148, 163, 184, 0.28)",
+          "modern-dark": "rgba(226, 232, 240, 0.12)",
+          "modern": "rgba(15, 23, 42, 0.12)",
+          "spruce-charcoal-dark": "rgba(226, 232, 240, 0.12)",
+          "spruce-charcoal": "rgba(15, 23, 42, 0.11)",
+          "spruce-dark": "rgba(255, 255, 255, 0.12)",
+          "spruce-slate-dark": "rgba(226, 232, 240, 0.12)",
+          "spruce-slate": "rgba(15, 23, 42, 0.11)",
+          "spruce": "rgba(24, 24, 27, 0.09)"
+        }
+      },
+      "focus": {
+        "$type": "color",
+        "$value": "#166534",
+        "$description": "Spruce semantic token --sp-input-border-focus.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-input-border-focus",
+          "org.sprucestack.modes": {
+            "light": "#166534",
+            "dark": "var(--sp-border-focus, var(--sp-primary))"
+          },
+          "org.sprucestack.presets": {
+            "agents-dark": "#818cf8",
+            "agents": "#6366f1",
+            "bumblebee-dark": "#f5c542",
+            "bumblebee": "#d99a00",
+            "liquid-glass-dark": "#0a84ff",
+            "liquid-glass": "#007aff",
+            "modern-dark": "#60a5fa",
+            "modern": "#2563eb",
+            "spruce-charcoal-dark": "#94a3b8",
+            "spruce-charcoal": "#334155",
+            "spruce-dark": "#22c55e",
+            "spruce-slate-dark": "#8aa6e6",
+            "spruce-slate": "#3a5ba0",
+            "spruce": "#166534"
+          }
+        }
+      }
+    },
+    "radius": {
+      "$type": "dimension",
+      "$value": "3px",
+      "$description": "Spruce semantic token --sp-input-radius.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-input-radius",
+        "org.sprucestack.modes": {
+          "light": "3px",
+          "dark": "3px"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "6px",
+          "agents": "6px",
+          "liquid-glass-dark": "16px",
+          "liquid-glass": "16px",
+          "material-dark": "8px",
+          "material": "8px",
+          "modern-dark": "6px",
+          "modern": "6px",
+          "spruce-charcoal-dark": "3px",
+          "spruce-charcoal": "3px",
+          "spruce-dark": "3px",
+          "spruce-slate-dark": "3px",
+          "spruce-slate": "3px",
+          "spruce": "3px"
+        }
+      }
+    },
+    "text": {
+      "$type": "color",
+      "$value": "#18181b",
+      "$description": "Spruce semantic token --sp-input-text.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-input-text",
+        "org.sprucestack.modes": {
+          "light": "#18181b",
+          "dark": "#cccccc"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#e4e4e7",
+          "agents": "#18181b",
+          "bumblebee-dark": "#e8e1cf",
+          "bumblebee": "#1f1a12",
+          "liquid-glass-dark": "#f8fafc",
+          "liquid-glass": "#0f172a",
+          "modern-dark": "#e2e8f0",
+          "modern": "#0f172a",
+          "spruce-charcoal-dark": "#e2e8f0",
+          "spruce-charcoal": "#0f172a",
+          "spruce-dark": "#cccccc",
+          "spruce-slate-dark": "#e2e8f0",
+          "spruce-slate": "#0f172a",
+          "spruce": "#18181b"
+        }
+      }
+    }
+  },
+  "modal": {
+    "bg": {
+      "$type": "color",
+      "$value": "#fafafa",
+      "$description": "Spruce semantic token --sp-modal-bg.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-modal-bg",
+        "org.sprucestack.modes": {
+          "light": "#fafafa",
+          "dark": "#252526"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#121215",
+          "agents": "#fafafa",
+          "bumblebee-dark": "#252526",
+          "liquid-glass-dark": "rgba(20, 24, 33, 0.76)",
+          "liquid-glass": "rgba(255, 255, 255, 0.74)",
+          "modern-dark": "#111827",
+          "modern": "#ffffff",
+          "spruce-charcoal-dark": "#131c30",
+          "spruce-charcoal": "#f8fafc",
+          "spruce-dark": "#252526",
+          "spruce-slate-dark": "#131c30",
+          "spruce-slate": "#f8fafc",
+          "spruce": "#fafafa"
+        }
+      }
+    },
+    "border": {
+      "$type": "color",
+      "$value": "rgba(24, 24, 27, 0.08)",
+      "$description": "Spruce semantic token --sp-modal-border.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-modal-border",
+        "org.sprucestack.modes": {
+          "light": "rgba(24, 24, 27, 0.08)",
+          "dark": "rgba(255, 255, 255, 0.1)"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "rgba(244, 244, 245, 0.1)",
+          "agents": "rgba(24, 24, 27, 0.08)",
+          "bumblebee-dark": "rgba(232, 225, 207, 0.10)",
+          "liquid-glass-dark": "rgba(255, 255, 255, 0.18)",
+          "liquid-glass": "rgba(255, 255, 255, 0.70)",
+          "modern-dark": "rgba(226, 232, 240, 0.08)",
+          "modern": "rgba(15, 23, 42, 0.08)",
+          "spruce-charcoal-dark": "rgba(226, 232, 240, 0.10)",
+          "spruce-charcoal": "rgba(15, 23, 42, 0.09)",
+          "spruce-dark": "rgba(255, 255, 255, 0.10)",
+          "spruce-slate-dark": "rgba(226, 232, 240, 0.10)",
+          "spruce-slate": "rgba(15, 23, 42, 0.09)",
+          "spruce": "rgba(24, 24, 27, 0.08)"
+        }
+      }
+    },
+    "radius": {
+      "$type": "dimension",
+      "$value": "8px",
+      "$description": "Spruce semantic token --sp-modal-radius.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-modal-radius",
+        "org.sprucestack.modes": {
+          "light": "8px",
+          "dark": "8px"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "12px",
+          "agents": "12px",
+          "liquid-glass-dark": "28px",
+          "liquid-glass": "28px",
+          "material-dark": "28px",
+          "material": "28px",
+          "modern-dark": "10px",
+          "modern": "10px",
+          "spruce-charcoal-dark": "8px",
+          "spruce-charcoal": "8px",
+          "spruce-dark": "8px",
+          "spruce-slate-dark": "8px",
+          "spruce-slate": "8px",
+          "spruce": "8px"
+        }
+      }
+    }
+  },
+  "overlay": {
+    "bg": {
+      "$type": "color",
+      "$value": "rgba(24, 24, 27, 0.45)",
+      "$description": "Spruce semantic token --sp-overlay-bg.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-overlay-bg",
+        "org.sprucestack.modes": {
+          "light": "rgba(24, 24, 27, 0.45)",
+          "dark": "rgba(0, 0, 0, 0.7)"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "rgba(9, 9, 11, 0.72)",
+          "agents": "rgba(24, 24, 27, 0.45)",
+          "bumblebee-dark": "rgba(0, 0, 0, 0.70)",
+          "bumblebee": "rgba(31, 26, 18, 0.46)",
+          "comic-dark": "rgba(5, 7, 13, 0.7)",
+          "comic": "rgba(18, 19, 23, 0.55)",
+          "liquid-glass-dark": "rgba(0, 0, 0, 0.58)",
+          "liquid-glass": "rgba(15, 23, 42, 0.28)",
+          "material-dark": "rgba(0, 0, 0, 0.65)",
+          "material": "rgba(0, 0, 0, 0.40)",
+          "modern-dark": "rgba(2, 6, 23, 0.72)",
+          "modern": "rgba(15, 23, 42, 0.56)",
+          "monokai-light": "rgba(39, 40, 34, 0.48)",
+          "monokai": "rgba(20, 21, 18, 0.78)",
+          "nord": "rgba(46, 52, 64, 0.80)",
+          "shadcn-dark": "rgba(0, 0, 0, 0.70)",
+          "spruce-charcoal-dark": "rgba(2, 6, 23, 0.62)",
+          "spruce-charcoal": "rgba(15, 23, 42, 0.45)",
+          "spruce-dark": "rgba(0, 0, 0, 0.70)",
+          "spruce-slate-dark": "rgba(2, 6, 23, 0.62)",
+          "spruce-slate": "rgba(15, 23, 42, 0.45)",
+          "spruce": "rgba(24, 24, 27, 0.45)",
+          "visual-studio-dark": "rgba(0, 0, 0, 0.70)",
+          "visual-studio": "rgba(30, 30, 30, 0.48)"
+        }
+      }
+    },
+    "border": {
+      "$type": "color",
+      "$value": "color-mix(in srgb, var(--sp-text-color, #18181b) 17%, transparent)",
+      "$description": "Spruce semantic token --sp-overlay-border.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-overlay-border",
+        "org.sprucestack.modes": {
+          "light": "color-mix(in srgb, var(--sp-text-color, #18181b) 17%, transparent)",
+          "dark": "color-mix(in srgb, var(--sp-text-color, #cccccc) 24%, transparent)"
+        },
+        "org.sprucestack.presets": {
+          "comic-dark": "#f4ecd8",
+          "comic": "#121317",
+          "liquid-glass-dark": "rgba(255, 255, 255, 0.28)",
+          "liquid-glass": "rgba(148, 163, 184, 0.55)"
+        }
+      },
+      "width": {
+        "$type": "color",
+        "$value": "var(--sp-border-width-hairline, 1px)",
+        "$description": "Spruce semantic token --sp-overlay-border-width.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-overlay-border-width",
+          "org.sprucestack.modes": {
+            "light": "var(--sp-border-width-hairline, 1px)",
+            "dark": "var(--sp-border-width-hairline, 1px)"
+          },
+          "org.sprucestack.presets": {
+            "comic-dark": "3px",
+            "comic": "3px"
+          }
+        }
+      }
+    }
+  },
+  "primary": {
+    "$type": "color",
+    "$value": "#166534",
+    "$description": "Spruce semantic token --sp-primary.",
+    "$extensions": {
+      "org.sprucestack.css-name": "--sp-primary",
+      "org.sprucestack.modes": {
+        "light": "#166534",
+        "dark": "#22c55e"
+      },
+      "org.sprucestack.presets": {
+        "agents-dark": "#818cf8",
+        "agents": "#6366f1",
+        "bumblebee-dark": "#f5c542",
+        "bumblebee": "#d99a00",
+        "comic-dark": "#5b8dff",
+        "comic": "#1a56d6",
+        "corporate-dark": "#4a8cc4",
+        "corporate": "#1d3557",
+        "dim": "#818cf8",
+        "dracula": "#bd93f9",
+        "forest": "#166534",
+        "liquid-glass-dark": "#0a84ff",
+        "liquid-glass": "#007aff",
+        "material-dark": "#d0bcff",
+        "material": "#6750a4",
+        "modern-dark": "#60a5fa",
+        "modern": "#2563eb",
+        "monokai-light": "#c2185b",
+        "monokai": "#f92672",
+        "night": "#38bdf8",
+        "nord": "#88C0D0",
+        "ocean": "#0e7490",
+        "retro": "#d97706",
+        "rose": "#be185d",
+        "shadcn-dark": "#fafafa",
+        "shadcn": "#18181b",
+        "spruce-charcoal-dark": "#cbd5e1",
+        "spruce-charcoal": "#1e293b",
+        "spruce-dark": "#22c55e",
+        "spruce-slate-dark": "#8aa6e6",
+        "spruce-slate": "#3a5ba0",
+        "spruce": "#166534",
+        "visual-studio-dark": "#5cb3f0",
+        "visual-studio": "#3a9bdc"
+      }
+    },
+    "active": {
+      "$type": "color",
+      "$value": "#052e16",
+      "$description": "Spruce semantic token --sp-primary-active.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-primary-active",
+        "org.sprucestack.modes": {
+          "light": "#052e16",
+          "dark": "#16a34a"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#6366f1",
+          "agents": "#4338ca",
+          "bumblebee-dark": "#d9a520",
+          "bumblebee": "#9f6a00",
+          "comic-dark": "#3f76f0",
+          "comic": "#0e3a94",
+          "corporate-dark": "#3a76ad",
+          "corporate": "#0e1f38",
+          "dim": "#6366f1",
+          "dracula": "#a87df7",
+          "forest": "#052e16",
+          "liquid-glass-dark": "#0066cc",
+          "liquid-glass": "#005ec4",
+          "material-dark": "#b69df8",
+          "material": "#4f378b",
+          "modern-dark": "#3b82f6",
+          "modern": "#1e40af",
+          "monokai-light": "#8e124b",
+          "monokai": "#d81f60",
+          "night": "#0ea5e9",
+          "nord": "#81A1C1",
+          "ocean": "#0a526a",
+          "retro": "#92400e",
+          "rose": "#831843",
+          "shadcn-dark": "#d4d4d8",
+          "shadcn": "#3f3f46",
+          "spruce-charcoal-dark": "#94a3b8",
+          "spruce-charcoal": "#0f172a",
+          "spruce-dark": "#16a34a",
+          "spruce-slate-dark": "#6f8fde",
+          "spruce-slate": "#2b4478",
+          "spruce": "#052e16",
+          "visual-studio-dark": "#4999d9",
+          "visual-studio": "#2672ae"
+        }
+      }
+    },
+    "border": {
+      "$type": "color",
+      "$value": "rgba(22, 101, 52, 0.25)",
+      "$description": "Spruce semantic token --sp-primary-border.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-primary-border",
+        "org.sprucestack.modes": {
+          "light": "rgba(22, 101, 52, 0.25)",
+          "dark": "rgba(34, 197, 94, 0.3)"
+        }
+      }
+    },
+    "fg": {
+      "$type": "color",
+      "$value": "{primary.text}",
+      "$description": "Spruce semantic token --sp-primary-fg.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-primary-fg",
+        "org.sprucestack.modes": {
+          "light": "{primary.text}",
+          "dark": "{primary.text}"
+        }
+      }
+    },
+    "hover": {
+      "$type": "color",
+      "$value": "#14532d",
+      "$description": "Spruce semantic token --sp-primary-hover.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-primary-hover",
+        "org.sprucestack.modes": {
+          "light": "#14532d",
+          "dark": "#4ade80"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#a5b4fc",
+          "agents": "#4f46e5",
+          "bumblebee-dark": "#ffd866",
+          "bumblebee": "#c18400",
+          "comic-dark": "#79a2ff",
+          "comic": "#1246b3",
+          "corporate-dark": "#6ba3d0",
+          "corporate": "#163048",
+          "dim": "#a5b4fb",
+          "dracula": "#caa7fa",
+          "forest": "#14532d",
+          "liquid-glass-dark": "#409cff",
+          "liquid-glass": "#006ee6",
+          "material-dark": "#e8deff",
+          "material": "#583f99",
+          "modern-dark": "#93c5fd",
+          "modern": "#1d4ed8",
+          "monokai-light": "#ad1457",
+          "monokai": "#ff4d8d",
+          "night": "#7dd3fc",
+          "nord": "#8FBCBB",
+          "ocean": "#0c6678",
+          "retro": "#b45309",
+          "rose": "#9d174d",
+          "shadcn-dark": "#e4e4e7",
+          "shadcn": "#27272a",
+          "spruce-charcoal-dark": "#e2e8f0",
+          "spruce-charcoal": "#273449",
+          "spruce-dark": "#4ade80",
+          "spruce-slate-dark": "#a9bff0",
+          "spruce-slate": "#324e8a",
+          "spruce": "#14532d",
+          "visual-studio-dark": "#6dbef7",
+          "visual-studio": "#2d87c6"
+        }
+      }
+    },
+    "on": {
+      "tint": {
+        "$type": "color",
+        "$value": "{primary}",
+        "$description": "Spruce semantic token --sp-primary-on-tint.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-primary-on-tint",
+          "org.sprucestack.modes": {
+            "light": "{primary}",
+            "dark": "{primary}"
+          }
+        }
+      }
+    },
+    "subtle": {
+      "$type": "color",
+      "$value": "rgba(22, 101, 52, 0.09)",
+      "$description": "Spruce semantic token --sp-primary-subtle.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-primary-subtle",
+        "org.sprucestack.modes": {
+          "light": "rgba(22, 101, 52, 0.09)",
+          "dark": "rgba(34, 197, 94, 0.15)"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "rgba(129, 140, 248, 0.14)",
+          "agents": "rgba(99, 102, 241, 0.09)",
+          "bumblebee-dark": "rgba(245, 197, 66, 0.14)",
+          "bumblebee": "rgba(217, 154, 0, 0.12)",
+          "comic-dark": "rgba(91, 141, 255, 0.22)",
+          "comic": "#e6edff",
+          "corporate-dark": "rgba(74, 140, 196, 0.15)",
+          "corporate": "rgba(29, 53, 87, 0.08)",
+          "dim": "rgba(129, 140, 248, 0.12)",
+          "dracula": "rgba(189, 147, 249, 0.15)",
+          "forest": "rgba(22, 101, 52, 0.1)",
+          "liquid-glass-dark": "rgba(10, 132, 255, 0.18)",
+          "liquid-glass": "rgba(0, 122, 255, 0.12)",
+          "material-dark": "rgba(208, 188, 255, 0.16)",
+          "material": "rgba(103, 80, 164, 0.12)",
+          "modern-dark": "rgba(96, 165, 250, 0.14)",
+          "modern": "rgba(37, 99, 235, 0.08)",
+          "monokai-light": "rgba(194, 24, 91, 0.10)",
+          "monokai": "rgba(249, 38, 114, 0.16)",
+          "night": "rgba(56, 189, 248, 0.15)",
+          "nord": "rgba(136, 192, 208, 0.13)",
+          "ocean": "rgba(14, 116, 144, 0.1)",
+          "retro": "rgba(217, 119, 6, 0.12)",
+          "rose": "rgba(190, 24, 93, 0.1)",
+          "shadcn-dark": "rgba(250, 250, 250, 0.10)",
+          "shadcn": "rgba(24, 24, 27, 0.08)",
+          "spruce-charcoal-dark": "rgba(203, 213, 225, 0.14)",
+          "spruce-charcoal": "rgba(30, 41, 59, 0.08)",
+          "spruce-dark": "rgba(34, 197, 94, 0.15)",
+          "spruce-slate-dark": "rgba(138, 166, 230, 0.16)",
+          "spruce-slate": "rgba(58, 91, 160, 0.08)",
+          "spruce": "rgba(22, 101, 52, 0.09)",
+          "visual-studio-dark": "rgba(92, 179, 240, 0.18)",
+          "visual-studio": "rgba(58, 155, 220, 0.10)"
+        }
+      }
+    },
+    "text": {
+      "$type": "color",
+      "$value": "#fafafa",
+      "$description": "Spruce semantic token --sp-primary-text.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-primary-text",
+        "org.sprucestack.modes": {
+          "light": "#fafafa",
+          "dark": "#052e16"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#0f172a",
+          "agents": "#fafafa",
+          "bumblebee-dark": "#1f1808",
+          "bumblebee": "#1f1808",
+          "comic-dark": "#0c1020",
+          "comic": "#ffffff",
+          "corporate-dark": "#ffffff",
+          "corporate": "#ffffff",
+          "dim": "#1e1e2e",
+          "dracula": "#1a0a2e",
+          "forest": "#ffffff",
+          "liquid-glass-dark": "#ffffff",
+          "liquid-glass": "#ffffff",
+          "material-dark": "#381e72",
+          "material": "#ffffff",
+          "modern-dark": "#0f172a",
+          "modern": "#ffffff",
+          "monokai-light": "#ffffff",
+          "monokai": "#21181b",
+          "night": "#0c1a2a",
+          "nord": "#2E3440",
+          "ocean": "#ffffff",
+          "retro": "#ffffff",
+          "rose": "#ffffff",
+          "shadcn-dark": "#09090b",
+          "shadcn": "#fafafa",
+          "spruce-charcoal-dark": "#0f172a",
+          "spruce-charcoal": "#f8fafc",
+          "spruce-dark": "#052e16",
+          "spruce-slate-dark": "#0f172a",
+          "spruce-slate": "#f8fafc",
+          "spruce": "#fafafa",
+          "visual-studio-dark": "#ffffff",
+          "visual-studio": "#ffffff"
+        }
+      }
+    },
+    "tint": {
+      "$type": "color",
+      "$value": "{primary.subtle}",
+      "$description": "Spruce semantic token --sp-primary-tint.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-primary-tint",
+        "org.sprucestack.modes": {
+          "light": "{primary.subtle}",
+          "dark": "{primary.subtle}"
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": "{primary.border}",
+        "$description": "Spruce semantic token --sp-primary-tint-border.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-primary-tint-border",
+          "org.sprucestack.modes": {
+            "light": "{primary.border}",
+            "dark": "{primary.border}"
+          }
+        }
+      }
+    }
+  },
+  "scrollbar": {
+    "hover": {
+      "$type": "color",
+      "$value": "#a1a1aa",
+      "$description": "Spruce semantic token --sp-scrollbar-hover.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-scrollbar-hover",
+        "org.sprucestack.modes": {
+          "light": "#a1a1aa",
+          "dark": "#5f5f5f"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#52525b",
+          "agents": "#a1a1aa",
+          "bumblebee-dark": "#6a6253",
+          "bumblebee": "#a9872f",
+          "comic-dark": "#c8f31d",
+          "comic": "#1a56d6",
+          "liquid-glass-dark": "rgba(203, 213, 225, 0.52)",
+          "liquid-glass": "rgba(100, 116, 139, 0.62)",
+          "material-dark": "#79747e",
+          "material": "#938f99",
+          "modern-dark": "#475569",
+          "modern": "#94a3b8",
+          "monokai-light": "#a9a18d",
+          "monokai": "rgba(248, 248, 242, 0.30)",
+          "nord": "rgba(216, 222, 233, 0.24)",
+          "retro": "rgba(180, 130, 30, 0.38)",
+          "shadcn-dark": "#52525b",
+          "spruce-charcoal-dark": "#475569",
+          "spruce-charcoal": "#94a3b8",
+          "spruce-dark": "#5f5f5f",
+          "spruce-slate-dark": "#475569",
+          "spruce-slate": "#94a3b8",
+          "spruce": "#a1a1aa",
+          "visual-studio-dark": "#5f5f5f",
+          "visual-studio": "#a0a0a0"
+        }
+      }
+    },
+    "thumb": {
+      "$type": "color",
+      "$value": "#d4d4d8",
+      "$description": "Spruce semantic token --sp-scrollbar-thumb.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-scrollbar-thumb",
+        "org.sprucestack.modes": {
+          "light": "#d4d4d8",
+          "dark": "#424242"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#3f3f46",
+          "agents": "#d4d4d8",
+          "bumblebee-dark": "#4a4a4a",
+          "bumblebee": "#d9b24a",
+          "comic-dark": "#f4ecd8",
+          "comic": "#121317",
+          "liquid-glass-dark": "rgba(148, 163, 184, 0.42)",
+          "liquid-glass": "rgba(148, 163, 184, 0.52)",
+          "material-dark": "#48464c",
+          "material": "#cac4d0",
+          "modern-dark": "#334155",
+          "modern": "#cbd5e1",
+          "monokai-light": "#c8c1aa",
+          "monokai": "rgba(248, 248, 242, 0.18)",
+          "nord": "rgba(216, 222, 233, 0.14)",
+          "retro": "rgba(180, 130, 30, 0.22)",
+          "shadcn-dark": "#3f3f46",
+          "spruce-charcoal-dark": "#334155",
+          "spruce-charcoal": "#cbd5e1",
+          "spruce-dark": "#424242",
+          "spruce-slate-dark": "#334155",
+          "spruce-slate": "#cbd5e1",
+          "spruce": "#d4d4d8",
+          "visual-studio-dark": "#424242",
+          "visual-studio": "#c8c8c8"
+        }
+      }
+    },
+    "track": {
+      "$type": "color",
+      "$value": "rgba(24, 24, 27, 0.028)",
+      "$description": "Spruce semantic token --sp-scrollbar-track.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-scrollbar-track",
+        "org.sprucestack.modes": {
+          "light": "rgba(24, 24, 27, 0.028)",
+          "dark": "rgba(255, 255, 255, 0.03)"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "rgba(244, 244, 245, 0.04)",
+          "agents": "rgba(24, 24, 27, 0.028)",
+          "bumblebee-dark": "rgba(255, 255, 255, 0.03)",
+          "bumblebee": "rgba(31, 26, 18, 0.04)",
+          "comic-dark": "rgba(244, 236, 216, 0.06)",
+          "comic": "rgba(18, 19, 23, 0.06)",
+          "liquid-glass-dark": "rgba(255, 255, 255, 0.06)",
+          "liquid-glass": "rgba(255, 255, 255, 0.24)",
+          "material-dark": "rgba(255, 255, 255, 0.03)",
+          "material": "rgba(0, 0, 0, 0.04)",
+          "modern-dark": "rgba(226, 232, 240, 0.04)",
+          "modern": "rgba(15, 23, 42, 0.03)",
+          "monokai-light": "rgba(39, 40, 34, 0.04)",
+          "monokai": "rgba(248, 248, 242, 0.04)",
+          "nord": "rgba(216, 222, 233, 0.04)",
+          "retro": "rgba(180, 130, 30, 0.05)",
+          "shadcn-dark": "rgba(255, 255, 255, 0.03)",
+          "spruce-charcoal-dark": "rgba(226, 232, 240, 0.04)",
+          "spruce-charcoal": "rgba(15, 23, 42, 0.03)",
+          "spruce-dark": "rgba(255, 255, 255, 0.03)",
+          "spruce-slate-dark": "rgba(226, 232, 240, 0.04)",
+          "spruce-slate": "rgba(15, 23, 42, 0.03)",
+          "spruce": "rgba(24, 24, 27, 0.028)",
+          "visual-studio-dark": "rgba(255, 255, 255, 0.03)",
+          "visual-studio": "rgba(30, 30, 30, 0.04)"
+        }
+      }
+    }
+  },
+  "secondary": {
+    "$type": "color",
+    "$value": "{primary}",
+    "$description": "Spruce semantic token --sp-secondary.",
+    "$extensions": {
+      "org.sprucestack.css-name": "--sp-secondary",
+      "org.sprucestack.modes": {
+        "light": "{primary}",
+        "dark": "{primary}"
+      },
+      "org.sprucestack.presets": {
+        "modern-dark": "#3cc9f6",
+        "modern": "#007aa7"
+      }
+    },
+    "active": {
+      "$type": "color",
+      "$value": "{primary.active}",
+      "$description": "Spruce semantic token --sp-secondary-active.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-secondary-active",
+        "org.sprucestack.modes": {
+          "light": "{primary.active}",
+          "dark": "{primary.active}"
+        },
+        "org.sprucestack.presets": {
+          "modern-dark": "#afe8ff",
+          "modern": "#005677"
+        }
+      }
+    },
+    "hover": {
+      "$type": "color",
+      "$value": "{primary.hover}",
+      "$description": "Spruce semantic token --sp-secondary-hover.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-secondary-hover",
+        "org.sprucestack.modes": {
+          "light": "{primary.hover}",
+          "dark": "{primary.hover}"
+        },
+        "org.sprucestack.presets": {
+          "modern-dark": "#75daff",
+          "modern": "#00688e"
+        }
+      }
+    },
+    "subtle": {
+      "$type": "color",
+      "$value": "{primary.subtle}",
+      "$description": "Spruce semantic token --sp-secondary-subtle.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-secondary-subtle",
+        "org.sprucestack.modes": {
+          "light": "{primary.subtle}",
+          "dark": "{primary.subtle}"
+        },
+        "org.sprucestack.presets": {
+          "modern-dark": "rgba(60, 201, 246, 0.14)",
+          "modern": "rgba(0, 122, 167, 0.1)"
+        }
+      }
+    },
+    "text": {
+      "$type": "color",
+      "$value": "{primary.text}",
+      "$description": "Spruce semantic token --sp-secondary-text.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-secondary-text",
+        "org.sprucestack.modes": {
+          "light": "{primary.text}",
+          "dark": "{primary.text}"
+        },
+        "org.sprucestack.presets": {
+          "modern-dark": "#0f172a",
+          "modern": "#ffffff"
+        }
+      }
+    }
+  },
+  "select": {
+    "bg": {
+      "$type": "color",
+      "$value": "#ffffff",
+      "$description": "Spruce semantic token --sp-select-bg.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-select-bg",
+        "org.sprucestack.modes": {
+          "light": "#ffffff",
+          "dark": "#252526"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#121215",
+          "agents": "#ffffff",
+          "bumblebee-dark": "#252526",
+          "bumblebee": "#fffdf7",
+          "liquid-glass-dark": "rgba(24, 29, 39, 0.50)",
+          "liquid-glass": "rgba(255, 255, 255, 0.52)",
+          "modern-dark": "#111827",
+          "modern": "#ffffff",
+          "spruce-charcoal-dark": "#131c30",
+          "spruce-charcoal": "#ffffff",
+          "spruce-dark": "#252526",
+          "spruce-slate-dark": "#131c30",
+          "spruce-slate": "#ffffff",
+          "spruce": "#ffffff"
+        }
+      }
+    },
+    "border": {
+      "$type": "color",
+      "$value": "rgba(24, 24, 27, 0.09)",
+      "$description": "Spruce semantic token --sp-select-border.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-select-border",
+        "org.sprucestack.modes": {
+          "light": "rgba(24, 24, 27, 0.09)",
+          "dark": "rgba(255, 255, 255, 0.12)"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "rgba(244, 244, 245, 0.11)",
+          "agents": "rgba(24, 24, 27, 0.09)",
+          "bumblebee-dark": "rgba(232, 225, 207, 0.14)",
+          "bumblebee": "rgba(31, 26, 18, 0.16)",
+          "liquid-glass-dark": "rgba(255, 255, 255, 0.16)",
+          "liquid-glass": "rgba(148, 163, 184, 0.28)",
+          "modern-dark": "rgba(226, 232, 240, 0.12)",
+          "modern": "rgba(15, 23, 42, 0.12)",
+          "spruce-charcoal-dark": "rgba(226, 232, 240, 0.12)",
+          "spruce-charcoal": "rgba(15, 23, 42, 0.11)",
+          "spruce-dark": "rgba(255, 255, 255, 0.12)",
+          "spruce-slate-dark": "rgba(226, 232, 240, 0.12)",
+          "spruce-slate": "rgba(15, 23, 42, 0.11)",
+          "spruce": "rgba(24, 24, 27, 0.09)"
+        }
+      },
+      "focus": {
+        "$type": "color",
+        "$value": "#166534",
+        "$description": "Spruce semantic token --sp-select-border-focus.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-select-border-focus",
+          "org.sprucestack.modes": {
+            "light": "#166534",
+            "dark": "var(--sp-border-focus, var(--sp-primary))"
+          },
+          "org.sprucestack.presets": {
+            "agents-dark": "#818cf8",
+            "agents": "#6366f1",
+            "bumblebee-dark": "#f5c542",
+            "bumblebee": "#d99a00",
+            "liquid-glass-dark": "#0a84ff",
+            "liquid-glass": "#007aff",
+            "modern-dark": "#60a5fa",
+            "modern": "#2563eb",
+            "spruce-charcoal-dark": "#94a3b8",
+            "spruce-charcoal": "#334155",
+            "spruce-dark": "#22c55e",
+            "spruce-slate-dark": "#8aa6e6",
+            "spruce-slate": "#3a5ba0",
+            "spruce": "#166534"
+          }
+        }
+      }
+    },
+    "radius": {
+      "$type": "dimension",
+      "$value": "3px",
+      "$description": "Spruce semantic token --sp-select-radius.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-select-radius",
+        "org.sprucestack.modes": {
+          "light": "3px",
+          "dark": "3px"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "6px",
+          "agents": "6px",
+          "liquid-glass-dark": "16px",
+          "liquid-glass": "16px",
+          "material-dark": "8px",
+          "material": "8px",
+          "modern-dark": "6px",
+          "modern": "6px",
+          "spruce-charcoal-dark": "3px",
+          "spruce-charcoal": "3px",
+          "spruce-dark": "3px",
+          "spruce-slate-dark": "3px",
+          "spruce-slate": "3px",
+          "spruce": "3px"
+        }
+      }
+    }
+  },
+  "shadow": {
+    "lg": {
+      "$type": "shadow",
+      "$value": "0 10px 15px -3px rgba(0, 0, 0, 0.64), 0 4px 6px -4px rgba(0, 0, 0, 0.52)",
+      "$description": "Spruce semantic token --sp-shadow-lg.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-shadow-lg",
+        "org.sprucestack.modes": {
+          "light": "0 10px 15px -3px rgba(0, 0, 0, 0.64), 0 4px 6px -4px rgba(0, 0, 0, 0.52)",
+          "dark": "0 10px 15px -3px rgba(0, 0, 0, 0.64), 0 4px 6px -4px rgba(0, 0, 0, 0.52)"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "0 12px 28px -8px rgba(0, 0, 0, 0.42)",
+          "agents": "0 12px 28px -8px rgba(24, 24, 27, 0.08)",
+          "bumblebee-dark": "0 10px 15px -3px rgba(0, 0, 0, 0.64), 0 4px 6px -4px rgba(0, 0, 0, 0.52)",
+          "comic-dark": "5px 5px 0 #05070d",
+          "comic": "5px 5px 0 #121317",
+          "liquid-glass-dark": "0 32px 76px -44px rgba(0, 0, 0, 0.76), inset 0 1px 0 rgba(255, 255, 255, 0.28), inset 0 0 0 1px rgba(255, 255, 255, 0.08)",
+          "liquid-glass": "0 28px 70px -42px rgba(15, 23, 42, 0.46), inset 0 1px 0 rgba(255, 255, 255, 0.94), inset 0 0 0 1px rgba(255, 255, 255, 0.16), inset 0 -1px 0 rgba(15, 23, 42, 0.06)",
+          "material-dark": "0 4px 8px 3px rgba(0, 0, 0, 0.45), 0 1px 3px 0 rgba(0, 0, 0, 0.60)",
+          "material": "0 4px 8px 3px rgba(0, 0, 0, 0.15), 0 1px 3px 0 rgba(0, 0, 0, 0.30)",
+          "modern-dark": "0 12px 24px -8px rgba(0, 0, 0, 0.46)",
+          "modern": "0 12px 24px -8px rgba(15, 23, 42, 0.14)",
+          "monokai": "0 10px 15px -3px rgba(0, 0, 0, 0.58), 0 4px 6px -4px rgba(0, 0, 0, 0.46)",
+          "nord": "0 10px 15px -3px rgba(46, 52, 64, 0.5), 0 4px 6px -4px rgba(46, 52, 64, 0.4)",
+          "shadcn-dark": "0 10px 15px -3px rgba(0, 0, 0, 0.65), 0 4px 6px -4px rgba(0, 0, 0, 0.55)",
+          "spruce-charcoal-dark": "0 10px 15px -3px rgba(0, 0, 0, 0.64), 0 4px 6px -4px rgba(0, 0, 0, 0.52)",
+          "spruce-charcoal": "0 12px 28px -8px rgba(15, 23, 42, 0.08)",
+          "spruce-dark": "0 10px 15px -3px rgba(0, 0, 0, 0.64), 0 4px 6px -4px rgba(0, 0, 0, 0.52)",
+          "spruce-slate-dark": "0 10px 15px -3px rgba(0, 0, 0, 0.64), 0 4px 6px -4px rgba(0, 0, 0, 0.52)",
+          "spruce-slate": "0 12px 28px -8px rgba(15, 23, 42, 0.08)",
+          "spruce": "0 12px 28px -8px rgba(24, 24, 27, 0.08)",
+          "visual-studio-dark": "0 10px 15px -3px rgba(0, 0, 0, 0.64), 0 4px 6px -4px rgba(0, 0, 0, 0.52)"
+        }
+      }
+    },
+    "md": {
+      "$type": "shadow",
+      "$value": "0 4px 6px -1px rgba(0, 0, 0, 0.58), 0 2px 4px -2px rgba(0, 0, 0, 0.46)",
+      "$description": "Spruce semantic token --sp-shadow-md.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-shadow-md",
+        "org.sprucestack.modes": {
+          "light": "0 4px 6px -1px rgba(0, 0, 0, 0.58), 0 2px 4px -2px rgba(0, 0, 0, 0.46)",
+          "dark": "0 4px 6px -1px rgba(0, 0, 0, 0.58), 0 2px 4px -2px rgba(0, 0, 0, 0.46)"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "0 4px 12px -2px rgba(0, 0, 0, 0.36), 0 2px 4px -2px rgba(0, 0, 0, 0.26)",
+          "agents": "0 4px 12px -2px rgba(24, 24, 27, 0.06), 0 2px 4px -2px rgba(24, 24, 27, 0.04)",
+          "bumblebee-dark": "0 4px 6px -1px rgba(0, 0, 0, 0.58), 0 2px 4px -2px rgba(0, 0, 0, 0.46)",
+          "comic-dark": "3px 3px 0 #05070d",
+          "comic": "3px 3px 0 #121317",
+          "liquid-glass-dark": "0 20px 44px -28px rgba(0, 0, 0, 0.66), inset 0 1px 0 rgba(255, 255, 255, 0.24), inset 0 0 0 1px rgba(255, 255, 255, 0.07)",
+          "liquid-glass": "0 18px 38px -26px rgba(15, 23, 42, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.90), inset 0 0 0 1px rgba(255, 255, 255, 0.14), inset 0 -1px 0 rgba(15, 23, 42, 0.05)",
+          "material-dark": "0 2px 6px 2px rgba(0, 0, 0, 0.45), 0 1px 2px 0 rgba(0, 0, 0, 0.60)",
+          "material": "0 2px 6px 2px rgba(0, 0, 0, 0.15), 0 1px 2px 0 rgba(0, 0, 0, 0.30)",
+          "modern-dark": "0 4px 8px -2px rgba(0, 0, 0, 0.36), 0 2px 4px -2px rgba(0, 0, 0, 0.26)",
+          "modern": "0 4px 8px -2px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.05)",
+          "monokai": "0 4px 6px -1px rgba(0, 0, 0, 0.54), 0 2px 4px -2px rgba(0, 0, 0, 0.42)",
+          "nord": "0 4px 6px -1px rgba(46, 52, 64, 0.45), 0 2px 4px -2px rgba(46, 52, 64, 0.35)",
+          "shadcn-dark": "0 4px 6px -1px rgba(0, 0, 0, 0.60), 0 2px 4px -2px rgba(0, 0, 0, 0.50)",
+          "spruce-charcoal-dark": "0 4px 6px -1px rgba(0, 0, 0, 0.58), 0 2px 4px -2px rgba(0, 0, 0, 0.46)",
+          "spruce-charcoal": "0 4px 12px -2px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04)",
+          "spruce-dark": "0 4px 6px -1px rgba(0, 0, 0, 0.58), 0 2px 4px -2px rgba(0, 0, 0, 0.46)",
+          "spruce-slate-dark": "0 4px 6px -1px rgba(0, 0, 0, 0.58), 0 2px 4px -2px rgba(0, 0, 0, 0.46)",
+          "spruce-slate": "0 4px 12px -2px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04)",
+          "spruce": "0 4px 12px -2px rgba(24, 24, 27, 0.06), 0 2px 4px -2px rgba(24, 24, 27, 0.04)",
+          "visual-studio-dark": "0 4px 6px -1px rgba(0, 0, 0, 0.58), 0 2px 4px -2px rgba(0, 0, 0, 0.46)"
+        }
+      }
+    },
+    "sm": {
+      "$type": "shadow",
+      "$value": "0 1px 3px rgba(0, 0, 0, 0.52), 0 1px 2px rgba(0, 0, 0, 0.4)",
+      "$description": "Spruce semantic token --sp-shadow-sm.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-shadow-sm",
+        "org.sprucestack.modes": {
+          "light": "0 1px 3px rgba(0, 0, 0, 0.52), 0 1px 2px rgba(0, 0, 0, 0.4)",
+          "dark": "0 1px 3px rgba(0, 0, 0, 0.52), 0 1px 2px rgba(0, 0, 0, 0.4)"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "0 1px 2px rgba(0, 0, 0, 0.34), 0 1px 3px rgba(0, 0, 0, 0.24)",
+          "agents": "0 1px 2px rgba(24, 24, 27, 0.04), 0 1px 3px rgba(24, 24, 27, 0.03)",
+          "bumblebee-dark": "0 1px 3px rgba(0, 0, 0, 0.52), 0 1px 2px rgba(0, 0, 0, 0.40)",
+          "comic-dark": "2px 2px 0 #05070d",
+          "comic": "2px 2px 0 #121317",
+          "liquid-glass-dark": "0 10px 24px -18px rgba(0, 0, 0, 0.58), inset 0 1px 0 rgba(255, 255, 255, 0.20), inset 0 0 0 1px rgba(255, 255, 255, 0.06)",
+          "liquid-glass": "0 8px 20px -16px rgba(15, 23, 42, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.85), inset 0 0 0 1px rgba(255, 255, 255, 0.12)",
+          "material-dark": "0 1px 3px 1px rgba(0, 0, 0, 0.45), 0 1px 2px 0 rgba(0, 0, 0, 0.60)",
+          "material": "0 1px 3px 1px rgba(0, 0, 0, 0.15), 0 1px 2px 0 rgba(0, 0, 0, 0.30)",
+          "modern-dark": "0 1px 3px rgba(0, 0, 0, 0.30), 0 1px 2px rgba(0, 0, 0, 0.22)",
+          "modern": "0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04)",
+          "monokai": "0 1px 3px rgba(0, 0, 0, 0.48), 0 1px 2px rgba(0, 0, 0, 0.36)",
+          "nord": "0 1px 3px rgba(46, 52, 64, 0.4), 0 1px 2px rgba(46, 52, 64, 0.3)",
+          "shadcn-dark": "0 1px 3px rgba(0, 0, 0, 0.55), 0 1px 2px rgba(0, 0, 0, 0.45)",
+          "spruce-charcoal-dark": "0 1px 3px rgba(0, 0, 0, 0.52), 0 1px 2px rgba(0, 0, 0, 0.4)",
+          "spruce-charcoal": "0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.03)",
+          "spruce-dark": "0 1px 3px rgba(0, 0, 0, 0.52), 0 1px 2px rgba(0, 0, 0, 0.4)",
+          "spruce-slate-dark": "0 1px 3px rgba(0, 0, 0, 0.52), 0 1px 2px rgba(0, 0, 0, 0.4)",
+          "spruce-slate": "0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.03)",
+          "spruce": "0 1px 2px rgba(24, 24, 27, 0.04), 0 1px 3px rgba(24, 24, 27, 0.03)",
+          "visual-studio-dark": "0 1px 3px rgba(0, 0, 0, 0.52), 0 1px 2px rgba(0, 0, 0, 0.40)"
+        }
+      }
+    },
+    "xl": {
+      "$type": "shadow",
+      "$value": "0 20px 25px -5px rgba(0, 0, 0, 0.7), 0 8px 10px -6px rgba(0, 0, 0, 0.58)",
+      "$description": "Spruce semantic token --sp-shadow-xl.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-shadow-xl",
+        "org.sprucestack.modes": {
+          "light": "0 20px 25px -5px rgba(0, 0, 0, 0.7), 0 8px 10px -6px rgba(0, 0, 0, 0.58)",
+          "dark": "0 20px 25px -5px rgba(0, 0, 0, 0.7), 0 8px 10px -6px rgba(0, 0, 0, 0.58)"
+        },
+        "org.sprucestack.presets": {
+          "bumblebee-dark": "0 20px 25px -5px rgba(0, 0, 0, 0.70), 0 8px 10px -6px rgba(0, 0, 0, 0.58)",
+          "comic-dark": "8px 8px 0 #05070d",
+          "comic": "8px 8px 0 #121317",
+          "liquid-glass-dark": "0 42px 110px -58px rgba(0, 0, 0, 0.82), inset 0 1px 0 rgba(255, 255, 255, 0.30), inset 0 0 0 1px rgba(255, 255, 255, 0.09)",
+          "liquid-glass": "0 36px 96px -52px rgba(15, 23, 42, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.96), inset 0 0 0 1px rgba(255, 255, 255, 0.18), inset 0 -1px 0 rgba(15, 23, 42, 0.06)",
+          "material-dark": "0 8px 12px 6px rgba(0, 0, 0, 0.45), 0 4px 4px 0 rgba(0, 0, 0, 0.60)",
+          "material": "0 8px 12px 6px rgba(0, 0, 0, 0.15), 0 4px 4px 0 rgba(0, 0, 0, 0.30)",
+          "monokai": "0 20px 25px -5px rgba(0, 0, 0, 0.62), 0 8px 10px -6px rgba(0, 0, 0, 0.50)",
+          "nord": "0 20px 25px -5px rgba(46, 52, 64, 0.55), 0 8px 10px -6px rgba(46, 52, 64, 0.45)",
+          "shadcn-dark": "0 20px 25px -5px rgba(0, 0, 0, 0.70), 0 8px 10px -6px rgba(0, 0, 0, 0.60)",
+          "visual-studio-dark": "0 20px 25px -5px rgba(0, 0, 0, 0.70), 0 8px 10px -6px rgba(0, 0, 0, 0.58)"
+        }
+      }
+    },
+    "xs": {
+      "$type": "shadow",
+      "$value": "0 1px 2px rgba(0, 0, 0, 0.45)",
+      "$description": "Spruce semantic token --sp-shadow-xs.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-shadow-xs",
+        "org.sprucestack.modes": {
+          "light": "0 1px 2px rgba(0, 0, 0, 0.45)",
+          "dark": "0 1px 2px rgba(0, 0, 0, 0.45)"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "0 1px 2px rgba(0, 0, 0, 0.28)",
+          "agents": "0 1px 2px rgba(24, 24, 27, 0.03)",
+          "bumblebee-dark": "0 1px 2px rgba(0, 0, 0, 0.45)",
+          "comic-dark": "1px 1px 0 #05070d",
+          "comic": "1px 1px 0 #121317",
+          "liquid-glass-dark": "0 1px 2px rgba(0, 0, 0, 0.28)",
+          "liquid-glass": "0 1px 2px rgba(15, 23, 42, 0.06)",
+          "material-dark": "0 1px 2px rgba(0, 0, 0, 0.45)",
+          "material": "0 1px 2px rgba(0, 0, 0, 0.12)",
+          "modern-dark": "0 1px 2px rgba(0, 0, 0, 0.24)",
+          "modern": "0 1px 2px rgba(15, 23, 42, 0.04)",
+          "monokai": "0 1px 2px rgba(0, 0, 0, 0.42)",
+          "nord": "0 1px 2px rgba(46, 52, 64, 0.35)",
+          "shadcn-dark": "0 1px 2px rgba(0, 0, 0, 0.45)",
+          "spruce-charcoal-dark": "0 1px 2px rgba(0, 0, 0, 0.45)",
+          "spruce-charcoal": "0 1px 2px rgba(15, 23, 42, 0.03)",
+          "spruce-dark": "0 1px 2px rgba(0, 0, 0, 0.45)",
+          "spruce-slate-dark": "0 1px 2px rgba(0, 0, 0, 0.45)",
+          "spruce-slate": "0 1px 2px rgba(15, 23, 42, 0.03)",
+          "spruce": "0 1px 2px rgba(24, 24, 27, 0.03)",
+          "visual-studio-dark": "0 1px 2px rgba(0, 0, 0, 0.45)"
+        }
+      }
+    }
+  },
+  "success": {
+    "$type": "color",
+    "$value": "#059669",
+    "$description": "Spruce semantic token --sp-success.",
+    "$extensions": {
+      "org.sprucestack.css-name": "--sp-success",
+      "org.sprucestack.modes": {
+        "light": "#059669",
+        "dark": "#34d399"
+      },
+      "org.sprucestack.presets": {
+        "agents-dark": "#34d399",
+        "agents": "#059669",
+        "bumblebee-dark": "#7bc96f",
+        "bumblebee": "#2f855a",
+        "comic-dark": "#7ede3c",
+        "comic": "#237514",
+        "corporate-dark": "#4ade80",
+        "corporate": "#16a34a",
+        "dim": "#a6e3a1",
+        "dracula": "#50fa7b",
+        "forest": "#15803d",
+        "liquid-glass-dark": "#30d158",
+        "liquid-glass": "#34c759",
+        "material-dark": "#a1f47d",
+        "material": "#386a20",
+        "modern-dark": "#4ade80",
+        "modern": "#16a34a",
+        "monokai-light": "#5f8f00",
+        "monokai": "#a6e22e",
+        "night": "#34d399",
+        "nord": "#A3BE8C",
+        "ocean": "#059669",
+        "retro": "#15803d",
+        "rose": "#15803d",
+        "shadcn-dark": "#4ade80",
+        "shadcn": "#16a34a",
+        "spruce-charcoal-dark": "#34d399",
+        "spruce-charcoal": "#16a34a",
+        "spruce-dark": "#34d399",
+        "spruce-slate-dark": "#34d399",
+        "spruce-slate": "#16a34a",
+        "spruce": "#059669",
+        "visual-studio-dark": "#89d185",
+        "visual-studio": "#16825d"
+      }
+    },
+    "active": {
+      "$type": "color",
+      "$value": "#065f46",
+      "$description": "Spruce semantic token --sp-success-active.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-success-active",
+        "org.sprucestack.modes": {
+          "light": "#065f46",
+          "dark": "#059669"
+        }
+      }
+    },
+    "bg": {
+      "$type": "color",
+      "$value": "#ecfdf5",
+      "$description": "Spruce semantic token --sp-success-bg.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-success-bg",
+        "org.sprucestack.modes": {
+          "light": "#ecfdf5",
+          "dark": "rgba(52, 211, 153, 0.12)"
+        }
+      }
+    },
+    "border": {
+      "$type": "color",
+      "$value": "rgba(5, 150, 105, 0.25)",
+      "$description": "Spruce semantic token --sp-success-border.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-success-border",
+        "org.sprucestack.modes": {
+          "light": "rgba(5, 150, 105, 0.25)",
+          "dark": "rgba(52, 211, 153, 0.25)"
+        }
+      }
+    },
+    "hover": {
+      "$type": "color",
+      "$value": "#047857",
+      "$description": "Spruce semantic token --sp-success-hover.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-success-hover",
+        "org.sprucestack.modes": {
+          "light": "#047857",
+          "dark": "#6ee7b7"
+        }
+      }
+    },
+    "on": {
+      "tint": {
+        "$type": "color",
+        "$value": "{success}",
+        "$description": "Spruce semantic token --sp-success-on-tint.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-success-on-tint",
+          "org.sprucestack.modes": {
+            "light": "{success}",
+            "dark": "{success}"
+          }
+        }
+      }
+    },
+    "subtle": {
+      "$type": "color",
+      "$value": "rgba(5, 150, 105, 0.09)",
+      "$description": "Spruce semantic token --sp-success-subtle.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-success-subtle",
+        "org.sprucestack.modes": {
+          "light": "rgba(5, 150, 105, 0.09)",
+          "dark": "rgba(52, 211, 153, 0.13)"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "rgba(52, 211, 153, 0.12)",
+          "agents": "rgba(5, 150, 105, 0.09)",
+          "bumblebee-dark": "rgba(123, 201, 111, 0.12)",
+          "bumblebee": "rgba(47, 133, 90, 0.10)",
+          "comic-dark": "rgba(126, 222, 60, 0.2)",
+          "comic": "#eefbdd",
+          "corporate-dark": "rgba(74, 222, 128, 0.12)",
+          "corporate": "rgba(22, 163, 74, 0.1)",
+          "dim": "rgba(166, 227, 161, 0.12)",
+          "dracula": "rgba(80, 250, 123, 0.12)",
+          "forest": "rgba(21, 128, 61, 0.1)",
+          "liquid-glass-dark": "rgba(48, 209, 88, 0.14)",
+          "liquid-glass": "rgba(52, 199, 89, 0.12)",
+          "material-dark": "rgba(161, 244, 125, 0.16)",
+          "material": "rgba(56, 106, 32, 0.12)",
+          "modern-dark": "rgba(74, 222, 128, 0.12)",
+          "modern": "rgba(22, 163, 74, 0.1)",
+          "monokai-light": "rgba(95, 143, 0, 0.10)",
+          "monokai": "rgba(166, 226, 46, 0.13)",
+          "night": "rgba(52, 211, 153, 0.12)",
+          "nord": "rgba(163, 190, 140, 0.12)",
+          "ocean": "rgba(5, 150, 105, 0.1)",
+          "retro": "rgba(21, 128, 61, 0.1)",
+          "rose": "rgba(21, 128, 61, 0.1)",
+          "shadcn-dark": "rgba(74, 222, 128, 0.12)",
+          "shadcn": "rgba(22, 163, 74, 0.1)",
+          "spruce-charcoal-dark": "rgba(52, 211, 153, 0.13)",
+          "spruce-charcoal": "rgba(22, 163, 74, 0.09)",
+          "spruce-dark": "rgba(52, 211, 153, 0.13)",
+          "spruce-slate-dark": "rgba(52, 211, 153, 0.13)",
+          "spruce-slate": "rgba(22, 163, 74, 0.09)",
+          "spruce": "rgba(5, 150, 105, 0.09)",
+          "visual-studio-dark": "rgba(137, 209, 133, 0.12)",
+          "visual-studio": "rgba(22, 130, 93, 0.10)"
+        }
+      }
+    },
+    "text": {
+      "$type": "color",
+      "$value": "#065f46",
+      "$description": "Spruce semantic token --sp-success-text.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-success-text",
+        "org.sprucestack.modes": {
+          "light": "#065f46",
+          "dark": "#6ee7b7"
+        }
+      }
+    },
+    "tint": {
+      "$type": "color",
+      "$value": "{success.subtle}",
+      "$description": "Spruce semantic token --sp-success-tint.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-success-tint",
+        "org.sprucestack.modes": {
+          "light": "{success.subtle}",
+          "dark": "{success.subtle}"
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": "{success.border}",
+        "$description": "Spruce semantic token --sp-success-tint-border.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-success-tint-border",
+          "org.sprucestack.modes": {
+            "light": "{success.border}",
+            "dark": "{success.border}"
+          }
+        }
+      }
+    }
+  },
+  "surface": {
+    "0": {
+      "$type": "color",
+      "$value": "#fafafa",
+      "$description": "Spruce semantic token --sp-surface-0.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-surface-0",
+        "org.sprucestack.modes": {
+          "light": "#fafafa",
+          "dark": "#1e1e1e"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#09090b",
+          "agents": "#fafafa",
+          "bumblebee-dark": "#1e1e1e",
+          "bumblebee": "#fffdf7",
+          "comic-dark": "#1b2130",
+          "comic": "#fffdf5",
+          "corporate-dark": "#0c1220",
+          "dim": "#1e1e2e",
+          "dracula": "#282a36",
+          "liquid-glass-dark": "rgba(20, 24, 33, 0.74)",
+          "liquid-glass": "rgba(255, 255, 255, 0.78)",
+          "material-dark": "#141218",
+          "material": "#ffffff",
+          "modern-dark": "#0f172a",
+          "modern": "#ffffff",
+          "monokai-light": "#f8f8f2",
+          "monokai": "#272822",
+          "night": "#0d1117",
+          "nord": "#2E3440",
+          "retro": "#fdf6e3",
+          "shadcn-dark": "#09090b",
+          "shadcn": "#ffffff",
+          "spruce-charcoal-dark": "#0f172a",
+          "spruce-charcoal": "#f8fafc",
+          "spruce-dark": "#1e1e1e",
+          "spruce-slate-dark": "#0f172a",
+          "spruce-slate": "#f8fafc",
+          "spruce": "#fafafa",
+          "visual-studio-dark": "#1e1e1e",
+          "visual-studio": "#ffffff"
+        }
+      }
+    },
+    "25": {
+      "$type": "color",
+      "$value": "#f8f8f9",
+      "$description": "Spruce semantic token --sp-surface-25.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-surface-25",
+        "org.sprucestack.modes": {
+          "light": "#f8f8f9",
+          "dark": "#222222"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#0c0c0e",
+          "agents": "#f8f8f9",
+          "bumblebee-dark": "#222222",
+          "bumblebee": "#fff9ea",
+          "comic-dark": "#1f2536",
+          "comic": "#fdf8ea",
+          "corporate-dark": "#101827",
+          "dim": "#20203c",
+          "dracula": "#2d2f3b",
+          "liquid-glass-dark": "rgba(24, 29, 39, 0.68)",
+          "liquid-glass": "rgba(255, 255, 255, 0.66)",
+          "material-dark": "#1d1b20",
+          "material": "#fdf8fd",
+          "modern-dark": "#111c30",
+          "modern": "#fcfdff",
+          "monokai-light": "#f3f2e9",
+          "monokai": "#2d2e27",
+          "night": "#111520",
+          "nord": "#323843",
+          "retro": "#faf1d5",
+          "shadcn-dark": "#101012",
+          "shadcn": "#fafafa",
+          "spruce-charcoal-dark": "#131c30",
+          "spruce-charcoal": "#f4f7fb",
+          "spruce-dark": "#222222",
+          "spruce-slate-dark": "#131c30",
+          "spruce-slate": "#f4f7fb",
+          "spruce": "#f8f8f9",
+          "visual-studio-dark": "#222222",
+          "visual-studio": "#f8f8f8"
+        }
+      }
+    },
+    "50": {
+      "$type": "color",
+      "$value": "#f4f4f5",
+      "$description": "Spruce semantic token --sp-surface-50.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-surface-50",
+        "org.sprucestack.modes": {
+          "light": "#f4f4f5",
+          "dark": "#252526"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#111113",
+          "agents": "#f4f4f5",
+          "bumblebee-dark": "#252526",
+          "bumblebee": "#fff3ce",
+          "comic-dark": "#242b3d",
+          "comic": "#faf1d8",
+          "corporate-dark": "#151e30",
+          "dim": "#24273a",
+          "dracula": "#313344",
+          "liquid-glass-dark": "rgba(29, 35, 48, 0.64)",
+          "liquid-glass": "rgba(248, 250, 255, 0.62)",
+          "material-dark": "#211f26",
+          "material": "#f7f2fa",
+          "modern-dark": "#162033",
+          "modern": "#f8fafc",
+          "monokai-light": "#eceadf",
+          "monokai": "#33342c",
+          "night": "#161b27",
+          "nord": "#3B4252",
+          "retro": "#f5e9c8",
+          "shadcn-dark": "#18181b",
+          "shadcn": "#f4f4f5",
+          "spruce-charcoal-dark": "#182236",
+          "spruce-charcoal": "#f1f5f9",
+          "spruce-dark": "#252526",
+          "spruce-slate-dark": "#182236",
+          "spruce-slate": "#f1f5f9",
+          "spruce": "#f4f4f5",
+          "visual-studio-dark": "#252526",
+          "visual-studio": "#f3f3f3"
+        }
+      }
+    },
+    "100": {
+      "$type": "color",
+      "$value": "#ececee",
+      "$description": "Spruce semantic token --sp-surface-100.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-surface-100",
+        "org.sprucestack.modes": {
+          "light": "#ececee",
+          "dark": "#2d2d30"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#18181b",
+          "agents": "#ececee",
+          "bumblebee-dark": "#2d2d30",
+          "bumblebee": "#ffe8a3",
+          "comic-dark": "#2c3547",
+          "comic": "#f4e7c2",
+          "corporate-dark": "#1c2942",
+          "dim": "#2a2d44",
+          "dracula": "#383b4d",
+          "liquid-glass-dark": "rgba(36, 43, 58, 0.62)",
+          "liquid-glass": "rgba(241, 246, 255, 0.58)",
+          "material-dark": "#2b2930",
+          "material": "#f3edf7",
+          "modern-dark": "#1e293b",
+          "modern": "#eef2f7",
+          "monokai-light": "#e2dfd0",
+          "monokai": "#3a3b32",
+          "night": "#1c2333",
+          "nord": "#3F4759",
+          "retro": "#eddbaa",
+          "shadcn-dark": "#1c1c1f",
+          "shadcn": "#ebebec",
+          "spruce-charcoal-dark": "#1e293b",
+          "spruce-charcoal": "#e9eef5",
+          "spruce-dark": "#2d2d30",
+          "spruce-slate-dark": "#1e293b",
+          "spruce-slate": "#e9eef5",
+          "spruce": "#ececee",
+          "visual-studio-dark": "#2d2d30",
+          "visual-studio": "#eeeeee"
+        }
+      }
+    },
+    "200": {
+      "$type": "color",
+      "$value": "#e4e4e7",
+      "$description": "Spruce semantic token --sp-surface-200.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-surface-200",
+        "org.sprucestack.modes": {
+          "light": "#e4e4e7",
+          "dark": "#333333"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#27272a",
+          "agents": "#e4e4e7",
+          "bumblebee-dark": "#333333",
+          "bumblebee": "#f4d16a",
+          "comic-dark": "#374158",
+          "comic": "#ecd9a8",
+          "corporate-dark": "#243454",
+          "dim": "#363a4f",
+          "dracula": "#44475a",
+          "liquid-glass-dark": "rgba(48, 57, 75, 0.66)",
+          "liquid-glass": "rgba(226, 234, 247, 0.62)",
+          "material-dark": "#36343b",
+          "material": "#ece6f0",
+          "modern-dark": "#273449",
+          "modern": "#e2e8f0",
+          "monokai-light": "#d6d1bd",
+          "monokai": "#49483e",
+          "night": "#253047",
+          "nord": "#434C5E",
+          "retro": "#dfc98c",
+          "shadcn-dark": "#27272a",
+          "shadcn": "#e4e4e7",
+          "spruce-charcoal-dark": "#273449",
+          "spruce-charcoal": "#e2e8f0",
+          "spruce-dark": "#333333",
+          "spruce-slate-dark": "#273449",
+          "spruce-slate": "#e2e8f0",
+          "spruce": "#e4e4e7",
+          "visual-studio-dark": "#333333",
+          "visual-studio": "#e5e5e5"
+        }
+      }
+    },
+    "300": {
+      "$type": "color",
+      "$value": "#d4d4d8",
+      "$description": "Spruce semantic token --sp-surface-300.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-surface-300",
+        "org.sprucestack.modes": {
+          "light": "#d4d4d8",
+          "dark": "#3c3c3c"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#3f3f46",
+          "agents": "#d4d4d8",
+          "bumblebee-dark": "#3c3c3c",
+          "bumblebee": "#d9b24a",
+          "comic-dark": "#46536e",
+          "comic": "#dcc389",
+          "corporate-dark": "#2e4068",
+          "dim": "#494d64",
+          "dracula": "#565972",
+          "liquid-glass-dark": "rgba(71, 85, 105, 0.74)",
+          "liquid-glass": "rgba(203, 213, 225, 0.72)",
+          "material-dark": "#48464c",
+          "material": "#e6e0e9",
+          "modern-dark": "#334155",
+          "modern": "#cbd5e1",
+          "monokai-light": "#c8c1aa",
+          "monokai": "#57564a",
+          "night": "#364260",
+          "nord": "#4C566A",
+          "retro": "#c9b070",
+          "shadcn-dark": "#3f3f46",
+          "shadcn": "#d4d4d8",
+          "spruce-charcoal-dark": "#334155",
+          "spruce-charcoal": "#cbd5e1",
+          "spruce-dark": "#3c3c3c",
+          "spruce-slate-dark": "#334155",
+          "spruce-slate": "#cbd5e1",
+          "spruce": "#d4d4d8",
+          "visual-studio-dark": "#3c3c3c",
+          "visual-studio": "#d4d4d4"
+        }
+      }
+    },
+    "400": {
+      "$type": "color",
+      "$value": "#a1a1aa",
+      "$description": "Spruce semantic token --sp-surface-400.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-surface-400",
+        "org.sprucestack.modes": {
+          "light": "#a1a1aa",
+          "dark": "#4a4a4a"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#52525b",
+          "agents": "#a1a1aa",
+          "bumblebee-dark": "#4a4a4a",
+          "bumblebee": "#a9872f",
+          "comic-dark": "#61708f",
+          "comic": "#b09a63",
+          "liquid-glass-dark": "#64748b",
+          "liquid-glass": "#94a3b8",
+          "material-dark": "#79747e",
+          "material": "#cac4d0",
+          "modern-dark": "#475569",
+          "modern": "#94a3b8",
+          "monokai-light": "#a9a18d",
+          "monokai": "#6c6b5d",
+          "shadcn-dark": "#52525b",
+          "shadcn": "#a1a1aa",
+          "spruce-charcoal-dark": "#475569",
+          "spruce-charcoal": "#94a3b8",
+          "spruce-dark": "#4a4a4a",
+          "spruce-slate-dark": "#475569",
+          "spruce-slate": "#94a3b8",
+          "spruce": "#a1a1aa",
+          "visual-studio-dark": "#4a4a4a",
+          "visual-studio": "#c8c8c8"
+        }
+      }
+    },
+    "500": {
+      "$type": "color",
+      "$value": "#71717a",
+      "$description": "Spruce semantic token --sp-surface-500.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-surface-500",
+        "org.sprucestack.modes": {
+          "light": "#71717a",
+          "dark": "#6a6a6a"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#71717a",
+          "agents": "#71717a",
+          "bumblebee-dark": "#6a6253",
+          "bumblebee": "#765f29",
+          "comic-dark": "#8494b3",
+          "comic": "#7f6f45",
+          "liquid-glass-dark": "#94a3b8",
+          "liquid-glass": "#64748b",
+          "material-dark": "#938f99",
+          "material": "#938f99",
+          "modern-dark": "#64748b",
+          "modern": "#64748b",
+          "monokai-light": "#81796a",
+          "monokai": "#888674",
+          "shadcn-dark": "#71717a",
+          "shadcn": "#71717a",
+          "spruce-charcoal-dark": "#64748b",
+          "spruce-charcoal": "#64748b",
+          "spruce-dark": "#6a6a6a",
+          "spruce-slate-dark": "#64748b",
+          "spruce-slate": "#64748b",
+          "spruce": "#71717a",
+          "visual-studio-dark": "#6a6a6a",
+          "visual-studio": "#a0a0a0"
+        }
+      }
+    },
+    "600": {
+      "$type": "color",
+      "$value": "#52525b",
+      "$description": "Spruce semantic token --sp-surface-600.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-surface-600",
+        "org.sprucestack.modes": {
+          "light": "#52525b",
+          "dark": "#858585"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#a1a1aa",
+          "agents": "#52525b",
+          "bumblebee-dark": "#8f8265",
+          "bumblebee": "#5b4a27",
+          "comic-dark": "#a7b4cd",
+          "comic": "#5d5133",
+          "liquid-glass-dark": "#cbd5e1",
+          "liquid-glass": "#475569",
+          "material-dark": "#cac4d0",
+          "material": "#79747e",
+          "modern-dark": "#94a3b8",
+          "modern": "#475569",
+          "monokai-light": "#625c51",
+          "monokai": "#a6a38d",
+          "shadcn-dark": "#a1a1aa",
+          "shadcn": "#52525b",
+          "spruce-charcoal-dark": "#94a3b8",
+          "spruce-charcoal": "#475569",
+          "spruce-dark": "#858585",
+          "spruce-slate-dark": "#94a3b8",
+          "spruce-slate": "#475569",
+          "spruce": "#52525b",
+          "visual-studio-dark": "#858585",
+          "visual-studio": "#7a7a7a"
+        }
+      }
+    },
+    "700": {
+      "$type": "color",
+      "$value": "#3f3f46",
+      "$description": "Spruce semantic token --sp-surface-700.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-surface-700",
+        "org.sprucestack.modes": {
+          "light": "#3f3f46",
+          "dark": "#a6a6a6"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#d4d4d8",
+          "agents": "#3f3f46",
+          "bumblebee-dark": "#b8aa84",
+          "bumblebee": "#403522",
+          "comic-dark": "#c5cfe1",
+          "comic": "#423923",
+          "liquid-glass-dark": "#e2e8f0",
+          "liquid-glass": "#334155",
+          "material-dark": "#e6e0e9",
+          "material": "#49454f",
+          "modern-dark": "#cbd5e1",
+          "modern": "#334155",
+          "monokai-light": "#49443c",
+          "monokai": "#c8c4aa",
+          "shadcn-dark": "#d4d4d8",
+          "shadcn": "#3f3f46",
+          "spruce-charcoal-dark": "#cbd5e1",
+          "spruce-charcoal": "#334155",
+          "spruce-dark": "#a6a6a6",
+          "spruce-slate-dark": "#cbd5e1",
+          "spruce-slate": "#334155",
+          "spruce": "#3f3f46",
+          "visual-studio-dark": "#a6a6a6",
+          "visual-studio": "#5f5f5f"
+        }
+      }
+    },
+    "800": {
+      "$type": "color",
+      "$value": "#27272a",
+      "$description": "Spruce semantic token --sp-surface-800.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-surface-800",
+        "org.sprucestack.modes": {
+          "light": "#27272a",
+          "dark": "#cccccc"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#e4e4e7",
+          "agents": "#27272a",
+          "bumblebee-dark": "#dccb9b",
+          "bumblebee": "#2b251b",
+          "comic-dark": "#dde4ef",
+          "comic": "#2b2517",
+          "liquid-glass-dark": "#f1f5f9",
+          "liquid-glass": "#1e293b",
+          "material-dark": "#ece6f0",
+          "material": "#313033",
+          "modern-dark": "#e2e8f0",
+          "modern": "#1e293b",
+          "monokai-light": "#38342e",
+          "monokai": "#e6e1c4",
+          "shadcn-dark": "#e4e4e7",
+          "shadcn": "#27272a",
+          "spruce-charcoal-dark": "#e2e8f0",
+          "spruce-charcoal": "#1e293b",
+          "spruce-dark": "#cccccc",
+          "spruce-slate-dark": "#e2e8f0",
+          "spruce-slate": "#1e293b",
+          "spruce": "#27272a",
+          "visual-studio-dark": "#cccccc",
+          "visual-studio": "#3c3c3c"
+        }
+      }
+    },
+    "900": {
+      "$type": "color",
+      "$value": "#18181b",
+      "$description": "Spruce semantic token --sp-surface-900.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-surface-900",
+        "org.sprucestack.modes": {
+          "light": "#18181b",
+          "dark": "#e5e5e5"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#f4f4f5",
+          "agents": "#18181b",
+          "bumblebee-dark": "#f1dfaa",
+          "bumblebee": "#1f1a12",
+          "comic-dark": "#eef2f8",
+          "comic": "#1a170e",
+          "liquid-glass-dark": "#f8fafc",
+          "liquid-glass": "#0f172a",
+          "material-dark": "#f3edf7",
+          "material": "#1d1b20",
+          "modern-dark": "#f1f5f9",
+          "modern": "#0f172a",
+          "monokai-light": "#272822",
+          "monokai": "#f8f8f2",
+          "shadcn-dark": "#f4f4f5",
+          "shadcn": "#18181b",
+          "spruce-charcoal-dark": "#f1f5f9",
+          "spruce-charcoal": "#0f172a",
+          "spruce-dark": "#e5e5e5",
+          "spruce-slate-dark": "#f1f5f9",
+          "spruce-slate": "#0f172a",
+          "spruce": "#18181b",
+          "visual-studio-dark": "#e5e5e5",
+          "visual-studio": "#252526"
+        }
+      }
+    },
+    "950": {
+      "$type": "color",
+      "$value": "#09090b",
+      "$description": "Spruce semantic token --sp-surface-950.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-surface-950",
+        "org.sprucestack.modes": {
+          "light": "#09090b",
+          "dark": "#ffffff"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#fafafa",
+          "agents": "#09090b",
+          "bumblebee-dark": "#fff4cf",
+          "bumblebee": "#15110a",
+          "comic-dark": "#ffffff",
+          "comic": "#0c0b06",
+          "liquid-glass-dark": "#ffffff",
+          "liquid-glass": "#020617",
+          "material-dark": "#fef7ff",
+          "material": "#141218",
+          "modern-dark": "#f8fafc",
+          "modern": "#020617",
+          "monokai-light": "#1b1c18",
+          "monokai": "#ffffff",
+          "shadcn-dark": "#fafafa",
+          "shadcn": "#09090b",
+          "spruce-charcoal-dark": "#f8fafc",
+          "spruce-charcoal": "#020617",
+          "spruce-dark": "#ffffff",
+          "spruce-slate-dark": "#f8fafc",
+          "spruce-slate": "#020617",
+          "spruce": "#09090b",
+          "visual-studio-dark": "#ffffff",
+          "visual-studio": "#1e1e1e"
+        }
+      }
+    },
+    "$type": "color",
+    "$value": "{surface.0}",
+    "$description": "Spruce semantic token --sp-surface.",
+    "$extensions": {
+      "org.sprucestack.css-name": "--sp-surface",
+      "org.sprucestack.modes": {
+        "light": "{surface.0}",
+        "dark": "{surface.0}"
+      }
+    },
+    "hover": {
+      "$type": "color",
+      "$value": "{content.hover.bg}",
+      "$description": "Spruce semantic token --sp-surface-hover.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-surface-hover",
+        "org.sprucestack.modes": {
+          "light": "{content.hover.bg}",
+          "dark": "{content.hover.bg}"
+        }
+      }
+    },
+    "raised": {
+      "$type": "color",
+      "$value": "{surface.50}",
+      "$description": "Spruce semantic token --sp-surface-raised.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-surface-raised",
+        "org.sprucestack.modes": {
+          "light": "{surface.50}",
+          "dark": "{surface.100}"
+        }
+      }
+    },
+    "sunken": {
+      "$type": "color",
+      "$value": "{surface.100}",
+      "$description": "Spruce semantic token --sp-surface-sunken.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-surface-sunken",
+        "org.sprucestack.modes": {
+          "light": "{surface.100}",
+          "dark": "{surface.25}"
+        }
+      }
+    }
+  },
+  "tertiary": {
+    "$type": "color",
+    "$value": "{primary}",
+    "$description": "Spruce semantic token --sp-tertiary.",
+    "$extensions": {
+      "org.sprucestack.css-name": "--sp-tertiary",
+      "org.sprucestack.modes": {
+        "light": "{primary}",
+        "dark": "{primary}"
+      },
+      "org.sprucestack.presets": {
+        "modern-dark": "#afadff",
+        "modern": "#7a49df"
+      }
+    },
+    "active": {
+      "$type": "color",
+      "$value": "{primary.active}",
+      "$description": "Spruce semantic token --sp-tertiary-active.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-tertiary-active",
+        "org.sprucestack.modes": {
+          "light": "{primary.active}",
+          "dark": "{primary.active}"
+        },
+        "org.sprucestack.presets": {
+          "modern-dark": "#dadaff",
+          "modern": "#5a1bb6"
+        }
+      }
+    },
+    "hover": {
+      "$type": "color",
+      "$value": "{primary.hover}",
+      "$description": "Spruce semantic token --sp-tertiary-hover.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-tertiary-hover",
+        "org.sprucestack.modes": {
+          "light": "{primary.hover}",
+          "dark": "{primary.hover}"
+        },
+        "org.sprucestack.presets": {
+          "modern-dark": "#c4c4ff",
+          "modern": "#6a34cb"
+        }
+      }
+    },
+    "subtle": {
+      "$type": "color",
+      "$value": "{primary.subtle}",
+      "$description": "Spruce semantic token --sp-tertiary-subtle.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-tertiary-subtle",
+        "org.sprucestack.modes": {
+          "light": "{primary.subtle}",
+          "dark": "{primary.subtle}"
+        },
+        "org.sprucestack.presets": {
+          "modern-dark": "rgba(175, 173, 255, 0.14)",
+          "modern": "rgba(122, 73, 223, 0.1)"
+        }
+      }
+    },
+    "text": {
+      "$type": "color",
+      "$value": "{primary.text}",
+      "$description": "Spruce semantic token --sp-tertiary-text.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-tertiary-text",
+        "org.sprucestack.modes": {
+          "light": "{primary.text}",
+          "dark": "{primary.text}"
+        },
+        "org.sprucestack.presets": {
+          "modern-dark": "#0f172a",
+          "modern": "#ffffff"
+        }
+      }
+    }
+  },
+  "text": {
+    "$type": "color",
+    "$value": "#18181b",
+    "$description": "Spruce semantic token --sp-text.",
+    "$extensions": {
+      "org.sprucestack.css-name": "--sp-text",
+      "org.sprucestack.modes": {
+        "light": "#18181b",
+        "dark": "#e4e4e7"
+      }
+    },
+    "color": {
+      "$type": "color",
+      "$value": "#18181b",
+      "$description": "Spruce semantic token --sp-text-color.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-text-color",
+        "org.sprucestack.modes": {
+          "light": "#18181b",
+          "dark": "#e4e4e7"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#e4e4e7",
+          "agents": "#18181b",
+          "bumblebee-dark": "#e8e1cf",
+          "bumblebee": "#1f1a12",
+          "comic-dark": "#f4ecd8",
+          "comic": "#121317",
+          "dim": "#cdd6f4",
+          "dracula": "#f8f8f2",
+          "liquid-glass-dark": "#f8fafc",
+          "liquid-glass": "#0f172a",
+          "material-dark": "#e6e0e9",
+          "material": "#1d1b20",
+          "modern-dark": "#e2e8f0",
+          "modern": "#0f172a",
+          "monokai-light": "#272822",
+          "monokai": "#f8f8f2",
+          "nord": "#ECEFF4",
+          "retro": "#292203",
+          "shadcn-dark": "#fafafa",
+          "shadcn": "#09090b",
+          "spruce-charcoal-dark": "#e2e8f0",
+          "spruce-charcoal": "#0f172a",
+          "spruce-dark": "#cccccc",
+          "spruce-slate-dark": "#e2e8f0",
+          "spruce-slate": "#0f172a",
+          "spruce": "#18181b",
+          "visual-studio-dark": "#cccccc",
+          "visual-studio": "#1e1e1e"
+        }
+      }
+    },
+    "disabled": {
+      "$type": "color",
+      "$value": "#a1a1aa",
+      "$description": "Spruce semantic token --sp-text-disabled.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-text-disabled",
+        "org.sprucestack.modes": {
+          "light": "#a1a1aa",
+          "dark": "#52525b"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#71717a",
+          "agents": "#a1a1aa",
+          "bumblebee-dark": "#6f6758",
+          "bumblebee": "#b59a58",
+          "comic-dark": "#5f6b82",
+          "comic": "#9ba1ad",
+          "dim": "#585b70",
+          "dracula": "#565872",
+          "liquid-glass-dark": "#64748b",
+          "liquid-glass": "#94a3b8",
+          "material-dark": "#635f68",
+          "material": "#a4a0a9",
+          "modern-dark": "#64748b",
+          "modern": "#94a3b8",
+          "monokai-light": "#a9a18d",
+          "monokai": "#6c6b5d",
+          "nord": "#4C566A",
+          "retro": "#c4a44e",
+          "shadcn-dark": "#52525b",
+          "shadcn": "#a1a1aa",
+          "spruce-charcoal-dark": "#64748b",
+          "spruce-charcoal": "#94a3b8",
+          "spruce-dark": "#5f5f5f",
+          "spruce-slate-dark": "#64748b",
+          "spruce-slate": "#94a3b8",
+          "spruce": "#a1a1aa",
+          "visual-studio-dark": "#5f5f5f",
+          "visual-studio": "#a0a0a0"
+        }
+      }
+    },
+    "inverse": {
+      "$type": "color",
+      "$value": "#fafafa",
+      "$description": "Spruce semantic token --sp-text-inverse.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-text-inverse",
+        "org.sprucestack.modes": {
+          "light": "#fafafa",
+          "dark": "#1e1e1e"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#09090b",
+          "agents": "#fafafa",
+          "bumblebee-dark": "#1e1e1e",
+          "bumblebee": "#fffdf7",
+          "comic-dark": "#12151f",
+          "comic": "#fffdf5",
+          "dim": "#1e1e2e",
+          "dracula": "#282a36",
+          "liquid-glass-dark": "#0f172a",
+          "liquid-glass": "#ffffff",
+          "material-dark": "#1d1b20",
+          "material": "#f4eff4",
+          "modern-dark": "#0f172a",
+          "modern": "#f8fafc",
+          "monokai-light": "#f8f8f2",
+          "monokai": "#272822",
+          "nord": "#2E3440",
+          "retro": "#fdf6e3",
+          "shadcn-dark": "#09090b",
+          "shadcn": "#fafafa",
+          "spruce-charcoal-dark": "#0f172a",
+          "spruce-charcoal": "#f8fafc",
+          "spruce-dark": "#1e1e1e",
+          "spruce-slate-dark": "#0f172a",
+          "spruce-slate": "#f8fafc",
+          "spruce": "#fafafa",
+          "visual-studio-dark": "#1e1e1e",
+          "visual-studio": "#ffffff"
+        }
+      }
+    },
+    "muted": {
+      "$type": "color",
+      "$value": "#52525b",
+      "$description": "Spruce semantic token --sp-text-muted.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-text-muted",
+        "org.sprucestack.modes": {
+          "light": "#52525b",
+          "dark": "#a1a1aa"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#d4d4d8",
+          "agents": "#3f3f46",
+          "bumblebee-dark": "#c9c0a9",
+          "bumblebee": "#4a3a18",
+          "comic-dark": "#c9d1e0",
+          "comic": "#3a3f4b",
+          "dim": "#a6adc8",
+          "dracula": "#bdbdcc",
+          "liquid-glass-dark": "#e2e8f0",
+          "liquid-glass": "#334155",
+          "material-dark": "#cac4d0",
+          "material": "#49454f",
+          "modern-dark": "#cbd5e1",
+          "modern": "#334155",
+          "monokai-light": "#4f4a41",
+          "monokai": "#d7d2b8",
+          "nord": "#D8DEE9",
+          "retro": "#57461e",
+          "shadcn-dark": "#d4d4d8",
+          "shadcn": "#52525b",
+          "spruce-charcoal-dark": "#cbd5e1",
+          "spruce-charcoal": "#334155",
+          "spruce-dark": "#b7b7b7",
+          "spruce-slate-dark": "#cbd5e1",
+          "spruce-slate": "#334155",
+          "spruce": "#3f3f46",
+          "visual-studio-dark": "#b7b7b7",
+          "visual-studio": "#3c3c3c"
+        }
+      }
+    },
+    "subtle": {
+      "$type": "color",
+      "$value": "#71717a",
+      "$description": "Spruce semantic token --sp-text-subtle.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-text-subtle",
+        "org.sprucestack.modes": {
+          "light": "#71717a",
+          "dark": "#71717a"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "#a1a1aa",
+          "agents": "#71717a",
+          "bumblebee-dark": "#9d927b",
+          "bumblebee": "#7a6125",
+          "comic-dark": "#9aa5bb",
+          "comic": "#5b6270",
+          "dim": "#7f849c",
+          "dracula": "#7970a9",
+          "liquid-glass-dark": "#cbd5e1",
+          "liquid-glass": "#64748b",
+          "material-dark": "#938f99",
+          "material": "#79747e",
+          "modern-dark": "#94a3b8",
+          "modern": "#64748b",
+          "monokai-light": "#776f60",
+          "monokai": "#a59f85",
+          "nord": "#8FBCBB",
+          "retro": "#87661e",
+          "shadcn-dark": "#a1a1aa",
+          "shadcn": "#71717a",
+          "spruce-charcoal-dark": "#94a3b8",
+          "spruce-charcoal": "#64748b",
+          "spruce-dark": "#858585",
+          "spruce-slate-dark": "#94a3b8",
+          "spruce-slate": "#64748b",
+          "spruce": "#71717a",
+          "visual-studio-dark": "#858585",
+          "visual-studio": "#6a6a6a"
+        }
+      }
+    }
+  },
+  "tone": {
+    "border": {
+      "c": {
+        "$type": "number",
+        "$value": "0.1",
+        "$description": "Spruce semantic token --sp-tone-border-c.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-tone-border-c",
+          "org.sprucestack.modes": {
+            "light": "0.1",
+            "dark": "0.09"
+          }
+        }
+      },
+      "l": {
+        "$type": "number",
+        "$value": "0.82",
+        "$description": "Spruce semantic token --sp-tone-border-l.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-tone-border-l",
+          "org.sprucestack.modes": {
+            "light": "0.82",
+            "dark": "0.5"
+          }
+        }
+      }
+    },
+    "on": {
+      "tint": {
+        "c": {
+          "$type": "number",
+          "$value": "0.13",
+          "$description": "Spruce semantic token --sp-tone-on-tint-c.",
+          "$extensions": {
+            "org.sprucestack.css-name": "--sp-tone-on-tint-c",
+            "org.sprucestack.modes": {
+              "light": "0.13",
+              "dark": "0.11"
+            }
+          }
+        },
+        "l": {
+          "$type": "number",
+          "$value": "0.47",
+          "$description": "Spruce semantic token --sp-tone-on-tint-l.",
+          "$extensions": {
+            "org.sprucestack.css-name": "--sp-tone-on-tint-l",
+            "org.sprucestack.modes": {
+              "light": "0.47",
+              "dark": "0.85"
+            }
+          }
+        }
+      }
+    },
+    "tint": {
+      "c": {
+        "$type": "number",
+        "$value": "0.035",
+        "$description": "Spruce semantic token --sp-tone-tint-c.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-tone-tint-c",
+          "org.sprucestack.modes": {
+            "light": "0.035",
+            "dark": "0.05"
+          }
+        }
+      },
+      "l": {
+        "$type": "number",
+        "$value": "0.96",
+        "$description": "Spruce semantic token --sp-tone-tint-l.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-tone-tint-l",
+          "org.sprucestack.modes": {
+            "light": "0.96",
+            "dark": "0.3"
+          }
+        }
+      }
+    }
+  },
+  "warning": {
+    "$type": "color",
+    "$value": "#b45309",
+    "$description": "Spruce semantic token --sp-warning.",
+    "$extensions": {
+      "org.sprucestack.css-name": "--sp-warning",
+      "org.sprucestack.modes": {
+        "light": "#b45309",
+        "dark": "#fbbf24"
+      },
+      "org.sprucestack.presets": {
+        "agents-dark": "#fbbf24",
+        "agents": "#b45309",
+        "bumblebee-dark": "#f5c542",
+        "bumblebee": "#b7791f",
+        "comic-dark": "#ffc247",
+        "comic": "#96540a",
+        "corporate-dark": "#fbbf24",
+        "corporate": "#ca8a04",
+        "dim": "#f9e2af",
+        "dracula": "#ffb86c",
+        "forest": "#a16207",
+        "liquid-glass-dark": "#ffd60a",
+        "liquid-glass": "#ff9500",
+        "material-dark": "#ffb870",
+        "material": "#b26a00",
+        "modern-dark": "#fbbf24",
+        "modern": "#d97706",
+        "monokai-light": "#9a6a00",
+        "monokai": "#e6db74",
+        "night": "#fbbf24",
+        "nord": "#EBCB8B",
+        "ocean": "#b45309",
+        "retro": "#a16207",
+        "rose": "#b45309",
+        "shadcn-dark": "#fbbf24",
+        "shadcn": "#d97706",
+        "spruce-charcoal-dark": "#fbbf24",
+        "spruce-charcoal": "#b45309",
+        "spruce-dark": "#fbbf24",
+        "spruce-slate-dark": "#fbbf24",
+        "spruce-slate": "#b45309",
+        "spruce": "#b45309",
+        "visual-studio-dark": "#cca700",
+        "visual-studio": "#bf8803"
+      }
+    },
+    "active": {
+      "$type": "color",
+      "$value": "#78350f",
+      "$description": "Spruce semantic token --sp-warning-active.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-warning-active",
+        "org.sprucestack.modes": {
+          "light": "#78350f",
+          "dark": "#d97706"
+        }
+      }
+    },
+    "bg": {
+      "$type": "color",
+      "$value": "#fffbeb",
+      "$description": "Spruce semantic token --sp-warning-bg.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-warning-bg",
+        "org.sprucestack.modes": {
+          "light": "#fffbeb",
+          "dark": "rgba(251, 191, 36, 0.12)"
+        }
+      }
+    },
+    "border": {
+      "$type": "color",
+      "$value": "rgba(180, 83, 9, 0.25)",
+      "$description": "Spruce semantic token --sp-warning-border.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-warning-border",
+        "org.sprucestack.modes": {
+          "light": "rgba(180, 83, 9, 0.25)",
+          "dark": "rgba(251, 191, 36, 0.25)"
+        }
+      }
+    },
+    "hover": {
+      "$type": "color",
+      "$value": "#92400e",
+      "$description": "Spruce semantic token --sp-warning-hover.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-warning-hover",
+        "org.sprucestack.modes": {
+          "light": "#92400e",
+          "dark": "#fcd34d"
+        }
+      }
+    },
+    "on": {
+      "tint": {
+        "$type": "color",
+        "$value": "{warning}",
+        "$description": "Spruce semantic token --sp-warning-on-tint.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-warning-on-tint",
+          "org.sprucestack.modes": {
+            "light": "{warning}",
+            "dark": "{warning}"
+          }
+        }
+      }
+    },
+    "subtle": {
+      "$type": "color",
+      "$value": "rgba(180, 83, 9, 0.09)",
+      "$description": "Spruce semantic token --sp-warning-subtle.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-warning-subtle",
+        "org.sprucestack.modes": {
+          "light": "rgba(180, 83, 9, 0.09)",
+          "dark": "rgba(251, 191, 36, 0.13)"
+        },
+        "org.sprucestack.presets": {
+          "agents-dark": "rgba(251, 191, 36, 0.12)",
+          "agents": "rgba(180, 83, 9, 0.09)",
+          "bumblebee-dark": "rgba(245, 197, 66, 0.14)",
+          "bumblebee": "rgba(183, 121, 31, 0.12)",
+          "comic-dark": "rgba(255, 194, 71, 0.2)",
+          "comic": "#fff5dd",
+          "corporate-dark": "rgba(251, 191, 36, 0.12)",
+          "corporate": "rgba(202, 138, 4, 0.1)",
+          "dim": "rgba(249, 226, 175, 0.12)",
+          "dracula": "rgba(255, 184, 108, 0.12)",
+          "forest": "rgba(161, 98, 7, 0.1)",
+          "liquid-glass-dark": "rgba(255, 214, 10, 0.15)",
+          "liquid-glass": "rgba(255, 149, 0, 0.13)",
+          "material-dark": "rgba(255, 184, 112, 0.16)",
+          "material": "rgba(178, 106, 0, 0.12)",
+          "modern-dark": "rgba(251, 191, 36, 0.12)",
+          "modern": "rgba(217, 119, 6, 0.1)",
+          "monokai-light": "rgba(154, 106, 0, 0.11)",
+          "monokai": "rgba(230, 219, 116, 0.14)",
+          "night": "rgba(251, 191, 36, 0.12)",
+          "nord": "rgba(235, 203, 139, 0.12)",
+          "ocean": "rgba(180, 83, 9, 0.1)",
+          "retro": "rgba(161, 98, 7, 0.1)",
+          "rose": "rgba(180, 83, 9, 0.1)",
+          "shadcn-dark": "rgba(251, 191, 36, 0.12)",
+          "shadcn": "rgba(217, 119, 6, 0.1)",
+          "spruce-charcoal-dark": "rgba(251, 191, 36, 0.13)",
+          "spruce-charcoal": "rgba(180, 83, 9, 0.09)",
+          "spruce-dark": "rgba(251, 191, 36, 0.13)",
+          "spruce-slate-dark": "rgba(251, 191, 36, 0.13)",
+          "spruce-slate": "rgba(180, 83, 9, 0.09)",
+          "spruce": "rgba(180, 83, 9, 0.09)",
+          "visual-studio-dark": "rgba(204, 167, 0, 0.13)",
+          "visual-studio": "rgba(191, 136, 3, 0.11)"
+        }
+      }
+    },
+    "text": {
+      "$type": "color",
+      "$value": "#92400e",
+      "$description": "Spruce semantic token --sp-warning-text.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-warning-text",
+        "org.sprucestack.modes": {
+          "light": "#92400e",
+          "dark": "#fde68a"
+        }
+      }
+    },
+    "tint": {
+      "$type": "color",
+      "$value": "{warning.subtle}",
+      "$description": "Spruce semantic token --sp-warning-tint.",
+      "$extensions": {
+        "org.sprucestack.css-name": "--sp-warning-tint",
+        "org.sprucestack.modes": {
+          "light": "{warning.subtle}",
+          "dark": "{warning.subtle}"
+        }
+      },
+      "border": {
+        "$type": "color",
+        "$value": "{warning.border}",
+        "$description": "Spruce semantic token --sp-warning-tint-border.",
+        "$extensions": {
+          "org.sprucestack.css-name": "--sp-warning-tint-border",
+          "org.sprucestack.modes": {
+            "light": "{warning.border}",
+            "dark": "{warning.border}"
+          }
+        }
+      }
+    }
+  },
+  "$extensions": {
+    "org.sprucestack.preset-order": [
+      {
+        "name": "agents-dark",
+        "displayName": "Agents Dark",
+        "base": "dark"
+      },
+      {
+        "name": "agents",
+        "displayName": "Agents",
+        "base": "light"
+      },
+      {
+        "name": "bumblebee-dark",
+        "displayName": "Bumblebee Dark",
+        "base": "dark"
+      },
+      {
+        "name": "bumblebee",
+        "displayName": "Bumblebee",
+        "base": "light"
+      },
+      {
+        "name": "comic-dark",
+        "displayName": "Comic Dark",
+        "base": "dark"
+      },
+      {
+        "name": "comic",
+        "displayName": "Comic",
+        "base": "light"
+      },
+      {
+        "name": "corporate-dark",
+        "displayName": "Corporate Dark",
+        "base": "dark"
+      },
+      {
+        "name": "corporate",
+        "displayName": "Corporate",
+        "base": "light"
+      },
+      {
+        "name": "dim",
+        "displayName": "Dim",
+        "base": "dark"
+      },
+      {
+        "name": "dracula",
+        "displayName": "Dracula",
+        "base": "dark"
+      },
+      {
+        "name": "forest",
+        "displayName": "Forest",
+        "base": "light"
+      },
+      {
+        "name": "liquid-glass-dark",
+        "displayName": "Liquid Glass Dark",
+        "base": "dark"
+      },
+      {
+        "name": "liquid-glass",
+        "displayName": "Liquid Glass",
+        "base": "light"
+      },
+      {
+        "name": "material-dark",
+        "displayName": "Material Dark",
+        "base": "dark"
+      },
+      {
+        "name": "material",
+        "displayName": "Material",
+        "base": "light"
+      },
+      {
+        "name": "modern-dark",
+        "displayName": "Modern Dark",
+        "base": "dark"
+      },
+      {
+        "name": "modern",
+        "displayName": "Modern",
+        "base": "light"
+      },
+      {
+        "name": "monokai-light",
+        "displayName": "Monokai Light",
+        "base": "light"
+      },
+      {
+        "name": "monokai",
+        "displayName": "Monokai",
+        "base": "dark"
+      },
+      {
+        "name": "night",
+        "displayName": "Night",
+        "base": "dark"
+      },
+      {
+        "name": "nord",
+        "displayName": "Nord",
+        "base": "dark"
+      },
+      {
+        "name": "ocean",
+        "displayName": "Ocean",
+        "base": "light"
+      },
+      {
+        "name": "retro",
+        "displayName": "Retro",
+        "base": "light"
+      },
+      {
+        "name": "rose",
+        "displayName": "Rose",
+        "base": "light"
+      },
+      {
+        "name": "shadcn-dark",
+        "displayName": "Shadcn Dark",
+        "base": "dark"
+      },
+      {
+        "name": "shadcn",
+        "displayName": "Shadcn",
+        "base": "light"
+      },
+      {
+        "name": "spruce-charcoal-dark",
+        "displayName": "Spruce Charcoal Dark",
+        "base": "dark"
+      },
+      {
+        "name": "spruce-charcoal",
+        "displayName": "Spruce Charcoal",
+        "base": "light"
+      },
+      {
+        "name": "spruce-dark",
+        "displayName": "Spruce Dark",
+        "base": "dark"
+      },
+      {
+        "name": "spruce-slate-dark",
+        "displayName": "Spruce Slate Dark",
+        "base": "dark"
+      },
+      {
+        "name": "spruce-slate",
+        "displayName": "Spruce Slate",
+        "base": "light"
+      },
+      {
+        "name": "spruce",
+        "displayName": "Spruce",
+        "base": "light"
+      },
+      {
+        "name": "visual-studio-dark",
+        "displayName": "Visual Studio Dark",
+        "base": "dark"
+      },
+      {
+        "name": "visual-studio",
+        "displayName": "Visual Studio",
+        "base": "light"
+      }
+    ]
+  }
+}

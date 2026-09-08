@@ -2,10 +2,11 @@ import { useMemo, useState } from 'react'
 import {
   HARMONY_PRESETS,
   HARMONY_SCHEMES,
+  HarmonyWheel,
   buildHarmonyPalette,
   useTheme,
 } from 'spruce-react'
-import type { HarmonySchemeId } from 'spruce-react'
+import type { HarmonySchemeId, HarmonySelection } from 'spruce-react'
 import { CodePreview } from '../../components/CodePreview'
 import { FoundationPageShell } from '../../components/FoundationPageShell'
 
@@ -25,6 +26,7 @@ export function ColorHarmonyPage() {
   const [scheme, setScheme] = useState<HarmonySchemeId | 'none'>(
     accentHarmony === 'custom' ? 'triadic' : accentHarmony,
   )
+  const [wheelSelection, setWheelSelection] = useState<HarmonySelection>('triadic')
 
   const preview = useMemo(
     () => (scheme === 'none' ? null : buildHarmonyPalette(baseColor, scheme)),
@@ -123,10 +125,15 @@ export function ColorHarmonyPage() {
 
       <section id="wheel" className="doc-section">
         <h2>Build your own</h2>
-        <p className="section-desc">Named schemes are well-behaved starting points. Choose a scheme, then adjust the seed and inspect the generated companion roles. The React implementation exposes the same palette generation API through <code>buildHarmonyPalette</code>.</p>
-        <CodePreview codeOnly language="typescript" code={`const palette = buildHarmonyPalette('#2563eb', 'triadic')
-palette.light.secondary.base
-palette.dark.tertiary.text`} />
+        <p className="section-desc">Drag the primary marker to rotate the brand while preserving the harmony. Drag companion markers to edit their offsets; near a canonical arrangement they snap back to the named scheme.</p>
+        <CodePreview code={`<HarmonyWheel
+  base={baseColor}
+  selection={selection}
+  onBaseChange={setBaseColor}
+  onSelectionChange={setSelection}
+/>`}>
+          <HarmonyWheel base={baseColor} selection={wheelSelection} onBaseChange={setBaseColor} onSelectionChange={setWheelSelection} />
+        </CodePreview>
       </section>
 
       <section id="roles" className="doc-section">

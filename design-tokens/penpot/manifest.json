@@ -1,0 +1,9 @@
+{
+  "name": "Spruce UI Foundations",
+  "code": "plugin.js",
+  "icon": "icon",
+  "permissions": [
+    "content:read",
+    "content:write"
+  ]
+}

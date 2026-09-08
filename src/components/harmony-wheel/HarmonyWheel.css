@@ -1,0 +1,118 @@
+.sp-harmony-wheel {
+  --sp-harmony-wheel-size: 220px;
+
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-space-2);
+  color: var(--sp-text-color);
+}
+
+.sp-harmony-wheel--disabled {
+  opacity: 0.5;
+}
+
+.sp-harmony-wheel__canvas {
+  inline-size: var(--sp-harmony-wheel-size);
+  block-size: var(--sp-harmony-wheel-size);
+  overflow: visible;
+  touch-action: none;
+}
+
+.sp-harmony-wheel__link {
+  fill: none;
+  stroke: var(--sp-border-strong);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+}
+
+.sp-harmony-wheel__marker {
+  cursor: grab;
+}
+
+.sp-harmony-wheel--disabled .sp-harmony-wheel__marker {
+  cursor: not-allowed;
+}
+
+.sp-harmony-wheel__marker--active {
+  cursor: grabbing;
+}
+
+.sp-harmony-wheel__marker-dot {
+  stroke: var(--sp-surface-0);
+  stroke-width: 3;
+  transition: stroke var(--sp-duration-fast) var(--sp-ease-out);
+}
+
+.sp-harmony-wheel__marker-halo {
+  fill: transparent;
+  stroke: transparent;
+  stroke-width: 3;
+}
+
+.sp-harmony-wheel__marker:focus {
+  outline: none;
+}
+
+.sp-harmony-wheel__marker:focus-visible .sp-harmony-wheel__marker-halo {
+  stroke: var(--sp-focus-ring-color);
+}
+
+.sp-harmony-wheel__marker:hover .sp-harmony-wheel__marker-dot,
+.sp-harmony-wheel__marker--active .sp-harmony-wheel__marker-dot {
+  stroke: var(--sp-primary);
+}
+
+.sp-harmony-wheel__readout {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-space-2);
+  font-size: var(--sp-text-xs);
+}
+
+.sp-harmony-wheel__scheme {
+  color: var(--sp-text-color);
+  font-weight: var(--sp-font-semibold);
+}
+
+.sp-harmony-wheel__offsets {
+  color: var(--sp-text-subtle);
+  font-family: var(--sp-font-mono);
+}
+
+.sp-harmony-wheel__instructions {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-contrast: more) {
+  .sp-harmony-wheel__link {
+    stroke-width: 2.5;
+  }
+
+  .sp-harmony-wheel__marker-dot {
+    stroke-width: 4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sp-harmony-wheel__marker-dot {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .sp-harmony-wheel__link,
+  .sp-harmony-wheel__marker-dot,
+  .sp-harmony-wheel__marker:focus-visible .sp-harmony-wheel__marker-halo {
+    stroke: CanvasText;
+  }
+
+  .sp-harmony-wheel__marker:focus-visible .sp-harmony-wheel__marker-halo {
+    stroke-width: 5;
+  }
+}

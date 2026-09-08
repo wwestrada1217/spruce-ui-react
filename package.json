@@ -25,7 +25,8 @@
     "docs"
   ],
   "files": [
-    "dist"
+    "dist",
+    "design-tokens"
   ],
   "main": "./dist/spruce-react.umd.js",
   "module": "./dist/spruce-react.es.js",
@@ -54,11 +55,13 @@
     "lint": "eslint .",
     "docs:build": "npm run build --workspace spruce-react-docs",
     "docs:preview": "npm run preview --workspace spruce-react-docs",
+    "tokens:generate": "node scripts/design-tokens.mjs",
+    "tokens:check": "node scripts/design-tokens.mjs --check",
     "test:type": "tsc -p tests/tsconfig.json --noEmit",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
-    "test:legacy": "node --experimental-strip-types --test tests/tokens.test.mjs tests/theme.test.mjs tests/i18n.test.mjs tests/datagrid.test.mjs tests/core-data.test.mjs",
-    "test:ci": "npm run test:type && npm run test:unit && npm run test:legacy",
+    "test:legacy": "node --experimental-strip-types --test tests/tokens.test.mjs tests/theme.test.mjs tests/design-tokens.test.mjs tests/i18n.test.mjs tests/datagrid.test.mjs tests/core-data.test.mjs",
+    "test:ci": "npm run tokens:check && npm run test:type && npm run test:unit && npm run test:legacy",
     "test": "npm run build && npm run test:ci"
   },
   "peerDependencies": {

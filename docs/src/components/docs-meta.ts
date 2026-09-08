@@ -35,6 +35,7 @@ const SYMBOLS: Record<string, readonly string[]> = {
   '#/components/slider-range': ['Slider', 'Range'],
   '#/components/text-diff': ['TextDiff'],
   '#/components/time-picker': ['TimePicker'],
+  '#/components/theme-switcher': ['ThemeSwitcher', 'ThemeSwitcherPanel', 'HarmonyWheel'],
   '#/components/tree': ['Tree'],
   '#/components/datepicker': ['DatePicker'],
   '#/charts/bar-race-chart': ['BarRaceChart'],
