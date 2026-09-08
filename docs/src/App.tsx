@@ -193,6 +193,7 @@ import { IconMotionPage } from './pages/effects/IconMotionPage'
 import { SlidePage } from './pages/effects/SlidePage'
 import { NumberTickerPage } from './pages/effects/NumberTickerPage'
 import { ContentTransitionPage } from './pages/effects/ContentTransitionPage'
+import { ChoreographyPage } from './pages/effects/ChoreographyPage'
 import { FocusUtilitiesPage } from './pages/utils/FocusUtilitiesPage'
 import { HighlightPage } from './pages/utils/HighlightPage'
 import { CodePreviewUtilPage } from './pages/utils/CodePreviewUtilPage'
@@ -424,6 +425,7 @@ function renderPage(hash: string): React.ReactElement {
     case '#/charts/venn-chart':            return <VennChartPage />
     case '#/charts/wheel-diagram':         return <WheelDiagramPage />
     // Effects & Animations
+    case '#/effects/choreography':         return <ChoreographyPage />
     case '#/effects/sparkles':             return <SparklesPage />
     case '#/effects/confetti':             return <ConfettiPage />
     case '#/effects/shimmer':              return <ShimmerPage />

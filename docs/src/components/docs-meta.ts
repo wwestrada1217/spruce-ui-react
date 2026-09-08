@@ -14,6 +14,7 @@ export interface DocsPageMetadata {
 }
 
 const SYMBOLS: Record<string, readonly string[]> = {
+  '#/effects/choreography': ['Fade', 'Slide', 'Shimmer', 'ContentTransition', 'Sparkles', 'useReducedMotion'],
   '#/components/barcode-qr': ['Barcode', 'QrCode'],
   '#/components/breadcrumbs': ['Breadcrumb'],
   '#/components/datagrid': ['Datagrid'],

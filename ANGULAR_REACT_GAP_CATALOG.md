@@ -150,9 +150,9 @@ React has no AI component package or `/ai/*` docs. Every Angular AI component ro
 | Flag | Angular area | React result | Prompt |
 | --- | --- | --- | --- |
 | **Complete** | Docs shell/platform | Package badges, metadata/search, section scrubber and deep links, mobile preview, docs i18n, CodePreview, property inspector/split pane, focus utilities, highlighting, responsive sidebar, back-to-top, and accessibility guidance exist. | No action. |
-| **TODO** | Docs for every component/theme TODO above | Routes, sidebar entries, live examples, API tables, accessibility/keyboard guidance, i18n/RTL examples, and source snippets must land with each missing/expanded public surface. | [D-01](#d-01--documentation-registration-and-coverage) |
-| **TODO** | Effects choreography | Angular documents cross-effect sequencing and composition; React has no equivalent page even though most individual effects exist. | [D-02](#d-02--effects-choreography-page) |
-| **TODO** | Six AI composed patterns: Chat Assistant, In-App Copilot, AI Search, Document Editor, Autonomous Agent, Multimodal Generator | React has none of the Angular AI pattern pages. These should follow the AI primitives rather than duplicate them. | [D-03](#d-03--ai-pattern-pages) |
+| **TODO** | Docs for every component/theme TODO above | All currently exported/routed React surfaces have discoverable routes, sidebar/search metadata, package badges, and coverage tests. Pages for future C/T surfaces remain gated until their public APIs exist. | [D-01](#d-01--documentation-registration-and-coverage) |
+| **Complete** | Effects choreography | React now documents cross-effect sequencing, timing, interruption/cancellation, layering, focus safety, and reduced-motion fallbacks with three live compositions. | [D-02](#d-02--effects-choreography-page) |
+| **TODO** | Six AI composed patterns: Chat Assistant, In-App Copilot, AI Search, Document Editor, Autonomous Agent, Multimodal Generator | Blocked until the public React AI primitives in C-14–C-20 exist; adding page-local stand-ins would violate the pattern-page contract. | [D-03](#d-03--ai-pattern-pages) |
 | **Not applicable** | Angular route aliases/redirects, including illustration aliases and standalone Datagrid full-demo route | React folds these into canonical pages. Separate URLs do not add behavior. | No action. |
 | **Not applicable** | Global analytics/privacy consent | Angular docs initializes analytics/consent. React docs does not currently collect analytics, so a global consent mechanism is unnecessary until telemetry is introduced. The Cookie Consent block itself is already complete. | No action. |
 | **Not applicable** | Standalone chart/grid performance analysis and solution Markdown files | These Angular files are internal engineering notes and are not routed product documentation. They may be copied as project notes if desired, but they are not a React component/docs parity requirement. | No action. |
@@ -325,17 +325,23 @@ Implement an exported React HarmonyWheel in C:\Users\acasauran\Documents\Spruce\
 
 ### D-01 — Documentation registration and coverage
 
+**Status: Complete for the currently exported React surface (2026-09-08).** Future component/theme TODO pages remain dependent on their corresponding C/T implementation prompts.
+
 ```text
 After implementing the TODO components in C:\Users\acasauran\Documents\Spruce\spruce-ui-react, audit docs/src/App.tsx, docs/src/components/Sidebar.tsx, docs search/navigation metadata, and every affected docs page against the current Angular docs in C:\Users\acasauran\Documents\Spruce\spruce-ng\projects\docs. Ensure every public component/type has a discoverable route, sidebar/search entry, package badge, live CodePreview, API/default table, controlled-state example, keyboard/accessibility guidance, i18n/RTL notes, reduced-motion notes where relevant, and mobile preview where relevant. Do not add Angular-only directive/signal/DI pages or legacy Datagridex. Add docs route/search tests where available, then run npm run docs:build, npm run lint, and npm run test:ci.
 ```
 
 ### D-02 — Effects choreography page
 
+**Status: Complete (2026-09-08).**
+
 ```text
 Add a React Effects Choreography documentation page in C:\Users\acasauran\Documents\Spruce\spruce-ui-react using the Angular /effects/choreography page in C:\Users\acasauran\Documents\Spruce\spruce-ng\projects\docs as content/behavior reference. Demonstrate sequencing and composing the existing React effects without introducing an unnecessary runtime abstraction. Include trigger coordination, timing tokens, interruption/cancellation, layering, focus/interaction safety, reduced-motion fallbacks, performance guidance, and at least three live CodePreview compositions. Register the route/sidebar/search metadata and add a docs smoke test. Run npm run docs:build, npm run lint, and npm run test:ci.
 ```
 
 ### D-03 — AI pattern pages
+
+**Status: Blocked pending C-14–C-20.** The six pages must be built from public React AI primitives, which do not exist in the current package yet.
 
 ```text
 Once the React AI primitives exist, add six composed pattern pages to C:\Users\acasauran\Documents\Spruce\spruce-ui-react based on the Angular docs in C:\Users\acasauran\Documents\Spruce\spruce-ng\projects\docs: Chat Assistant, In-App Copilot, AI Search, Document Editor, Autonomous Agent, and Multimodal Generator. Build the examples from public React AI components rather than page-local copies. Each page must show state ownership/data adapters, loading/streaming/error/recovery paths, approvals and human control where relevant, keyboard/focus behavior, accessibility announcements, privacy/safety considerations, responsive/mobile behavior, i18n/RTL, and reduced-motion handling. Register /ai/patterns routes/sidebar/search metadata, add runnable CodePreview examples and smoke tests, then run npm run docs:build, npm run lint, and npm run test:ci.

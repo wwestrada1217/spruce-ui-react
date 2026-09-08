@@ -239,6 +239,7 @@ const RAW_NAV_SECTIONS: NavSection[] = [
   {
     label: 'Effects & Animations',
     items: [
+      { icon: 'layers',            label: 'Effects Choreography', route: '#/effects/choreography', description: 'Coordinate effect timing, cancellation, layering, focus safety, and reduced-motion fallbacks.', keywords: ['sequencing', 'composition', 'animation'] },
       { icon: 'sparkles',       label: 'Sparkles', route: '#/effects/sparkles' },
       { icon: 'zap',            label: 'Confetti', route: '#/effects/confetti' },
       { icon: 'scan-line',      label: 'Shimmer',  route: '#/effects/shimmer'  },
