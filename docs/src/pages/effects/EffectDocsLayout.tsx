@@ -22,7 +22,7 @@ export interface EffectDocsLayoutProps {
   packageSymbols?: readonly string[];
 }
 
-export function EffectDocsLayout({ title, description, sections, children, packageName, packageSymbols }: EffectDocsLayoutProps) {
+export function EffectDocsLayout({ title, description, sections, children, packageName = 'spruce-react', packageSymbols }: EffectDocsLayoutProps) {
   const [activeSection, setActiveSection] = useState(sections[0]?.id ?? '');
   const mainRef = useRef<HTMLDivElement>(null);
 
