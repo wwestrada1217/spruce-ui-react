@@ -150,7 +150,7 @@ React has no AI component package or `/ai/*` docs. Every Angular AI component ro
 | Flag | Angular area | React result | Prompt |
 | --- | --- | --- | --- |
 | **Complete** | Docs shell/platform | Package badges, metadata/search, section scrubber and deep links, mobile preview, docs i18n, CodePreview, property inspector/split pane, focus utilities, highlighting, responsive sidebar, back-to-top, and accessibility guidance exist. | No action. |
-| **TODO** | Docs for every component/theme TODO above | All currently exported/routed React surfaces have discoverable routes, sidebar/search metadata, package badges, and coverage tests. Pages for future C/T surfaces remain gated until their public APIs exist. | [D-01](#d-01--documentation-registration-and-coverage) |
+| **Complete** | Docs for every component/theme TODO above | All currently exported/routed React surfaces have discoverable routes, sidebar/search metadata, package badges, and coverage tests. Pages for future C/T surfaces remain gated until their public APIs exist. | [D-01](#d-01--documentation-registration-and-coverage) |
 | **Complete** | Effects choreography | React now documents cross-effect sequencing, timing, interruption/cancellation, layering, focus safety, and reduced-motion fallbacks with three live compositions. | [D-02](#d-02--effects-choreography-page) |
 | **TODO** | Six AI composed patterns: Chat Assistant, In-App Copilot, AI Search, Document Editor, Autonomous Agent, Multimodal Generator | Blocked until the public React AI primitives in C-14–C-20 exist; adding page-local stand-ins would violate the pattern-page contract. | [D-03](#d-03--ai-pattern-pages) |
 | **Not applicable** | Angular route aliases/redirects, including illustration aliases and standalone Datagrid full-demo route | React folds these into canonical pages. Separate URLs do not add behavior. | No action. |
@@ -363,6 +363,6 @@ Recommended dependency order:
 4. **Complete (2026-09-08):** Complete reusable theme UI: T-01 and T-02.
 5. Add the Mobile family: C-09 through C-13.
 6. Add AI shared types and primitives: C-14 through C-20.
-7. Finish cross-cutting docs: D-01 through D-03.
+7. **In progress:** Finish cross-cutting docs: D-01 and D-02 are complete; D-03 remains blocked pending C-14 through C-20.
 
 Every implementation task should preserve unrelated work and follow the repository's React/TypeScript, accessibility, CSS/token, export, docs, and testing conventions.

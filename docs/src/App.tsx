@@ -228,7 +228,12 @@ function useHash(): string {
   return hash
 }
 
-function renderPage(hash: string): React.ReactElement {
+export interface DocsRouteProps {
+  readonly hash: string;
+}
+
+/** Resolve a documentation hash to its page component. Exported for route coverage tests. */
+export function DocsRoute({ hash }: DocsRouteProps): React.ReactElement {
   switch (getRouteHash(hash)) {
     case '#/':
     case '#':
@@ -544,7 +549,7 @@ export default function App() {
           </svg>
         </button>
         <div className="page-inner">
-          {renderPage(hash)}
+          <DocsRoute hash={hash} />
         </div>
       </main>
       {showBackToTop && (
