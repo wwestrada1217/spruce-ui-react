@@ -6,7 +6,7 @@
  */
 
 import './Lightbox.css';
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon } from '../../icons/Icon.js';
 import { useI18n } from '../../i18n/i18n-context.js';
@@ -58,6 +58,8 @@ export function Lightbox({
   const [activeIndex, setActiveIndex] = useState(startIndex);
   const [zoom, setZoom] = useState(1);
   const [loading, setLoading] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
 
   const currentImage = useMemo(
     () => (images.length > 0 ? images[activeIndex] : null),
@@ -68,6 +70,8 @@ export function Lightbox({
   useEffect(() => {
     if (open) {
       const clamped = Math.max(0, Math.min(startIndex, images.length - 1));
+      // Opening starts a new viewing session and must reset transient navigation state.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveIndex(clamped);
       setZoom(1);
       setLoading(true);
@@ -77,11 +81,26 @@ export function Lightbox({
   // Lock body scroll
   useEffect(() => {
     if (open) {
+      const previousOverflow = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
       return () => {
-        document.body.style.overflow = '';
+        document.body.style.overflow = previousOverflow;
       };
     }
+  }, [open]);
+
+  // Focus the dialog once per open session and restore the trigger on close.
+  useEffect(() => {
+    if (!open) return;
+    previousFocusRef.current = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null;
+    const frame = requestAnimationFrame(() => dialogRef.current?.focus({ preventScroll: true }));
+    return () => {
+      cancelAnimationFrame(frame);
+      previousFocusRef.current?.focus({ preventScroll: true });
+      previousFocusRef.current = null;
+    };
   }, [open]);
 
   const goTo = useCallback(
@@ -115,7 +134,7 @@ export function Lightbox({
   }, [onClose]);
 
   const onBackdropClick = useCallback(
-    (e: React.MouseEvent) => {
+    () => {
       if (closeOnBackdrop) close();
     },
     [closeOnBackdrop, close],
@@ -123,6 +142,28 @@ export function Lightbox({
 
   const onKeydown = useCallback(
     (event: React.KeyboardEvent) => {
+      if (event.key === 'Tab') {
+        const dialog = dialogRef.current;
+        if (!dialog) return;
+        const focusable = Array.from(dialog.querySelectorAll<HTMLElement>(
+          'button:not(:disabled), [href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])',
+        ));
+        if (focusable.length === 0) {
+          event.preventDefault();
+          dialog.focus();
+          return;
+        }
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && (document.activeElement === first || document.activeElement === dialog)) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+        return;
+      }
       switch (event.key) {
         case 'Escape':
           event.preventDefault();
@@ -166,11 +207,12 @@ export function Lightbox({
     <div
       className={rootClasses}
       role="dialog"
+      aria-modal="true"
       aria-roledescription="lightbox"
       aria-label={currentImage?.alt || t('imageEditor')}
       tabIndex={-1}
       onKeyDown={onKeydown}
-      ref={(el) => el?.focus()}
+      ref={dialogRef}
     >
       {/* Toolbar */}
       <div className="sp-lightbox__toolbar">
@@ -181,6 +223,7 @@ export function Lightbox({
           {zoomable && (
             <>
               <button
+                type="button"
                 className="sp-lightbox__btn"
                 onClick={zoomIn}
                 aria-label={t('zoomIn')}
@@ -188,6 +231,7 @@ export function Lightbox({
                 <Icon name="zoom-in" size={18} />
               </button>
               <button
+                type="button"
                 className="sp-lightbox__btn"
                 onClick={zoomOut}
                 aria-label={t('zoomOut')}
@@ -195,6 +239,7 @@ export function Lightbox({
                 <Icon name="zoom-out" size={18} />
               </button>
               <button
+                type="button"
                 className="sp-lightbox__btn"
                 onClick={resetZoom}
                 aria-label={t('resetZoom')}
@@ -204,6 +249,7 @@ export function Lightbox({
             </>
           )}
           <button
+            type="button"
             className="sp-lightbox__btn"
             onClick={close}
                 aria-label={t('closeLightbox')}
@@ -217,6 +263,7 @@ export function Lightbox({
       <div className="sp-lightbox__body" onClick={onBackdropClick}>
         {images.length > 1 && (
           <button
+            type="button"
             className="sp-lightbox__nav sp-lightbox__nav--prev"
             onClick={(e) => {
               prev();
@@ -237,21 +284,24 @@ export function Lightbox({
               <div className="sp-lightbox__spinner-ring" />
             </div>
           )}
-          <img
-            className="sp-lightbox__image"
-            src={currentImage?.src}
-            alt={currentImage?.alt || ''}
-            style={{
-              transform: `scale(${zoom})`,
-              opacity: loading ? 0 : 1,
-            }}
-            onLoad={onImageLoad}
-            draggable={false}
-          />
+          {currentImage && (
+            <img
+              className="sp-lightbox__image"
+              src={currentImage.src}
+              alt={currentImage.alt || ''}
+              style={{
+                transform: `scale(${zoom})`,
+                opacity: loading ? 0 : 1,
+              }}
+              onLoad={onImageLoad}
+              draggable={false}
+            />
+          )}
         </div>
 
         {images.length > 1 && (
           <button
+            type="button"
             className="sp-lightbox__nav sp-lightbox__nav--next"
             onClick={(e) => {
               next();
@@ -278,7 +328,8 @@ export function Lightbox({
         >
           {images.map((img, i) => (
             <button
-              key={img.src}
+              type="button"
+              key={`${img.src}-${i}`}
               className={[
                 'sp-lightbox__thumb',
                 activeIndex === i && 'sp-lightbox__thumb--active',

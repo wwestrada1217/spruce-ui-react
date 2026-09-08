@@ -105,7 +105,12 @@ function computeCardPos(
 
 // ── Component ────────────────────────────────────────────────────────────────
 
-export function Coachmark({
+export function Coachmark(props: CoachmarkProps) {
+  if (!props.active || props.steps.length === 0) return null;
+  return <ActiveCoachmark {...props} />;
+}
+
+function ActiveCoachmark({
   steps,
   active = false,
   showProgress = true,
@@ -173,19 +178,32 @@ export function Coachmark({
     });
   }, [step, globalPadding]);
 
-  // ── Reset on activate ─────────────────────────────────────────────────────
-  useEffect(() => {
-    if (active) {
-      setCurrentIndex(0);
-      setReady(false);
+  // ── Navigation ────────────────────────────────────────────────────────────
+  const goNext = useCallback(() => {
+    if (currentIndex < steps.length - 1) {
+      const next = currentIndex + 1;
+      setCurrentIndex(next);
+      onStepChange?.(next);
+    } else {
+      onComplete?.();
     }
-  }, [active]);
+  }, [currentIndex, onComplete, onStepChange, steps.length]);
+
+  const goBack = useCallback(() => {
+    if (currentIndex > 0) {
+      const prev = currentIndex - 1;
+      setCurrentIndex(prev);
+      onStepChange?.(prev);
+    }
+  }, [currentIndex, onStepChange]);
 
   // ── Position on step change ───────────────────────────────────────────────
   useEffect(() => {
     if (!active || !step) return;
-    setReady(false);
-    const raf = requestAnimationFrame(() => positionForCurrentStep());
+    const raf = requestAnimationFrame(() => {
+      setReady(false);
+      positionForCurrentStep();
+    });
     return () => cancelAnimationFrame(raf);
   }, [active, currentIndex, positionForCurrentStep, step]);
 
@@ -217,26 +235,7 @@ export function Coachmark({
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [active, currentIndex, steps.length]);
-
-  // ── Navigation ────────────────────────────────────────────────────────────
-  function goNext() {
-    if (currentIndex < steps.length - 1) {
-      const next = currentIndex + 1;
-      setCurrentIndex(next);
-      onStepChange?.(next);
-    } else {
-      onComplete?.();
-    }
-  }
-
-  function goBack() {
-    if (currentIndex > 0) {
-      const prev = currentIndex - 1;
-      setCurrentIndex(prev);
-      onStepChange?.(prev);
-    }
-  }
+  }, [active, goBack, goNext, onSkip]);
 
   function handleBackdropClick() {
     if (closeOnBackdrop) {

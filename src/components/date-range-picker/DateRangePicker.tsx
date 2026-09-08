@@ -242,8 +242,8 @@ export function DateRangePicker({
   const [focusedDate, setFocusedDate] = useState<string | null>(null);
 
   // Input mode text state
-  const [startInputText, setStartInputText] = useState('');
-  const [endInputText, setEndInputText] = useState('');
+  const [startInputText, setStartInputText] = useState(() => value?.start ? isoToInput(value.start) : '');
+  const [endInputText, setEndInputText] = useState(() => value?.end ? isoToInput(value.end) : '');
 
   /* ── Sync from controlled value ── */
 

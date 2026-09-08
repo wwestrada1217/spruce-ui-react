@@ -5,6 +5,8 @@
  * The full license information can be found in LICENSE in the root directory of this project.
  */
 
+/* eslint-disable react-refresh/only-export-components -- the public provider API intentionally co-locates its hook. */
+
 import './Snackbar.css';
 import {
   createContext,
@@ -78,6 +80,7 @@ export function SnackbarProvider({ children }: SnackbarProviderProps) {
   const { t } = useI18n();
   const [current, setCurrent] = useState<SnackbarConfig | null>(null);
   const [removing, setRemoving] = useState(false);
+  const currentRef = useRef<SnackbarConfig | null>(null);
   const autoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const animTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -98,18 +101,14 @@ export function SnackbarProvider({ children }: SnackbarProviderProps) {
   }, [clearTimers]);
 
   const dismiss = useCallback(() => {
-    setCurrent((prev) => {
-      if (!prev) return prev;
-      clearTimers();
-      setRemoving(true);
-
-      animTimerRef.current = setTimeout(() => {
-        setCurrent(null);
-        setRemoving(false);
-      }, 300);
-
-      return prev;
-    });
+    if (!currentRef.current) return;
+    clearTimers();
+    setRemoving(true);
+    animTimerRef.current = setTimeout(() => {
+      currentRef.current = null;
+      setCurrent(null);
+      setRemoving(false);
+    }, 300);
   }, [clearTimers]);
 
   const show = useCallback(
@@ -117,8 +116,10 @@ export function SnackbarProvider({ children }: SnackbarProviderProps) {
       clearTimers();
 
       // Replace immediately (skip exit animation for replaced snackbar)
+      const next = { dismissible: true, ...config };
+      currentRef.current = next;
       setRemoving(false);
-      setCurrent({ dismissible: true, ...config });
+      setCurrent(next);
 
       const duration = config.duration ?? 4000;
       if (duration > 0) {

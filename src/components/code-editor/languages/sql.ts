@@ -74,6 +74,6 @@ export const sql: LanguageDefinition = {
     { pattern: /@@?\w+/gy, type: 'variable' },
     { pattern: /[a-zA-Z_]\w*/gy, type: 'plain' },
     { pattern: /[!=<>]=?|[+\-*/%&|^~]/gy, type: 'operator' },
-    { pattern: /[{}()\[\];:,.]/gy, type: 'punctuation' },
+    { pattern: /[{}()[\];:,.]/gy, type: 'punctuation' },
   ],
 };

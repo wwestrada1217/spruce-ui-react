@@ -70,6 +70,30 @@ describe('P1.0-06 notification and feedback parity', () => {
     await view.user.click(view.getAllByRole('button', { name: 'Dismiss notification' })[0]);
   });
 
+  it('can dismiss feedback immediately after it is queued', async () => {
+    function Probe() {
+      const toast = useToast();
+      const snackbar = useSnackbar();
+      return (
+        <button type="button" onClick={() => {
+          const toastId = toast.info('Transient toast', { duration: 0 });
+          toast.dismiss(toastId);
+          snackbar.open('Transient snackbar', { duration: 0 });
+          snackbar.dismiss();
+        }}>
+          Queue and dismiss
+        </button>
+      );
+    }
+
+    const view = renderWithSpruce(<ToastProvider><SnackbarProvider><Probe /></SnackbarProvider></ToastProvider>);
+    await view.user.click(view.getByRole('button', { name: 'Queue and dismiss' }));
+    await waitFor(() => {
+      expect(view.queryByText('Transient toast')).not.toBeInTheDocument();
+      expect(view.queryByText('Transient snackbar')).not.toBeInTheDocument();
+    });
+  });
+
   it('replaces and dismisses snackbars through controlled actions', async () => {
     function Probe() {
       const snackbar = useSnackbar();

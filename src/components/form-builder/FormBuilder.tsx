@@ -364,21 +364,21 @@ export const FormBuilder = forwardRef<FormBuilderHandle, FormBuilderProps>(funct
     return () => { window.removeEventListener('pointermove', handleMove); window.removeEventListener('pointerup', handleUp); };
   }, [currentSchema, resizing, updateField]);
 
-  function submit(): void {
+  const submit = useCallback((): void => {
     onSubmit?.({ value: { ...currentValue }, valid, errors: { ...fieldErrors } });
-  }
+  }, [currentValue, fieldErrors, onSubmit, valid]);
 
-  function addSection(title = t('section')): string {
+  const addSection = useCallback((title = t('section')): string => {
     const id = nextId('section');
     commitSchema({ ...currentSchema, sections: [...currentSchema.sections, { id, title, cols: 12, fields: [] }] });
     setActiveSectionId(id);
     setEditingSectionId(id);
     return id;
-  }
+  }, [commitSchema, currentSchema, t]);
 
-  function removeSection(sectionId: string): void {
+  const removeSection = useCallback((sectionId: string): void => {
     commitSchema({ ...currentSchema, sections: currentSchema.sections.filter((section) => section.id !== sectionId) });
-  }
+  }, [commitSchema, currentSchema]);
 
   function updateSection(sectionId: string, patch: Partial<FormBuilderSection>): void {
     commitSchema({ ...currentSchema, sections: currentSchema.sections.map((section) => section.id === sectionId ? { ...section, ...patch } : section) });
@@ -393,7 +393,14 @@ export const FormBuilder = forwardRef<FormBuilderHandle, FormBuilderProps>(funct
     commitSchema({ ...currentSchema, sections });
   }
 
-  function addField(sectionId: string, type: FormBuilderFieldType): string {
+  const activeTabIdFor = useCallback((sectionId: string): string | null => {
+    const section = currentSchema.sections.find((item) => item.id === sectionId);
+    if (!section?.tabs?.length) return null;
+    const current = activeTabs[sectionId];
+    return section.tabs.some((tab) => tab.id === current) ? current ?? null : section.tabs[0].id;
+  }, [activeTabs, currentSchema]);
+
+  const addField = useCallback((sectionId: string, type: FormBuilderFieldType): string => {
     const meta = FIELD_TYPES.find((item) => item.type === type) ?? FIELD_TYPES[0];
     const section = currentSchema.sections.find((item) => item.id === sectionId);
     if (!section) return '';
@@ -411,12 +418,12 @@ export const FormBuilder = forwardRef<FormBuilderHandle, FormBuilderProps>(funct
     setActiveSectionId(sectionId);
     setSelectedFieldId(id);
     return id;
-  }
+  }, [activeTabIdFor, commitSchema, currentSchema, t]);
 
-  function removeField(fieldId: string): void {
+  const removeField = useCallback((fieldId: string): void => {
     commitSchema({ ...currentSchema, sections: currentSchema.sections.map((section) => ({ ...section, fields: section.fields.filter((field) => field.id !== fieldId) })) });
     if (selectedFieldId === fieldId) setSelectedFieldId(null);
-  }
+  }, [commitSchema, currentSchema, selectedFieldId]);
 
   function duplicateField(fieldId: string): void {
     const source = currentSchema.sections.flatMap((section) => section.fields.map((field) => ({ section, field }))).find((item) => item.field.id === fieldId);
@@ -451,13 +458,6 @@ export const FormBuilder = forwardRef<FormBuilderHandle, FormBuilderProps>(funct
       : section.fields.filter((field) => field.tabId !== tabId);
     commitSchema({ ...currentSchema, sections: currentSchema.sections.map((item) => item.id === sectionId ? { ...item, tabs: tabs.length ? tabs : undefined, fields } : item) });
     setActiveTabs((current) => ({ ...current, [sectionId]: tabs[0]?.id ?? '' }));
-  }
-
-  function activeTabIdFor(sectionId: string): string | null {
-    const section = currentSchema.sections.find((item) => item.id === sectionId);
-    if (!section?.tabs?.length) return null;
-    const current = activeTabs[sectionId];
-    return section.tabs.some((tab) => tab.id === current) ? current ?? null : section.tabs[0].id;
   }
 
   function fieldsForDesign(section: FormBuilderSection): FormBuilderField[] {
@@ -551,13 +551,13 @@ export const FormBuilder = forwardRef<FormBuilderHandle, FormBuilderProps>(funct
     return <Field label={field.label} {...common}>{control}</Field>;
   }
 
-  function save(): FormBuilderSchema { return cloneSchema(currentSchema); }
-  function restore(next: FormBuilderSchema): void { commitSchema(cloneSchema(next)); }
-  function resetValues(): void {
+  const save = useCallback((): FormBuilderSchema => cloneSchema(currentSchema), [currentSchema]);
+  const restore = useCallback((next: FormBuilderSchema): void => { commitSchema(cloneSchema(next)); }, [commitSchema]);
+  const resetValues = useCallback((): void => {
     const next: Record<string, unknown> = {};
     currentSchema.sections.forEach((section) => section.fields.forEach((field) => { next[field.name] = cloneUnknown(field.defaultValue ?? defaultValueForType(field.type)); }));
     commitValue(next);
-  }
+  }, [commitValue, currentSchema]);
 
   useImperativeHandle(ref, () => ({ save, restore, submit, resetValues, addSection, removeSection, addField, removeField }), [
     addField, addSection, removeField, removeSection, resetValues, restore, save, submit,

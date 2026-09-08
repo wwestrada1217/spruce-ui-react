@@ -1,0 +1,12 @@
+.docs-platform-meta { color: var(--sp-text-muted); font-size: var(--sp-text-sm); }
+.docs-platform-demo-button { min-block-size: 32px; padding-inline: var(--sp-space-3); border: 1px solid var(--sp-primary); border-radius: var(--sp-radius-md); background: var(--sp-primary); color: var(--sp-primary-text); font: inherit; cursor: pointer; }
+.docs-platform-scrubber-demo { display: flex; align-items: center; gap: var(--sp-space-5); min-height: 120px; padding: var(--sp-space-4); border: 1px solid var(--sp-border); border-radius: var(--sp-radius-lg); background: var(--sp-surface-50); }
+.docs-platform-scrubber-demo .sp-card { flex: 1; }
+.docs-platform-scrubber-demo p { margin: var(--sp-space-2) 0 0; color: var(--sp-text-muted); font-size: var(--sp-text-sm); }
+.docs-platform-mobile-demo { display: flex; flex-direction: column; gap: var(--sp-space-3); width: 100%; max-width: 240px; padding: var(--sp-space-4); }
+.docs-platform-mobile-demo__eyebrow { color: var(--sp-primary); font-size: var(--sp-text-xs); font-weight: var(--sp-font-semibold); text-transform: uppercase; letter-spacing: var(--sp-tracking-wide); }
+.docs-platform-mobile-demo strong { font-size: var(--sp-text-xl); }
+.docs-platform-i18n-demo { display: flex; align-items: center; gap: var(--sp-space-3); flex-wrap: wrap; }
+.docs-platform-i18n-demo output { color: var(--sp-text-muted); font-family: var(--sp-font-mono); font-size: var(--sp-text-sm); }
+.docs-platform-checklist { display: grid; gap: var(--sp-space-3); margin: 0; padding-inline-start: var(--sp-space-5); color: var(--sp-text-muted); }
+.docs-platform-checklist strong { color: var(--sp-text-color); }

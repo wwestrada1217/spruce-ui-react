@@ -170,6 +170,7 @@ const UTILITIES: NavCard[] = [
   { icon: 'panel-right',  label: 'Scrollbar',       route: '#/utils/scrollbar',        description: 'Custom scrollbar styling' },
   { icon: 'more-vertical',label: 'Overflow',        route: '#/utils/overflow',         description: 'Overflow menu for truncated items' },
   { icon: 'app-window',   label: 'Code Preview',    route: '#/utils/code-preview',    description: 'Live interactive code snippet viewer' },
+  { icon: 'app-window',   label: 'Documentation Platform', route: '#/utils/docs-platform', description: 'Shared documentation infrastructure and patterns' },
 ];
 
 const BLOCKS: NavCard[] = [
@@ -184,6 +185,7 @@ const BLOCKS: NavCard[] = [
   { icon: 'bar-chart',       label: 'Charts',             route: '#/blocks/charts',             description: 'Analytics dashboards and chart compositions' },
   { icon: 'shield',          label: 'Privacy & Cookie Consent', route: '#/blocks/cookie-consent', description: 'GDPR/CCPA privacy consent banner' },
   { icon: 'table',           label: 'Operations Grid',    route: '#/blocks/operations-grid',   description: 'Queue triage and bulk review workspace' },
+  { icon: 'route',           label: 'REST Client Workflow', route: '#/blocks/rest-client-workflow', description: 'Conditional API request pipelines' },
   { icon: 'trending-up',     label: 'Stocks App',         route: '#/blocks/stocks',             description: 'Ticker, candlestick, and watchlist dashboard' },
 ];
 

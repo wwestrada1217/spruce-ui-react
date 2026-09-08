@@ -41,7 +41,7 @@ describe('SpruceProvider test contract', () => {
     expect(document.head.querySelector('#sp-theme-override')).not.toBeNull();
 
     for (const preset of SPRUCE_THEME_PRESETS) {
-      await user.click(getByRole('button', { name: preset.name, exact: true }));
+      await user.click(getByRole('button', { name: preset.name }));
       expectDocumentTheme(preset.base);
       expect(document.documentElement).toHaveAttribute('data-theme-preset', preset.name);
       const stylesheet = document.head.querySelector('#sp-theme-override');
@@ -76,7 +76,7 @@ describe('SpruceProvider test contract', () => {
 
     const preset = SPRUCE_THEME_PRESETS.find((theme) => theme.name === 'modern-dark');
     expect(preset).toBeDefined();
-    await user.click(getByRole('button', { name: 'modern-dark', exact: true }));
+    await user.click(getByRole('button', { name: 'modern-dark' }));
 
     const stylesheet = document.head.querySelector('#sp-theme-override')?.textContent;
     expect(stylesheet).toContain(":root[data-theme='light'],\n:root[data-theme='dark']");

@@ -81,6 +81,7 @@ function parseTime(
   const minute = parseInt(match[2], 10);
   const second = match[3] ? parseInt(match[3], 10) : 0;
   const period = match[4]?.toUpperCase();
+  if (period && (hour < 1 || hour > 12)) return null;
   if (period === 'PM' && hour < 12) hour += 12;
   if (period === 'AM' && hour === 12) hour = 0;
   if (hour < 0 || hour > 23 || minute < 0 || minute > 59 || second < 0 || second > 59) {

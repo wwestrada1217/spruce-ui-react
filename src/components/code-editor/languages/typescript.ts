@@ -46,6 +46,6 @@ export const typescript: LanguageDefinition = {
     { pattern: /\b([a-zA-Z_$][\w$]*)\s*(?=\()/gy, type: 'function' },
     { pattern: /[a-zA-Z_$][\w$]*/gy, type: 'plain' },
     { pattern: /[!=<>]=?=?|&&|\|\||[+\-*/%]=?|\?\?|\.{3}|=>|[?:]/gy, type: 'operator' },
-    { pattern: /[{}()\[\];,.]/gy, type: 'punctuation' },
+    { pattern: /[{}()[\];,.]/gy, type: 'punctuation' },
   ],
 };

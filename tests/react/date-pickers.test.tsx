@@ -200,3 +200,49 @@ describe('C-03 shared date-control contract', () => {
     expect(onBlur).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('typed date and time validation', () => {
+  it('shows initial controlled values in text-input mode', () => {
+    const date = renderWithSpruce(<DatePicker inputMode value="2026-04-15" />);
+    expect(date.getByDisplayValue('04/15/2026')).toBeInTheDocument();
+    date.unmount();
+
+    const range = renderWithSpruce(
+      <DateRangePicker inputMode value={{ start: '2026-04-15', end: '2026-04-18' }} />,
+    );
+    expect(range.getByDisplayValue('04/15/2026')).toBeInTheDocument();
+    expect(range.getByDisplayValue('04/18/2026')).toBeInTheDocument();
+    range.unmount();
+
+    const dateTime = renderWithSpruce(
+      <DateTimePicker inputMode value="2026-04-15T14:30" />,
+    );
+    expect(dateTime.getByDisplayValue('Apr 15, 2026 02:30 PM')).toBeInTheDocument();
+  });
+
+  it('does not normalize impossible calendar dates', () => {
+    const onChange = vi.fn();
+    const { getByRole } = renderWithSpruce(
+      <DateTimePicker inputMode ariaLabel="Appointment" onChange={onChange} />,
+    );
+
+    fireEvent.change(getByRole('textbox', { name: 'Appointment' }), {
+      target: { value: '02/30/2026 10:30 AM' },
+    });
+
+    expect(onChange).toHaveBeenLastCalledWith('02/30/2026 10:30 AM');
+  });
+
+  it('does not reinterpret invalid 12-hour clock values', () => {
+    const onChange = vi.fn();
+    const { getByRole } = renderWithSpruce(
+      <TimePicker inputMode ariaLabel="Start time" onChange={onChange} />,
+    );
+
+    fireEvent.change(getByRole('textbox', { name: 'Start time' }), {
+      target: { value: '13:30 PM' },
+    });
+
+    expect(onChange).toHaveBeenLastCalledWith('13:30 PM');
+  });
+});

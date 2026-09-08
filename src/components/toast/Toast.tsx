@@ -5,6 +5,8 @@
  * The full license information can be found in LICENSE in the root directory of this project.
  */
 
+/* eslint-disable react-refresh/only-export-components -- the public provider API intentionally co-locates its hook. */
+
 import './Toast.css';
 import {
   createContext,
@@ -176,11 +178,19 @@ export function ToastProvider({ children, position = 'top-right', stackMode = 'd
     const toast = toastsRef.current.find((item) => item.id === id);
     if (!toast || toast.removing) return;
 
-    setToasts((prev) => prev.map((t) => (t.id === id ? { ...t, removing: true } : t)));
+    setToasts((prev) => {
+      const next = prev.map((t) => (t.id === id ? { ...t, removing: true } : t));
+      toastsRef.current = next;
+      return next;
+    });
 
     // Remove after exit animation completes
     const removalTimer = setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
+      setToasts((prev) => {
+        const next = prev.filter((t) => t.id !== id);
+        toastsRef.current = next;
+        return next;
+      });
       removalTimersRef.current.delete(id);
     }, 300);
     removalTimersRef.current.set(id, removalTimer);
@@ -200,6 +210,7 @@ export function ToastProvider({ children, position = 'top-right', stackMode = 'd
         solid: config.solid ?? false,
       };
 
+      toastsRef.current = [...toastsRef.current, instance];
       setToasts((prev) => [...prev, instance]);
 
       if (instance.duration > 0) {

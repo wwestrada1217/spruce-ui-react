@@ -1,8 +1,11 @@
+/* eslint-disable react-refresh/only-export-components -- the public provider API intentionally co-locates its hooks. */
+
 import {
+  useCallback,
   createContext,
   useContext,
   useEffect,
-  useRef,
+  useMemo,
   useState,
   type ReactNode,
 } from 'react';
@@ -10,7 +13,17 @@ import type { IconDefinition } from './collections/icon-definition.js';
 
 // ─── Icon Registry Context ────────────────────────────────────────────────────
 
-const IconRegistryContext = createContext<Map<string, string>>(new Map());
+interface IconRegistryContextValue {
+  registry: Map<string, string>;
+  register: (icons: readonly IconDefinition[]) => void;
+}
+
+const EMPTY_REGISTRY = new Map<string, string>();
+const IconRegistryContext = createContext<IconRegistryContextValue>({
+  registry: EMPTY_REGISTRY,
+  register: () => undefined,
+});
+const EMPTY_ICONS: Readonly<Record<string, string>> = {};
 
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
@@ -19,10 +32,22 @@ interface IconRegistryProviderProps {
   children: ReactNode;
 }
 
-export function IconRegistryProvider({ icons = {}, children }: IconRegistryProviderProps) {
-  const [registry] = useState(() => new Map<string, string>(Object.entries(icons)));
+export function IconRegistryProvider({ icons = EMPTY_ICONS, children }: IconRegistryProviderProps) {
+  const [registeredIcons, setRegisteredIcons] = useState<Map<string, string>>(() => new Map());
+  const register = useCallback((definitions: readonly IconDefinition[]) => {
+    setRegisteredIcons((current) => {
+      const missing = definitions.filter(([name]) => !current.has(name));
+      if (missing.length === 0) return current;
+      return new Map([...current, ...missing]);
+    });
+  }, []);
+  const registry = useMemo(
+    () => new Map<string, string>([...registeredIcons, ...Object.entries(icons)]),
+    [icons, registeredIcons],
+  );
+  const value = useMemo(() => ({ registry, register }), [register, registry]);
   return (
-    <IconRegistryContext.Provider value={registry}>
+    <IconRegistryContext.Provider value={value}>
       {children}
     </IconRegistryContext.Provider>
   );
@@ -34,11 +59,8 @@ export function IconRegistryProvider({ icons = {}, children }: IconRegistryProvi
  * Returns the icon registry map. Use to look up SVG strings by name.
  */
 export function useIconRegistry(): Map<string, string> {
-  return useContext(IconRegistryContext);
+  return useContext(IconRegistryContext).registry;
 }
-
-/** Tracks which icon definition arrays have already been registered to avoid duplicates. */
-const _registered = new Set<readonly IconDefinition[]>();
 
 /**
  * Registers the given icon definitions into the nearest icon registry.
@@ -49,18 +71,9 @@ const _registered = new Set<readonly IconDefinition[]>();
  * will only be registered once per registry instance.
  */
 export function useIcons(arr: readonly IconDefinition[]): void {
-  const registry = useContext(IconRegistryContext);
-
-  const registryRef = useRef(registry);
-  registryRef.current = registry;
+  const { register } = useContext(IconRegistryContext);
 
   useEffect(() => {
-    if (_registered.has(arr)) return;
-    _registered.add(arr);
-    for (const [name, svg] of arr) {
-      if (!registryRef.current.has(name)) {
-        registryRef.current.set(name, svg);
-      }
-    }
-  }, [arr]);
+    register(arr);
+  }, [arr, register]);
 }

@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { Modal, Popover, Tooltip } from '../../src/index.js';
+import { Lightbox, Modal, Popover, Tooltip } from '../../src/index.js';
 import {
   expectFocused,
   expectNoA11yViolations,
@@ -51,5 +52,33 @@ describe('overlays', () => {
     await waitFor(() => expect(queryByRole('tooltip')).toBeInTheDocument());
     await user.tab();
     expect(queryByRole('tooltip')).not.toBeInTheDocument();
+  });
+
+  it('traps lightbox focus and restores it when closed', async () => {
+    function Harness() {
+      const [open, setOpen] = useState(false);
+      return (
+        <>
+          <button type="button" onClick={() => setOpen(true)}>Open gallery</button>
+          <Lightbox
+            images={[{ src: '/photo.jpg', alt: 'Sample photo' }]}
+            open={open}
+            zoomable={false}
+            onClose={() => setOpen(false)}
+          />
+        </>
+      );
+    }
+
+    const { getByRole, user } = renderWithSpruce(<Harness />);
+    const trigger = getByRole('button', { name: 'Open gallery' });
+    await user.click(trigger);
+    const dialog = getByRole('dialog', { name: 'Sample photo' });
+    await waitFor(() => expectFocused(dialog));
+
+    await user.keyboard('{Shift>}{Tab}{/Shift}');
+    expectFocused(getByRole('button', { name: 'Close lightbox' }));
+    await pressKey(user, 'Escape');
+    await waitFor(() => expectFocused(trigger));
   });
 });

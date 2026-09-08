@@ -193,7 +193,7 @@ export function DatePicker({
     return p ? p.month : new Date().getMonth() + 1;
   });
   const [focusedDate, setFocusedDate] = useState<string | null>(null);
-  const [inputText, setInputText] = useState('');
+  const [inputText, setInputText] = useState(() => formatInputValue(value));
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);

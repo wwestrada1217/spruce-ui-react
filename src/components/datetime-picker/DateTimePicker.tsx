@@ -131,7 +131,7 @@ function parseISO(raw: string | null | undefined): ParsedDateTime | null {
   const month = parseInt(dateMatch[2], 10) - 1; // 0-indexed
   const day = parseInt(dateMatch[3], 10);
 
-  if (month < 0 || month > 11 || day < 1 || day > 31) return null;
+  if (year < 1 || month < 0 || month > 11 || day < 1 || day > getDaysInMonth(year, month)) return null;
 
   const timeMatch = timePart.match(/^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?$/);
   if (!timeMatch) return null;
@@ -166,12 +166,14 @@ function parseInputString(
   const second = match[6] ? parseInt(match[6], 10) : 0;
   const period = match[7]?.toUpperCase();
 
+  if (period && (hour < 1 || hour > 12)) return null;
+
   if (period === 'PM' && hour < 12) hour += 12;
   if (period === 'AM' && hour === 12) hour = 0;
 
   if (
     month < 0 || month > 11 ||
-    day < 1 || day > 31 ||
+    year < 1 || day < 1 || day > getDaysInMonth(year, month) ||
     hour < 0 || hour > 23 ||
     minute < 0 || minute > 59 ||
     second < 0 || second > 59
@@ -252,12 +254,13 @@ export function DateTimePicker({
   const [pos, setPos] = useState({ top: 0, left: 0 });
   const [panelReady, setPanelReady] = useState(false);
   const rafId = useRef(0);
+  const [initialParsed] = useState(() => parseISO(value));
 
-  const [viewMonth, setViewMonth] = useState(() => new Date().getMonth());
-  const [viewYear, setViewYear] = useState(() => new Date().getFullYear());
+  const [viewMonth, setViewMonth] = useState(() => initialParsed?.date.month ?? new Date().getMonth());
+  const [viewYear, setViewYear] = useState(() => initialParsed?.date.year ?? new Date().getFullYear());
   const [viewMode, setViewMode] = useState<'days' | 'months' | 'years'>('days');
   const [yearRangeStart, setYearRangeStart] = useState(() => {
-    const y = new Date().getFullYear();
+    const y = initialParsed?.date.year ?? new Date().getFullYear();
     return y - (y % 12);
   });
 
@@ -265,10 +268,11 @@ export function DateTimePicker({
     year: number;
     month: number;
     day: number;
-  } | null>(null);
-  const [hour24, setHour24] = useState(0);
-  const [minute, setMinute] = useState(0);
-  const [second, setSecond] = useState(0);
+  } | null>(initialParsed?.date ?? null);
+  const [hour24, setHour24] = useState(initialParsed?.hour ?? 0);
+  const [minute, setMinute] = useState(initialParsed?.minute ?? 0);
+  const [second, setSecond] = useState(initialParsed?.second ?? 0);
+  const [inputDraft, setInputDraft] = useState<string | null>(null);
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -286,7 +290,13 @@ export function DateTimePicker({
       setSecond(parsed.second);
       setViewMonth(parsed.date.month);
       setViewYear(parsed.date.year);
+    } else {
+      setSelectedDate(null);
+      setHour24(0);
+      setMinute(0);
+      setSecond(0);
     }
+    setInputDraft(null);
   }
 
   /* ── Display value ─────────────────────────────────────────────────────── */
@@ -344,6 +354,7 @@ export function DateTimePicker({
     setHour24(0);
     setMinute(0);
     setSecond(0);
+    setInputDraft(null);
     onChange?.(null);
     setOpen(false);
   }, [onChange]);
@@ -376,6 +387,7 @@ export function DateTimePicker({
   function toggleOpen() {
     if (disabled || contract.readOnly) return;
     if (!open) {
+      setInputDraft(null);
       const parsed = parseISO(value);
       if (parsed) {
         setSelectedDate(parsed.date);
@@ -397,6 +409,7 @@ export function DateTimePicker({
     const raw = e.target.value;
     const parsed = parseInputString(raw);
     if (parsed) {
+      setInputDraft(null);
       setSelectedDate(parsed.date);
       setHour24(parsed.hour);
       setMinute(parsed.minute);
@@ -405,6 +418,7 @@ export function DateTimePicker({
       setViewYear(parsed.date.year);
       onChange?.(buildISOValue(parsed.date, parsed.hour, parsed.minute, parsed.second, showSeconds));
     } else {
+      setInputDraft(raw);
       onChange?.(raw || null);
     }
   }
@@ -490,6 +504,7 @@ export function DateTimePicker({
   function selectDay(day: CalendarDay) {
     if (day.isOtherMonth && !selectOtherMonths) return;
     setSelectedDate({ year: day.year, month: day.month, day: day.day });
+    setInputDraft(null);
   }
 
   function selectMonth(month: number) {
@@ -950,7 +965,7 @@ export function DateTimePicker({
             className="sp-dtp__input"
             type="text"
             placeholder={inputPlaceholder || resolvedPlaceholder}
-            value={displayValue}
+            value={inputDraft ?? displayValue}
             disabled={disabled}
             readOnly={contract.readOnly}
             onChange={handleInputChange}

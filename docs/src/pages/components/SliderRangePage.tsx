@@ -15,6 +15,7 @@ interface Section { id: string; label: string }
 const SECTIONS: Section[] = [
   { id: 'slider-basic',    label: 'Slider' },
   { id: 'slider-step',     label: 'Slider with Step' },
+  { id: 'slider-no-value', label: 'Slider without Value' },
   { id: 'range-basic',     label: 'Range' },
   { id: 'range-step',      label: 'Range with Step' },
   { id: 'disabled',        label: 'Disabled' },
@@ -55,6 +56,16 @@ export function SliderRangePage() {
           <CodePreview code={SLIDER_STEP_CODE}>
             <div style={{ maxWidth: 400 }}>
               <Slider defaultValue={50} step={10} showTicks />
+            </div>
+          </CodePreview>
+        </section>
+
+        <section id="slider-no-value" className="demo-section" aria-labelledby="slider-no-value-heading">
+          <h2 id="slider-no-value-heading">Slider without a Value Label</h2>
+          <p className="section-desc">Hide the visible value when surrounding content already communicates it.</p>
+          <CodePreview code={SLIDER_NO_VALUE_CODE}>
+            <div style={{ maxWidth: 400 }}>
+              <Slider defaultValue={30} showValue={false} ariaLabel="Example value" />
             </div>
           </CodePreview>
         </section>

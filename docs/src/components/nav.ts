@@ -283,6 +283,7 @@ const RAW_NAV_SECTIONS: NavSection[] = [
       { icon: 'chevron-up',   label: 'Hide on Scroll',  route: '#/utils/hide-on-scroll'  },
       { icon: 'more-vertical',label: 'Overflow',        route: '#/utils/overflow'        },
       { icon: 'app-window',   label: 'Code Preview',    route: '#/utils/code-preview'    },
+      { icon: 'app-window',   label: 'Documentation Platform', route: '#/utils/docs-platform' },
     ],
   },
   {
@@ -299,6 +300,7 @@ const RAW_NAV_SECTIONS: NavSection[] = [
       { icon: 'bar-chart',       label: 'Charts',             route: '#/blocks/charts'             },
       { icon: 'shield',          label: 'Privacy & Cookie Consent', route: '#/blocks/cookie-consent' },
       { icon: 'table',           label: 'Operations Grid',    route: '#/blocks/operations-grid'   },
+      { icon: 'route',           label: 'REST Client Workflow', route: '#/blocks/rest-client-workflow' },
       { icon: 'trending-up',     label: 'Stocks App',         route: '#/blocks/stocks'             },
     ],
   },
